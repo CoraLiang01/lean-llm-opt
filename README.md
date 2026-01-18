@@ -13,8 +13,8 @@ This repository accompanies the paper: https://papers.ssrn.com/sol3/papers.cfm?a
 2. **Test_Dataset/**  
    - Contains test datasets, including:
      - Air_NRM (Singapore Airlines use case)  
-     - Large-scale-or (70 benchmarks)  
-     - Small-scale (NL4OPT and IndustryOR)
+     - Large-scale-or (101 benchmarks)  
+     - Small-scale Benchmarks
 
 3. **Results/**  
    - Contains all numerical results in the paper
@@ -25,16 +25,22 @@ This repository accompanies the paper: https://papers.ssrn.com/sol3/papers.cfm?a
 5. **Ablation_Study_Air_NRM_RAG_Only.ipynb**  
    - Another ablation study focusing on RAG-Only setting for the Air_NRM use case.
 
-6. **LEAN_LLM_OPT_Air_NRM.ipynb**  
-   - Implements the LEAN-LLM-OPT framework for the Air_NRM scenario.
+6. **LEAN_LLM_OPT_4.1_Air_NRM.ipynb**  
+   - Implements the LEAN-LLM-OPT framework based on GPT-4.1 for the Air_NRM scenario.
 
-7. **LEAN_LLM_OPT_Large-scale-or.ipynb**  
-   - Implements the LEAN-LLM-OPT framework for large-scale and small-scale experiments.
+7. **LEAN_LLM_OPT_gpt_oss_20b_Air_NRM.ipynb**  
+   - Implements the LEAN-LLM-OPT framework based on gpt-oss-20b for the Air_NRM scenario.
 
-8. **README.md**  
+8. **LEAN_LLM_OPT_4.1_Large-scale-or.ipynb**  
+   - Implements the LEAN-LLM-OPT framework based on GPT-4.1 for large-scale and small-scale experiments.
+
+9. **LEAN_LLM_OPT_gpt_oss_20b_Large-scale-or.ipynb**  
+   - Implements the LEAN-LLM-OPT framework based on gpt-oss-20b for large-scale and small-scale experiments.
+
+10. **README.md**  
    - The current project description (this file).
 
-9. **requirements.txt**  
+11. **requirements.txt**  
    - Lists required Python packages.  
 #### Installation
 Prerequisites:

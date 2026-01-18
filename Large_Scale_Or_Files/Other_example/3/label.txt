@@ -1,0 +1,114 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+# ================================
+# Capacitated Facility Location (15 customers × 10 centres)
+# Capacity: each opened centre may serve at most 4 customers
+# Data consistent with the modeling and CSVs previously provided
+# ================================
+
+# Sets
+customers = range(1, 16)  # C1..C15
+centres   = range(1, 11)  # SC1..SC10
+
+# Fixed opening costs F_j for centres SC1..SC10
+fixed_cost_list = [385.1, 546.3, 485.2, 448.1, 324.1, 323.9, 296.5, 522.7, 448.7, 478.7]
+fixed_cost = {j: fixed_cost_list[j-1] for j in centres}
+
+# Assignment (service) cost matrix c_{ij}: rows = customers C1..C15, cols = centres SC1..SC10
+service_cost_matrix = [
+    # SC1   SC2   SC3   SC4   SC5   SC6   SC7   SC8   SC9   SC10
+    [15.1, 21.2, 14.9, 18.8, 22.9, 16.8, 16.5,  9.4, 16.1, 17.3],  # C1
+    [13.4, 16.3, 20.2, 19.6, 20.9, 22.1, 16.9,  9.4, 13.8, 11.7],  # C2
+    [15.2, 18.8, 14.7, 21.7, 18.1, 18.6, 12.3, 11.2, 11.9, 20.4],  # C3
+    [16.8, 19.1, 18.3, 18.8, 23.1, 15.7, 13.1,  8.6, 15.6, 22.2],  # C4
+    [13.4, 18.6, 20.8, 19.8, 22.1, 18.1, 16.7, 12.1, 11.4, 18.2],  # C5
+    [12.5, 22.5, 15.5, 14.9, 21.6, 21.3, 16.1, 10.7, 11.9, 14.6],  # C6
+    [12.1, 17.1, 19.8, 18.6, 22.1, 20.7, 20.5, 12.2, 15.4, 18.7],  # C7
+    [12.3, 15.7, 17.9, 21.3, 22.7, 15.3, 16.6, 11.4, 14.1, 20.1],  # C8
+    [16.3, 21.3, 17.6, 20.8, 21.8, 17.2, 15.5, 12.6, 19.9, 19.1],  # C9
+    [12.1, 18.7, 14.4, 20.1, 22.7, 14.1, 18.1, 11.4, 18.1, 17.4],  # C10
+    [16.7, 18.7, 15.7, 19.9, 24.2, 18.7, 14.2, 13.1, 14.7, 16.1],  # C11
+    [11.3, 23.8, 15.5, 17.3, 23.2, 17.7, 16.8, 14.5, 15.8, 17.8],  # C12
+    [15.1, 20.5, 15.1, 18.4, 20.6, 17.9, 14.5,  8.5, 14.9, 13.9],  # C13
+    [ 8.3, 20.7, 14.7, 20.4, 20.6, 14.8, 14.2, 11.5, 14.1, 15.1],  # C14
+    [12.1, 16.3, 16.4, 15.1, 21.3, 19.1, 19.5, 16.7, 11.1, 18.7],  # C15
+]
+
+# Build assignment cost dict {(i,j): c_ij}
+assign_cost = {(i, j): service_cost_matrix[i-1][j-1] for i in customers for j in centres}
+
+# Capacity: each opened centre can serve at most 4 customers
+cap = 4
+
+# ----------------
+# Model
+# ----------------
+m = gp.Model("Facility_Location_Capacity_4")
+
+# Decision variables
+y = m.addVars(centres, vtype=GRB.BINARY, name="y")                     # y_j = 1 if centre j is opened
+x = m.addVars(customers, centres, vtype=GRB.BINARY, name="x")          # x_ij = 1 if customer i served by centre j
+
+# Objective: minimize total fixed + assignment costs
+m.setObjective(
+    gp.quicksum(fixed_cost[j] * y[j] for j in centres) +
+    gp.quicksum(assign_cost[(i, j)] * x[i, j] for i in customers for j in centres),
+    GRB.MINIMIZE
+)
+
+# Constraints:
+# 1) Each customer assigned to exactly one centre
+for i in customers:
+    m.addConstr(gp.quicksum(x[i, j] for j in centres) == 1, name=f"assign_{i}")
+
+# 2) Assignment only allowed to open centres
+for i in customers:
+    for j in centres:
+        m.addConstr(x[i, j] <= y[j], name=f"openlink_{i}_{j}")
+
+# 3) Capacity: each opened centre serves at most 4 customers
+for j in centres:
+    m.addConstr(gp.quicksum(x[i, j] for i in customers) <= cap * y[j], name=f"capacity_{j}")
+
+# (Optional) MIP settings
+# m.Params.MIPFocus = 1
+# m.Params.TimeLimit = 60
+
+# Solve
+m.optimize()
+
+# ----------------
+# Reporting
+# ----------------
+if m.Status == GRB.OPTIMAL:
+    print(f"Optimal objective value (total cost): {m.ObjVal:.3f}")
+
+    open_centres = [j for j in centres if y[j].X > 0.5]
+    print(f"Opened centres: {open_centres}")
+
+    # Customer → Centre assignment
+    assignment = {}
+    for i in customers:
+        for j in centres:
+            if x[i, j].X > 0.5:
+                assignment[i] = j
+                break
+
+    print("Assignments (customer -> centre):")
+    for i in customers:
+        print(f"  C{i} -> SC{assignment[i]} (cost {assign_cost[(i, assignment[i])]:.1f})")
+
+    # Cost breakdown
+    fixed_total = sum(fixed_cost[j] for j in open_centres)
+    var_total = sum(assign_cost[(i, assignment[i])] for i in customers)
+    print(f"Fixed cost total: {fixed_total:.3f}")
+    print(f"Assignment cost total: {var_total:.3f}")
+
+    # Capacity check
+    print("Load per opened centre (customers served):")
+    for j in open_centres:
+        served = sum(1 for i in customers if x[i, j].X > 0.5)
+        print(f"  SC{j}: {served} (cap {cap})")
+else:
+    print(f"Optimization ended with status code {m.Status}")
