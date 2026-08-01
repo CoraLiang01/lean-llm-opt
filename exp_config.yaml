@@ -1,0 +1,356 @@
+# =============================================================================
+# exp_config.yaml  --  single source of truth for every LEAN-LLM-OPT experiment
+# =============================================================================
+# Every number the reviewers asked us to disclose lives here and here only:
+# model versions, decoding parameters, retrieval settings, agent limits,
+# retry policy, solver limits, and the price table used for cost accounting.
+#
+# The file is hashed (sha256) into every run log, so a run can always be tied
+# back to the exact settings that produced it.
+#
+# Paths below are relative to this file, i.e. the repository root. Notebooks
+# are launched from the repository root, so they resolve as-is.
+# -----------------------------------------------------------------------------
+
+common:
+  # ---- reproducibility ------------------------------------------------------
+  seed: 20250101
+  n_repeats: 3                      # >1 -> report mean +/- std, not a single run
+  max_retries: 3
+  retry_backoff_s: 5.0
+  sleep_between_instances_s: 0.0    # replaces the ad-hoc time.sleep(15)
+  solver_time_limit_s: 300.0
+  # Hard spending cap per run. Checked after every instance, so the overshoot
+  # is at most one instance. Set to 0 to disable. A full 101-instance
+  # Large-Scale-OR run measured ~$3.2, so $10 leaves headroom without letting
+  # a runaway loop empty the account.
+  budget_usd_per_run: 10.0
+
+  # ---- retrieval ------------------------------------------------------------
+  # These are the values the notebooks ACTUALLY use, transcribed call site by
+  # call site. k is load-bearing here (k=1000 pulls a whole table into context,
+  # k=1 is a single-row lookup), so nothing is normalised to a common value --
+  # the point is that the settings are now disclosed in one place rather than
+  # buried in 20 cells. If you decide to unify any of them, change it here and
+  # re-run; the config hash in the run id will change accordingly.
+  retriever_search_type: similarity
+  retriever_max_tokens_limit: null
+  retriever_k:
+    default: 5
+
+  retrievers:
+    # -- classification over RefData.csv ------------------------------------
+    refdata:              {k: 5}
+    # -- Large-Scale-OR, GPT-4.1 notebook -----------------------------------
+    examples_nrm:         {k: 1}      # cell 7,  few-shot exemplar retrieval
+    data_nrm:             {k: 1000}   # cell 7,  row retrieval from user CSV
+    examples_ra:          {k: 3}      # cell 9
+    data_ra:              {k: 220}    # cell 9
+    examples_tp:          {k: 3}      # cell 11
+    data_tp:              {k: 300}    # cell 11
+    examples_ap:          {k: 1, max_tokens_limit: 400}   # cell 13
+    data_ap:              {k: 1, max_tokens_limit: 400}   # cell 13
+    examples_flp:         {k: 1, max_tokens_limit: 400}   # cell 15
+    data_flp:             {k: 1, max_tokens_limit: 400}   # cell 15
+    examples_others:      {k: 1}      # cell 17, retrieve_examples() default
+    examples_others_nocsv: {k: 5}     # cell 19
+    # -- Large-Scale-OR, gpt-oss-20b notebook -------------------------------
+    oss_refdata:          {k: 5}      # cell 6,  retrieve_ref_examples default
+    oss_examples:         {k: 1}      # cell 6,  retrieve_examples default
+    oss_data_nrm:         {k: 300}    # cell 10
+    oss_data_ra:          {k: 400}    # cell 12
+    oss_data_ap:          {k: 400}    # cell 14
+    oss_data_flp:         {k: 400}    # cell 16
+    oss_examples_nocsv:   {k: 5}      # cell 22
+    # -- Air-NRM (both notebooks + both ablations) --------------------------
+    air_flight:           {k: 1}      # filtered by OD + departure time
+    air_demand:           {k: 1}      # OD-level demand lookup
+    air_examples:         {k: 1}      # SBLP exemplar retrieval
+
+  # ---- classification -------------------------------------------------------
+  # Which RefData columns the classifier retrieves over. The original code used
+  # CSVLoader, which put every column into every document -- including `Label`
+  # (the complete mathematical model) and `Label_Code`. With k=5 and
+  # chain_type="stuff" that pasted five full formulations into the prompt just
+  # to decide the problem class, which they say nothing about.
+  classification:
+    refdata_file: Large_Scale_Or_Files/RefData.csv
+    # Data_address is kept because the file names themselves carry a strong
+    # signal about the problem class (supply_capacity.csv + transportation_
+    # costs.csv reads as a transportation problem). `Label` and `Label_Code`
+    # stay out: they are the largest columns and say nothing about the class.
+    refdata_columns: [prompt, Data_address, New Problem Type]
+    label_column: New Problem Type
+
+  # ---- agent ----------------------------------------------------------------
+  agent_type: ZERO_SHOT_REACT_DESCRIPTION
+  agent_max_iterations: 5           # was: unbounded in the 4.1 notebooks, 5 in the oss ones
+  agent_max_execution_time: 300.0
+  agent_early_stopping_method: force
+  handle_parsing_errors: true
+  verbose: false
+
+  # ---- logging --------------------------------------------------------------
+  out_dir: runs
+  log_prompts: true                 # referee 1 Q4: "report exact prompts"
+  log_raw_responses: true
+  token_fallback_encoder: o200k_base
+
+  # ---- hardware (for local-model runs; copied verbatim into config.json) ----
+  hardware_note: "TODO: e.g. 1x NVIDIA A100 80GB, Ollama 0.x, gpt-oss:20b Q4_K_M"
+
+# =============================================================================
+# Model profiles.  One profile == one row in the cost/accuracy comparison table.
+# `defaults` applies to all roles; a role block overrides it.
+# Roles: classifier | modeler | data_agent | coder
+# PRICES: USD per 1,000,000 tokens. Checked 2026-07-24; re-verify before the
+# camera-ready run and cite the date in the paper.
+# =============================================================================
+
+model_profiles:
+
+  # ---------------------------------------------------------------- GPT-4.1 --
+  gpt-4.1:
+    embedding_provider: openai
+    embedding_model: text-embedding-3-small
+    embedding_price_per_1m: 0.02         # checked 2026-07-24
+    defaults:
+      provider: openai
+      model: gpt-4.1-2025-04-14     # pin the dated snapshot, not the alias
+      temperature: 0.0
+      top_p: 1.0
+      n: 1
+      seed: 20250101
+      max_tokens: 8192
+      price_in_per_1m: 2.00
+      price_cached_in_per_1m: 0.50
+      price_out_per_1m: 8.00
+    roles:
+      classifier: {}                # NOTE: was gpt-4 in the old notebooks
+      modeler: {}
+      data_agent: {}
+      coder: {}
+
+  # --------------------------------------- GPT-4.1 via the OpenRouter gateway -
+  # Same model, different billing account. Useful when the group's OpenAI
+  # project has no quota. OpenRouter is OpenAI-API-compatible, so only base_url,
+  # the model slug and the key variable change -- no code differences.
+  # Per-token list price matches OpenAI direct ($2 / $8 per 1M); OpenRouter
+  # takes its margin on credit top-ups, not per token, so the logged cost is
+  # the model cost. Note that in the paper this is still "GPT-4.1", but the
+  # serving route should be disclosed: OpenRouter may dispatch to different
+  # upstream hosts, so outputs are not guaranteed bit-identical to OpenAI direct.
+  openrouter-gpt-4.1:
+    embedding_provider: openai
+    embedding_model: openai/text-embedding-3-small
+    embedding_base_url: https://openrouter.ai/api/v1
+    embedding_api_key_env: OPENROUTER_API_KEY
+    embedding_price_per_1m: 0.02
+    defaults:
+      provider: openai
+      model: openai/gpt-4.1
+      base_url: https://openrouter.ai/api/v1
+      api_key_env: OPENROUTER_API_KEY
+      temperature: 0.0
+      top_p: 1.0
+      n: 1
+      seed: null                    # some upstream hosts reject `seed`
+      max_tokens: 8192
+      price_in_per_1m: 2.00
+      price_cached_in_per_1m: 0.50
+      price_out_per_1m: 8.00
+    roles:
+      classifier: {}
+      modeler: {}
+      data_agent: {}
+      coder: {}
+
+  # ------------------------------------------------------------ gpt-oss-20b --
+  gpt-oss-20b:
+    embedding_provider: ollama
+    embedding_model: nomic-embed-text
+    embedding_base_url: http://localhost:11434
+    embedding_price_per_1m: 0.0          # local server
+    defaults:
+      provider: ollama
+      model: gpt-oss:20b
+      temperature: 0.0
+      top_p: 1.0
+      seed: 20250101
+      max_tokens: 8192
+      base_url: http://localhost:11434
+      # Local inference: monetary price 0; we report GPU wall-clock instead.
+      price_in_per_1m: 0.0
+      price_out_per_1m: 0.0
+    roles:
+      classifier: {}
+      modeler: {}
+      data_agent: {}
+      coder: {}
+
+  # ------------------------------- smoke-test profile: small local model -----
+  # NOT for paper results. A 3B model is too weak to formulate these problems,
+  # but it is enough to check that routing, logging, token accounting and the
+  # aggregation tables all work end to end without spending anything.
+  #   ollama pull llama3.2:3b && ollama pull nomic-embed-text
+  ollama-small:
+    embedding_provider: ollama
+    embedding_model: nomic-embed-text
+    embedding_base_url: http://localhost:11434
+    embedding_price_per_1m: 0.0          # local server
+    defaults:
+      provider: ollama
+      model: llama3.2:3b
+      temperature: 0.0
+      top_p: 1.0
+      seed: 20250101
+      max_tokens: 2048
+      base_url: http://localhost:11434
+      price_in_per_1m: 0.0
+      price_out_per_1m: 0.0
+    roles:
+      classifier: {}
+      modeler: {}
+      data_agent: {}
+      coder: {}
+
+  # ------------------------------------------- single-call baseline: GPT-5.2 --
+  gpt-5.2:
+    embedding_provider: openai
+    embedding_model: text-embedding-3-small
+    embedding_price_per_1m: 0.02         # checked 2026-07-24
+    defaults:
+      provider: openai
+      model: gpt-5.2
+      # NOTE: the old Benchmark_Base_Model_Small_Scale.ipynb ran GPT-5 at
+      # temperature=1.0 while every other model ran at 0.0. Keep 0.0 unless the
+      # endpoint rejects it; if it does, record the deviation in `notes`.
+      temperature: 0.0
+      top_p: 1.0
+      max_tokens: 16384
+      price_in_per_1m: 0.88
+      price_cached_in_per_1m: 0.088
+      price_out_per_1m: 7.00
+    roles:
+      modeler: {}
+      coder: {}
+
+  # -------------------------------------- single-call baseline: Gemini 3 Pro --
+  gemini-3-pro:
+    embedding_provider: openai      # keep retrieval identical across profiles
+    embedding_model: text-embedding-3-small
+    defaults:
+      provider: google
+      model: gemini-3-pro
+      temperature: 0.0
+      top_p: 1.0
+      max_tokens: 16384
+      # <=200K-token prompts; the long-context tier is ~2x and must be flagged
+      # if any instance exceeds 200K tokens
+      price_in_per_1m: 2.00
+      price_out_per_1m: 12.00
+    roles:
+      modeler: {}
+      coder: {}
+
+# =============================================================================
+# Methods (pipeline variants). `method` is a free-form string passed to
+# load_config(); listed here so the ablation grid is documented in one place.
+# The notebook column says which file currently implements each variant.
+# =============================================================================
+methods:
+  LEAN-LLM-OPT:
+    desc: full pipeline (classification + type-tailored workflow + data tools)
+    notebooks:
+      - LEAN_LLM_OPT_4.1_Large-scale-or.ipynb
+      - LEAN_LLM_OPT_4.1_Air_NRM.ipynb
+      - LEAN_LLM_OPT_gpt_oss_20b_Large-scale-or.ipynb
+      - LEAN_LLM_OPT_gpt_oss_20b_Air_NRM.ipynb
+  Abl-RAGOnly:
+    desc: retrieval only, no type-tailored workflow
+    notebooks: [Ablation_Study_Air_NRM_RAG_Only.ipynb]
+  Abl-FewShotOnly:
+    desc: static few-shot exemplars, no retrieval, no workflow
+    notebooks: [Ablation_Study_Air_NRM_Few-shot_Only.ipynb]
+  Base-SingleCall:
+    desc: one prompt, one call, dataset schema pasted in
+    notebooks: [Benchmark_Base_Model_Small_Scale.ipynb]
+  # --- still to be implemented (referee 1 Q3/Q4, referee 2 Q5) --------------
+  Abl-NoWorkflow:      {desc: LLM + data tools, no type-tailored workflow}
+  Abl-NoDataTools:     {desc: LLM + retrieved examples, no CSVQA / FileQA tools}
+  Abl-PandasOnly:      {desc: LLM + raw pandas access, no retrieval, no workflow}
+  Abl-OracleType:      {desc: ground-truth problem type injected (bypasses classifier)}
+  Abl-WrongRouting:    {desc: deliberately routed to an incorrect workflow}
+  Base-OptiMUS:        {desc: OptiMUS as published, run on our benchmark}
+  Base-OptiMUS-native: {desc: OptiMUS on NLP4LP (its intended setting)}
+
+# =============================================================================
+# Datasets -- verified against the repository on 2026-07-24
+# =============================================================================
+datasets:
+  Large-Scale-OR: Test_Dataset/Large-scale-or/Large-scale-or-101.csv
+  # Air-NRM has two cases under Test_Dataset/Air_NRM/, both built from
+  # Singapore Airlines data: small_scale/ is the 3-airport toy instance the
+  # notebooks currently run; large_scale/ is the SQ direct 2-city real-data
+  # build (90 ODs / 268 departures). See Test_Dataset/Air_NRM/README.md.
+  Air-NRM-CA:     Test_Dataset/Air_NRM/small_scale/query_CA.csv
+  Air-NRM-NP:     Test_Dataset/Air_NRM/small_scale/query_NP_Flow.csv
+  Air-NRM-CA-LS:  Test_Dataset/Air_NRM/large_scale/query_largescale_CA.csv
+  NL4OPT:         Test_Dataset/Small-scale/NL4OPT NEW.csv
+  IndustryOR:     Test_Dataset/Small-scale/IndustryOR_fixedV2.csv
+  MAMO-easy:      Test_Dataset/Small-scale/MAMO_EasyLP_fixed.csv
+  MAMO-complex:   Test_Dataset/Small-scale/MAMO_ComplexLP_fixed.csv
+  # not yet in the repo -- referee 2 Q1 asks for these two
+  ComplexOR:      null
+  OptiBench:      null
+
+# =============================================================================
+# Dataset column mapping
+# =============================================================================
+# The benchmark CSVs came from different sources and name the same things
+# differently -- Large-Scale-OR calls the ground-truth optimum
+# `Label-objective`, every small-scale set calls it `Label`. Hard-coding one
+# name means the other datasets score as "no ground truth available", which
+# looks like a modelling failure and is really a column-name mismatch.
+#
+# `candidates` is tried in order against the CSV's actual columns; the first
+# match wins. `overrides` pins a specific dataset when the generic search would
+# guess wrong. A field that matches nothing is simply absent -- that is a real
+# answer for e.g. Air-NRM, which ships no ground-truth objective.
+dataset_columns:
+  candidates:
+    query:            [Query, query, question, Question, problem, Problem]
+    gold_objective:   [Label-objective, Label, label, objective, Objective,
+                       answer, Answer, optimal_value]
+    gold_type:        [Problem Type, problem_type, Type, type]
+    dataset_address:  [Dataset_address, dataset_address, data_files, Data_address]
+    size_class:       [Type by size, size_class, size]
+
+  overrides:
+    # MAMO ships `original_answer` AND a misspelled `orginal_answer`, both
+    # empty in the current files. `Label` is the column actually populated;
+    # name it explicitly so neither empty column can win by accident.
+    MAMO-easy:      {gold_objective: Label}
+    MAMO-complex:   {gold_objective: Label}
+    # Air-NRM small_scale carries ground truth again as of 2026-07-31: the
+    # objectives were always in SBLP_*_Label/, but the query files did not
+    # expose them, so nothing could score this dataset. link_air_nrm_labels.py
+    # copies them across as `Label-objective` after verifying row alignment;
+    # the generic candidate list picks that up, so no override is needed.
+    #
+    # large_scale is different -- no reference .lp files have been generated
+    # for it yet, so it genuinely has no ground truth.
+    Air-NRM-CA-LS:  {gold_objective: null}
+
+# Reference / RAG corpora (read by the classification and few-shot agents)
+reference_files:
+  refdata:          Large_Scale_Or_Files/RefData.csv
+  examples_NRM:     Large_Scale_Or_Files/RAG_Example_NRM2_MD.csv
+  examples_RA:      Large_Scale_Or_Files/RAG_Example_RA2_MD.csv
+  examples_TP:      Large_Scale_Or_Files/RAG_Example_TP2_MD.csv
+  examples_AP:      Large_Scale_Or_Files/RAG_Example_AP2_MD.csv
+  examples_FLP:     Large_Scale_Or_Files/RAG_Example_FLP2_MD.csv
+  examples_Others:  Large_Scale_Or_Files/RAG_Example_Others.csv
+  examples_OthersNoCSV: Large_Scale_Or_Files/RAG_Example_Others_Without_CSV.csv
+  examples_SBLP_CA:   Large_Scale_Or_Files/RAG_Example_SBLP_CA.csv
+  examples_SBLP_Flow: Large_Scale_Or_Files/RAG_Example_SBLP_Flow.csv
