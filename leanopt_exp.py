@@ -75,7 +75,13 @@ __all__ = [
     "ensure_api_keys", "load_refdata", "load_refdata_docs",
     "refdata_token_report",
     "RunLogger", "InstanceRecord", "call_with_retry", "environment_manifest",
+    "dataset_fingerprint",
 ]
+
+# Repository root. Dataset paths in exp_config.yaml are written relative to it,
+# and resolving them here rather than against the caller's cwd keeps them valid
+# whether the entry point is a notebook, a script, or run_notebook.py.
+HERE = Path(__file__).resolve().parent
 
 # --------------------------------------------------------------------------- #
 # 0.  Configuration objects
@@ -235,6 +241,56 @@ def _pkg_versions() -> Dict[str, str]:
     return out
 
 
+def dataset_fingerprint(path: str | Path | None) -> Dict[str, Any]:
+    """Identify the dataset file a run actually read.
+
+    `config_sha256` fixes the settings but says nothing about the data: the
+    config records a *path*, so editing the file it points at leaves the hash
+    untouched. Two runs can therefore carry an identical config hash and have
+    been measured on different problems -- which happened here on 2026-08-02,
+    when a 101-instance file was temporarily replaced by a 14-instance one and
+    nothing in the log showed it.
+
+    So hash the bytes too. Any edit to the dataset changes `sha256`, and
+    `rows` makes the common case (a different number of instances) readable
+    without comparing hashes by eye.
+
+    A missing file is recorded rather than raised on: this runs at config load,
+    long before anything would actually read the data, and failing here would
+    turn a dry-run or a preflight import into an error.
+    """
+    if not path:
+        return {"path": None, "present": False}
+    p = Path(path)
+    if not p.is_absolute():
+        p = HERE / p
+    if not p.exists():
+        return {"path": str(path), "present": False}
+
+    h = hashlib.sha256()
+    with p.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+
+    out: Dict[str, Any] = {
+        "path": str(path),
+        "present": True,
+        "sha256": h.hexdigest(),
+        "bytes": p.stat().st_size,
+        "mtime_utc": datetime.utcfromtimestamp(p.stat().st_mtime).isoformat(
+            timespec="seconds") + "Z",
+    }
+    # Row count via pandas rather than counting newlines: several of these CSVs
+    # embed newlines inside quoted fields (the Air-NRM queries do), so a line
+    # count would be wrong in exactly the files it matters for.
+    try:
+        import pandas as pd
+        out["rows"] = int(len(pd.read_csv(p)))
+    except Exception:                                     # noqa: BLE001
+        pass
+    return out
+
+
 def environment_manifest() -> Dict[str, Any]:
     """Provenance block -> answers 'report model versions / settings'."""
     try:
@@ -352,6 +408,8 @@ def load_config(path: str | Path,
     cfg.manifest = environment_manifest()
     cfg.manifest["config_file"] = str(path.resolve())
     cfg.manifest["config_sha256"] = hashlib.sha256(raw_text.encode()).hexdigest()
+    # config_sha256 covers the settings; this covers the data they point at.
+    cfg.manifest["dataset"] = dataset_fingerprint(cfg.dataset_path)
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     cfg.run_id = (f"{method}__{model_profile}__{dataset or 'na'}"
                   f"__r{repeat_index}__{stamp}__{cfg.config_hash()}")
@@ -1327,6 +1385,18 @@ class RunLogger:
         self._call_f = None
         self.records: List[InstanceRecord] = []
         print(f"[leanopt_exp] run_id = {cfg.run_id}")
+        # Show the dataset up front. Stored in config.json it is only auditable
+        # after the fact; printed here it is checkable before any money is
+        # spent -- "101 rows" vs "14 rows" is the cheapest possible way to
+        # notice you are not running what you think you are.
+        ds = (cfg.manifest or {}).get("dataset") or {}
+        if ds.get("present"):
+            rows = ds.get("rows")
+            print(f"[leanopt_exp] dataset  = {ds['path']}"
+                  f"{f' ({rows} rows)' if rows is not None else ''}"
+                  f"  sha256:{ds['sha256'][:12]}")
+        elif ds.get("path"):
+            print(f"[leanopt_exp] dataset  = {ds['path']}  !! file not found")
         print(f"[leanopt_exp] will log to {self._dir} (created on first result)")
 
     # ------------------------------------------------------------------ #
