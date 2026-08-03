@@ -186,9 +186,20 @@ def attach_gold(df: pd.DataFrame, gold_path: Path | None) -> pd.DataFrame:
 
 
 # --------------------------------------------------------------------------- #
-def cost_table(df: pd.DataFrame) -> pd.DataFrame:
-    """The headline table: accuracy vs. resource cost, per method/model/dataset."""
+def cost_table(df: pd.DataFrame, per_run: bool = False) -> pd.DataFrame:
+    """The headline table: accuracy vs. resource cost, per method/model/dataset.
+
+    With `per_run`, `run_id` joins the grouping keys. Merging every run of a
+    method into one row is only meaningful when those runs are repeats of the
+    same thing -- and they often are not. Our own first full table averaged a
+    101-instance run together with four 3-instance smoke tests, two of which
+    had been executed against an earlier version of the dataset, and reported
+    the result as a single 74.07% over "113 instances". The per-run table makes
+    that visible instead of dissolving it into an average.
+    """
     keys = ["dataset", "method", "model_profile"]
+    if per_run:
+        keys = keys + ["run_id"]
 
     def agg(x: pd.DataFrame) -> pd.Series:
         n = len(x)
@@ -317,6 +328,9 @@ def main():
     ap.add_argument("runs_dir", type=Path)
     ap.add_argument("-o", "--out", type=Path, default=Path("tables"))
     ap.add_argument("--gold", type=Path, default=None)
+    ap.add_argument("--run", default=None,
+                    help="substring filter on run_id; use it to report a "
+                         "single run instead of an average over several")
     ap.add_argument("--prune-empty", action="store_true",
                     help="delete run directories that hold no results "
                          "(left behind by re-running the config cell)")
@@ -338,6 +352,13 @@ def main():
     args.out.mkdir(parents=True, exist_ok=True)
 
     df = load_instances(args.runs_dir)
+    if args.run:
+        before = df["run_id"].nunique()
+        df = df[df["run_id"].str.contains(args.run, na=False)]
+        if df.empty:
+            raise SystemExit(f"no run_id contains {args.run!r}")
+        print(f"[aggregate_runs] --run {args.run!r}: "
+              f"{df['run_id'].nunique()} of {before} run(s) kept")
     df = attach_gold(df, args.gold)
     df.to_csv(args.out / "per_instance.csv", index=False)
 
@@ -350,6 +371,12 @@ def main():
              "recorded in the run configuration.",
              "tab:cost")
 
+    # Always emit the per-run breakdown alongside the merged table: the merged
+    # one hides whether its rows came from one run or from several that are not
+    # comparable. Cheap to produce, and the first thing to check.
+    ct_run = cost_table(df, per_run=True)
+    ct_run.to_csv(args.out / "cost_table_per_run.csv", index=False)
+
     sb = stage_breakdown(df)
     if not sb.empty:
         sb.to_csv(args.out / "stage_breakdown.csv", index=False)
@@ -359,6 +386,16 @@ def main():
         cr.to_csv(args.out / "classification.csv", index=False)
 
     print(ct.to_string(index=False))
+
+    if len(ct_run) > len(ct):
+        cols = [c for c in ("run_id", "n_instances", "n_unique_instances",
+                            "acc_optimal_%", "cost_usd_total", "latency_s_mean")
+                if c in ct_run.columns]
+        print("\nper run (the merged table above averages these together):")
+        show = ct_run[cols].copy()
+        show["run_id"] = show["run_id"].str.slice(-34)
+        print(show.to_string(index=False))
+
     print(f"\nwritten to {args.out.resolve()}")
 
 

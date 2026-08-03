@@ -49,6 +49,58 @@ def clean_code(code: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
+#: "Optimal objective 1.234e+05" as Gurobi prints it. One row of the 101-set
+#: has a whole solver transcript pasted into the label cell instead of a number.
+_GUROBI_OBJ_RE = re.compile(
+    r"optimal\s+objective\s*[:=]?\s*"
+    r"([-+]?\d[\d,]*\.?\d*(?:[eE][-+]?\d+)?)", re.I)
+
+#: Thousands separators, currency marks and stray whitespace. Not a general
+#: number parser -- anything outside this set is left to fail loudly.
+_NUMERIC_NOISE_RE = re.compile(r"[,\s$¥€£]")
+
+
+def parse_gold(value) -> float | None:
+    """Read a ground-truth objective that was entered by hand.
+
+    `Label-objective` is human-maintained, so it holds things `float()` cannot
+    take: `'11,258,129.67'`, `'$24,877.39 '`, and one cell containing an entire
+    Gurobi transcript. A bare `float()` turned all five into "no ground truth",
+    and an instance with no ground truth is dropped from the accuracy
+    denominator -- so a formatting quirk silently shrank the sample instead of
+    being reported.
+
+    Recovery is deliberately narrow: strip separators and currency marks, and
+    recognise Gurobi's own "Optimal objective ..." line. Anything else returns
+    None rather than guessing, because inventing a number here would turn a
+    visible gap into a wrong accuracy figure.
+    """
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        v = float(value)
+        return None if v != v else v            # NaN -> None
+    s = str(value).strip()
+    if not s:
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        pass
+    cleaned = _NUMERIC_NOISE_RE.sub("", s)
+    try:
+        return float(cleaned)
+    except ValueError:
+        pass
+    m = _GUROBI_OBJ_RE.search(s)
+    if m:
+        try:
+            return float(m.group(1).replace(",", ""))
+        except ValueError:
+            pass
+    return None
+
+
 def data_dir_for(rec: dict) -> Path | None:
     """Directory the generated code should run in, from `dataset_address`.
 
@@ -109,7 +161,18 @@ def _solve_worker(code: str, time_limit: float, q, workdir: str | None = None):
                 if isinstance(v, gp.Model):
                     model = v
             if model is None:
-                q.put({"ok": False, "error": "no gurobipy Model in namespace"})
+                # The generated code is written from a few-shot template that
+                # wraps everything in `try: ... except Exception as e: print(e,
+                # file=sys.stderr)`. So a failure does not propagate: the code
+                # "succeeds", `m` is never bound, and the only symptom left is
+                # a missing Model. Reporting just that discards the one thing
+                # that explains it -- the message the code printed on its way
+                # down, which this buffer is holding right now.
+                tail = buf.getvalue().strip().replace("\n", " | ")[-300:]
+                q.put({"ok": False,
+                       "error": "no gurobipy Model in namespace"
+                                + (f" -- code output: {tail}" if tail else
+                                   " (and it printed nothing)")})
                 return
             status = model.Status
             res = {
@@ -196,6 +259,9 @@ def score_run(run_dir: Path, tol: float, time_limit: float) -> pd.DataFrame:
     # through the same logger after reset_index(drop=True) -- in that case the
     # earlier results are silently lost, which must not pass unnoticed.
     latest, seen = {}, {}
+    # Ground-truth values that are present but unreadable; reported at the end
+    # so an instance never leaves the accuracy denominator silently.
+    unparsed: list[tuple] = []
     for line in lines:
         d = json.loads(line)
         iid = d.get("instance_id")
@@ -211,10 +277,11 @@ def score_run(run_dir: Path, tol: float, time_limit: float) -> pd.DataFrame:
     for iid, d in sorted(latest.items(), key=lambda kv: (kv[0] is None, kv[0])):
         code = clean_code(d.get("code_output") or "")
         gold = d.get("gold_objective")
-        try:
-            gold_val = float(gold)
-        except (TypeError, ValueError):
-            gold_val = None
+        gold_val = parse_gold(gold)
+        if gold_val is None and gold not in (None, ""):
+            # Present but unreadable. Say so: this instance is about to drop
+            # out of the accuracy denominator, and that should never be quiet.
+            unparsed.append((iid, str(gold)[:60].replace("\n", " ")))
 
         # Generated code addresses its data in one of two incompatible ways,
         # and neither is wrong -- nothing in the prompt ever fixes a working
@@ -253,6 +320,15 @@ def score_run(run_dir: Path, tol: float, time_limit: float) -> pd.DataFrame:
             # visible so the retry in solve_anywhere() stays auditable
             "workdir_used": r.get("workdir_used"),
         })
+
+    if unparsed:
+        print(f"  ! {run_dir.name}: {len(unparsed)} ground-truth value(s) could "
+              f"not be read as a number, so those instances are excluded from "
+              f"the accuracy denominator:")
+        for iid, raw in unparsed[:5]:
+            print(f"      [{iid}] {raw!r}")
+        if len(unparsed) > 5:
+            print(f"      ... and {len(unparsed) - 5} more")
 
     df = pd.DataFrame(rows)
     if not df.empty:
@@ -307,6 +383,15 @@ def main() -> int:
     print(f"\n{len(combined)} instances scored across {len(all_df)} runs")
     print(f"gold labels -> {args.out}")
 
+    # Written unconditionally. This used to sit inside the `if not sc.empty`
+    # below, so a run in which nothing solved left the previous run's file in
+    # place -- and the stale contents then read as if they belonged to the run
+    # just scored. A run where everything failed is exactly when the detail is
+    # most worth having.
+    scored_all = args.out.with_name("scored_all.csv")
+    combined.to_csv(scored_all, index=False)
+    print(f"per-instance detail -> {scored_all}")
+
     # scale statistics -- Referee 2 Q2 asks for exactly this
     sc = combined[combined["n_vars"].notna()]
     if not sc.empty:
@@ -315,8 +400,8 @@ def main() -> int:
             s = sc[col]
             print(f"  {col:<12} min {s.min():>8.0f}  median {s.median():>8.0f}  "
                   f"max {s.max():>8.0f}")
-        combined.to_csv(args.out.with_name("scored_all.csv"), index=False)
-        print(f"per-instance detail -> {args.out.with_name('scored_all.csv')}")
+    else:
+        print("\nno instance produced a solvable model in this selection.")
 
     print("\nnext: python aggregate_runs.py runs/ -o tables/ "
           f"--gold {args.out}")
