@@ -1,0 +1,39 @@
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+cost_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others4/cost.csv', sep=',')
+foods = cost_df['Food'].astype(str).tolist()
+calories = dict(zip(cost_df['Food'].astype(str), cost_df['Calories'].astype(float)))
+protein = dict(zip(cost_df['Food'].astype(str), cost_df['Protein(g)'].astype(float)))
+fat = dict(zip(cost_df['Food'].astype(str), cost_df['Fat(g)'].astype(float)))
+vitamin_c = dict(zip(cost_df['Food'].astype(str), cost_df['VitaminC(mg)'].astype(float)))
+cost = dict(zip(cost_df['Food'].astype(str), cost_df['Cost'].astype(float)))
+for f in foods:
+    if f not in calories or f not in protein or f not in fat or (f not in vitamin_c) or (f not in cost):
+        raise ValueError(f'Missing parameter(s) for food: {f}')
+m = gp.Model('MealPlanMinCost')
+x = m.addVars(foods, lb=0.0, vtype=gp.GRB.CONTINUOUS, name='')
+m.setObjective(gp.quicksum((cost[f] * x[f] for f in foods)), gp.GRB.MINIMIZE)
+m.addConstr(gp.quicksum((calories[f] * x[f] for f in foods)) >= 2000, name='calories_min')
+m.addConstr(gp.quicksum((protein[f] * x[f] for f in foods)) >= 50, name='protein_min')
+m.addConstr(gp.quicksum((vitamin_c[f] * x[f] for f in foods)) >= 60, name='vitaminc_min')
+m.addConstr(gp.quicksum((fat[f] * x[f] for f in foods)) <= 70, name='fat_max')
+m.optimize()
+if m.status == gp.GRB.OPTIMAL:
+    print(f'Optimal total cost: ${m.objVal:.2f}')
+    print('\n--- Optimal Meal Plan (servings per food) ---')
+    for f in foods:
+        if x[f].X > 1e-05:
+            print(f'{f}: {x[f].X:.3f} servings')
+    total_cal = sum((calories[f] * x[f].X for f in foods))
+    total_prot = sum((protein[f] * x[f].X for f in foods))
+    total_fat = sum((fat[f] * x[f].X for f in foods))
+    total_vitc = sum((vitamin_c[f] * x[f].X for f in foods))
+    print('\n--- Nutrition Totals ---')
+    print(f'Calories: {total_cal:.1f} kcal')
+    print(f'Protein: {total_prot:.1f} g')
+    print(f'Fat: {total_fat:.1f} g')
+    print(f'Vitamin C: {total_vitc:.1f} mg')
+else:
+    print(f'No optimal solution found. Status: {m.status}')
