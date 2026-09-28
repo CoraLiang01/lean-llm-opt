@@ -1,0 +1,14 @@
+fixed_cost.csv
+{"values": {"Unnamed: 0": "S1", "fixed_costs": "102.33"}}
+{"values": {"Unnamed: 0": "S2", "fixed_costs": "94.92"}}
+{"values": {"Unnamed: 0": "S3", "fixed_costs": "91.83"}}
+
+transportation_costs.csv
+{"values": {"Unnamed: 0": "S1", "C1": "1506.22", "C2": "70.90000000000001", "C3": "8.44"}}
+{"values": {"Unnamed: 0": "S2", "C1": "1732.65", "C2": "1780.72", "C3": "567.4400000000001"}}
+{"values": {"Unnamed: 0": "S3", "C1": "115.66", "C2": "100.76", "C3": "64.68000000000001"}}
+
+demand.csv
+{"values": {"customer": "C1", "demand": "1083"}}
+{"values": {"customer": "C2", "demand": "776"}}
+{"values": {"customer": "C3", "demand": "16214"}}

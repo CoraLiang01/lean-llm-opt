@@ -1,0 +1,32 @@
+import gurobipy as gp
+from gurobipy import GRB
+suppliers = ['MOUNT AYR', 'WAUKEE', 'WAVERLY', 'PELLA', 'DES MOINES']
+customers = ['CLARINDA', 'FORT MADISON', 'SIOUX CITY', 'TOLEDO', 'BANCROFT']
+fixed_costs = {'MOUNT AYR': 96.58, 'WAUKEE': 94.06, 'WAVERLY': 94.37, 'PELLA': 82.88, 'DES MOINES': 94.96}
+transportation_costs = {'MOUNT AYR': {'CLARINDA': 694.68, 'FORT MADISON': 17.48, 'SIOUX CITY': 20.07, 'TOLEDO': 199.02, 'BANCROFT': 1685.53}, 'WAUKEE': {'CLARINDA': 15.13, 'FORT MADISON': 1.5, 'SIOUX CITY': 1.43, 'TOLEDO': 27.88, 'BANCROFT': 90.69}, 'WAVERLY': {'CLARINDA': 2.34, 'FORT MADISON': 349.34, 'SIOUX CITY': 246.6, 'TOLEDO': 41.3, 'BANCROFT': 78.73}, 'PELLA': {'CLARINDA': 1181.6, 'FORT MADISON': 1458.53, 'SIOUX CITY': 1646.36, 'TOLEDO': 1924.55, 'BANCROFT': 38.93}, 'DES MOINES': {'CLARINDA': 1030.8, 'FORT MADISON': 43.48, 'SIOUX CITY': 932.43, 'TOLEDO': 55.39, 'BANCROFT': 103.84}}
+demand = {'CLARINDA': 2397, 'FORT MADISON': 1889, 'SIOUX CITY': 2518, 'TOLEDO': 3218, 'BANCROFT': 1813}
+for i in suppliers:
+    if i not in fixed_costs:
+        raise ValueError(f'Missing fixed cost for supplier {i}')
+    if i not in transportation_costs:
+        raise ValueError(f'Missing transportation costs for supplier {i}')
+    for j in customers:
+        if j not in transportation_costs[i]:
+            raise ValueError(f'Missing transportation cost for supplier {i}, customer {j}')
+for j in customers:
+    if j not in demand:
+        raise ValueError(f'Missing demand for customer {j}')
+m = gp.Model('Iowa_Liquor_Supplier_Selection')
+y = m.addVars(suppliers, vtype=GRB.BINARY, name='')
+x = m.addVars(suppliers, customers, vtype=GRB.CONTINUOUS, lb=0, name='')
+m.setObjective(gp.quicksum((fixed_costs[i] * y[i] for i in suppliers)) + gp.quicksum((transportation_costs[i][j] * x[i, j] for i in suppliers for j in customers)), GRB.MINIMIZE)
+m.addConstrs((gp.quicksum((x[i, j] for i in suppliers)) == demand[j] for j in customers), name='')
+m.addConstrs((x[i, j] <= demand[j] * y[i] for i in suppliers for j in customers), name='')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

@@ -1,0 +1,7 @@
+{"values": {"course_id": "C22", "course_name": "Operations Research: Linear Programming", "discipline": "Operations Research", "credits": "5", "interest_points": "95"}}
+{"values": {"course_id": "C23", "course_name": "Integer Programming", "discipline": "Operations Research", "credits": "5", "interest_points": "92"}}
+{"values": {"course_id": "C24", "course_name": "Stochastic Processes", "discipline": "Operations Research", "credits": "4", "interest_points": "86"}}
+{"values": {"course_id": "C25", "course_name": "Simulation Modeling", "discipline": "Operations Research", "credits": "4", "interest_points": "82"}}
+{"values": {"course_id": "C26", "course_name": "Network Flows", "discipline": "Operations Research", "credits": "4", "interest_points": "85"}}
+{"values": {"course_id": "C27", "course_name": "Queueing Theory", "discipline": "Operations Research", "credits": "4", "interest_points": "80"}}
+{"values": {"course_id": "C28", "course_name": "Revenue Management", "discipline": "Operations Research", "credits": "4", "interest_points": "88"}}

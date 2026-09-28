@@ -1,0 +1,84 @@
+Let $x_i \geq 0$ be the number of units of drug $i$ to order each day (continuous, for all $i$ in the list below).
+
+Maximize total benefit:
+$$
+\max \Big(
+250\,x_{\text{NSAIDs}}
++ 178\,x_{\text{Antirheumatic Drugs}}
++ 313\,x_{\text{Acetic Acid Derivatives}}
++ 301\,x_{\text{Antibiotics}}
++ 425\,x_{\text{Antiviral Drugs}}
++ 260\,x_{\text{Antifungal Agents}}
++ 848\,x_{\text{Antidepressants}}
++ 934\,x_{\text{Antipsychotics}}
++ 114\,x_{\text{Antihistamines}}
++ 1357\,x_{\text{Corticosteroids}}
++ 156\,x_{\text{Beta Blockers}}
++ 1780\,x_{\text{Calcium Channel Blockers}}
++ 695\,x_{\text{ACE Inhibitors}}
++ 405\,x_{\text{Angiotensin II Receptor Blockers}}
++ 320\,x_{\text{Diuretics}}
++ 320\,x_{\text{Statins}}
++ 1357\,x_{\text{Insulin}}
++ 1357\,x_{\text{Anticoagulants}}
++ 405\,x_{\text{Antiepileptic Drugs}}
++ 998\,x_{\text{Antiemetics}}
+\Big)
+$$
+
+Subject to the overall stock capacity constraint:
+$$
+913\,x_{\text{NSAIDs}}
++ 754\,x_{\text{Antirheumatic Drugs}}
++ 428\,x_{\text{Acetic Acid Derivatives}}
++ 711\,x_{\text{Antibiotics}}
++ 350\,x_{\text{Antiviral Drugs}}
++ 159\,x_{\text{Antifungal Agents}}
++ 353\,x_{\text{Antidepressants}}
++ 291\,x_{\text{Antipsychotics}}
++ 302\,x_{\text{Antihistamines}}
++ 50\,x_{\text{Corticosteroids}}
++ 250\,x_{\text{Beta Blockers}}
++ 178\,x_{\text{Calcium Channel Blockers}}
++ 313\,x_{\text{ACE Inhibitors}}
++ 378\,x_{\text{Angiotensin II Receptor Blockers}}
++ 94\,x_{\text{Diuretics}}
++ 97\,x_{\text{Statins}}
++ 470\,x_{\text{Insulin}}
++ 341\,x_{\text{Anticoagulants}}
++ 121\,x_{\text{Antiepileptic Drugs}}
++ 61\,x_{\text{Antiemetics}}
+\leq 520
+$$
+
+and
+$$
+x_i \geq 0 \quad \text{for all drugs } i.
+$$
+
+Where the drugs $i$ and their coefficients are:
+
+| Drug Name                              | Value | Weight |
+|---------------------------------------- |-------|--------|
+| NSAIDs                                 | 250   | 913    |
+| Antirheumatic Drugs                    | 178   | 754    |
+| Acetic Acid Derivatives                | 313   | 428    |
+| Antibiotics                            | 301   | 711    |
+| Antiviral Drugs                        | 425   | 350    |
+| Antifungal Agents                      | 260   | 159    |
+| Antidepressants                        | 848   | 353    |
+| Antipsychotics                         | 934   | 291    |
+| Antihistamines                         | 114   | 302    |
+| Corticosteroids                        | 1357  | 50     |
+| Beta Blockers                          | 156   | 250    |
+| Calcium Channel Blockers                | 1780  | 178    |
+| ACE Inhibitors                         | 695   | 313    |
+| Angiotensin II Receptor Blockers       | 405   | 378    |
+| Diuretics                              | 320   | 94     |
+| Statins                                | 320   | 97     |
+| Insulin                                | 1357  | 470    |
+| Anticoagulants                         | 1357  | 341    |
+| Antiepileptic Drugs                    | 405   | 121    |
+| Antiemetics                            | 998   | 61     |
+
+Capacity limit: $520$ units (total weighted sum of ordered drugs).

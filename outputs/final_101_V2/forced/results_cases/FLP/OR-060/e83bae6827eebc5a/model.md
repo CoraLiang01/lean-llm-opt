@@ -1,0 +1,100 @@
+##### Decision Variables
+
+- $x_{ij} \geq 0$: Quantity of goods supplied from supplier (facility) $i \in I$ to supermarket (customer) $j \in J$ (continuous).
+- $y_i \in \{0,1\}$: 1 if supplier $i$ is operational (open), 0 otherwise (binary).
+
+##### Parameters
+
+- $I = \{$S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12$\}$ (set of suppliers/facilities)
+- $J = \{$C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12$\}$ (set of supermarkets/customers)
+- $f_i$: Fixed cost of opening supplier $i$ (see table below)
+- $c_{ij}$: Per-unit transportation cost from supplier $i$ to customer $j$ (see matrix below)
+- $d_j$: Demand of customer $j$ (see table below)
+- $M_j = d_j$ (since each customer must be fully supplied, and $x_{ij} \leq d_j y_i$ is a valid upper bound)
+
+##### Objective Function
+
+\[
+\min \sum_{i \in I} f_i y_i + \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij}
+\]
+
+##### Constraints
+
+1. **Demand satisfaction:**  
+   For each customer $j \in J$,
+   \[
+   \sum_{i \in I} x_{ij} = d_j
+   \]
+2. **Supplier activation:**  
+   For each supplier $i \in I$ and customer $j \in J$,
+   \[
+   x_{ij} \leq d_j y_i
+   \]
+   (If supplier $i$ is not open, it cannot supply any goods.)
+3. **Variable domains:**  
+   \[
+   x_{ij} \geq 0 \quad \forall i \in I,\, j \in J
+   \]
+   \[
+   y_i \in \{0,1\} \quad \forall i \in I
+   \]
+
+---
+
+#### Parameter Tables
+
+**Fixed Costs ($f_i$):**
+
+| Supplier | Fixed Cost |
+|----------|------------|
+| S1       | 98.88      |
+| S2       | 99.73      |
+| S3       | 94.01      |
+| S4       | 93.77      |
+| S5       | 107.59     |
+| S6       | 112.65     |
+| S7       | 97.05      |
+| S8       | 103        |
+| S9       | 90.45      |
+| S10      | 96.73      |
+| S11      | 96.43      |
+| S12      | 112.19     |
+
+**Demand ($d_j$):**
+
+| Customer | Demand |
+|----------|--------|
+| C1       | 1097   |
+| C2       | 61     |
+| C3       | 11     |
+| C4       | 7      |
+| C5       | 82     |
+| C6       | 37     |
+| C7       | 483    |
+| C8       | 582    |
+| C9       | 223    |
+| C10      | 89     |
+| C11      | 60     |
+| C12      | 55     |
+
+**Transportation Costs ($c_{ij}$):**
+
+| Supplier | C1     | C2     | C3     | C4     | C5     | C6     | C7     | C8     | C9     | C10    | C11    | C12    |
+|----------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+| S1       | 284.11 | 53.78  | 10.62  | 111.27 | 158.5  | 8.79   | 53.79  | 8.84   | 1911.43| 8.87   | 1129.47| 185.53 |
+| S2       | 7.19   | 1031.96| 90.94  | 276.97 | 0.45   | 0.2    | 49.14  | 1.05   | 2079.54| 1.45   | 49.14  | 0.05   |
+| S3       | 151.1  | 884.48 | 4.33   | 277.04 | 0.33   | 0.19   | 49.14  | 0.99   | 99.03  | 1.63   | 884.47 | 0.96   |
+| S4       | 144.16 | 868.75 | 94.2   | 285.48 | 16.93  | 0.94   | 868.78 | 16.6   | 98.69  | 19.74  | 868.74 | 19.85  |
+| S5       | 151.34 | 1030.88| 91.43  | 13.24  | 0.72   | 0.87   | 49.09  | 0.01   | 99.05  | 0.84   | 883.6  | 0.58   |
+| S6       | 7.18   | 49.13  | 90.72  | 277.57 | 0.37   | 0.58   | 1031.74| 0.76   | 1782.98| 1.06   | 884.31 | 0.34   |
+| S7       | 104.38 | 1324.35| 1829.39| 1857.57| 1782.69| 2079.47| 1324.31| 2080.29| 0      | 2080.99| 1545.08| 99.07  |
+| S8       | 129.51 | 1031.96| 4.33   | 276.97 | 0.02   | 0.23   | 884.56 | 1.22   | 2079.54| 1.69   | 49.14  | 0.05   |
+| S9       | 50.93  | 5.75   | 1057.85| 58.62  | 47.63  | 1000.41| 103.48 | 47.6   | 1642.85| 47.59  | 5.75   | 999.94 |
+| S10      | 129.62 | 884.35 | 91.10  | 277.12 | 0.27   | 0.07   | 1031.78| 0.91   | 99.03  | 0.08   | 49.13  | 0.04   |
+| S11      | 53.3   | 0      | 941.91 | 58.92  | 1031.61| 49.13  | 0.03   | 1030.99| 1324.29| 49.1   | 0.08   | 49.12  |
+| S12      | 959.55 | 0.11   | 941.98 | 1237.42| 49.13  | 1031.86| 0.09   | 1031.07| 73.57  | 49.1   | 0.12   | 1031.53 |
+
+---
+
+**Summary:**  
+Sets, parameters, and all coefficients are preserved as in the original data. The model determines which suppliers to open and how much each supermarket should source from each supplier to minimize total fixed and transportation costs, while meeting all supermarket demands.

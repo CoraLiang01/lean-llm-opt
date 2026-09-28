@@ -1,0 +1,9 @@
+{"values": {"Equipment / Cost": "A1", "Product I": "5", "Product II": "10", "Product III": "", "Available Equipment Operating Time": "6000", "Equipment Cost at Full Load (yuan)": "300"}}
+{"values": {"Equipment / Cost": "A2", "Product I": "7", "Product II": "9", "Product III": "12", "Available Equipment Operating Time": "10000", "Equipment Cost at Full Load (yuan)": "321"}}
+{"values": {"Equipment / Cost": "A3", "Product I": "6", "Product II": "11", "Product III": "2", "Available Equipment Operating Time": "8000", "Equipment Cost at Full Load (yuan)": "203"}}
+{"values": {"Equipment / Cost": "B1", "Product I": "6", "Product II": "8", "Product III": "", "Available Equipment Operating Time": "4000", "Equipment Cost at Full Load (yuan)": "250"}}
+{"values": {"Equipment / Cost": "B2", "Product I": "4", "Product II": "", "Product III": "11", "Available Equipment Operating Time": "7000", "Equipment Cost at Full Load (yuan)": "783"}}
+{"values": {"Equipment / Cost": "B3", "Product I": "7", "Product II": "", "Product III": "", "Available Equipment Operating Time": "4000", "Equipment Cost at Full Load (yuan)": "200"}}
+{"values": {"Equipment / Cost": "B4", "Product I": "3", "Product II": "5", "Product III": "8", "Available Equipment Operating Time": "5000", "Equipment Cost at Full Load (yuan)": "300"}}
+{"values": {"Equipment / Cost": "Raw Material Cost (yuan/unit)", "Product I": "0.25", "Product II": "0.35", "Product III": "0.5", "Available Equipment Operating Time": "", "Equipment Cost at Full Load (yuan)": ""}}
+{"values": {"Equipment / Cost": "Unit Price (yuan/unit)", "Product I": "1.25", "Product II": "2", "Product III": "2.8", "Available Equipment Operating Time": "", "Equipment Cost at Full Load (yuan)": ""}}

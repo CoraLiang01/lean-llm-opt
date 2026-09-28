@@ -1,0 +1,155 @@
+##### Sets and Indices
+
+Let $I = \{1,2,3,4,5,6,7,8,9,10,11\}$ be the set of potential warehouses, indexed by $i$.
+
+Let $J = \{1,2,3,4,5,6,7,8,9,10,11\}$ be the set of stores, indexed by $j$.
+
+##### Parameters
+
+From PotentialWarehouses_Costs.csv (in source order):
+
+| $i$ | Opening Cost $f_i$ | Capacity $K_i$ |
+|-----|--------------------|---------------|
+| 1   | 3000               | 180           |
+| 2   | 3200               | 160           |
+| 3   | 3100               | 200           |
+| 4   | 2800               | 150           |
+| 5   | 3500               | 170           |
+| 6   | 2700               | 190           |
+| 7   | 2900               | 160           |
+| 8   | 3050               | 175           |
+| 9   | 3100               | 170           |
+| 10  | 2200               | 180           |
+| 11  | 2890               | 190           |
+
+From Stores_Demands.csv (in source order):
+
+| $j$ | Demand $d_j$ |
+|-----|-------------|
+| 1   | 30          |
+| 2   | 40          |
+| 3   | 20          |
+| 4   | 35          |
+| 5   | 20          |
+| 6   | 25          |
+| 7   | 45          |
+| 8   | 38          |
+| 9   | 32          |
+| 10  | 41          |
+| 11  | 44          |
+
+From TransportationCost.csv (rows: $i$ as $W1$ to $W11$, columns: $j$ as $W1$ to $W11$):
+
+Let $c_{ij}$ be the transportation cost per unit from warehouse $i$ to store $j$:
+
+| $i$ | $j=1$ | $j=2$ | $j=3$ | $j=4$ | $j=5$ | $j=6$ | $j=7$ | $j=8$ | $j=9$ | $j=10$ | $j=11$ |
+|-----|-------|-------|-------|-------|-------|-------|-------|-------|-------|--------|--------|
+| 1   | 12    | 11    | 14    | 15    | 17    | 13    | 12    | 16    | 16    | 14     | 15     |
+| 2   | 17    | 19    | 15    | 20    | 18    | 14    | 17    | 15    | 13    | 15     | 16     |
+| 3   | 13    | 14    | 12    | 14    | 16    | 15    | 11    | 14    | 16    | 18     | 17     |
+| 4   | 18    | 16    | 17    | 13    | 18    | 17    | 14    | 19    | 16    | 13     | 18     |
+| 5   | 10    | 13    | 12    | 19    | 15    | 11    | 12    | 14    | 12    | 15     | 17     |
+| 6   | 15    | 12    | 14    | 16    | 13    | 17    | 16    | 16    | 14    | 18     | 19     |
+| 7   | 14    | 13    | 15    | 17    | 12    | 13    | 14    | 15    | 12    | 16     | 14     |
+| 8   | 19    | 16    | 18    | 20    | 17    | 19    | 16    | 18    | 15    | 15     | 18     |
+| 9   | 17    | 18    | 12    | 14    | 16    | 15    | 14    | 17    | 21    | 15     | 18     |
+| 10  | 14    | 13    | 15    | 17    | 16    | 18    | 14    | 19    | 15    | 17     | 19     |
+| 11  | 15    | 13    | 16    | 17    | 11    | 13    | 14    | 15    | 19    | 21     | 13     |
+
+##### Decision Variables
+
+- $y_i \in \{0,1\}$: 1 if warehouse $i$ is opened, 0 otherwise, for $i \in I$.
+- $x_{ij} \geq 0$: quantity shipped from warehouse $i$ to store $j$, for $i \in I$, $j \in J$.
+
+##### Objective Function
+
+Minimize total cost (opening + transportation):
+
+$$
+\min \sum_{i=1}^{11} f_i y_i + \sum_{i=1}^{11} \sum_{j=1}^{11} c_{ij} x_{ij}
+$$
+
+where $f_i$ and $c_{ij}$ are as above.
+
+##### Constraints
+
+1. **Demand satisfaction:** Each store's demand must be met:
+   $$
+   \sum_{i=1}^{11} x_{ij} \geq d_j \qquad \forall j = 1,\ldots,11
+   $$
+
+2. **Warehouse capacity:** Each warehouse cannot ship more than its capacity if opened:
+   $$
+   \sum_{j=1}^{11} x_{ij} \leq K_i y_i \qquad \forall i = 1,\ldots,11
+   $$
+
+3. **Non-negativity and integrality:**
+   $$
+   x_{ij} \geq 0 \qquad \forall i,j \\
+   y_i \in \{0,1\} \qquad \forall i
+   $$
+
+##### Complete Numerical Formulation
+
+Let $f_i$, $K_i$, $d_j$, $c_{ij}$ be as given above.
+
+$$
+\begin{align*}
+\min\ & \sum_{i=1}^{11} f_i y_i + \sum_{i=1}^{11} \sum_{j=1}^{11} c_{ij} x_{ij} \\
+\text{s.t.}\quad
+& \sum_{i=1}^{11} x_{ij} \geq d_j \qquad \forall j = 1,\ldots,11 \\
+& \sum_{j=1}^{11} x_{ij} \leq K_i y_i \qquad \forall i = 1,\ldots,11 \\
+& x_{ij} \geq 0 \qquad \forall i,j \\
+& y_i \in \{0,1\} \qquad \forall i
+\end{align*}
+$$
+
+##### Retrieved Information
+
+PotentialWarehouses_Costs.csv (source order):
+
+| Warehouse (i) | Opening Cost (fi) | Capacity (units) |
+|---------------|-------------------|------------------|
+| 1             | 3000              | 180              |
+| 2             | 3200              | 160              |
+| 3             | 3100              | 200              |
+| 4             | 2800              | 150              |
+| 5             | 3500              | 170              |
+| 6             | 2700              | 190              |
+| 7             | 2900              | 160              |
+| 8             | 3050              | 175              |
+| 9             | 3100              | 170              |
+| 10            | 2200              | 180              |
+| 11            | 2890              | 190              |
+
+Stores_Demands.csv (source order):
+
+| Store (j) | Demand (units, dj) |
+|-----------|--------------------|
+| 1         | 30                 |
+| 2         | 40                 |
+| 3         | 20                 |
+| 4         | 35                 |
+| 5         | 20                 |
+| 6         | 25                 |
+| 7         | 45                 |
+| 8         | 38                 |
+| 9         | 32                 |
+| 10        | 41                 |
+| 11        | 44                 |
+
+TransportationCost.csv (source order):
+
+| $i$ | $j=1$ | $j=2$ | $j=3$ | $j=4$ | $j=5$ | $j=6$ | $j=7$ | $j=8$ | $j=9$ | $j=10$ | $j=11$ |
+|-----|-------|-------|-------|-------|-------|-------|-------|-------|-------|--------|--------|
+| 1   | 12    | 11    | 14    | 15    | 17    | 13    | 12    | 16    | 16    | 14     | 15     |
+| 2   | 17    | 19    | 15    | 20    | 18    | 14    | 17    | 15    | 13    | 15     | 16     |
+| 3   | 13    | 14    | 12    | 14    | 16    | 15    | 11    | 14    | 16    | 18     | 17     |
+| 4   | 18    | 16    | 17    | 13    | 18    | 17    | 14    | 19    | 16    | 13     | 18     |
+| 5   | 10    | 13    | 12    | 19    | 15    | 11    | 12    | 14    | 12    | 15     | 17     |
+| 6   | 15    | 12    | 14    | 16    | 13    | 17    | 16    | 16    | 14    | 18     | 19     |
+| 7   | 14    | 13    | 15    | 17    | 12    | 13    | 14    | 15    | 12    | 16     | 14     |
+| 8   | 19    | 16    | 18    | 20    | 17    | 19    | 16    | 18    | 15    | 15     | 18     |
+| 9   | 17    | 18    | 12    | 14    | 16    | 15    | 14    | 17    | 21    | 15     | 18     |
+| 10  | 14    | 13    | 15    | 17    | 16    | 18    | 14    | 19    | 15    | 17     | 19     |
+| 11  | 15    | 13    | 16    | 17    | 11    | 13    | 14    | 15    | 19    | 21     | 13     |

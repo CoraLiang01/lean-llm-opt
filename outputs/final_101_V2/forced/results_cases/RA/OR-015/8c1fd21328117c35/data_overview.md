@@ -1,0 +1,1 @@
+Product Name: Aalopuri, Revenue: 20, Initial Inventory: 10440.0, Demand: 1483

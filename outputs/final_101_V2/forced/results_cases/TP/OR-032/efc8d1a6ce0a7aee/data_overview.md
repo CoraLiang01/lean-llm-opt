@@ -1,0 +1,5 @@
+{"values": {"Product_Name": "Books_15.15", "Revenue": "15.15", "Demand": "1980", "Initial Inventory": "9920.0"}}
+{"values": {"Product_Name": "Books_30.3", "Revenue": "30.3", "Demand": "3024", "Initial Inventory": "20160.0"}}
+{"values": {"Product_Name": "Books_45.45", "Revenue": "45.45", "Demand": "4536", "Initial Inventory": "30000.0"}}
+{"values": {"Product_Name": "Books_60.6", "Revenue": "60.6", "Demand": "5601", "Initial Inventory": "38360.0"}}
+{"values": {"Product_Name": "Books_75.75", "Revenue": "75.75", "Demand": "7567", "Initial Inventory": "51450.0"}}

@@ -1,0 +1,8 @@
+```csv
+SKU,Revenue,Demand,Initial Inventory
+ZZ2AO,24.38,2,10.0
+ZZDW7,30.12,4,20.0
+ZZM1A,19.52,82,530.0
+ZZNC5,10.79,2,10.0
+ZZX6K,111.81,2,10.0
+```

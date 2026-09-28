@@ -1,0 +1,59 @@
+LEGACY_OBSERVATION = 'school_capacity.csv\n{"values": {"School": "I", "Capacity": "2028"}}\n{"values": {"School": "II", "Capacity": "1560"}}\n\nneighborhoods_population.csv\n{"values": {"Neighborhood": "N01", "Population_White": "78", "Population_NonWhite": "22"}}\n{"values": {"Neighborhood": "N02", "Population_White": "57", "Population_NonWhite": "33"}}\n{"values": {"Neighborhood": "N03", "Population_White": "47", "Population_NonWhite": "63"}}\n{"values": {"Neighborhood": "N04", "Population_White": "78", "Population_NonWhite": "22"}}\n{"values": {"Neighborhood": "N05", "Population_White": "57", "Population_NonWhite": "33"}}\n{"values": {"Neighborhood": "N06", "Population_White": "47", "Population_NonWhite": "63"}}\n{"values": {"Neighborhood": "N07", "Population_White": "78", "Population_NonWhite": "22"}}\n{"values": {"Neighborhood": "N08", "Population_White": "57", "Population_NonWhite": "33"}}\n{"values": {"Neighborhood": "N09", "Population_White": "46", "Population_NonWhite": "64"}}\n{"values": {"Neighborhood": "N10", "Population_White": "77", "Population_NonWhite": "23"}}\n{"values": {"Neighborhood": "N11", "Population_White": "56", "Population_NonWhite": "34"}}\n{"values": {"Neighborhood": "N12", "Population_White": "46", "Population_NonWhite": "64"}}\n{"values": {"Neighborhood": "N13", "Population_White": "77", "Population_NonWhite": "23"}}\n{"values": {"Neighborhood": "N14", "Population_White": "56", "Population_NonWhite": "34"}}\n{"values": {"Neighborhood": "N15", "Population_White": "46", "Population_NonWhite": "64"}}\n{"values": {"Neighborhood": "N16", "Population_White": "77", "Population_NonWhite": "23"}}\n{"values": {"Neighborhood": "N17", "Population_White": "56", "Population_NonWhite": "34"}}\n{"values": {"Neighborhood": "N18", "Population_White": "46", "Population_NonWhite": "64"}}\n{"values": {"Neighborhood": "N19", "Population_White": "77", "Population_NonWhite": "23"}}\n{"values": {"Neighborhood": "N20", "Population_White": "56", "Population_NonWhite": "34"}}\n{"values": {"Neighborhood": "N21", "Population_White": "46", "Population_NonWhite": "64"}}\n{"values": {"Neighborhood": "N22", "Population_White": "77", "Population_NonWhite": "23"}}\n{"values": {"Neighborhood": "N23", "Population_White": "56", "Population_NonWhite": "34"}}\n{"values": {"Neighborhood": "N24", "Population_White": "46", "Population_NonWhite": "64"}}\n{"values": {"Neighborhood": "N25", "Population_White": "77", "Population_NonWhite": "23"}}\n{"values": {"Neighborhood": "N26", "Population_White": "56", "Population_NonWhite": "34"}}\n{"values": {"Neighborhood": "N27", "Population_White": "46", "Population_NonWhite": "64"}}\n{"values": {"Neighborhood": "N28", "Population_White": "77", "Population_NonWhite": "23"}}\n{"values": {"Neighborhood": "N29", "Population_White": "56", "Population_NonWhite": "34"}}\n{"values": {"Neighborhood": "N30", "Population_White": "46", "Population_NonWhite": "64"}}\n{"values": {"Neighborhood": "N31", "Population_White": "74", "Population_NonWhite": "46"}}\n\ndistance.csv\n{"values": {"School": "I", "N01": "1.25", "N02": "1.3", "N03": "1.35", "N04": "1.4", "N05": "1.45", "N06": "1.5", "N07": "1.55", "N08": "1.6", "N09": "1.65", "N10": "1.7", "N11": "1.75", "N12": "1.8", "N13": "1.85", "N14": "1.9", "N15": "1.95", "N16": "2.0", "N17": "3.08", "N18": "3.16", "N19": "3.24", "N20": "3.32", "N21": "3.4", "N22": "3.48", "N23": "3.56", "N24": "3.64", "N25": "3.7199999999999998", "N26": "3.8", "N27": "3.88", "N28": "3.96", "N29": "4.04", "N30": "4.12", "N31": "4.2"}}\n{"values": {"School": "II", "N01": "3.08", "N02": "3.16", "N03": "3.24", "N04": "3.32", "N05": "3.4", "N06": "3.48", "N07": "3.56", "N08": "3.64", "N09": "3.7199999999999998", "N10": "3.8", "N11": "3.88", "N12": "3.96", "N13": "4.04", "N14": "4.12", "N15": "4.2", "N16": "4.28", "N17": "1.25", "N18": "1.3", "N19": "1.35", "N20": "1.4", "N21": "1.45", "N22": "1.5", "N23": "1.55", "N24": "1.6", "N25": "1.65", "N26": "1.7", "N27": "1.75", "N28": "1.8", "N29": "1.85", "N30": "1.9", "N31": "1.95"}}'
+LEGACY_RECORDS = [{'source': 'school_capacity.csv', 'values': {'School': 'I', 'Capacity': '2028'}}, {'source': 'school_capacity.csv', 'values': {'School': 'II', 'Capacity': '1560'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N01', 'Population_White': '78', 'Population_NonWhite': '22'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N02', 'Population_White': '57', 'Population_NonWhite': '33'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N03', 'Population_White': '47', 'Population_NonWhite': '63'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N04', 'Population_White': '78', 'Population_NonWhite': '22'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N05', 'Population_White': '57', 'Population_NonWhite': '33'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N06', 'Population_White': '47', 'Population_NonWhite': '63'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N07', 'Population_White': '78', 'Population_NonWhite': '22'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N08', 'Population_White': '57', 'Population_NonWhite': '33'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N09', 'Population_White': '46', 'Population_NonWhite': '64'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N10', 'Population_White': '77', 'Population_NonWhite': '23'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N11', 'Population_White': '56', 'Population_NonWhite': '34'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N12', 'Population_White': '46', 'Population_NonWhite': '64'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N13', 'Population_White': '77', 'Population_NonWhite': '23'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N14', 'Population_White': '56', 'Population_NonWhite': '34'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N15', 'Population_White': '46', 'Population_NonWhite': '64'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N16', 'Population_White': '77', 'Population_NonWhite': '23'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N17', 'Population_White': '56', 'Population_NonWhite': '34'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N18', 'Population_White': '46', 'Population_NonWhite': '64'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N19', 'Population_White': '77', 'Population_NonWhite': '23'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N20', 'Population_White': '56', 'Population_NonWhite': '34'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N21', 'Population_White': '46', 'Population_NonWhite': '64'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N22', 'Population_White': '77', 'Population_NonWhite': '23'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N23', 'Population_White': '56', 'Population_NonWhite': '34'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N24', 'Population_White': '46', 'Population_NonWhite': '64'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N25', 'Population_White': '77', 'Population_NonWhite': '23'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N26', 'Population_White': '56', 'Population_NonWhite': '34'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N27', 'Population_White': '46', 'Population_NonWhite': '64'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N28', 'Population_White': '77', 'Population_NonWhite': '23'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N29', 'Population_White': '56', 'Population_NonWhite': '34'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N30', 'Population_White': '46', 'Population_NonWhite': '64'}}, {'source': 'neighborhoods_population.csv', 'values': {'Neighborhood': 'N31', 'Population_White': '74', 'Population_NonWhite': '46'}}, {'source': 'distance.csv', 'values': {'School': 'I', 'N01': '1.25', 'N02': '1.3', 'N03': '1.35', 'N04': '1.4', 'N05': '1.45', 'N06': '1.5', 'N07': '1.55', 'N08': '1.6', 'N09': '1.65', 'N10': '1.7', 'N11': '1.75', 'N12': '1.8', 'N13': '1.85', 'N14': '1.9', 'N15': '1.95', 'N16': '2.0', 'N17': '3.08', 'N18': '3.16', 'N19': '3.24', 'N20': '3.32', 'N21': '3.4', 'N22': '3.48', 'N23': '3.56', 'N24': '3.64', 'N25': '3.7199999999999998', 'N26': '3.8', 'N27': '3.88', 'N28': '3.96', 'N29': '4.04', 'N30': '4.12', 'N31': '4.2'}}, {'source': 'distance.csv', 'values': {'School': 'II', 'N01': '3.08', 'N02': '3.16', 'N03': '3.24', 'N04': '3.32', 'N05': '3.4', 'N06': '3.48', 'N07': '3.56', 'N08': '3.64', 'N09': '3.7199999999999998', 'N10': '3.8', 'N11': '3.88', 'N12': '3.96', 'N13': '4.04', 'N14': '4.12', 'N15': '4.2', 'N16': '4.28', 'N17': '1.25', 'N18': '1.3', 'N19': '1.35', 'N20': '1.4', 'N21': '1.45', 'N22': '1.5', 'N23': '1.55', 'N24': '1.6', 'N25': '1.65', 'N26': '1.7', 'N27': '1.75', 'N28': '1.8', 'N29': '1.85', 'N30': '1.9', 'N31': '1.95'}}]
+import gurobipy as gp
+from gurobipy import GRB
+school_caps = {}
+neigh_pop_white = {}
+neigh_pop_nonwhite = {}
+schools = []
+neighborhoods = []
+distance = {}
+for rec in LEGACY_RECORDS:
+    src = rec.get('source', '')
+    vals = rec['values']
+    if src == 'school_capacity.csv':
+        school = vals['School']
+        cap = int(vals['Capacity'])
+        school_caps[school] = cap
+        if school not in schools:
+            schools.append(school)
+    elif src == 'neighborhoods_population.csv':
+        n = vals['Neighborhood']
+        pw = int(vals['Population_White'])
+        pnw = int(vals['Population_NonWhite'])
+        neigh_pop_white[n] = pw
+        neigh_pop_nonwhite[n] = pnw
+        if n not in neighborhoods:
+            neighborhoods.append(n)
+    elif src == 'distance.csv':
+        school = vals['School']
+        if school not in distance:
+            distance[school] = {}
+        for n in neighborhoods:
+            if n in vals:
+                distance[school][n] = float(vals[n])
+for s in schools:
+    if s not in distance or any((n not in distance[s] for n in neighborhoods)):
+        raise ValueError(f'Missing distance data for school {s}')
+for n in neighborhoods:
+    if n not in neigh_pop_white or n not in neigh_pop_nonwhite:
+        raise ValueError(f'Missing population data for neighborhood {n}')
+m = gp.Model('SchoolAssignment')
+x = m.addVars(schools, neighborhoods, ['W', 'NW'], lb=0, vtype=GRB.INTEGER, name='')
+m.setObjective(gp.quicksum((distance[s][n] * (x[s, n, 'W'] + x[s, n, 'NW']) for s in schools for n in neighborhoods)), GRB.MINIMIZE)
+m.addConstrs((gp.quicksum((x[s, n, 'W'] for s in schools)) == neigh_pop_white[n] for n in neighborhoods), name='')
+m.addConstrs((gp.quicksum((x[s, n, 'NW'] for s in schools)) == neigh_pop_nonwhite[n] for n in neighborhoods), name='')
+m.addConstrs((gp.quicksum((x[s, n, 'W'] + x[s, n, 'NW'] for n in neighborhoods)) <= school_caps[s] for s in schools), name='')
+for s in schools:
+    total = gp.quicksum((x[s, n, 'W'] + x[s, n, 'NW'] for n in neighborhoods))
+    white = gp.quicksum((x[s, n, 'W'] for n in neighborhoods))
+    m.addConstr(white >= 0.5 * total, name=f'race_lb_{s}')
+    m.addConstr(white <= 0.7 * total, name=f'race_ub_{s}')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

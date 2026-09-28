@@ -1,0 +1,21 @@
+Here is all the data from 43.csv, preserving all identifiers, coefficients, and values:
+
+---
+
+**Equipment / Cost Data**
+
+| Equipment / Cost | Product I | Product II | Product III | Available Equipment Operating Time | Equipment Cost at Full Load (yuan) |
+|------------------|-----------|------------|-------------|------------------------------------|------------------------------------|
+| A1               | 5         | 10         |             | 6000                               | 300                                |
+| A2               | 7         | 9          | 12          | 10000                              | 321                                |
+| A3               | 6         | 11         | 2           | 8000                               | 203                                |
+| B1               | 6         | 8          |             | 4000                               | 250                                |
+| B2               | 4         |            | 11          | 7000                               | 783                                |
+| B3               | 7         |            |             | 4000                               | 200                                |
+| B4               | 3         | 5          | 8           | 5000                               | 300                                |
+| Raw Material Cost (yuan/unit) | 0.25      | 0.35        | 0.5         |                                    |                                    |
+| Unit Price (yuan/unit)        | 1.25      | 2           | 2.8         |                                    |                                    |
+
+---
+
+All identifiers, coefficients, and values are preserved as in the original data.
