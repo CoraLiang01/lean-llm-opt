@@ -5,6 +5,8 @@ Large-scale optimization is a key backbone in modern business decision-making. H
 
 This repository accompanies the paper: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5329027
 
+For the current paired Large-scale-or implementations and their 101-case reproduction instructions, see [Reproducing the Large-scale-or experiments](README_REPRODUCE_LARGE_SCALE.md). The current notebooks are `LEAN_LLM_OPT_4.1_Large-scale.ipynb` and `LEAN_LLM_OPT_gpt_oss_20b_Large-scale.ipynb`; the older `*-Large-scale-or.ipynb` files are retained for historical compatibility.
+
 #### Directory Structure
 
 1. **Large_Scale_Or_Files/**  
