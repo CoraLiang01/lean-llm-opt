@@ -1,0 +1,157 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure: the objective is to maximize total benefit from ordering drug quantities, subject to overall stock capacity constraints. The decision variables are the order quantities for each drug per day. There is no mention of demand streams, sales horizon, assignment, transportation, facility location, or additional mechanisms such as batch sizes, logical dependencies, or multi-stage processes. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: maximize total benefit by choosing daily order quantities for each drug, subject to overall stock capacity constraints; decision variables are order quantities per drug per day
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 2]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 4]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others[0m
+Thought:[32;1m[1;3mI now know the final answer
+Final Answer: RA[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = {
+        "capacity": CSVQA_DATA["tables"][0]["records"],
+        "products": CSVQA_DATA["tables"][1]["records"]
+    }
+
+    # Index set I: ProductName
+    I = []
+    v = {}
+    w = {}
+    for rec in data["products"]:
+        pname = rec["values"]["ProductName"]
+        I.append(pname)
+        try:
+            v[pname] = float(rec["values"]["Value"])
+        except Exception:
+            raise ValueError(f"Missing or invalid Value for product {pname}")
+        try:
+            w[pname] = float(rec["values"]["Weight"])
+        except Exception:
+            raise ValueError(f"Missing or invalid Weight for product {pname}")
+
+    # Parameter C: Capacity
+    if len(data["capacity"]) == 0:
+        raise ValueError("No capacity record found")
+    try:
+        C = float(data["capacity"][0]["values"]["Capacity"])
+    except Exception:
+        raise ValueError("Missing or invalid Capacity value")
+
+    # Validate dimensions
+    if set(v.keys()) != set(I) or set(w.keys()) != set(I):
+        raise ValueError("Mismatch in product identifiers for value/weight")
+
+    # Build model
+    m = gp.Model('pharmacy_inventory')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize sum_i v_i x_i
+    m.setObjective(gp.quicksum(v[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraint: sum_i w_i x_i <= C
+    m.addConstr(gp.quicksum(w[i] * x[i] for i in I) <= C, name='stock_capacity')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 20 columns and 20 nonzeros
+Model fingerprint: 0x364cdb09
+Variable types: 0 continuous, 20 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [5e+01, 9e+02]
+  Objective range  [1e+02, 2e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [5e+02, 5e+02]
+Found heuristic solution: objective 1670.0000000
+Presolve removed 1 rows and 20 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 13570 1670 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.357000000000e+04, best bound 1.357000000000e+04, gap 0.0000%
+ObjVal: 13570.0
+C0: 0.0
+C1: 0.0
+C2: -0.0
+C3: 0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: 10.0
+C10: -0.0
+C11: 0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+Optimal objective: 13570.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', -0.0), ('C3', 0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', 10.0), ('C10', -0.0), ('C11', 0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0)]

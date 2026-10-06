@@ -1,0 +1,120 @@
+Product Name,Revenue,Demand,Initial Inventory
+1984 by George Orwell,19.99,6,20
+Adidas 3-Stripes Shorts,29.99,7,30
+Adidas Essential Track Pants,44.99,5,20
+Adidas FIFA World Cup Football,29.99,4,20
+Adidas Originals Superstar Sneakers,79.99,6,20
+Adidas Originals Trefoil Hoodie,64.99,6,20
+Adidas Ultraboost Running Shoes,179.99,3,10
+Adidas Ultraboost Shoes,179.99,3,10
+Amazon Echo Dot (4th Gen),49.99,5,20
+Amazon Echo Show 10,249.99,2,10
+Amazon Fire TV Stick 4K,49.99,5,20
+Anastasia Beverly Hills Brow Wiz,23,3,10
+Anker PowerCore Portable Charger,59.99,6,20
+Anova Precision Cooker,199,3,10
+Anova Precision Oven,599,2,10
+Apple AirPods Max,549,2,10
+Apple AirPods Pro,249.99,3,10
+Apple MacBook Air,1199.99,2,10
+Apple MacBook Pro 16-inch,2399,2,10
+Apple TV 4K,179,3,10
+Apple Watch Series 8,399.99,4,20
+Apple iPad Air,599.99,3,10
+Atomic Habits by James Clear,16.99,6,20
+Babolat Pure Drive Tennis Racket,199.99,5,20
+Becoming by Michelle Obama,32.5,6,20
+Biore UV Aqua Rich Watery Essence Sunscreen,15,2,10
+Blueair Classic 480i,599.99,3,10
+Bose QuietComfort 35 Headphones,299.99,2,10
+Bose QuietComfort 35 II Wireless Headphones,299,2,10
+Bose SoundLink Color Bluetooth Speaker II,129,2,10
+Bose SoundLink Revolve+ Speaker,299.99,5,20
+Bose SoundSport Wireless Earbuds,149.99,3,10
+Bowflex SelectTech 1090 Adjustable Dumbbells,699.99,2,10
+Bowflex SelectTech 552 Dumbbells,399.99,2,10
+Breville Nespresso Creatista Plus,499.95,2,10
+Breville Smart Coffee Grinder Pro,199.95,2,10
+Breville Smart Grill,299.95,3,10
+Breville Smart Oven,299.99,2,10
+Calvin Klein Boxer Briefs,29.99,7,30
+Canon EOS R5 Camera,3899.99,2,10
+Canon EOS Rebel T7i DSLR Camera,749.99,2,10
+Caudalie Vinoperfect Radiance Serum,79,2,10
+CeraVe Hydrating Facial Cleanser,14.99,3,10
+Champion Reverse Weave Hoodie,49.99,5,20
+Chanel No. 5 Perfume,129.99,2,10
+Charlotte Tilbury Magic Cream,100,2,10
+Clinique Dramatically Different Moisturizing Lotion,29.5,2,10
+Clinique Moisture Surge,52,2,10
+Columbia Fleece Jacket,59.99,6,20
+Crock-Pot 6-Quart Slow Cooker,49.99,3,10
+Cuisinart Coffee Center,199.95,3,10
+Cuisinart Custom 14-Cup Food Processor,199.99,2,10
+Cuisinart Griddler Deluxe,159.99,2,10
+De'Longhi Magnifica Espresso Machine,899.99,2,10
+Dr. Jart+ Cicapair Tiger Grass Color Correcting Treatment,52,2,10
+Drunk Elephant C-Firma Day Serum,78,2,10
+Dune by Frank Herbert,25.99,6,20
+Dyson Pure Cool Link,499.99,2,10
+Dyson Supersonic Hair Dryer,399.99,5,20
+Dyson V11 Vacuum,499.99,2,10
+Dyson V8 Absolute,399.99,2,10
+Educated by Tara Westover,28,4,20
+Estee Lauder Advanced Night Repair,105,2,10
+Eufy RoboVac 11S,219.99,5,20
+Fenty Beauty Killawatt Highlighter,36,2,10
+First Aid Beauty Ultra Repair Cream,34,3,10
+Fitbit Charge 5,129.99,3,10
+Fitbit Inspire 2,99.95,3,10
+Fitbit Luxe,149.95,3,10
+Fitbit Versa 3,229.95,5,20
+Forever 21 Graphic Tee,12.99,7,30
+Fresh Sugar Lip Treatment,24,2,10
+Gap 1969 Original Fit Jeans,59.99,5,20
+Gap Crewneck Sweatshirt,34.99,6,20
+Gap Essential Crewneck T-Shirt,19.99,8,30
+Gap High Rise Skinny Jeans,49.99,5,20
+Garmin Edge 530,299.99,3,10
+Garmin Fenix 6X Pro,999.99,2,10
+Garmin Forerunner 245,299.99,2,10
+Garmin Forerunner 945,499.99,5,20
+GlamGlow Supermud Clearing Treatment,59,2,10
+Glossier Boy Brow,16,3,10
+Glossier Cloud Paint,18,2,10
+GoPro HERO10 Black,399.99,4,20
+GoPro HERO9 Black,449.99,2,10
+Gone Girl by Gillian Flynn,22.99,3,10
+Google Nest Hub Max,229.99,3,10
+Google Nest Wifi Router,169,2,10
+Google Pixel 6 Pro,899.99,2,10
+Google Pixelbook Go,649.99,2,10
+H&M Slim Fit Jeans,39.99,5,20
+HP Spectre x360 Laptop,1599.99,2,10
+Hamilton Beach FlexBrew Coffee Maker,89.99,2,10
+Hanes ComfortSoft T-Shirt,9.99,15,50
+Harry Potter and the Sorcerer's Stone,24.99,4,20
+Hydro Flask Standard Mouth Water Bottle,32.95,5,20
+Hydro Flask Wide Mouth Water Bottle,39.95,6,20
+Hyperice Hypervolt Massager,349,2,10
+Instant Pot Duo,89.99,4,20
+Instant Pot Duo Crisp,179.99,2,10
+Instant Pot Duo Evo Plus,139.99,3,10
+Instant Pot Duo Nova,99.95,2,10
+Instant Pot Ultra,139.99,2,10
+Keurig K-Elite Coffee Maker,189.99,5,20
+Keurig K-Mini Coffee Maker,79.99,3,10
+Kiehl's Midnight Recovery Concentrate,82,2,10
+Kindle Paperwhite,129.99,3,10
+KitchenAid Artisan Stand Mixer,499.99,2,10
+KitchenAid Stand Mixer,379.99,2,10
+L'Occitane Shea Butter Hand Cream,29,3,10
+L'Oreal Revitalift Serum,39.99,3,10
+LG OLED TV,1299.99,3,10
+La Mer Cr_¨me de la Mer Moisturizer,190,2,10
+Lancome La Vie Est Belle,102,2,10
+Laneige Water Sleeping Mask,25,2,10
+Levi's 501 Jeans,69.99,5,20
+Levi's 511 Slim Fit Jeans,59.99,5,20
+Levi's Sherpa Trucker Jacket,98,3,10
+Levi's Trucker Jacket,89.99,3,10

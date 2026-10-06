@@ -1,0 +1,33 @@
+ShelfID,CleaningMinutesLastMonth,Capacity,CleaningVisitsLastQuarter
+1,12,5,22
+2,25,7,12
+3,3,6,27
+4,24,8,22
+5,3,5.5,20
+6,4,9,24
+7,11,6.5,23
+8,6,7.5,30
+9,14,8.2,11
+10,29,5.7,23
+
+ProductPhotoCount,CatalogViewsLastMonth,MerchandisingTeam,ProductName,Value,Weight
+30,14,Team_A,Smartphone,200,1
+18,12,Team_B,Laptop,1500,5
+27,8,Team_B,Headphones,100,0.5
+2,29,Team_B,Camera,800,2
+16,26,Team_C,Smartwatch,250,0.3
+16,18,Team_B,Tablet,600,1.5
+28,7,Team_B,Bluetooth Speaker,150,1
+12,1,Team_C,Keyboard,80,0.8
+2,20,Team_A,Mouse,50,0.2
+16,9,Team_A,Monitor,300,3
+2,17,Team_C,Printer,400,4
+16,7,Team_B,External Hard Drive,120,0.5
+27,22,Team_B,Router,60,0.3
+12,12,Team_B,Power Bank,40,0.4
+9,11,Team_A,Memory Card,30,0.05
+26,21,Team_A,USB Flash Drive,25,0.02
+30,13,Team_A,Smart Home Hub,100,0.6
+5,24,Team_A,Gaming Console,500,4
+9,15,Team_B,Fitness Tracker,90,0.2
+18,28,Team_A,E-Reader,180,0.5

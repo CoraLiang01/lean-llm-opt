@@ -1,0 +1,1 @@
+I do not have access to the contents of cost_12x12.csv in the current context. Please provide the contents of cost_12x12.csv (either by pasting the data here or uploading the file), and I will retrieve all necessary data and formulate the complete mathematical model as requested.

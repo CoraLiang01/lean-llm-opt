@@ -1,0 +1,96 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Required table file_0_view_0 not found in CSVQA_DATA.")
+
+    records = table["records"]
+    I = []
+    r = {}
+    d = {}
+    s = {}
+    for rec in records:
+        vals = rec["values"]
+        prod = vals["Product Name"]
+        I.append(prod)
+        try:
+            r[prod] = float(vals["Revenue"])
+            d[prod] = int(vals["Demand"])
+            s[prod] = int(vals["Initial Inventory"])
+        except Exception as e:
+            raise RuntimeError(f"Invalid data for product {prod}: {e}")
+
+    # Validate all required data present
+    for prod in I:
+        if prod not in r or prod not in d or prod not in s:
+            raise RuntimeError(f"Missing data for product {prod}")
+
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0 integer, upper bound min(s_i, d_i)
+    x = m.addVars(
+        I,
+        lb=0,
+        ub={i: min(s[i], d[i]) for i in I},
+        vtype=GRB.INTEGER,
+        name=''
+    )
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(r[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraints: 0 <= x_i <= min(s_i, d_i) (already set via bounds)
+    # Integrality is enforced by vtype
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for i in I:
+            print(x[i].VarName, x[i].X)
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 0 rows, 3 columns and 0 nonzeros
+Model fingerprint: 0xe8a43da2
+Variable types: 0 continuous, 3 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [2e+01, 6e+01]
+  Bounds range     [3e+00, 5e+00]
+  RHS range        [0e+00, 0e+00]
+Found heuristic solution: objective 532.3000000
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 532.3 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.323000000000e+02, best bound 5.323000000000e+02, gap 0.0000%
+532.3
+C0 5.0
+C1 3.0
+C2 3.0
+Optimal objective: 532.3
+Optimal solution: [('C0', 5.0), ('C1', 3.0), ('C2', 3.0)]

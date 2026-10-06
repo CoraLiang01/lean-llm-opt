@@ -1,0 +1,214 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract table records
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Required table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+    records = table["records"]
+    # Build index set I and parameter dictionaries
+    I = []
+    r = {}
+    d = {}
+    s = {}
+    for rec in records:
+        vals = rec["values"]
+        prod = vals["Product Name"]
+        if prod in r:
+            raise ValueError(f"Duplicate product name found: {prod}")
+        I.append(prod)
+        try:
+            r[prod] = float(vals["Revenue"])
+            d[prod] = int(vals["Demand"])
+            s[prod] = int(vals["Initial Inventory"])
+        except Exception as e:
+            raise ValueError(f"Error parsing data for product '{prod}': {e}")
+
+    # Validate all index sets and parameter coverage
+    for prod in I:
+        if prod not in r or prod not in d or prod not in s:
+            raise ValueError(f"Missing parameter data for product '{prod}'.")
+
+    # Build variable bounds
+    lb = {prod: 0 for prod in I}
+    ub = {prod: min(d[prod], s[prod]) for prod in I}
+
+    # Create model
+    m = gp.Model("inventory_allocation")
+    x = m.addVars(I, lb=lb, ub=ub, vtype=GRB.INTEGER, name='x', obj=0)
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(r[prod] * x[prod] for prod in I), GRB.MAXIMIZE)
+
+    # Constraints: demand and inventory
+    m.addConstrs((x[prod] <= d[prod] for prod in I), name='demand')
+    m.addConstrs((x[prod] <= s[prod] for prod in I), name='inventory')
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+    return m
+
+m = solve_problem(CSVQA_DATA)
+if m.Status == GRB.OPTIMAL:
+    print(m.ObjVal)
+    for v in m.getVars():
+        print(v.VarName, v.X)
+else:
+    print(m.Status)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 238 rows, 119 columns and 238 nonzeros
+Model fingerprint: 0x039af70a
+Variable types: 0 continuous, 119 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+01, 4e+03]
+  Bounds range     [2e+00, 2e+01]
+  RHS range        [2e+00, 5e+01]
+Found heuristic solution: objective 83748.370000
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 83748.4 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 8.374837000000e+04, best bound 8.374837000000e+04, gap 0.0000%
+83748.37000000001
+C0 6.0
+C1 7.0
+C2 5.0
+C3 4.0
+C4 6.0
+C5 6.0
+C6 3.0
+C7 3.0
+C8 5.0
+C9 2.0
+C10 5.0
+C11 3.0
+C12 6.0
+C13 3.0
+C14 2.0
+C15 2.0
+C16 3.0
+C17 2.0
+C18 2.0
+C19 3.0
+C20 4.0
+C21 3.0
+C22 6.0
+C23 5.0
+C24 6.0
+C25 2.0
+C26 3.0
+C27 2.0
+C28 2.0
+C29 2.0
+C30 5.0
+C31 3.0
+C32 2.0
+C33 2.0
+C34 2.0
+C35 2.0
+C36 3.0
+C37 2.0
+C38 7.0
+C39 2.0
+C40 2.0
+C41 2.0
+C42 3.0
+C43 5.0
+C44 2.0
+C45 2.0
+C46 2.0
+C47 2.0
+C48 6.0
+C49 3.0
+C50 3.0
+C51 2.0
+C52 2.0
+C53 2.0
+C54 2.0
+C55 2.0
+C56 6.0
+C57 2.0
+C58 5.0
+C59 2.0
+C60 2.0
+C61 4.0
+C62 2.0
+C63 5.0
+C64 2.0
+C65 3.0
+C66 3.0
+C67 3.0
+C68 3.0
+C69 5.0
+C70 7.0
+C71 2.0
+C72 5.0
+C73 6.0
+C74 8.0
+C75 5.0
+C76 3.0
+C77 2.0
+C78 2.0
+C79 5.0
+C80 2.0
+C81 3.0
+C82 2.0
+C83 4.0
+C84 2.0
+C85 3.0
+C86 3.0
+C87 2.0
+C88 2.0
+C89 2.0
+C90 5.0
+C91 2.0
+C92 2.0
+C93 15.0
+C94 4.0
+C95 5.0
+C96 6.0
+C97 2.0
+C98 4.0
+C99 2.0
+C100 3.0
+C101 2.0
+C102 2.0
+C103 5.0
+C104 3.0
+C105 2.0
+C106 3.0
+C107 2.0
+C108 2.0
+C109 3.0
+C110 3.0
+C111 3.0
+C112 2.0
+C113 2.0
+C114 2.0
+C115 5.0
+C116 5.0
+C117 3.0
+C118 3.0
+Optimal objective: 83748.37000000001
+Optimal solution: [('C0', 6.0), ('C1', 7.0), ('C2', 5.0), ('C3', 4.0), ('C4', 6.0), ('C5', 6.0), ('C6', 3.0), ('C7', 3.0), ('C8', 5.0), ('C9', 2.0), ('C10', 5.0), ('C11', 3.0), ('C12', 6.0), ('C13', 3.0), ('C14', 2.0), ('C15', 2.0), ('C16', 3.0), ('C17', 2.0), ('C18', 2.0), ('C19', 3.0), ('C20', 4.0), ('C21', 3.0), ('C22', 6.0), ('C23', 5.0), ('C24', 6.0), ('C25', 2.0), ('C26', 3.0), ('C27', 2.0), ('C28', 2.0), ('C29', 2.0), ('C30', 5.0), ('C31', 3.0), ('C32', 2.0), ('C33', 2.0), ('C34', 2.0), ('C35', 2.0), ('C36', 3.0), ('C37', 2.0), ('C38', 7.0), ('C39', 2.0), ('C40', 2.0), ('C41', 2.0), ('C42', 3.0), ('C43', 5.0), ('C44', 2.0), ('C45', 2.0), ('C46', 2.0), ('C47', 2.0), ('C48', 6.0), ('C49', 3.0), ('C50', 3.0), ('C51', 2.0), ('C52', 2.0), ('C53', 2.0), ('C54', 2.0), ('C55', 2.0), ('C56', 6.0), ('C57', 2.0), ('C58', 5.0), ('C59', 2.0), ('C60', 2.0), ('C61', 4.0), ('C62', 2.0), ('C63', 5.0), ('C64', 2.0), ('C65', 3.0), ('C66', 3.0), ('C67', 3.0), ('C68', 3.0), ('C69', 5.0), ('C70', 7.0), ('C71', 2.0), ('C72', 5.0), ('C73', 6.0), ('C74', 8.0), ('C75', 5.0), ('C76', 3.0), ('C77', 2.0), ('C78', 2.0), ('C79', 5.0), ('C80', 2.0), ('C81', 3.0), ('C82', 2.0), ('C83', 4.0), ('C84', 2.0), ('C85', 3.0), ('C86', 3.0), ('C87', 2.0), ('C88', 2.0), ('C89', 2.0), ('C90', 5.0), ('C91', 2.0), ('C92', 2.0), ('C93', 15.0), ('C94', 4.0), ('C95', 5.0), ('C96', 6.0), ('C97', 2.0), ('C98', 4.0), ('C99', 2.0), ('C100', 3.0), ('C101', 2.0), ('C102', 2.0), ('C103', 5.0), ('C104', 3.0), ('C105', 2.0), ('C106', 3.0), ('C107', 2.0), ('C108', 2.0), ('C109', 3.0), ('C110', 3.0), ('C111', 3.0), ('C112', 2.0), ('C113', 2.0), ('C114', 2.0), ('C115', 5.0), ('C116', 5.0), ('C117', 3.0), ('C118', 3.0)]

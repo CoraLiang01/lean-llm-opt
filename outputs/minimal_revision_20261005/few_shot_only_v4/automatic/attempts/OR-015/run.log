@@ -1,0 +1,108 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with robust encoding attempts
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM6/RestaurantSalesreport.csv"
+    tried_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in tried_encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not decode CSV with tried encodings.")
+
+    # Check required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Filter for 'Aalop' products (case-insensitive substring match)
+    mask = df['Product Name'].astype(str).str.casefold().str.contains('aalop')
+    df_aalop = df[mask].copy()
+    if df_aalop.empty:
+        raise ValueError("No products classified under 'Aalop' found in the data.")
+
+    # Remove rows with missing required data
+    df_aalop = df_aalop.dropna(subset=['Product Name', 'Revenue', 'Demand', 'Initial Inventory'])
+
+    # Build index set I and parameter dictionaries
+    items = df_aalop['Product Name'].astype(str).tolist()
+    if len(set(items)) != len(items):
+        raise ValueError("Duplicate 'Product Name' entries found for 'Aalop' products.")
+
+    try:
+        revenue = dict(zip(items, df_aalop['Revenue'].astype(float)))
+        demand = dict(zip(items, df_aalop['Demand'].astype(float)))
+        inventory = dict(zip(items, df_aalop['Initial Inventory'].astype(float)))
+    except Exception as e:
+        raise ValueError(f"Error converting parameters to float: {e}")
+
+    # Validate all coefficients are present
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f"Missing parameter for product: {i}")
+
+    # Model
+    m = gp.Model('Aalop_Restaurant_RevOpt')
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    # Constraints
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 2 rows, 1 columns and 2 nonzeros
+Model fingerprint: 0x1371e1e4
+Variable types: 0 continuous, 1 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+01, 2e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 1e+04]
+Found heuristic solution: objective 29660.000000
+Presolve removed 2 rows and 1 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 29660 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.966000000000e+04, best bound 2.966000000000e+04, gap 0.0000%
+ObjVal: 29660.0
+C0: 1483.0
+Optimal objective: 29660.0
+Optimal solution: [('C0', 1483.0)]

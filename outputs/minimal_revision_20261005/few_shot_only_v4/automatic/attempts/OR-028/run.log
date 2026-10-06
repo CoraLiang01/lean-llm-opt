@@ -1,0 +1,127 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Try reading the CSV with multiple encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM19/WomenClothingEcommerceSalesData.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read CSV at {csv_path} with tried encodings.")
+
+    # Required columns
+    required_cols = ["Product Name", "Revenue", "Demand", "Initial Inventory"]
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Remove rows with missing required data
+    df = df.dropna(subset=required_cols)
+
+    # Group by Product Name and sum repeated rows
+    grouped = df.groupby("Product Name", as_index=False).agg({
+        "Revenue": "sum",
+        "Demand": "sum",
+        "Initial Inventory": "sum"
+    })
+
+    # Build index set and parameter dictionaries
+    items = grouped["Product Name"].tolist()
+    revenue = dict(zip(grouped["Product Name"], grouped["Revenue"]))
+    demand = dict(zip(grouped["Product Name"], grouped["Demand"]))
+    inventory = dict(zip(grouped["Product Name"], grouped["Initial Inventory"]))
+
+    # Validate all coefficients are present and numeric
+    for i in items:
+        if not (i in revenue and i in demand and i in inventory):
+            raise ValueError(f"Missing data for product: {i}")
+        if not (pd.api.types.is_number(revenue[i]) and pd.api.types.is_number(demand[i]) and pd.api.types.is_number(inventory[i])):
+            raise ValueError(f"Non-numeric data for product: {i}")
+
+    m = gp.Model("WomenClothingEcommerceSales")
+    m.setParam("MIPGap", 1e-4)
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    # Constraints: x_i <= demand_i, x_i <= inventory_i
+    m.addConstrs((x[i] <= demand[i] for i in items), name='')
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 48 rows, 24 columns and 48 nonzeros
+Model fingerprint: 0x98ea484e
+Variable types: 0 continuous, 24 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+02, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+00, 3e+03]
+Found heuristic solution: objective 285816.00000
+Presolve removed 48 rows and 24 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 285816 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.858160000000e+05, best bound 2.858160000000e+05, gap 0.0000%
+ObjVal: 285816.0
+C0: 10.0
+C1: 8.0
+C2: 18.0
+C3: 2.0
+C4: 4.0
+C5: 8.0
+C6: 2.0
+C7: 198.0
+C8: 32.0
+C9: 18.0
+C10: 570.0
+C11: 6.0
+C12: 26.0
+C13: 6.0
+C14: 33.0
+C15: 6.0
+C16: 4.0
+C17: 16.0
+C18: 14.0
+C19: 4.0
+C20: 32.0
+C21: 8.0
+C22: 2.0
+C23: 33.0
+Optimal objective: 285816.0
+Optimal solution: [('C0', 10.0), ('C1', 8.0), ('C2', 18.0), ('C3', 2.0), ('C4', 4.0), ('C5', 8.0), ('C6', 2.0), ('C7', 198.0), ('C8', 32.0), ('C9', 18.0), ('C10', 570.0), ('C11', 6.0), ('C12', 26.0), ('C13', 6.0), ('C14', 33.0), ('C15', 6.0), ('C16', 4.0), ('C17', 16.0), ('C18', 14.0), ('C19', 4.0), ('C20', 32.0), ('C21', 8.0), ('C22', 2.0), ('C23', 33.0)]

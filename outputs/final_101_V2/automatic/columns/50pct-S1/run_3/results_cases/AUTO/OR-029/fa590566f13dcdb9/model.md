@@ -1,0 +1,88 @@
+Let $x_{ij}$ be the number of units of product $j$ placed on display $i$, where $i$ indexes ShelfID from capacity.csv and $j$ indexes ProductName from products.csv. All $x_{ij} \in \mathbb{Z}_{\geq 0}$.
+
+**Parameters:**
+
+- Displays (from capacity.csv, in order):
+
+  | $i$ | ShelfID | Capacity |
+  |-----|---------|----------|
+  | 1   | 1       | 5        |
+  | 2   | 2       | 7        |
+  | 3   | 3       | 6        |
+  | 4   | 4       | 8        |
+  | 5   | 5       | 5.5      |
+  | 6   | 6       | 9        |
+  | 7   | 7       | 6.5      |
+  | 8   | 8       | 7.5      |
+  | 9   | 9       | 8.2      |
+  | 10  | 10      | 5.7      |
+
+- Products (from products.csv, in order):
+
+  | $j$ | ProductName           | Value | Weight |
+  |-----|-----------------------|-------|--------|
+  | 1   | Smartphone            | 200   | 1      |
+  | 2   | Laptop                | 1500  | 5      |
+  | 3   | Headphones            | 100   | 0.5    |
+  | 4   | Camera                | 800   | 2      |
+  | 5   | Smartwatch            | 250   | 0.3    |
+  | 6   | Tablet                | 600   | 1.5    |
+  | 7   | Bluetooth Speaker     | 150   | 1      |
+  | 8   | Keyboard              | 80    | 0.8    |
+  | 9   | Mouse                 | 50    | 0.2    |
+  | 10  | Monitor               | 300   | 3      |
+  | 11  | Printer               | 400   | 4      |
+  | 12  | External Hard Drive   | 120   | 0.5    |
+  | 13  | Router                | 60    | 0.3    |
+  | 14  | Power Bank            | 40    | 0.4    |
+  | 15  | Memory Card           | 30    | 0.05   |
+  | 16  | USB Flash Drive       | 25    | 0.02   |
+  | 17  | Smart Home Hub        | 100   | 0.6    |
+  | 18  | Gaming Console        | 500   | 4      |
+  | 19  | Fitness Tracker       | 90    | 0.2    |
+  | 20  | E-Reader              | 180   | 0.5    |
+
+---
+
+**Mathematical Model:**
+
+**Decision Variables:**
+$$
+x_{ij} \in \mathbb{Z}_{\geq 0} \quad \forall i \in \{1,\ldots,10\},\ j \in \{1,\ldots,20\}
+$$
+
+**Objective:**
+$$
+\max \sum_{i=1}^{10} \sum_{j=1}^{20} v_j\, x_{ij}
+$$
+where $v_j$ is the Value of product $j$ as given above.
+
+**Constraints:**
+
+1. **Display Capacity Constraints (for each display $i$):**
+   $$
+   \sum_{j=1}^{20} w_j\, x_{ij} \leq c_i \qquad \forall i \in \{1,\ldots,10\}
+   $$
+   where $w_j$ is the Weight of product $j$ and $c_i$ is the Capacity of display $i$.
+
+2. **Minimum Allocation of First Product (Smartphone):**
+   $$
+   \sum_{i=1}^{10} x_{i1} \geq 5
+   $$
+
+3. **Nonnegativity and Integrality:**
+   $$
+   x_{ij} \in \mathbb{Z}_{\geq 0} \qquad \forall i,j
+   $$
+
+---
+
+**All identifiers and coefficients:**
+
+- ShelfID: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+- ProductName: Smartphone, Laptop, Headphones, Camera, Smartwatch, Tablet, Bluetooth Speaker, Keyboard, Mouse, Monitor, Printer, External Hard Drive, Router, Power Bank, Memory Card, USB Flash Drive, Smart Home Hub, Gaming Console, Fitness Tracker, E-Reader
+- Value: 200, 1500, 100, 800, 250, 600, 150, 80, 50, 300, 400, 120, 60, 40, 30, 25, 100, 500, 90, 180
+- Weight: 1, 5, 0.5, 2, 0.3, 1.5, 1, 0.8, 0.2, 3, 4, 0.5, 0.3, 0.4, 0.05, 0.02, 0.6, 4, 0.2, 0.5
+- Capacity: 5, 7, 6, 8, 5.5, 9, 6.5, 7.5, 8.2, 5.7
+
+**All variables $x_{ij}$ are nonnegative integers.**

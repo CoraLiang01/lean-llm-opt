@@ -1,0 +1,31 @@
+products.csv
+warranty_months,supplier_contact_channel,ProductName,average_test_drive_minutes,marketing_campaign_format,Value,showroom_display_zone,Weight,vehicle_catalog_views_last_month
+48,Portal,Sedan,40,Web feature,2524,South Wing,99,120
+60,Phone,SUV,30,Newsletter,4614,Central Hall,55,680
+48,Email,Truck,40,Newsletter,8416,Central Hall,75,680
+36,Phone,Convertible,20,Web feature,5917,Central Hall,94,120
+12,Portal,Minivan,30,Newsletter,9048,Central Hall,80,120
+24,Phone,Coupe,40,Newsletter,1140,North Wing,82,250
+36,Email,Hatchback,15,Web feature,8962,South Wing,71,410
+48,Email,Station Wagon,20,Newsletter,1888,South Wing,100,410
+12,Portal,Electric Car,15,Brochure,8487,North Wing,28,680
+12,Portal,Hybrid Car,30,Brochure,4425,South Wing,93,250
+36,Portal,Luxury Sedan,20,Brochure,4717,South Wing,84,410
+36,Phone,Sports Car,25,Newsletter,4210,Central Hall,83,120
+60,Portal,Crossover,25,Newsletter,1226,Central Hall,62,680
+12,Email,Diesel Truck,15,Newsletter,7400,Central Hall,90,410
+48,Phone,Compact SUV,20,Brochure,4639,South Wing,99,680
+36,Portal,Luxury SUV,40,Newsletter,7712,Central Hall,96,120
+36,Email,Cargo Van,40,Newsletter,3299,Central Hall,21,120
+12,Portal,Pickup Truck,20,Newsletter,9895,South Wing,39,250
+48,Phone,Roadster,15,Newsletter,4496,South Wing,99,680
+36,Portal,Muscle Car,20,Newsletter,4526,South Wing,81,920
+48,Email,Off-road Vehicle,30,Newsletter,5688,Central Hall,6,120
+12,Email,Camper Van,25,Brochure,3007,South Wing,58,680
+36,Portal,Compact Car,20,Brochure,3623,South Wing,37,920
+48,Portal,Motorcycle,20,Newsletter,8474,Central Hall,15,680
+24,Portal,Electric SUV,30,Web feature,8372,Central Hall,37,920
+
+capacity.csv
+showroom_cleaning_minutes_last_month,annual_maintenance_visits,Capacity
+600,8,765

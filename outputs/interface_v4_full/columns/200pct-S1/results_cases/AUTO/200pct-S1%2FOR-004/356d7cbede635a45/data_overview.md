@@ -1,0 +1,3 @@
+You requested the full contents of cost_12x12.csv, containing the machining costs c_ij for assigning each of 12 machines to each of 12 tasks. However, the provided context does not include the contents of cost_12x12.csv or any cost matrix data. 
+
+To proceed with your request, please provide the full contents of cost_12x12.csv (the 12x12 cost matrix), either as a table, CSV text, or file upload. Once you provide the data, I will retrieve and present all cost data in source order, preserving exact identifiers and values as requested.

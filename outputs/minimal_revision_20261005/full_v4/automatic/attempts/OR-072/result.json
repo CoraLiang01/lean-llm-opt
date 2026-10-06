@@ -1,0 +1,134 @@
+{
+  "problem_id": "OR-072",
+  "query": "For a certain daytime and nighttime service bus route, the number of drivers and crew members required during each time period is given in 42.csv:\n\n    Assuming that the drivers and crew members start working at the beginning of each time period and work continuously for 4 hours, how many drivers and crew members should be assigned to this bus route at least? Write down the linear programming model for this problem.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others1/42.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 320.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the minimum number of drivers and crew members to assign to a bus route, such that for each hour of the day, the number of on-duty staff meets or exceeds the required number for that hour. Each staff member starts work at the beginning of an hour and works continuously for 4 hours.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) covering problem (specifically, a staff/shift scheduling problem).\n3.  **Define Index Sets:** The primary index is the set of time periods (hours), indexed by `i` (where `i = 1, ..., 24` for the 24 hours in the day, as given in the CSV).\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of staff (drivers and crew members) who start their shift at hour `i`. Type: GRB.INTEGER (nonnegative integer).\n5.  **Identify Parameters (from Schema):**\n    -   The required number of staff for each hour comes from the column `'Number Required'` in the CSV, indexed by hour `i`.\n    -   The time periods are given by the `'Time'` column, but the model will use the index `i` (1 to 24) for each hour.\n6.  **Formulate Objective:** Minimize the total number of staff assigned, i.e., minimize the sum over all hours of `x[i]`.\n7.  **Formulate Constraints:**\n    -   Coverage Constraint: For each hour `j` (from 1 to 24), the sum of staff who started in the current or previous 3 hours (i.e., those whose 4-hour shift covers hour `j`) must be at least the required number for hour `j`. That is, for each hour `j`,  \n        `x[j] + x[j-1] + x[j-2] + x[j-3] >= Number Required[j]`,  \n        where indices wrap around the 24-hour cycle (e.g., hour 1 is covered by shifts starting at hours 1, 24, 23, and 22).\n    -   Nonnegativity and Integrality: For all `i`, `x[i] >= 0` and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others1/42.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 24\nColumns: ['Shift', 'Time', 'Number Required']\nParsed column types: {'Shift': 'int64', 'Time': 'object', 'Number Required': 'int64'}\nPreview only (first 10 rows):\nShift       Time Number Required\n    1  0:00-1:00              20\n    2  1:00-2:00              18\n    3  2:00-3:00              15\n    4  3:00-4:00              15\n    5  4:00-5:00              20\n    6  5:00-6:00              30\n    7  6:00-7:00              60\n    8  7:00-8:00              70\n    9  8:00-9:00              50\n   10 9:00-10:00              55\nFull-file column statistics: {\"Shift\": {\"missing\": 0, \"unique_nonempty\": 24, \"numeric_range\": [1.0, 24.0]}, \"Time\": {\"missing\": 0, \"unique_nonempty\": 24}, \"Number Required\": {\"missing\": 0, \"unique_nonempty\": 15, \"numeric_range\": [15.0, 85.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"time\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"60e56c66a4df0d6401f3e1b0320a71a7ef85d894613776bd4a94954999533579\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others1/42.csv'\ndf = pd.read_csv(csv_path, sep=',')\nif not set(['Shift', 'Number Required']).issubset(df.columns):\n    raise KeyError(\"CSV missing required columns 'Shift' and/or 'Number Required'.\")\nshifts = sorted(df['Shift'].astype(int).unique())\nif shifts != list(range(1, 25)):\n    raise ValueError(f'Expected shifts 1..24, got {shifts}')\nrequired = df.set_index(df['Shift'].astype(int))['Number Required'].to_dict()\nif len(required) != 24:\n    raise ValueError('Missing required staff data for some shifts.')\nm = gp.Model('BusStaffScheduling')\nx = m.addVars(shifts, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((x[i] for i in shifts)), gp.GRB.MINIMIZE)\nfor j in shifts:\n    covered_starts = [(j - k - 1) % 24 + 1 for k in range(4)]\n    m.addConstr(gp.quicksum((x[i] for i in covered_starts)) >= required[j], name=f'cov{j}')\nm.setParam('MIPGap', 0.0001)\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'ObjVal: {m.objVal}')\n    for i in shifts:\n        print(f'{x[i].VarName} {x[i].X}')\nelse:\n    print(f'Solver status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 320.0,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      0.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      15.0
+    ],
+    [
+      "C4",
+      5.0
+    ],
+    [
+      "C5",
+      10.0
+    ],
+    [
+      "C6",
+      30.0
+    ],
+    [
+      "C7",
+      25.0
+    ],
+    [
+      "C8",
+      0.0
+    ],
+    [
+      "C9",
+      0.0
+    ],
+    [
+      "C10",
+      40.0
+    ],
+    [
+      "C11",
+      35.0
+    ],
+    [
+      "C12",
+      5.0
+    ],
+    [
+      "C13",
+      0.0
+    ],
+    [
+      "C14",
+      20.0
+    ],
+    [
+      "C15",
+      30.0
+    ],
+    [
+      "C16",
+      10.0
+    ],
+    [
+      "C17",
+      15.0
+    ],
+    [
+      "C18",
+      30.0
+    ],
+    [
+      "C19",
+      15.0
+    ],
+    [
+      "C20",
+      0.0
+    ],
+    [
+      "C21",
+      0.0
+    ],
+    [
+      "C22",
+      20.0
+    ],
+    [
+      "C23",
+      15.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 35.124,
+  "base_notebook_sha256": "27b17404536910dec6442e66cce5a76d0dc4c391b243142a3f5b75e5f9962a4d",
+  "notebook_source_sha256": "27b17404536910dec6442e66cce5a76d0dc4c391b243142a3f5b75e5f9962a4d",
+  "cache_fingerprint": "831457d90524a0b1692bff65ce4b3fb805819700524d1cf2b66fbb5694ae2205",
+  "evaluated_utc": "2026-10-05T14:50:24.209664+00:00"
+}

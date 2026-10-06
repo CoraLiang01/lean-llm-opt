@@ -1,0 +1,26 @@
+capacity.csv
+previous_period_capacity,Capacity
+681,586
+
+products.csv
+previous_period_development_status,previous_period_resource_requirement,previous_period_unit_value,ProductName,Value,Weight
+Planned,866,458,Queens,469,954
+Planned,764,275,Brooklyn,290,650
+Planned,913,202,Manhattan,236,961
+Completed,782,257,Bronx,235,950
+Planned,413,741,Staten Island,745,379
+Completed,678,657,Harlem,684,776
+In progress,319,374,Upper East Side,444,381
+In progress,887,201,Lower Manhattan,172,808
+In progress,968,901,Midtown,1000,937
+Planned,541,277,Long Island City,336,608
+Planned,954,547,Williamsburg,546,912
+In progress,452,549,Bushwick,535,391
+Completed,410,432,Flatbush,539,465
+Completed,491,985,Greenpoint,831,490
+In progress,840,137,Park Slope,139,918
+Completed,811,449,Astoria,432,787
+Completed,392,570,Jackson Heights,627,347
+Planned,281,582,Flushing,629,274
+Completed,565,259,Sunnyside,292,642
+In progress,145,1025,Ditmars,978,130

@@ -1,0 +1,29 @@
+**facility_sites.csv**
+
+| Center | OpeningCost | CoveredDistricts   |
+|--------|-------------|--------------------|
+| B1     | 11          | Z1;Z2;Z5           |
+| B2     | 14          | Z2;Z3;Z6           |
+| B3     | 10          | Z4;Z5;Z8           |
+| B4     | 13          | Z1;Z6;Z7           |
+| B5     | 16          | Z3;Z7;Z9           |
+| B6     | 9           | Z8;Z9;Z10          |
+| B7     | 12          | Z4;Z10             |
+| B8     | 15          | Z5;Z6;Z9           |
+
+---
+
+**service_zones.csv**
+
+| Zone  |
+|-------|
+| Z1    |
+| Z2    |
+| Z3    |
+| Z4    |
+| Z5    |
+| Z6    |
+| Z7    |
+| Z8    |
+| Z9    |
+| Z10   |

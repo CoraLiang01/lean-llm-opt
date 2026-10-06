@@ -1,0 +1,91 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with robust encoding
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM17/SupermarketSales.csv"
+    tried_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in tried_encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not decode CSV with tried encodings.")
+
+    # Check required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Filter for 'Fashion' products (case-insensitive, substring match)
+    # If there is a 'Category' column, use it; otherwise, filter by 'Product Name'
+    if 'Category' in df.columns:
+        mask = df['Category'].str.casefold() == 'fashion'
+    else:
+        mask = df['Product Name'].str.casefold().str.contains('fashion')
+    df_fashion = df[mask].copy()
+
+    if df_fashion.empty:
+        raise ValueError("No 'Fashion' products found in the source data.")
+
+    # Aggregate by product name in case of duplicates
+    grouped = df_fashion.groupby('Product Name', as_index=False).agg({
+        'Revenue': 'sum',
+        'Demand': 'sum',
+        'Initial Inventory': 'sum'
+    })
+
+    # Build index set and coefficient dictionaries
+    items = list(grouped['Product Name'])
+    revenue = dict(zip(items, grouped['Revenue']))
+    demand = dict(zip(items, grouped['Demand']))
+    inventory = dict(zip(items, grouped['Initial Inventory']))
+
+    # Validate all coefficients are present and finite
+    for i in items:
+        if pd.isnull(revenue[i]) or pd.isnull(demand[i]) or pd.isnull(inventory[i]):
+            raise ValueError(f"Missing data for product: {i}")
+        if not (isinstance(revenue[i], (int, float)) and isinstance(demand[i], (int, float)) and isinstance(inventory[i], (int, float))):
+            raise ValueError(f"Non-numeric data for product: {i}")
+        if demand[i] < 0 or inventory[i] < 0:
+            raise ValueError(f"Negative demand or inventory for product: {i}")
+
+    # Model
+    m = gp.Model('Supermarket_Fashion_Revenue')
+    m.Params.MIPGap = 1e-4
+
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v5/frozen_notebook.ipynb:cell29", line 140, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v5/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 53, in <module>
+  File "<string>", line 24, in solve_problem
+  File "/opt/miniconda3/envs/lean_llm_opt_4_1/lib/python3.10/site-packages/pandas/core/frame.py", line 3797, in __getitem__
+    if com.is_bool_indexer(key):
+  File "/opt/miniconda3/envs/lean_llm_opt_4_1/lib/python3.10/site-packages/pandas/core/common.py", line 135, in is_bool_indexer
+    raise ValueError(na_msg)
+ValueError: Cannot mask with non-boolean array containing NA / NaN values

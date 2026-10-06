@@ -1,0 +1,529 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure, focusing on the objective, decision variables, and main constraints. The objective is to maximize total expected NPV by selecting a subset of projects, subject to a budget constraint and several logical dependencies (mutual exclusivity, prerequisites, and contingent selections). These logical constraints introduce dependencies between project selection decisions, which may indicate a hybrid or non-standard structure. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: binary project selection to maximize total expected NPV under a budget constraint, with additional logical dependencies including mutual exclusivity, prerequisites, and contingent selection constraints
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A financial institution wants to form a revenue-maximizing portfolio by investing in a selection of 10 structured financial products (e.g., CDOs, CLOs, MBS, etc.). Each product provides a specific expected revenue per unit invested, involves exposure to various risk factors (market, credit, interest rate, etc.), and is subject to upper limits on allocation in ProductCharacteristics_IndividualCaps.csv. The portfolio must satisfy the upper exposure limits for the nine risk factors and the All-in Investment budget limit in RiskFactorLimits.csv, and adhere to product-specific allocation caps.
+
+Your task:
+Maximize expected portfolio revenue while satisfying the diversification/risk constraints and allocation bounds.
+Type: Mixture
+
+[Retrieved example 2]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP[0m
+Thought:[32;1m[1;3mThought: The objective is to maximize total expected NPV by selecting a subset of projects, subject to a budget constraint and several logical dependencies (mutual exclusivity, prerequisites, and contingent selection). The decision variables are binary project-selection variables. The principal constraints are a budget constraint and logical constraints that couple project selections. The retrieved examples include project selection with risk and allocation constraints (Mixture), production planning with batch and activation decisions (Mixture), and a pure assignment problem (AP). The presence of logical dependencies (mutual exclusivity, prerequisites, contingent selection) means this is not a clean knapsack or project-selection problem, but rather a hybrid with interacting constraint families. This matches the Mixture label in the retrieved examples for project selection with additional logical or risk constraints.
+
+Final Answer: Mixture[0m
+
+[1m> Finished chain.[0m
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A financial institution wants to form a revenue-maximizing portfolio by investing in a selection of 10 structured financial products (e.g., CDOs, CLOs, MBS, etc.). Each product provides a specific expected revenue per unit invested, involves exposure to various risk factors (market, credit, interest rate, etc.), and is subject to upper limits on allocation in ProductCharacteristics_IndividualCaps.csv. The portfolio must satisfy the upper exposure limits for the nine risk factors and the All-in Investment budget limit in RiskFactorLimits.csv, and adhere to product-specific allocation caps.
+
+Your task:
+Maximize expected portfolio revenue while satisfying the diversification/risk constraints and allocation bounds.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+Let $\mathbf{x} = [x_1,x_2,\ldots,x_{10}]^\top$ be the vector of investment amounts (in million dollars). 
+Let each constraint coefficient vector be $\mathbf{m}, \mathbf{c}, \mathbf{i}, \mathbf{f}, \mathbf{l}, \mathbf{r}, \mathbf{e}, \mathbf{v}, \mathbf{g}$ as defined below.
+
+---
+
+**Objective:**
+$$
+\text{Maximize} \quad Z = \mathbf{p} \cdot \mathbf{x} = \sum_{i=1}^{10} p_i x_i
+$$
+where $\mathbf{p} = [73,76,65,70,68,75,67,74,69,72]$.
+
+---
+
+**Subject to:**
+
+**Total invested:**
+$$
+\sum_{i=1}^{10} x_i \leq 35
+$$
+
+**Box constraints:**
+$$
+\mathbf{0} \leq \mathbf{x} \leq \mathbf{u}
+$$
+where $\mathbf{u} = [12,8,10,9,7,11,8,10,9,12]$.
+
+---
+
+**Risk factor limits (all written as vector dot products):**
+
+- Market Risk:
+$$
+\mathbf{m} \cdot \mathbf{x} \leq 42
+$$
+where $\mathbf{m} = [5.1,6.0,3.8,5.3,4.8,6.7,4.0,5.8,4.7,5.6]$
+
+- Credit Risk:
+$$
+\mathbf{c} \cdot \mathbf{x} \leq 50
+$$
+where $\mathbf{c} = [6.2,7.1,5.7,6.4,6.1,6.5,5.8,6.3,6.0,6.6]$
+
+- Interest Rate Risk:
+$$
+\mathbf{i} \cdot \mathbf{x} \leq 29
+$$
+where $\mathbf{i} = [3.4,3.8,2.9,3.2,3.1,4.1,3.0,3.7,3.3,3.5]$
+
+- FX Risk:
+$$
+\mathbf{f} \cdot \mathbf{x} \leq 39
+$$
+where $\mathbf{f} = [4.2,4.6,3.4,4.8,4.0,5.1,3.7,4.9,4.1,4.5]$
+
+- Liquidity Risk:
+$$
+\mathbf{l} \cdot \mathbf{x} \leq 25
+$$
+where $\mathbf{l} = [2.8,2.6,2.4,3.3,2.9,3.7,2.5,3.0,2.8,2.7]$
+
+- IR Risk:
+$$
+\mathbf{r} \cdot \mathbf{x} \leq 49
+$$
+where $\mathbf{r} = [5.9,4.8,6.2,5.1,4.9,6.3,5.6,6.1,5.2,5.4]$
+
+- Equity Risk:
+$$
+\mathbf{e} \cdot \mathbf{x} \leq 25
+$$
+where $\mathbf{e} = [2.7,2.5,2.2,2.6,2.3,3.0,2.4,2.9,2.7,2.8]$
+
+- Volatility:
+$$
+\mathbf{v} \cdot \mathbf{x} \leq 36
+$$
+where $\mathbf{v} = [4.5,5.1,3.9,4.8,4.4,5.4,4.0,5.0,4.3,4.7]$
+
+- Regulatory Risk:
+$$
+\mathbf{g} \cdot \mathbf{x} \leq 27
+$$
+where $\mathbf{g} = [2.2,3.0,2.7,2.5,2.4,3.3,2.6,3.2,2.3,2.8]$
+
+---
+
+**Domain:**
+$$
+x_i \geq 0 \quad \text{for all } i = 1, \ldots, 10
+$$
+
+The source limits contain nine named risk factors plus All-in Investment <= 35. This reference uses these upper bounds, product-specific allocation caps and nonnegative investment amounts.
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Maximize**
+
+$$
+N
+$$
+
+**subject to**
+
+$$
+x_{A1} + x_{A2} + x_{A3} \leq 100 
+\quad (\text{workshop A hours})
+$$
+
+$$
+x_{B1} + x_{B2} + x_{B3} \leq 150 
+\quad (\text{workshop B hours})
+$$
+
+$$
+x_{C1} + x_{C2} + x_{C3} \leq 80 
+\quad (\text{workshop C hours})
+$$
+
+$$
+x_{D1} + x_{D2} + x_{D3} \leq 200 
+\quad (\text{workshop D hours})
+$$
+
+**component requirements**
+
+$$
+10\, x_{A1} + 15\, x_{B1} + 20\, x_{C1} + 10\, x_{D1} \geq N 
+\quad (\text{component 1})
+$$
+
+$$
+15\, x_{A2} + 10\, x_{B2} + 5\, x_{C2} + 15\, x_{D2} \geq N 
+\quad (\text{component 2})
+$$
+
+$$
+5\, x_{A3} + 5\, x_{B3} + 10\, x_{C3} + 20\, x_{D3} \geq N 
+\quad (\text{component 3})
+$$
+
+**where**
+
+$$
+x_{wc} \geq 0 
+\quad \text{for all } 
+w \in \{A,B,C,D\},\, 
+c \in \{1,2,3\}
+$$
+
+$$
+N \geq 0 
+\quad (\text{number of completed products})
+$$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+Maximize
+39.62 x_1 - 178539 y_1 + 35.98 x_2 - 157708 y_2 + 37.96 x_3 - 85192 y_3
+
+Subject to
+x_1 <= 5732 (demand)
+x_1 <= 12892 (22-day individual production quota)
+x_1 >= 18 y_1 (minimum batch)
+x_1 <= 5732 y_1 (activation)
+x_2 <= 5607 (demand)
+x_2 <= 7238 (22-day individual production quota)
+x_2 >= 25 y_2 (minimum batch)
+x_2 <= 5607 y_2 (activation)
+x_3 <= 4653 (demand)
+x_3 <= 11902 (22-day individual production quota)
+x_3 >= 23 y_3 (minimum batch)
+x_3 <= 4653 y_3 (activation)
+x_1/586 + x_2/329 + x_3/541 <= 22 (shared production days)
+x_1, x_2, x_3 >= 0 integer; y_1, y_2, y_3 binary.
+
+###### Retrieved Information
+
+{
+  "daily_quota": {
+    "1": 586,
+    "2": 329,
+    "3": 541
+  },
+  "demand": {
+    "1": 5732,
+    "2": 5607,
+    "3": 4653
+  },
+  "fixed_cost": {
+    "1": 178539,
+    "2": 157708,
+    "3": 85192
+  },
+  "min_batch": {
+    "1": 18,
+    "2": 25,
+    "3": 23
+  },
+  "products": [
+    "A1",
+    "A2",
+    "A3"
+  ],
+  "profit": {
+    "1": 39.62,
+    "2": 35.98,
+    "3": 37.96
+  },
+  "quota": {
+    "1": 12892,
+    "2": 7238,
+    "3": 11902
+  }
+}
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to select a subset of 110 potential investment projects to maximize total expected Net Present Value (NPV), subject to a total capital budget and several strategic project dependencies (mutual exclusivity, prerequisites, and contingent selections).
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem (specifically, a binary project selection/knapsack problem with logical constraints).
+3.  **Define Index Sets:** The primary index is the set of Projects, indexed by `i` (where `i` ranges from 1 to 110, corresponding to 'Project ID').
+4.  **Define Decision Variables:**
+    -   `x[i]` = 1 if project `i` is selected, 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'NPV (k$)' column gives the expected NPV for each project.
+    -   Constraint coefficients: 'Capital (k$)' column gives the capital required for each project.
+    -   Constraint RHS: Budget limit is 1,000 k$ (from the query, not the CSV).
+    -   Project dependencies: Specific project IDs and their relationships are given in the query (not in the CSV).
+6.  **Formulate Objective:** Maximize the sum of selected projects' NPVs, i.e., maximize sum over all projects of `schema['NPV (k$)'][i] * x[i]`.
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Budget Constraint): The total capital of selected projects cannot exceed 1,000 k$. Formally, sum over all projects of `schema['Capital (k$)'][i] * x[i] <= 1000`.
+    -   Constraint 2 (Mutually Exclusive Projects 4 & 7): At most one of Project 4 or Project 7 can be selected: `x[4] + x[7] <= 1`.
+    -   Constraint 3 (Pre-requisite: Project 6 requires 1): Project 6 can only be selected if Project 1 is also selected: `x[6] <= x[1]`.
+    -   Constraint 4 (Contingent: Project 10 requires 5): Project 10 can only be selected if Project 5 is also selected: `x[10] <= x[5]`.
+    -   Constraint 5 (Binary domain): For all projects, `x[i]` ∈ {0,1}.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+
+# Read the project data
+project_path = '/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/Mixture_testing/Mixture4/project.csv'
+df = pd.read_csv(project_path, sep=',')
+
+# Define the set of project IDs (from 1 to 110, as per the query)
+project_ids = df['Project ID'].astype(int).tolist()
+n_projects = len(project_ids)
+if n_projects != 110:
+    raise ValueError(f"Expected 110 projects, found {n_projects} in CSV.")
+
+# Map project IDs to their NPV and Capital
+npv = df.set_index('Project ID')['NPV (k$)'].astype(float).to_dict()
+capital = df.set_index('Project ID')['Capital (k$)'].astype(float).to_dict()
+
+# Validate that all required projects for constraints exist
+required_ids = [1, 4, 5, 6, 7, 10]
+for pid in required_ids:
+    if pid not in project_ids:
+        raise ValueError(f"Required project ID {pid} not found in project list.")
+
+def solve_problem():
+    m = gp.Model("ProjectSelection")
+    # Decision variables: x[i] = 1 if project i is selected, 0 otherwise
+    x = m.addVars(project_ids, vtype=gp.GRB.BINARY, name='x')
+
+    # Objective: maximize total expected NPV
+    m.setObjective(gp.quicksum(npv[i] * x[i] for i in project_ids), gp.GRB.MAXIMIZE)
+
+    # Constraint 1: Total capital investment cannot exceed 1,000 k$
+    m.addConstr(gp.quicksum(capital[i] * x[i] for i in project_ids) <= 1000, name='budget')
+
+    # Constraint 2: Mutually exclusive (Projects 4 & 7): at most one can be selected
+    m.addConstr(x[4] + x[7] <= 1, name='mutual_excl_4_7')
+
+    # Constraint 3: Pre-requisite (Project 6 requires 1): x[6] <= x[1]
+    m.addConstr(x[6] <= x[1], name='prereq_6_1')
+
+    # Constraint 4: Contingent (Project 10 requires 5): x[10] <= x[5]
+    m.addConstr(x[10] <= x[5], name='contingent_10_5')
+
+    # Set MIPGap as required
+    m.setParam('MIPGap', 1e-4)
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+if m.status == gp.GRB.OPTIMAL:
+    print(f"ObjVal: {m.objVal}")
+    for v in m.getVars():
+        print(f"{v.VarName} {v.X}")
+else:
+    print(f"Solver status: {m.status}")
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 4 rows, 110 columns and 116 nonzeros
+Model fingerprint: 0xa55f6aab
+Variable types: 0 continuous, 110 integer (110 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+02]
+  Objective range  [1e+01, 2e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+03]
+Found heuristic solution: objective 1322.0000000
+Presolve time: 0.00s
+Presolved: 4 rows, 110 columns, 116 nonzeros
+Variable types: 0 continuous, 110 integer (110 binary)
+
+Root relaxation: objective 1.514516e+03, 1 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 1514.51579    0    1 1322.00000 1514.51579  14.6%     -    0s
+H    0     0                    1356.0000000 1514.51579  11.7%     -    0s
+H    0     0                    1506.0000000 1514.51579  0.57%     -    0s
+H    0     0                    1514.0000000 1514.51579  0.03%     -    0s
+     0     0 1514.51579    0    1 1514.00000 1514.51579  0.03%     -    0s
+
+Explored 1 nodes (1 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 4: 1514 1506 1356 1322 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.514000000000e+03, best bound 1.514000000000e+03, gap 0.0000%
+ObjVal: 1514.0
+C0 -0.0
+C1 -0.0
+C2 0.0
+C3 -0.0
+C4 -0.0
+C5 -0.0
+C6 -0.0
+C7 -0.0
+C8 -0.0
+C9 -0.0
+C10 -0.0
+C11 -0.0
+C12 -0.0
+C13 -0.0
+C14 -0.0
+C15 -0.0
+C16 1.0
+C17 1.0
+C18 -0.0
+C19 -0.0
+C20 -0.0
+C21 -0.0
+C22 -0.0
+C23 -0.0
+C24 -0.0
+C25 1.0
+C26 1.0
+C27 -0.0
+C28 -0.0
+C29 -0.0
+C30 -0.0
+C31 -0.0
+C32 -0.0
+C33 1.0
+C34 -0.0
+C35 0.0
+C36 -0.0
+C37 -0.0
+C38 -0.0
+C39 -0.0
+C40 -0.0
+C41 -0.0
+C42 -0.0
+C43 -0.0
+C44 1.0
+C45 -0.0
+C46 -0.0
+C47 -0.0
+C48 -0.0
+C49 -0.0
+C50 -0.0
+C51 0.0
+C52 -0.0
+C53 -0.0
+C54 -0.0
+C55 -0.0
+C56 -0.0
+C57 1.0
+C58 -0.0
+C59 -0.0
+C60 -0.0
+C61 -0.0
+C62 -0.0
+C63 -0.0
+C64 -0.0
+C65 0.0
+C66 1.0
+C67 -0.0
+C68 -0.0
+C69 -0.0
+C70 -0.0
+C71 -0.0
+C72 -0.0
+C73 -0.0
+C74 -0.0
+C75 -0.0
+C76 -0.0
+C77 1.0
+C78 1.0
+C79 -0.0
+C80 -0.0
+C81 -0.0
+C82 -0.0
+C83 -0.0
+C84 -0.0
+C85 -0.0
+C86 -0.0
+C87 -0.0
+C88 -0.0
+C89 1.0
+C90 1.0
+C91 -0.0
+C92 -0.0
+C93 -0.0
+C94 -0.0
+C95 0.0
+C96 -0.0
+C97 0.0
+C98 -0.0
+C99 -0.0
+C100 -0.0
+C101 -0.0
+C102 -0.0
+C103 -0.0
+C104 -0.0
+C105 -0.0
+C106 -0.0
+C107 -0.0
+C108 -0.0
+C109 -0.0
+Optimal objective: 1514.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', 0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', 1.0), ('C17', 1.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', 1.0), ('C26', 1.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', -0.0), ('C33', 1.0), ('C34', -0.0), ('C35', 0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', 1.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', 0.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', 1.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', -0.0), ('C65', 0.0), ('C66', 1.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', -0.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', 1.0), ('C78', 1.0), ('C79', -0.0), ('C80', -0.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', 1.0), ('C90', 1.0), ('C91', -0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', 0.0), ('C96', -0.0), ('C97', 0.0), ('C98', -0.0), ('C99', -0.0), ('C100', -0.0), ('C101', -0.0), ('C102', -0.0), ('C103', -0.0), ('C104', -0.0), ('C105', -0.0), ('C106', -0.0), ('C107', -0.0), ('C108', -0.0), ('C109', -0.0)]

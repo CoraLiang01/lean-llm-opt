@@ -1,0 +1,147 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract sets
+    customer_table = None
+    supplier_table = None
+    cost_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            customer_table = t
+        elif t["table_id"] == "file_1_view_0":
+            supplier_table = t
+        elif t["table_id"] == "file_2_view_0":
+            cost_table = t
+    if customer_table is None or supplier_table is None or cost_table is None:
+        raise RuntimeError("Missing required table(s) in CSVQA_DATA.")
+
+    # Customers and demands
+    C = []
+    d = {}
+    for rec in customer_table["records"]:
+        cust = rec["values"]["Customers"]
+        C.append(cust)
+        d[cust] = float(rec["values"]["demand"])
+
+    # Suppliers and capacities
+    S = []
+    u = {}
+    for rec in supplier_table["records"]:
+        sup = rec["values"]["Suppliers"]
+        S.append(sup)
+        u[sup] = float(rec["values"]["supply_capacity"])
+
+    # Transportation costs c_{ij}
+    c = {}
+    cost_rows = cost_table["records"]
+    # Validate that all suppliers and customers are present in cost matrix
+    cost_suppliers = [rec["values"]["Unnamed: 0"] for rec in cost_rows]
+    cost_customers = [col for col in cost_table["columns"] if col != "Unnamed: 0"]
+    if set(S) != set(cost_suppliers):
+        raise ValueError("Mismatch between supplier list and cost matrix rows.")
+    if set(C) != set(cost_customers):
+        raise ValueError("Mismatch between customer list and cost matrix columns.")
+    for rec in cost_rows:
+        sup = rec["values"]["Unnamed: 0"]
+        for cust in C:
+            key = (sup, cust)
+            val = rec["values"][cust]
+            if val is None or val == "":
+                raise ValueError(f"Missing cost for ({sup},{cust})")
+            c[key] = float(val)
+
+    # Validate coefficient coverage
+    for i in S:
+        for j in C:
+            if (i, j) not in c:
+                raise ValueError(f"Missing cost coefficient for ({i},{j})")
+
+    # Build model
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_{ij} >= 0, continuous
+    x_keys = [(i, j) for i in S for j in C]
+    x = m.addVars(x_keys, lb=0, vtype=GRB.CONTINUOUS, name='', obj=[c[(i, j)] for (i, j) in x_keys])
+
+    # Demand constraints: sum_i x_{ij} == d_j for all j
+    for j in C:
+        m.addConstr(gp.quicksum(x[i, j] for i in S) == d[j], name='')
+
+    # Supply constraints: sum_j x_{ij} <= u_i for all i
+    for i in S:
+        m.addConstr(gp.quicksum(x[i, j] for j in C) <= u[i], name='')
+
+    # Objective: minimize total transportation cost
+    m.ModelSense = GRB.MINIMIZE
+    m.update()
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for (i, j) in x_keys:
+            print(f"{x[i, j].VarName} {x[i, j].X}")
+    else:
+        print(m.Status)
+    return m
+
+m = solve_problem(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 11 rows, 30 columns and 60 nonzeros
+Model fingerprint: 0xd7c13d71
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 4e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [6e+01, 2e+02]
+Presolve time: 0.00s
+Presolved: 11 rows, 30 columns, 60 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    6.6000000e+02   0.000000e+00   0.000000e+00      0s
+
+Solved in 0 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  6.600000000e+02
+660.0
+C0 0.0
+C1 0.0
+C2 60.0
+C3 0.0
+C4 0.0
+C5 95.0
+C6 70.0
+C7 0.0
+C8 0.0
+C9 0.0
+C10 0.0
+C11 0.0
+C12 0.0
+C13 80.0
+C14 0.0
+C15 0.0
+C16 85.0
+C17 0.0
+C18 0.0
+C19 0.0
+C20 0.0
+C21 90.0
+C22 0.0
+C23 0.0
+C24 0.0
+C25 0.0
+C26 0.0
+C27 0.0
+C28 0.0
+C29 0.0
+Optimal objective: 660.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 60.0), ('C3', 0.0), ('C4', 0.0), ('C5', 95.0), ('C6', 70.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 80.0), ('C14', 0.0), ('C15', 0.0), ('C16', 85.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 90.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0)]

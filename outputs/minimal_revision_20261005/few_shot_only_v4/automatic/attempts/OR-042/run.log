@@ -1,0 +1,140 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # File paths
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/products.csv"
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/capacity.csv"
+
+    # Try reading products.csv with fallback encodings
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            products_df = pd.read_csv(products_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {products_path} with tried encodings.")
+
+    # Try reading capacity.csv with fallback encodings
+    for enc in encodings:
+        try:
+            capacity_df = pd.read_csv(capacity_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {capacity_path} with tried encodings.")
+
+    # Validate required columns
+    for col in ['ProductName', 'Value', 'Weight']:
+        if col not in products_df.columns:
+            raise ValueError(f"Column '{col}' missing from products.csv")
+    if 'Capacity' not in capacity_df.columns:
+        raise ValueError("Column 'Capacity' missing from capacity.csv")
+
+    # Build index set I and parameters
+    # Use all rows, preserving text identifiers
+    I = products_df['ProductName'].astype(str).tolist()
+    v = products_df.set_index('ProductName')['Value'].to_dict()
+    w = products_df.set_index('ProductName')['Weight'].to_dict()
+
+    # Validate all required coefficients are present and numeric
+    for i in I:
+        if i not in v or i not in w:
+            raise ValueError(f"Missing value or weight for product '{i}'")
+        if pd.isnull(v[i]) or pd.isnull(w[i]):
+            raise ValueError(f"Null value or weight for product '{i}'")
+        try:
+            v[i] = float(v[i])
+            w[i] = float(w[i])
+        except Exception:
+            raise ValueError(f"Non-numeric value or weight for product '{i}'")
+
+    # Capacity: use the sum of all Capacity entries (if multiple rows)
+    if capacity_df['Capacity'].isnull().any():
+        raise ValueError("Null value in Capacity column of capacity.csv")
+    try:
+        C = float(capacity_df['Capacity'].sum())
+    except Exception:
+        raise ValueError("Non-numeric value in Capacity column of capacity.csv")
+
+    # Build model
+    m = gp.Model('Pharmacy_Inventory')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize sum_i v_i x_i
+    m.setObjective(gp.quicksum(v[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraint: sum_i w_i x_i <= C
+    m.addConstr(gp.quicksum(w[i] * x[i] for i in I) <= C, name='capacity')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 20 columns and 20 nonzeros
+Model fingerprint: 0xf58bd490
+Variable types: 0 continuous, 20 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [5e+01, 5e+02]
+  Objective range  [3e+02, 1e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+03, 4e+03]
+Found heuristic solution: objective 47970.000000
+Presolve removed 1 rows and 20 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 81918 47970 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 8.191800000000e+04, best bound 8.191800000000e+04, gap 0.0000%
+ObjVal: 81918.0
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: 82.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+Optimal objective: 81918.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', 82.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0)]

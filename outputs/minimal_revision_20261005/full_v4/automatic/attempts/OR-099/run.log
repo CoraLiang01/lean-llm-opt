@@ -1,0 +1,303 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure: the objective is to minimize total cost (warehouse opening plus transportation), decision variables are which warehouses to open and how much to ship from each open warehouse to each store, constraints are warehouse capacities and store demand satisfaction, and there is a coupling between facility-opening and assignment/shipment. I should call FileQA once to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: facility-opening decisions with fixed opening costs, assignment of store demands to warehouses, warehouse capacity constraints, store demand satisfaction, transportation costs, minimize total cost
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 2]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP
+
+[Retrieved example 3]
+prompt: A factory needs to rent a warehouse to store materials for the next 4 months. The required warehouse area for each month is listed in 39-1.csv.The longer the rental contract period, the greater the discount on warehouse rental fees. The specific data is listed in 39-2.csv.
+
+The warehouse rental contract can be processed at the beginning of each month, and each contract specifies the rental area and period. Therefore, the factory can rent a contract on any month, and each time, they can sign one contract or multiple contracts with different rental areas and rental periods. The overall goal is to minimize the rental fees paid. Try to establish a linear programming mathematical model based on the above requirements.
+Type: Others
+
+[Retrieved example 4]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP
+
+[Retrieved example 5]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others[0m
+Thought:[32;1m[1;3mThought: The problem involves deciding which warehouses to open (facility-opening decisions with fixed costs) and how to assign/ship goods from open warehouses to stores (assignment/shipment decisions), subject to warehouse capacity and store demand constraints, with the objective of minimizing total (opening plus transportation) cost. This matches the defining structure of the Facility Location Problem (FLP), as supported by retrieved examples with similar facility-opening and assignment/shipment coupling. There are no additional mechanisms such as multi-stage decisions, blending, or logical dependencies that would make it Mixture.
+
+Final Answer: FLP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # --- Extract data from CSVQA_DATA ---
+    # Table IDs
+    warehouse_table_id = "file_0_view_0"
+    store_table_id = "file_1_view_0"
+    cost_matrix_table_id = "file_2_view_0"
+
+    # --- Warehouses: I ---
+    warehouse_records = [r["values"] for r in CSVQA_DATA["tables"] if r["table_id"] == warehouse_table_id][0:][0]["records"] if False else [r["values"] for r in next(t for t in CSVQA_DATA["tables"] if t["table_id"] == warehouse_table_id)["records"]]
+    I = [rec["Warehouse (i)"] for rec in warehouse_records]
+
+    # Opening cost and capacity
+    f = {rec["Warehouse (i)"]: float(rec["Opening Cost (fi)"]) for rec in warehouse_records}
+    u = {rec["Warehouse (i)"]: float(rec["Capacity (units)"]) for rec in warehouse_records}
+
+    # --- Stores: J ---
+    store_records = [r["values"] for r in CSVQA_DATA["tables"] if r["table_id"] == store_table_id][0:][0]["records"] if False else [r["values"] for r in next(t for t in CSVQA_DATA["tables"] if t["table_id"] == store_table_id)["records"]]
+    J = [rec["Store (j)"] for rec in store_records]
+    d = {rec["Store (j)"]: float(rec["Demand (units, dj)"]) for rec in store_records}
+
+    # --- Transportation cost matrix: c_{ij} ---
+    # Use relationships for mapping
+    rel = next(r for r in CSVQA_DATA["relationships"] if r["matrix_table_id"] == cost_matrix_table_id)
+    row_id_col = rel["row_id_column"]
+    row_id_mapping = rel.get("row_id_mapping", {})
+    col_id_mapping = rel.get("column_id_mapping", {})
+    # Matrix records
+    cost_matrix_records = [r["values"] for r in next(t for t in CSVQA_DATA["tables"] if t["table_id"] == cost_matrix_table_id)["records"]]
+    # Build c_{ij} with mapped warehouse and store IDs
+    c = {}
+    for rec in cost_matrix_records:
+        # Map warehouse
+        raw_row = rec[row_id_col]
+        i = row_id_mapping[raw_row] if raw_row in row_id_mapping else raw_row
+        c[i] = {}
+        for raw_col in rel["column_id_mapping"]:
+            j = col_id_mapping[raw_col] if raw_col in col_id_mapping else raw_col
+            c[i][j] = float(rec[raw_col])
+
+    # --- Validate dimensions ---
+    if set(I) != set(c.keys()):
+        raise ValueError("Mismatch between warehouse index sets in cost matrix and warehouse table.")
+    for i in I:
+        if set(J) != set(c[i].keys()):
+            raise ValueError(f"Mismatch between store index set in cost matrix for warehouse {i} and store table.")
+
+    # --- Build Gurobi model ---
+    m = gp.Model("Warehouse_Location")
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    x_keys = [(i, j) for i in I for j in J]
+    x = m.addVars(x_keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    y = m.addVars(I, vtype=GRB.BINARY, name='y')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(f[i] * y[i] for i in I) +
+        gp.quicksum(c[i][j] * x[i, j] for i in I for j in J),
+        GRB.MINIMIZE
+    )
+
+    # Demand satisfaction
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in I) == d[j] for j in J),
+        name='demand'
+    )
+
+    # Warehouse capacity
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in J) <= u[i] * y[i] for i in I),
+        name='capacity'
+    )
+
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 22 rows, 132 columns and 253 nonzeros
+Model fingerprint: 0xeea06988
+Variable types: 121 continuous, 11 integer (11 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+02]
+  Objective range  [1e+01, 4e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [2e+01, 4e+01]
+Found heuristic solution: objective 28856.000000
+Presolve time: 0.00s
+Presolved: 22 rows, 132 columns, 253 nonzeros
+Variable types: 121 continuous, 11 integer (11 binary)
+
+Root relaxation: objective 1.022124e+04, 28 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 10221.2368    0    2 28856.0000 10221.2368  64.6%     -    0s
+H    0     0                    13292.000000 10221.2368  23.1%     -    0s
+H    0     0                    10631.000000 10221.2368  3.85%     -    0s
+     0     0 10397.4523    0    4 10631.0000 10397.4523  2.20%     -    0s
+     0     0 10397.4523    0    2 10631.0000 10397.4523  2.20%     -    0s
+     0     0 10397.4523    0    4 10631.0000 10397.4523  2.20%     -    0s
+H    0     0                    10419.000000 10419.0000  0.00%     -    0s
+
+Cutting planes:
+  Implied bound: 5
+  Relax-and-lift: 1
+
+Explored 1 nodes (68 simplex iterations) in 0.04 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 5: 10419 10631 13292 ... 28856
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.041900000000e+04, best bound 1.041900000000e+04, gap 0.0000%
+ObjVal: 10419.0
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 0.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 0.0
+C68: 0.0
+C69: 0.0
+C70: 0.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 0.0
+C83: 0.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 0.0
+C96: 0.0
+C97: 0.0
+C98: 0.0
+C99: 30.0
+C100: 0.0
+C101: 20.0
+C102: 12.0
+C103: 0.0
+C104: 0.0
+C105: 45.0
+C106: 0.0
+C107: 32.0
+C108: 41.0
+C109: 0.0
+C110: 0.0
+C111: 40.0
+C112: 0.0
+C113: 23.0
+C114: 20.0
+C115: 25.0
+C116: 0.0
+C117: 38.0
+C118: 0.0
+C119: 0.0
+C120: 44.0
+C121: 0.0
+C122: 0.0
+C123: -0.0
+C124: 0.0
+C125: 0.0
+C126: 0.0
+C127: 0.0
+C128: 0.0
+C129: 0.0
+C130: 1.0
+C131: 1.0
+Optimal objective: 10419.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 30.0), ('C100', 0.0), ('C101', 20.0), ('C102', 12.0), ('C103', 0.0), ('C104', 0.0), ('C105', 45.0), ('C106', 0.0), ('C107', 32.0), ('C108', 41.0), ('C109', 0.0), ('C110', 0.0), ('C111', 40.0), ('C112', 0.0), ('C113', 23.0), ('C114', 20.0), ('C115', 25.0), ('C116', 0.0), ('C117', 38.0), ('C118', 0.0), ('C119', 0.0), ('C120', 44.0), ('C121', 0.0), ('C122', 0.0), ('C123', -0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 1.0), ('C131', 1.0)]

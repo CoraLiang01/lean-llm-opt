@@ -1,0 +1,126 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read warehouse data
+    warehouse_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv"
+    store_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv"
+    cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv"
+
+    # Try reading with different encodings
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            warehouses_df = pd.read_csv(warehouse_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {warehouse_path} with tried encodings.")
+
+    for enc in encodings:
+        try:
+            stores_df = pd.read_csv(store_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {store_path} with tried encodings.")
+
+    for enc in encodings:
+        try:
+            cost_df = pd.read_csv(cost_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {cost_path} with tried encodings.")
+
+    # Extract warehouse info
+    warehouses = warehouses_df['Warehouse (i)'].astype(str).tolist()
+    f = dict(zip(warehouses_df['Warehouse (i)'].astype(str), warehouses_df['Opening Cost (fi)']))
+    K = dict(zip(warehouses_df['Warehouse (i)'].astype(str), warehouses_df['Capacity (units)']))
+
+    # Extract store info
+    stores = stores_df['Store (j)'].astype(str).tolist()
+    d = dict(zip(stores_df['Store (j)'].astype(str), stores_df['Demand (units, dj)']))
+
+    # Extract transportation costs
+    # cost_df: first column is store, rest are warehouses
+    if 'Unnamed: 0' in cost_df.columns:
+        cost_df = cost_df.rename(columns={'Unnamed: 0': 'Store (j)'})
+    cost_df['Store (j)'] = cost_df['Store (j)'].astype(str)
+    cost_df = cost_df.set_index('Store (j)')
+    # Ensure all warehouses and stores are present
+    missing_warehouses = set(warehouses) - set(cost_df.columns)
+    missing_stores = set(stores) - set(cost_df.index)
+    if missing_warehouses:
+        raise ValueError(f"Missing warehouses in TransportationCost.csv: {missing_warehouses}")
+    if missing_stores:
+        raise ValueError(f"Missing stores in TransportationCost.csv: {missing_stores}")
+
+    # Build c[i][j] dictionary
+    c = {}
+    for i in warehouses:
+        c[i] = {}
+        for j in stores:
+            try:
+                c[i][j] = float(cost_df.loc[j, i])
+            except Exception:
+                raise ValueError(f"Missing transportation cost for warehouse {i}, store {j}")
+
+    # Validate all required data is present
+    for i in warehouses:
+        if i not in f or i not in K:
+            raise ValueError(f"Missing opening cost or capacity for warehouse {i}")
+    for j in stores:
+        if j not in d:
+            raise ValueError(f"Missing demand for store {j}")
+
+    # Model
+    m = gp.Model('UFLP14')
+    x_keys = [(i, j) for i in warehouses for j in stores]
+    x = m.addVars(x_keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    y = m.addVars(warehouses, vtype=GRB.BINARY, name='y')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(f[i] * y[i] for i in warehouses) +
+        gp.quicksum(c[i][j] * x[i, j] for i in warehouses for j in stores),
+        GRB.MINIMIZE
+    )
+
+    # Demand satisfaction
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in warehouses) == d[j] for j in stores),
+        name='demand'
+    )
+
+    # Warehouse capacity
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in stores) <= K[i] * y[i] for i in warehouses),
+        name='capacity'
+    )
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v5/frozen_notebook.ipynb:cell29", line 140, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v5/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 79, in <module>
+  File "<string>", line 46, in solve_problem
+ValueError: Missing warehouses in TransportationCost.csv: {'2', '10', '3', '1', '7', '5', '9', '6', '4', '8', '11'}

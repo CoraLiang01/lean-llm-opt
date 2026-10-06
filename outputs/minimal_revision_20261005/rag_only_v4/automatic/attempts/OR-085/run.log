@@ -1,0 +1,139 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal visiting order for a traveling salesman who must visit 15 customers (at 15 locations), starting and ending at location 1, such that the total travel distance is minimized. The pairwise (symmetric) distances between locations are provided in a CSV file.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem, specifically a Traveling Salesman Problem (TSP).
+3.  **Define Index Sets:** The primary indices are the set of locations/customers, indexed as \( i, j \) where \( i, j \in \{1, 2, ..., 15\} \).
+4.  **Define Decision Variables:**
+    -   `x[i, j]` = 1 if the route goes directly from location \( i \) to location \( j \), 0 otherwise. Type: GRB.BINARY.
+    -   `u[i]` = the position of location \( i \) in the tour (used for subtour elimination). Type: GRB.INTEGER (for \( i = 2, ..., 15 \); \( u[1] \) is fixed).
+5.  **Identify Parameters (from Schema):**
+    -   Distance between locations \( i \) and \( j \) is given by the CSV file, specifically the value in row \( i \), column \( j \) (excluding the 'Unnamed: 0' column, which is just the location index).
+    -   The distance matrix is symmetric, so missing values can be filled from the transpose entry.
+6.  **Formulate Objective:** Minimize the total travel distance, i.e., minimize the sum over all pairs \( (i, j) \) of `distance[i, j] * x[i, j]`, where `distance[i, j]` is the parameter from the CSV.
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Visit Each Location Exactly Once): For each location \( i \), the sum over all \( j \neq i \) of `x[i, j]` equals 1 (the salesman leaves each location exactly once).
+    -   Constraint 2 (Arrive at Each Location Exactly Once): For each location \( j \), the sum over all \( i \neq j \) of `x[i, j]` equals 1 (the salesman arrives at each location exactly once).
+    -   Constraint 3 (Subtour Elimination): For all \( i, j \in \{2, ..., 15\} \), \( i \neq j \), enforce `u[i] - u[j] + 15 * x[i, j] <= 14` to prevent subtours (Miller-Tucker-Zemlin formulation).
+    -   Constraint 4 (Start and End at Location 1): The tour must start and end at location 1, which is enforced by the above constraints, but can be explicitly checked by ensuring that exactly one route leaves and enters location 1.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+import gurobipy as gp
+from gurobipy import GRB
+
+# Read the distance matrix CSV
+csv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others7/20.csv'
+df = pd.read_csv(csv_path, sep=',')
+
+# The locations are indexed from 1 to 15 as per the CSV and query
+locations = [str(i) for i in range(1, 16)]
+
+# Build the symmetric distance matrix as a dict of dicts: distance[i][j]
+distance = {}
+for i_row in df.itertuples(index=False):
+    i = str(getattr(i_row, 'Unnamed: 0'))
+    distance[i] = {}
+    for j in locations:
+        val = getattr(i_row, j)
+        if pd.isna(val):
+            distance[i][j] = None
+        else:
+            distance[i][j] = float(val)
+
+# Fill missing off-diagonal entries from the transpose (since the matrix is symmetric)
+for i in locations:
+    for j in locations:
+        if i == j:
+            distance[i][j] = 0.0
+        else:
+            dij = distance[i][j]
+            dji = distance[j][i]
+            if dij is None and dji is not None:
+                distance[i][j] = dji
+            elif dij is not None and dji is None:
+                distance[j][i] = dij
+            elif dij is None and dji is None:
+                raise ValueError(f"Missing distance between {i} and {j}")
+
+# Validate that all required distances are present and symmetric
+for i in locations:
+    for j in locations:
+        if distance[i][j] is None:
+            raise ValueError(f"Missing distance between {i} and {j}")
+        if abs(distance[i][j] - distance[j][i]) > 1e-6:
+            raise ValueError(f"Distance matrix not symmetric at ({i},{j})")
+
+# Decision variables:
+# x[i,j] = 1 if route goes from i to j, 0 otherwise, for i != j
+x_keys = [(i, j) for i in locations for j in locations if i != j]
+
+# u[i]: position of location i in the tour (for subtour elimination), for i in 2..15
+u_locs = [i for i in locations if i != '1']
+
+m = gp.Model('tsp')
+m.Params.MIPGap = 1e-4
+
+x = m.addVars(x_keys, vtype=GRB.BINARY, name='x', lb=0, ub=1)
+u = m.addVars(u_locs, vtype=GRB.INTEGER, name='u', lb=2, ub=15)
+
+# Objective: minimize total travel distance
+m.setObjective(
+    gp.quicksum(distance[i][j] * x[i, j] for (i, j) in x_keys),
+    GRB.MINIMIZE
+)
+
+# Constraint 1: Leave each location exactly once
+for i in locations:
+    m.addConstr(
+        gp.quicksum(x[i, j] for j in locations if j != i) == 1,
+        name=''
+    )
+
+# Constraint 2: Arrive at each location exactly once
+for j in locations:
+    m.addConstr(
+        gp.quicksum(x[i, j] for i in locations if i != j) == 1,
+        name=''
+    )
+
+# Constraint 3: Subtour elimination (MTZ), for i,j in 2..15, i != j
+n = len(locations)
+for i in u_locs:
+    for j in u_locs:
+        if i != j:
+            m.addConstr(
+                u[i] - u[j] + n * x[i, j] <= n - 1,
+                name=''
+            )
+
+# Constraint 4: u[1] is fixed to 1 (starting location)
+# Not a variable, but for completeness, we can treat u[1]=1 in the MTZ constraints
+
+# Optimize
+m.optimize()
+
+# Output
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName} {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+```
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/rag_only_v4/frozen_notebook.ipynb:cell29", line 138, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/rag_only_v4/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 10, in <module>
+AttributeError: 'Pandas' object has no attribute 'Unnamed: 0'

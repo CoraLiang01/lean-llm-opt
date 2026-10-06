@@ -1,0 +1,168 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal sequence for a single delivery van to depart from the depot, visit each of three customer locations (A, B, and C) exactly once in any order, and return to the depot, such that the total travel distance is minimized. The pairwise distances between all locations (including the depot) are provided in a distance matrix CSV file.
+2.  **Identify Model Type:** Based on the query, this is a Traveling Salesman Problem (TSP), which is a type of Mixed-Integer Programming (MIP) problem.
+3.  **Define Index Sets:** The primary indices are the set of locations to be visited: {Depot, A, B, C}. Only these four locations are relevant; other locations in the CSV (D, E, F, etc.) are not included in this instance.
+4.  **Define Decision Variables:**
+    -   `x[i, j]` = 1 if the van travels directly from location i to location j, 0 otherwise. Type: GRB.BINARY, for all ordered pairs (i, j) where i ≠ j and i, j ∈ {Depot, A, B, C}.
+5.  **Identify Parameters (from Schema):**
+    -   Distance between locations i and j will come from the corresponding entry in DistanceMatrix.csv, using the intersection of row i and column j (for i, j ∈ {Depot, A, B, C}).
+6.  **Formulate Objective:** Minimize the total travel distance, i.e., minimize the sum over all pairs (i, j) of distance[i, j] * x[i, j], where x[i, j] = 1 if the route goes directly from i to j.
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Visit Each Location Once): For each location (including the depot), the van must depart from it exactly once: sum over j≠i of x[i, j] = 1 for all i ∈ {Depot, A, B, C}.
+    -   Constraint 2 (Arrive at Each Location Once): For each location (including the depot), the van must arrive at it exactly once: sum over i≠j of x[i, j] = 1 for all j ∈ {Depot, A, B, C}.
+    -   Constraint 3 (Subtour Elimination): To prevent disconnected cycles (subtours), add constraints (e.g., Miller-Tucker-Zemlin or explicit enumeration for small n) to ensure the route is a single tour visiting all locations.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+# Read the distance matrix CSV
+distance_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others5/DistanceMatrix.csv', sep=',')
+
+# Define the set of locations to use (as per the query and Abstract Model Plan)
+locations = ['Depot', 'A', 'B', 'C']
+
+# Normalize identifiers for matching (casefold, strip)
+def norm(s):
+    return str(s).casefold().strip()
+
+norm_locations = [norm(loc) for loc in locations]
+
+# Build a mapping from normalized to original for both rows and columns
+row_map = {norm(row): row for row in distance_df['Unnamed: 0']}
+col_map = {norm(col): col for col in distance_df.columns if col != 'Unnamed: 0'}
+
+# Validate that all required locations are present in both rows and columns
+missing_rows = [loc for loc in norm_locations if loc not in row_map]
+missing_cols = [loc for loc in norm_locations if loc not in col_map]
+if missing_rows or missing_cols:
+    raise ValueError(f"Missing rows: {missing_rows}, Missing columns: {missing_cols}")
+
+# Extract the relevant 4x4 distance matrix as a dict of dicts: distance[i][j]
+distance = {}
+for i in locations:
+    norm_i = norm(i)
+    row_label = row_map[norm_i]
+    row = distance_df[distance_df['Unnamed: 0'].apply(norm) == norm_i]
+    if row.empty:
+        raise ValueError(f"Row for location '{i}' not found in distance matrix.")
+    row = row.iloc[0]
+    distance[i] = {}
+    for j in locations:
+        norm_j = norm(j)
+        col_label = col_map[norm_j]
+        val = row[col_label]
+        if pd.isnull(val):
+            raise ValueError(f"Missing distance from {i} to {j} in distance matrix.")
+        distance[i][j] = float(val)
+
+# Decision variables: x[i, j] = 1 if travel from i to j, 0 otherwise, for i != j
+arcs = [(i, j) for i in locations for j in locations if i != j]
+
+def solve_problem():
+    m = gp.Model("TSP_Courier")
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    x = m.addVars(arcs, vtype=GRB.BINARY, name='x', lb=0, ub=1)
+
+    # Objective: minimize total travel distance
+    m.setObjective(gp.quicksum(distance[i][j] * x[i, j] for (i, j) in arcs), GRB.MINIMIZE)
+
+    # Constraint 1: Depart from each location exactly once
+    for i in locations:
+        m.addConstr(gp.quicksum(x[i, j] for j in locations if j != i) == 1, name='depart_%s' % i)
+
+    # Constraint 2: Arrive at each location exactly once
+    for j in locations:
+        m.addConstr(gp.quicksum(x[i, j] for i in locations if i != j) == 1, name='arrive_%s' % j)
+
+    # Subtour elimination (Miller-Tucker-Zemlin, since n=4 is small)
+    # Introduce u[i] for i in locations, with u[Depot]=0, 1 <= u[i] <= n-1 for i != Depot
+    n = len(locations)
+    u = m.addVars([loc for loc in locations if loc != 'Depot'], vtype=GRB.CONTINUOUS, lb=1, ub=n-1, name='u')
+
+    for i in locations:
+        for j in locations:
+            if i != j and i != 'Depot' and j != 'Depot':
+                # u[i] - u[j] + (n-1)*x[i,j] <= n-2
+                m.addConstr(u[i] - u[j] + (n-1)*x[i, j] <= n-2, name='mtz_%s_%s' % (i, j))
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+# Output as per instructions
+if m.Status == GRB.OPTIMAL:
+    print(f"ObjVal: {m.ObjVal}")
+    for v in m.getVars():
+        print(f"{v.VarName} {v.X}")
+else:
+    print(f"Solver status: {m.Status}")
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 14 rows, 15 columns and 42 nonzeros
+Model fingerprint: 0xe68f96b9
+Variable types: 3 continuous, 12 integer (12 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 3e+00]
+  Objective range  [3e+01, 9e+01]
+  Bounds range     [1e+00, 3e+00]
+  RHS range        [1e+00, 2e+00]
+Found heuristic solution: objective 199.0000000
+Presolve time: 0.00s
+Presolved: 14 rows, 15 columns, 48 nonzeros
+Variable types: 3 continuous, 12 integer (12 binary)
+
+Root relaxation: infeasible, 9 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 infeasible    0       199.00000  199.00000  0.00%     -    0s
+
+Explored 1 nodes (9 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 1: 199 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.990000000000e+02, best bound 1.990000000000e+02, gap 0.0000%
+ObjVal: 199.0
+C0 0.0
+C1 0.0
+C2 1.0
+C3 1.0
+C4 0.0
+C5 0.0
+C6 0.0
+C7 1.0
+C8 0.0
+C9 0.0
+C10 0.0
+C11 1.0
+C12 3.0
+C13 2.0
+C14 1.0
+Optimal objective: 199.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 1.0), ('C3', 1.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 1.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 1.0), ('C12', 3.0), ('C13', 2.0), ('C14', 1.0)]

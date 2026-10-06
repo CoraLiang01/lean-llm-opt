@@ -1,0 +1,20 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv
+CSV delimiter: comma; first line consumed as header.
+Total rows: 9
+Columns: ['Equipment / Cost', 'Product I', 'Product II', 'Product III', 'Available Equipment Operating Time', 'Equipment Cost at Full Load (yuan)']
+Parsed column types: {'Equipment / Cost': 'object', 'Product I': 'float64', 'Product II': 'float64', 'Product III': 'float64', 'Available Equipment Operating Time': 'float64', 'Equipment Cost at Full Load (yuan)': 'float64'}
+Preview only (first 10 rows):
+             Equipment / Cost Product I Product II Product III Available Equipment Operating Time Equipment Cost at Full Load (yuan)
+                           A1         5         10                                           6000                                300
+                           A2         7          9          12                              10000                                321
+                           A3         6         11           2                               8000                                203
+                           B1         6          8                                           4000                                250
+                           B2         4                     11                               7000                                783
+                           B3         7                                                      4000                                200
+                           B4         3          5           8                               5000                                300
+Raw Material Cost (yuan/unit)      0.25       0.35         0.5                                                                      
+       Unit Price (yuan/unit)      1.25          2         2.8                                                                      
+Full-file column statistics: {"Equipment / Cost": {"missing": 0, "unique_nonempty": 9}, "Product I": {"missing": 0, "unique_nonempty": 7, "numeric_range": [0.25, 7.0]}, "Product II": {"missing": 2, "unique_nonempty": 7, "numeric_range": [0.35, 11.0]}, "Product III": {"missing": 3, "unique_nonempty": 6, "numeric_range": [0.5, 12.0]}, "Available Equipment Operating Time": {"missing": 2, "unique_nonempty": 6, "numeric_range": [4000.0, 10000.0]}, "Equipment Cost at Full Load (yuan)": {"missing": 2, "unique_nonempty": 6, "numeric_range": [200.0, 783.0]}}
+Matching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.
+Counts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.
+Query-name evidence: [{"term": "a1", "matching_columns": [{"column": "Equipment / Cost", "exact": 1, "prefix": 1, "contains": 1, "examples": ["A1"]}], "exact_matching_columns": 1}, {"term": "a2", "matching_columns": [{"column": "Equipment / Cost", "exact": 1, "prefix": 1, "contains": 1, "examples": ["A2"]}], "exact_matching_columns": 1}, {"term": "available equipment operating time", "matching_columns": [], "exact_matching_columns": 0}, {"term": "b1", "matching_columns": [{"column": "Equipment / Cost", "exact": 1, "prefix": 1, "contains": 1, "examples": ["B1"]}], "exact_matching_columns": 1}, {"term": "b2", "matching_columns": [{"column": "Equipment / Cost", "exact": 1, "prefix": 1, "contains": 1, "examples": ["B2"]}], "exact_matching_columns": 1}, {"term": "b3", "matching_columns": [{"column": "Equipment / Cost", "exact": 1, "prefix": 1, "contains": 1, "examples": ["B3"]}], "exact_matching_columns": 1}, {"term": "product i", "matching_columns": [], "exact_matching_columns": 0}, {"term": "product ii", "matching_columns": [], "exact_matching_columns": 0}, {"term": "product iii", "matching_columns": [], "exact_matching_columns": 0}]

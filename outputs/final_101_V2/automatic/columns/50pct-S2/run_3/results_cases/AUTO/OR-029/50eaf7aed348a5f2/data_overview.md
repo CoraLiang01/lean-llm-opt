@@ -1,0 +1,35 @@
+capacity.csv
+ShelfID,CleaningMinutesLastMonth,Capacity
+1,12,5
+2,25,7
+3,3,6
+4,24,8
+5,3,5.5
+6,4,9
+7,11,6.5
+8,6,7.5
+9,14,8.2
+10,29,5.7
+
+products.csv
+CatalogViewsLastMonth,MerchandisingTeam,ProductName,Value,Weight
+14,Team_A,Smartphone,200,1
+12,Team_B,Laptop,1500,5
+8,Team_B,Headphones,100,0.5
+29,Team_B,Camera,800,2
+26,Team_C,Smartwatch,250,0.3
+18,Team_B,Tablet,600,1.5
+7,Team_B,Bluetooth Speaker,150,1
+1,Team_C,Keyboard,80,0.8
+20,Team_A,Mouse,50,0.2
+9,Team_A,Monitor,300,3
+17,Team_C,Printer,400,4
+7,Team_B,External Hard Drive,120,0.5
+22,Team_B,Router,60,0.3
+12,Team_B,Power Bank,40,0.4
+11,Team_A,Memory Card,30,0.05
+21,Team_A,USB Flash Drive,25,0.02
+13,Team_A,Smart Home Hub,100,0.6
+24,Team_A,Gaming Console,500,4
+15,Team_B,Fitness Tracker,90,0.2
+28,Team_A,E-Reader,180,0.5

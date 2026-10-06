@@ -1,0 +1,109 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with robust encoding
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv"
+    tried_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in tried_encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not decode CSV with tried encodings.")
+
+    # Ensure required columns exist
+    required_cols = ['SKU', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Filter for 'ZZ' products (case-insensitive, exact match)
+    zz_mask = df['SKU'].astype(str).str.casefold().str.startswith('zz')
+    zz_df = df[zz_mask].copy()
+    if zz_df.empty:
+        raise ValueError("No 'ZZ' products found in the data.")
+
+    # Remove duplicates, sum repeated rows by SKU
+    zz_df = zz_df.groupby('SKU', as_index=False).agg({
+        'Revenue': 'sum',
+        'Demand': 'sum',
+        'Initial Inventory': 'sum'
+    })
+
+    # Build index set and coefficient dictionaries
+    items = zz_df['SKU'].tolist()
+    revenue = dict(zip(zz_df['SKU'], zz_df['Revenue']))
+    demand = dict(zip(zz_df['SKU'], zz_df['Demand']))
+    inventory = dict(zip(zz_df['SKU'], zz_df['Initial Inventory']))
+
+    # Validate all coefficients are present for each item
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f"Missing coefficients for item: {i}")
+
+    m = gp.Model('RetailStore_ZZ_RevMax')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    # Constraints: demand and inventory
+    m.addConstrs((x[i] <= demand[i] for i in items), name='demand')
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inventory')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 10 rows, 5 columns and 10 nonzeros
+Model fingerprint: 0x3384aa0b
+Variable types: 0 continuous, 5 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+01, 1e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+00, 5e+02]
+Found heuristic solution: objective 2015.0800000
+Presolve removed 10 rows and 5 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 2015.08 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.015080000000e+03, best bound 2.015080000000e+03, gap 0.0000%
+ObjVal: 2015.08
+C0: 2.0
+C1: 4.0
+C2: 82.0
+C3: 2.0
+C4: 2.0
+Optimal objective: 2015.08
+Optimal solution: [('C0', 2.0), ('C1', 4.0), ('C2', 82.0), ('C3', 2.0), ('C4', 2.0)]

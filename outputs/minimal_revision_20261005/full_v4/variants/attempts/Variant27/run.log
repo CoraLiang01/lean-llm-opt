@@ -1,0 +1,286 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure of the problem. The objective is to minimize total assignment cost. The decision variables are binary: assign each candidate to at most one project, and each project must be assigned exactly one candidate. There are eligibility constraints: exclude on_leave=1, enforce required_skill, and forbid assignments where the cost cell is blank. The cost matrix is sparse, and assignments are only allowed where permitted. This is a one-to-one assignment with eligibility constraints. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: assign each of ten projects to one of twelve candidates, each candidate to at most one project, minimize total assignment cost, exclude ineligible candidates (on_leave=1), enforce required_skill, forbid assignments where cost cell is blank, binary assignment variables, one-to-one matching
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP
+
+[Retrieved example 2]
+prompt: A bank is planning its loan allocation strategy across 7 different industry sectors (S1, S2, S3, S4, S5, S6, S7). Within each of these sectors, the bank can provide loans across up to 6 loan types, labeled L1 through L6 (for example: Short-Term, Medium-Term, Long-Term, Consumer, SME, and Real Estate).
+
+The bank has the following data, organized in three separate CSV tables:
+
+ProjectedInterestIncome.csv:
+Each cell represents the expected interest income earned per million dollars invested in a given combination of sector and loan type (sector *loan type).
+
+RiskWeight.csv:
+Each cell shows the estimated risk weight associated with lending one million dollars in the corresponding combination of sector and loan type.
+(Risk weights reflect factors such as the financial health of the sector, characteristics of the loan type, and current macroeconomic trends.)
+
+LendingAllocationCaps.csv:
+Each cell indicates the maximum allowable allocation (in millions of dollars) that can be lent in each combination of industry sector and loan type.
+
+The bank wants to determine a lending allocation plan across the sectors and loan types to maximize the total expected interest income while:
+Do not exceeding the per-loan-type allocation (per sector) caps;
+Total risk-weighted exposure must stay below a regulatory cap: Total risk-weighted exposure cap: $14.0$;
+Minimum lending requirement: The total lending across all sectors and loan types must be at least $30 million;
+All allocations must be in integer millions.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem is a one-to-one assignment of workers to projects, with each project assigned exactly one worker and each worker assigned to at most one project. The objective is to minimize total assignment cost. Eligibility constraints (on_leave, required_skill, forbidden assignments via blank cells) restrict the feasible assignments but do not introduce additional decision families or hybrid mechanisms. The retrieved examples include a textbook assignment problem with eligibility constraints labeled AP, and the other examples are not structurally similar. The current problem is a clean assignment problem with standard eligibility constraints.
+
+Final Answer: AP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Skill order mapping
+    skill_order = {'junior': 0, 'intermediate': 1, 'senior': 2, 'expert': 3}
+
+    # --- 1. Read workers ---
+    workers_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            workers_table = t
+            break
+    if workers_table is None:
+        raise RuntimeError("Workers table not found")
+    workers = []
+    worker_skill = {}
+    for rec in workers_table["records"]:
+        wid = rec["values"]["worker_id"]
+        on_leave = rec["values"]["on_leave"]
+        if str(on_leave).strip() == "0":
+            workers.append(wid)
+            skill = rec["values"]["skill"]
+            worker_skill[wid] = skill.strip()
+    # --- 2. Read projects ---
+    projects_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_1_view_0":
+            projects_table = t
+            break
+    if projects_table is None:
+        raise RuntimeError("Projects table not found")
+    projects = []
+    project_required_skill = {}
+    for rec in projects_table["records"]:
+        pid = rec["values"]["project_id"]
+        projects.append(pid)
+        project_required_skill[pid] = rec["values"]["required_skill"].strip()
+    # --- 3. Read and merge cost matrices ---
+    cost_tables = []
+    for tid in ["file_2_view_0", "file_3_view_0", "file_4_view_0"]:
+        found = False
+        for t in CSVQA_DATA["tables"]:
+            if t["table_id"] == tid:
+                cost_tables.append(t)
+                found = True
+                break
+        if not found:
+            raise RuntimeError(f"Cost table {tid} not found")
+    # Build cost dict: cost[worker_id][project_id] = cost (int, in cents)
+    cost = {}
+    for t in cost_tables:
+        for rec in t["records"]:
+            wid = rec["values"]["worker_id"]
+            if wid not in cost:
+                cost[wid] = {}
+            for pid in projects:
+                val = rec["values"].get(pid, "")
+                if val is not None and str(val).strip() != "":
+                    cost[wid][pid] = int(str(val).strip())
+    # --- 4. Build eligible assignment pairs ---
+    eligible_pairs = []
+    for w in workers:
+        w_skill = worker_skill[w].casefold()
+        w_skill_level = skill_order[w_skill]
+        for p in projects:
+            p_skill = project_required_skill[p].casefold()
+            p_skill_level = skill_order[p_skill]
+            # Only allow if worker's skill >= required
+            if w_skill_level >= p_skill_level:
+                # Only allow if cost is present
+                if w in cost and p in cost[w]:
+                    eligible_pairs.append((w, p))
+    # --- 5. Validate coverage ---
+    # Each project must have at least one eligible worker
+    for p in projects:
+        found = False
+        for w in workers:
+            if (w, p) in eligible_pairs:
+                found = True
+                break
+        if not found:
+            raise RuntimeError(f"No eligible worker for project {p}")
+    # Each worker may have zero or more eligible projects (that's fine)
+    # --- 6. Build model ---
+    m = gp.Model("assignment")
+    x = m.addVars(eligible_pairs, vtype=GRB.BINARY, name='x')
+    # Objective
+    m.setObjective(gp.quicksum(cost[w][p] * x[w, p] for (w, p) in eligible_pairs), GRB.MINIMIZE)
+    # Constraint: Each project assigned to exactly one worker
+    for p in projects:
+        m.addConstr(gp.quicksum(x[w, p] for w in workers if (w, p) in x) == 1)
+    # Constraint: Each worker assigned to at most one project
+    for w in workers:
+        m.addConstr(gp.quicksum(x[w, p] for p in projects if (w, p) in x) <= 1)
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    return m
+
+m = solve_problem()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 21 rows, 79 columns and 158 nonzeros
+Model fingerprint: 0x573be526
+Variable types: 0 continuous, 79 integer (79 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+02, 1e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 5570.0000000
+Presolve time: 0.00s
+Presolved: 21 rows, 79 columns, 158 nonzeros
+Variable types: 0 continuous, 79 integer (79 binary)
+
+Root relaxation: objective 1.679000e+03, 11 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    1679.0000000 1679.00000  0.00%     -    0s
+
+Explored 1 nodes (11 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 1679 5570 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.679000000000e+03, best bound 1.679000000000e+03, gap 0.0000%
+ObjVal: 1679.0
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: 1.0
+C4: -0.0
+C5: -0.0
+C6: 1.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: 1.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: 0.0
+C29: 1.0
+C30: -0.0
+C31: -0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: 1.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: 1.0
+C43: -0.0
+C44: -0.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: 1.0
+C50: -0.0
+C51: -0.0
+C52: -0.0
+C53: -0.0
+C54: -0.0
+C55: -0.0
+C56: -0.0
+C57: 1.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: -0.0
+C62: -0.0
+C63: -0.0
+C64: -0.0
+C65: -0.0
+C66: -0.0
+C67: 1.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: -0.0
+C72: -0.0
+C73: -0.0
+C74: -0.0
+C75: -0.0
+C76: -0.0
+C77: -0.0
+C78: 1.0
+Optimal objective: 1679.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', 1.0), ('C4', -0.0), ('C5', -0.0), ('C6', 1.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', 1.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', 0.0), ('C29', 1.0), ('C30', -0.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', 1.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', 1.0), ('C43', -0.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', 1.0), ('C50', -0.0), ('C51', -0.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', 1.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', -0.0), ('C65', -0.0), ('C66', -0.0), ('C67', 1.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', -0.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', 1.0)]

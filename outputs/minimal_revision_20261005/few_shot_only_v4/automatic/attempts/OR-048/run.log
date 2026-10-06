@@ -1,0 +1,283 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    def read_csv_with_encodings(path):
+        encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+        for enc in encodings:
+            try:
+                return pd.read_csv(path, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise ValueError(f"Could not decode {path} with tried encodings.")
+
+    # Source schema paths
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA14/AmazonProductsSalesDataset2023/capacity.csv"
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA14/AmazonProductsSalesDataset2023/products.csv"
+
+    # Read data
+    cap_df = read_csv_with_encodings(capacity_path)
+    prod_df = read_csv_with_encodings(products_path)
+
+    # Validate required columns
+    if not {'StorageID', 'Capacity'}.issubset(cap_df.columns):
+        raise ValueError("capacity.csv missing required columns.")
+    if not {'ProductName', 'Value', 'Weight'}.issubset(prod_df.columns):
+        raise ValueError("products.csv missing required columns.")
+
+    # Build index sets
+    I = cap_df['StorageID'].astype(str).unique().tolist()
+    J = prod_df['ProductName'].astype(str).unique().tolist()
+
+    # Build parameter dictionaries
+    c_i = {}
+    for _, row in cap_df.iterrows():
+        key = str(row['StorageID'])
+        val = row['Capacity']
+        if pd.isnull(val):
+            raise ValueError(f"Missing Capacity for StorageID {key}")
+        if key in c_i:
+            c_i[key] += val
+        else:
+            c_i[key] = val
+
+    v_j = {}
+    w_j = {}
+    for _, row in prod_df.iterrows():
+        key = str(row['ProductName'])
+        vval = row['Value']
+        wval = row['Weight']
+        if pd.isnull(vval) or pd.isnull(wval):
+            raise ValueError(f"Missing Value or Weight for ProductName {key}")
+        if key in v_j:
+            v_j[key] += vval
+            w_j[key] += wval
+        else:
+            v_j[key] = vval
+            w_j[key] = wval
+
+    # Validate all indices have parameters
+    for i in I:
+        if i not in c_i:
+            raise ValueError(f"Missing capacity for StorageID {i}")
+    for j in J:
+        if j not in v_j or j not in w_j:
+            raise ValueError(f"Missing value/weight for ProductName {j}")
+
+    # Build model
+    m = gp.Model('Amazon_AC_Storage')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_{ij} >= 0, integer
+    keys = [(i, j) for i in I for j in J]
+    x = m.addVars(keys, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total value
+    m.setObjective(gp.quicksum(v_j[j] * x[i, j] for i in I for j in J), GRB.MAXIMIZE)
+
+    # Storage area capacity constraints
+    for i in I:
+        m.addConstr(
+            gp.quicksum(w_j[j] * x[i, j] for j in J) <= c_i[i],
+            name=f'cap_{i}'
+        )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 15 rows, 150 columns and 150 nonzeros
+Model fingerprint: 0x437075e0
+Variable types: 0 continuous, 150 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+02, 3e+02]
+  Objective range  [1e+03, 5e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [5e+02, 2e+03]
+Found heuristic solution: objective 635052.00000
+Presolve removed 14 rows and 148 columns
+Presolve time: 0.00s
+Presolved: 1 rows, 2 columns, 2 nonzeros
+Variable types: 0 continuous, 2 integer (0 binary)
+
+Root relaxation: cutoff, 0 iterations, 0.00 seconds (0.00 work units)
+
+Explored 1 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 1: 635052 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.350520000000e+05, best bound 6.350520000000e+05, gap 0.0000%
+ObjVal: 635052.0
+C0: 9.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: 16.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: 6.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: 11.0
+C31: -0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: 11.0
+C41: -0.0
+C42: -0.0
+C43: -0.0
+C44: -0.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: 4.0
+C51: -0.0
+C52: -0.0
+C53: -0.0
+C54: -0.0
+C55: -0.0
+C56: -0.0
+C57: -0.0
+C58: -0.0
+C59: -0.0
+C60: 16.0
+C61: -0.0
+C62: -0.0
+C63: -0.0
+C64: -0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: -0.0
+C69: -0.0
+C70: 7.0
+C71: -0.0
+C72: -0.0
+C73: -0.0
+C74: -0.0
+C75: -0.0
+C76: -0.0
+C77: -0.0
+C78: -0.0
+C79: -0.0
+C80: 5.0
+C81: -0.0
+C82: -0.0
+C83: -0.0
+C84: -0.0
+C85: -0.0
+C86: -0.0
+C87: -0.0
+C88: -0.0
+C89: -0.0
+C90: 5.0
+C91: -0.0
+C92: -0.0
+C93: -0.0
+C94: -0.0
+C95: -0.0
+C96: -0.0
+C97: -0.0
+C98: -0.0
+C99: -0.0
+C100: 8.0
+C101: -0.0
+C102: -0.0
+C103: -0.0
+C104: -0.0
+C105: -0.0
+C106: -0.0
+C107: -0.0
+C108: -0.0
+C109: -0.0
+C110: 5.0
+C111: -0.0
+C112: -0.0
+C113: -0.0
+C114: -0.0
+C115: -0.0
+C116: -0.0
+C117: -0.0
+C118: -0.0
+C119: -0.0
+C120: 12.0
+C121: -0.0
+C122: -0.0
+C123: -0.0
+C124: -0.0
+C125: -0.0
+C126: -0.0
+C127: -0.0
+C128: -0.0
+C129: -0.0
+C130: 10.0
+C131: -0.0
+C132: -0.0
+C133: -0.0
+C134: -0.0
+C135: -0.0
+C136: -0.0
+C137: -0.0
+C138: -0.0
+C139: -0.0
+C140: 7.0
+C141: -0.0
+C142: -0.0
+C143: -0.0
+C144: -0.0
+C145: -0.0
+C146: -0.0
+C147: -0.0
+C148: -0.0
+C149: -0.0
+Optimal objective: 635052.0
+Optimal solution: [('C0', 9.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', 16.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', 6.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', 11.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', 11.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', 4.0), ('C51', -0.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', 16.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', -0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', 7.0), ('C71', -0.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0), ('C80', 5.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', -0.0), ('C90', 5.0), ('C91', -0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', -0.0), ('C96', -0.0), ('C97', -0.0), ('C98', -0.0), ('C99', -0.0), ('C100', 8.0), ('C101', -0.0), ('C102', -0.0), ('C103', -0.0), ('C104', -0.0), ('C105', -0.0), ('C106', -0.0), ('C107', -0.0), ('C108', -0.0), ('C109', -0.0), ('C110', 5.0), ('C111', -0.0), ('C112', -0.0), ('C113', -0.0), ('C114', -0.0), ('C115', -0.0), ('C116', -0.0), ('C117', -0.0), ('C118', -0.0), ('C119', -0.0), ('C120', 12.0), ('C121', -0.0), ('C122', -0.0), ('C123', -0.0), ('C124', -0.0), ('C125', -0.0), ('C126', -0.0), ('C127', -0.0), ('C128', -0.0), ('C129', -0.0), ('C130', 10.0), ('C131', -0.0), ('C132', -0.0), ('C133', -0.0), ('C134', -0.0), ('C135', -0.0), ('C136', -0.0), ('C137', -0.0), ('C138', -0.0), ('C139', -0.0), ('C140', 7.0), ('C141', -0.0), ('C142', -0.0), ('C143', -0.0), ('C144', -0.0), ('C145', -0.0), ('C146', -0.0), ('C147', -0.0), ('C148', -0.0), ('C149', -0.0)]

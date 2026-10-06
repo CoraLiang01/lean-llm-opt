@@ -1,0 +1,467 @@
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/full_v4/frozen_notebook.ipynb:cell13:329: LangChainDeprecationWarning: LangChain agents will continue to be supported, but it is recommended for new use cases to be built with LangGraph. LangGraph offers a more flexible and full-featured framework for building agents, including support for tool-calling, persistence of state, and human-in-the-loop workflows. For details, refer to the [LangGraph documentation](https://langchain-ai.github.io/langgraph/) as well as guides for [Migrating from AgentExecutor](https://python.langchain.com/docs/how_to/migrate_agent/) and LangGraph's [Pre-built ReAct agent](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent/).
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure of the problem. The objective is to minimize total transportation cost by determining shipment quantities from distribution centers (sources) to customer groups (destinations), subject to supply capacities at sources and demand satisfaction at destinations. The decision variables are the shipment quantities along each route. There are no additional mechanisms such as vehicle-count coupling, batch decisions, or multi-stage constraints. I should call FileQA once to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: minimize total transportation cost by choosing shipment quantities from multiple sources with supply capacities to multiple destinations with demand requirements, ensuring all demands are met and no supply is exceeded
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 2]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others
+
+[Retrieved example 3]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP
+
+[Retrieved example 4]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem's objective is to minimize total transportation cost by determining shipment quantities from multiple distribution centers (sources) to multiple customer groups (destinations), subject to supply capacities at sources and demand satisfaction at destinations. The decision variables are the shipment quantities along each route. There are no additional mechanisms such as fixed charges, supplier activation, batch or lot-size decisions, or multi-stage constraints. The retrieved examples confirm that this structure matches the canonical transportation problem (TP), as in example 1. There is no evidence of hybrid or non-standard coupling that would require Mixture or Others.
+
+Final Answer: TP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = CSVQA_DATA
+
+    # Index sets
+    # I: distribution centers (from file_1_view_0, column "Unnamed: 0")
+    I = [rec['values']['Unnamed: 0'] for rec in next(t for t in data['tables'] if t['table_id'] == 'file_1_view_0')['records']]
+    # J: customer groups (from file_0_view_0, column "customer")
+    J = [rec['values']['customer'] for rec in next(t for t in data['tables'] if t['table_id'] == 'file_0_view_0')['records']]
+
+    # Parameters
+    # d_j: demand for customer j (from file_0_view_0, column "demand")
+    demand_table = next(t for t in data['tables'] if t['table_id'] == 'file_0_view_0')
+    d_j = {}
+    for rec in demand_table['records']:
+        j = rec['values']['customer']
+        d_j[j] = float(rec['values']['demand'])
+
+    # s_i: supply capacity for center i (from file_1_view_0, column "supply_capacity")
+    supply_table = next(t for t in data['tables'] if t['table_id'] == 'file_1_view_0')
+    s_i = {}
+    for rec in supply_table['records']:
+        i = rec['values']['Unnamed: 0']
+        s_i[i] = float(rec['values']['supply_capacity'])
+
+    # c_ij: transportation cost per unit from center i to customer j (from file_2_view_0)
+    cost_table = next(t for t in data['tables'] if t['table_id'] == 'file_2_view_0')
+    c_ij = {}
+    for rec in cost_table['records']:
+        i = rec['values']['Unnamed: 0']
+        c_ij[i] = {}
+        for j in J:
+            c_ij[i][j] = float(rec['values'][j])
+
+    # Validate coefficient dimensions and identifier coverage
+    for i in I:
+        if i not in c_ij:
+            raise ValueError(f"Missing cost row for distribution center {i}")
+        for j in J:
+            if j not in c_ij[i]:
+                raise ValueError(f"Missing cost entry for ({i},{j})")
+    for j in J:
+        if j not in d_j:
+            raise ValueError(f"Missing demand for customer {j}")
+    for i in I:
+        if i not in s_i:
+            raise ValueError(f"Missing supply capacity for center {i}")
+
+    # Model
+    m = gp.Model('Amazon_Distribution_Transportation')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables: x_{ij} >= 0, continuous
+    x = m.addVars(I, J, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: Minimize total transportation cost
+    m.setObjective(gp.quicksum(c_ij[i][j] * x[i, j] for i in I for j in J), GRB.MINIMIZE)
+
+    # Constraints
+    # 1. Demand satisfaction: sum_i x_{ij} >= d_j for all j in J
+    m.addConstrs((gp.quicksum(x[i, j] for i in I) >= d_j[j] for j in J), name='demand')
+
+    # 2. Supply capacity: sum_j x_{ij} <= s_i for all i in I
+    m.addConstrs((gp.quicksum(x[i, j] for j in J) <= s_i[i] for i in I), name='supply')
+
+    # 3. Non-negativity is handled by lb=0 in addVars
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 36 rows, 324 columns and 648 nonzeros
+Model fingerprint: 0xc9de97f6
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [3e-04, 1e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+01, 2e+04]
+Presolve time: 0.00s
+Presolved: 36 rows, 324 columns, 648 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   3.931800e+04   0.000000e+00      0s
+      51    1.7275282e+05   0.000000e+00   0.000000e+00      0s
+
+Solved in 51 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  1.727528246e+05
+ObjVal: 172752.82458839755
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 151.0
+C7: 0.0
+C8: 0.0
+C9: 4489.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 517.0
+C24: 0.0
+C25: 185.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 350.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 10638.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 491.0
+C66: 0.0
+C67: 354.0
+C68: 0.0
+C69: 0.0
+C70: 0.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 0.0
+C83: 0.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 411.0
+C96: 0.0
+C97: 0.0
+C98: 0.0
+C99: 0.0
+C100: 0.0
+C101: 0.0
+C102: 0.0
+C103: 555.0
+C104: 0.0
+C105: 0.0
+C106: 1456.0
+C107: 556.0
+C108: 0.0
+C109: 0.0
+C110: 0.0
+C111: 0.0
+C112: 0.0
+C113: 180.0
+C114: 0.0
+C115: 0.0
+C116: 0.0
+C117: 0.0
+C118: 0.0
+C119: 0.0
+C120: 0.0
+C121: 0.0
+C122: 0.0
+C123: 27.0
+C124: 0.0
+C125: 0.0
+C126: 0.0
+C127: 0.0
+C128: 0.0
+C129: 0.0
+C130: 0.0
+C131: 0.0
+C132: 0.0
+C133: 0.0
+C134: 0.0
+C135: 0.0
+C136: 0.0
+C137: 0.0
+C138: 788.0
+C139: 0.0
+C140: 0.0
+C141: 0.0
+C142: 0.0
+C143: 0.0
+C144: 4415.0
+C145: 0.0
+C146: 81.0
+C147: 0.0
+C148: 0.0
+C149: 0.0
+C150: 0.0
+C151: 0.0
+C152: 0.0
+C153: 0.0
+C154: 0.0
+C155: 0.0
+C156: 0.0
+C157: 0.0
+C158: 316.0
+C159: 0.0
+C160: 0.0
+C161: 2155.0
+C162: 0.0
+C163: 0.0
+C164: 0.0
+C165: 0.0
+C166: 0.0
+C167: 0.0
+C168: 0.0
+C169: 0.0
+C170: 0.0
+C171: 0.0
+C172: 0.0
+C173: 0.0
+C174: 0.0
+C175: 0.0
+C176: 0.0
+C177: 43.0
+C178: 0.0
+C179: 0.0
+C180: 0.0
+C181: 0.0
+C182: 0.0
+C183: 0.0
+C184: 0.0
+C185: 0.0
+C186: 0.0
+C187: 0.0
+C188: 0.0
+C189: 0.0
+C190: 0.0
+C191: 0.0
+C192: 0.0
+C193: 0.0
+C194: 0.0
+C195: 0.0
+C196: 0.0
+C197: 0.0
+C198: 0.0
+C199: 0.0
+C200: 0.0
+C201: 0.0
+C202: 0.0
+C203: 205.0
+C204: 0.0
+C205: 0.0
+C206: 0.0
+C207: 0.0
+C208: 0.0
+C209: 0.0
+C210: 1348.0
+C211: 0.0
+C212: 0.0
+C213: 0.0
+C214: 0.0
+C215: 0.0
+C216: 0.0
+C217: 0.0
+C218: 0.0
+C219: 146.0
+C220: 0.0
+C221: 0.0
+C222: 0.0
+C223: 0.0
+C224: 0.0
+C225: 0.0
+C226: 0.0
+C227: 0.0
+C228: 0.0
+C229: 0.0
+C230: 0.0
+C231: 0.0
+C232: 0.0
+C233: 0.0
+C234: 0.0
+C235: 0.0
+C236: 0.0
+C237: 0.0
+C238: 0.0
+C239: 0.0
+C240: 0.0
+C241: 0.0
+C242: 0.0
+C243: 0.0
+C244: 76.0
+C245: 2038.0
+C246: 0.0
+C247: 0.0
+C248: 0.0
+C249: 0.0
+C250: 0.0
+C251: 0.0
+C252: 0.0
+C253: 0.0
+C254: 0.0
+C255: 0.0
+C256: 0.0
+C257: 0.0
+C258: 0.0
+C259: 0.0
+C260: 0.0
+C261: 0.0
+C262: 0.0
+C263: 0.0
+C264: 0.0
+C265: 0.0
+C266: 0.0
+C267: 0.0
+C268: 0.0
+C269: 0.0
+C270: 0.0
+C271: 5430.0
+C272: 0.0
+C273: 0.0
+C274: 0.0
+C275: 0.0
+C276: 0.0
+C277: 0.0
+C278: 0.0
+C279: 0.0
+C280: 0.0
+C281: 0.0
+C282: 0.0
+C283: 0.0
+C284: 0.0
+C285: 0.0
+C286: 0.0
+C287: 0.0
+C288: 0.0
+C289: 0.0
+C290: 0.0
+C291: 0.0
+C292: 0.0
+C293: 0.0
+C294: 0.0
+C295: 0.0
+C296: 1584.0
+C297: 0.0
+C298: 0.0
+C299: 0.0
+C300: 0.0
+C301: 0.0
+C302: 0.0
+C303: 0.0
+C304: 0.0
+C305: 0.0
+C306: 0.0
+C307: 0.0
+C308: 0.0
+C309: 0.0
+C310: 0.0
+C311: 0.0
+C312: 0.0
+C313: 0.0
+C314: 333.0
+C315: 0.0
+C316: 0.0
+C317: 0.0
+C318: 0.0
+C319: 0.0
+C320: 0.0
+C321: 0.0
+C322: 0.0
+C323: 0.0
+Optimal objective: 172752.82458839755
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 151.0), ('C7', 0.0), ('C8', 0.0), ('C9', 4489.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 517.0), ('C24', 0.0), ('C25', 185.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 350.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 10638.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 491.0), ('C66', 0.0), ('C67', 354.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 411.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 555.0), ('C104', 0.0), ('C105', 0.0), ('C106', 1456.0), ('C107', 556.0), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0), ('C111', 0.0), ('C112', 0.0), ('C113', 180.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 0.0), ('C118', 0.0), ('C119', 0.0), ('C120', 0.0), ('C121', 0.0), ('C122', 0.0), ('C123', 27.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0), ('C132', 0.0), ('C133', 0.0), ('C134', 0.0), ('C135', 0.0), ('C136', 0.0), ('C137', 0.0), ('C138', 788.0), ('C139', 0.0), ('C140', 0.0), ('C141', 0.0), ('C142', 0.0), ('C143', 0.0), ('C144', 4415.0), ('C145', 0.0), ('C146', 81.0), ('C147', 0.0), ('C148', 0.0), ('C149', 0.0), ('C150', 0.0), ('C151', 0.0), ('C152', 0.0), ('C153', 0.0), ('C154', 0.0), ('C155', 0.0), ('C156', 0.0), ('C157', 0.0), ('C158', 316.0), ('C159', 0.0), ('C160', 0.0), ('C161', 2155.0), ('C162', 0.0), ('C163', 0.0), ('C164', 0.0), ('C165', 0.0), ('C166', 0.0), ('C167', 0.0), ('C168', 0.0), ('C169', 0.0), ('C170', 0.0), ('C171', 0.0), ('C172', 0.0), ('C173', 0.0), ('C174', 0.0), ('C175', 0.0), ('C176', 0.0), ('C177', 43.0), ('C178', 0.0), ('C179', 0.0), ('C180', 0.0), ('C181', 0.0), ('C182', 0.0), ('C183', 0.0), ('C184', 0.0), ('C185', 0.0), ('C186', 0.0), ('C187', 0.0), ('C188', 0.0), ('C189', 0.0), ('C190', 0.0), ('C191', 0.0), ('C192', 0.0), ('C193', 0.0), ('C194', 0.0), ('C195', 0.0), ('C196', 0.0), ('C197', 0.0), ('C198', 0.0), ('C199', 0.0), ('C200', 0.0), ('C201', 0.0), ('C202', 0.0), ('C203', 205.0), ('C204', 0.0), ('C205', 0.0), ('C206', 0.0), ('C207', 0.0), ('C208', 0.0), ('C209', 0.0), ('C210', 1348.0), ('C211', 0.0), ('C212', 0.0), ('C213', 0.0), ('C214', 0.0), ('C215', 0.0), ('C216', 0.0), ('C217', 0.0), ('C218', 0.0), ('C219', 146.0), ('C220', 0.0), ('C221', 0.0), ('C222', 0.0), ('C223', 0.0), ('C224', 0.0), ('C225', 0.0), ('C226', 0.0), ('C227', 0.0), ('C228', 0.0), ('C229', 0.0), ('C230', 0.0), ('C231', 0.0), ('C232', 0.0), ('C233', 0.0), ('C234', 0.0), ('C235', 0.0), ('C236', 0.0), ('C237', 0.0), ('C238', 0.0), ('C239', 0.0), ('C240', 0.0), ('C241', 0.0), ('C242', 0.0), ('C243', 0.0), ('C244', 76.0), ('C245', 2038.0), ('C246', 0.0), ('C247', 0.0), ('C248', 0.0), ('C249', 0.0), ('C250', 0.0), ('C251', 0.0), ('C252', 0.0), ('C253', 0.0), ('C254', 0.0), ('C255', 0.0), ('C256', 0.0), ('C257', 0.0), ('C258', 0.0), ('C259', 0.0), ('C260', 0.0), ('C261', 0.0), ('C262', 0.0), ('C263', 0.0), ('C264', 0.0), ('C265', 0.0), ('C266', 0.0), ('C267', 0.0), ('C268', 0.0), ('C269', 0.0), ('C270', 0.0), ('C271', 5430.0), ('C272', 0.0), ('C273', 0.0), ('C274', 0.0), ('C275', 0.0), ('C276', 0.0), ('C277', 0.0), ('C278', 0.0), ('C279', 0.0), ('C280', 0.0), ('C281', 0.0), ('C282', 0.0), ('C283', 0.0), ('C284', 0.0), ('C285', 0.0), ('C286', 0.0), ('C287', 0.0), ('C288', 0.0), ('C289', 0.0), ('C290', 0.0), ('C291', 0.0), ('C292', 0.0), ('C293', 0.0), ('C294', 0.0), ('C295', 0.0), ('C296', 1584.0), ('C297', 0.0), ('C298', 0.0), ('C299', 0.0), ('C300', 0.0), ('C301', 0.0), ('C302', 0.0), ('C303', 0.0), ('C304', 0.0), ('C305', 0.0), ('C306', 0.0), ('C307', 0.0), ('C308', 0.0), ('C309', 0.0), ('C310', 0.0), ('C311', 0.0), ('C312', 0.0), ('C313', 0.0), ('C314', 333.0), ('C315', 0.0), ('C316', 0.0), ('C317', 0.0), ('C318', 0.0), ('C319', 0.0), ('C320', 0.0), ('C321', 0.0), ('C322', 0.0), ('C323', 0.0)]

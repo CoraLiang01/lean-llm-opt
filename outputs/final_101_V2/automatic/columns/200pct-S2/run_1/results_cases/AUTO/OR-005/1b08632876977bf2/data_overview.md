@@ -1,0 +1,16 @@
+From capacity.csv:
+daily_cleaning_cost,storage_equipment_inspections_last_year,resource_capacity
+204.6,2,180
+
+From products.csv:
+supplier_contact_channel,supplier_service_tier,item_name,ingredient_supplier_rating,item_value,recipe_photo_count,marketing_campaign_format,average_baking_minutes,resource_requirement
+Phone,Standard,Baguette,4.7,888,2,Newsletter,30,4
+Phone,Premium,Croissant,3.2,134,6,Newsletter,30,2
+Phone,Standard,Sourdough,3.2,129,4,Newsletter,45,4
+Email,Priority,Rye Bread,3.5,370,6,Brochure,30,3
+Portal,Standard,Brioche,4.7,921,4,Newsletter,12,2
+Portal,Premium,Focaccia,3.5,765,6,Web feature,24,1
+Email,Priority,Ciabatta,3.2,154,8,Newsletter,45,2
+Email,Premium,Pita,3.8,837,4,Brochure,18,1
+Phone,Premium,Bagel,4.7,584,6,Web feature,30,3
+Portal,Standard,English Muffin,4.4,365,8,Web feature,12,3

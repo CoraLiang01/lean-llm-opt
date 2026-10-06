@@ -1,0 +1,102 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract table
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Required table_id file_0_view_0 not found in CSVQA_DATA.")
+
+    # Build index set I: products whose 'Product Name' contains '27in' (case-insensitive)
+    I = []
+    for rec in table["records"]:
+        pname = rec["values"]["Product Name"]
+        if "27in" in pname.casefold():
+            I.append(rec)
+
+    # Validate and extract parameters for each i in I
+    keys = []
+    r = {}
+    d = {}
+    s = {}
+    for rec in I:
+        pname = rec["values"]["Product Name"]
+        try:
+            ri = float(rec["values"]["Revenue"])
+            di = int(rec["values"]["Demand"])
+            si = int(rec["values"]["Initial Inventory"])
+        except Exception as e:
+            raise RuntimeError(f"Missing or invalid data for product '{pname}': {e}")
+        key = pname
+        keys.append(key)
+        r[key] = ri
+        d[key] = di
+        s[key] = si
+
+    # Check that all keys have all required data
+    for key in keys:
+        if key not in r or key not in d or key not in s:
+            raise RuntimeError(f"Missing data for product '{key}'.")
+
+    # Model
+    m = gp.Model()
+    # Decision variables: x_i integer, 0 <= x_i <= min{d_i, s_i}
+    ub = {key: min(d[key], s[key]) for key in keys}
+    x = m.addVars(keys, lb=0, ub=ub, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize sum_i r_i x_i
+    m.setObjective(gp.quicksum(r[key] * x[key] for key in keys), GRB.MAXIMIZE)
+
+    # Constraints: 0 <= x_i <= min{d_i, s_i} (already set in variable bounds)
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for key in keys:
+            print(x[key].VarName, x[key].X)
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 0 rows, 2 columns and 0 nonzeros
+Model fingerprint: 0x1bda13cb
+Variable types: 0 continuous, 2 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [5e+01, 3e+02]
+  Bounds range     [1e+04, 2e+04]
+  RHS range        [0e+00, 0e+00]
+Found heuristic solution: objective 4049812.4247
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 4.04981e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.049812424700e+06, best bound 4.049812424700e+06, gap 0.0000%
+4049812.4247
+C0 12474.0
+C1 15057.0
+Optimal objective: 4049812.4247
+Optimal solution: [('C0', 12474.0), ('C1', 15057.0)]

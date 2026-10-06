@@ -1,0 +1,46 @@
+__lean_models_v2 = []
+
+def __lean_capture_v2(value):
+    __lean_models_v2.append(value)
+    return value
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_walmart_transportation():
+    S = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11']
+    C = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12']
+    customer_demand = {'C1': 11, 'C2': 1148, 'C3': 54, 'C4': 833, 'C5': 154, 'C6': 551, 'C7': 7081, 'C8': 76, 'C9': 66, 'C10': 174, 'C11': 15, 'C12': 680}
+    supply_capacity = {'S1': 4, 'S2': 575, 'S3': 1504, 'S4': 178, 'S5': 228, 'S6': 50, 'S7': 3, 'S8': 6148, 'S9': 6, 'S10': 10673, 'S11': 174}
+    transportation_costs = {'S1': {'C1': 0.6391445, 'C2': 49.718428, 'C3': 33.758577, 'C4': 1570.6731, 'C5': 1370.4095, 'C6': 57.353078, 'C7': 57.182995, 'C8': 54.920961, 'C9': 1143.6809, 'C10': 52.49127, 'C11': 606.44344, 'C12': 1192.4687}, 'S2': {'C1': 605.47864, 'C2': 64.535626, 'C3': 478.4779, 'C4': 887.04807, 'C5': 65.461112, 'C6': 71.936052, 'C7': 41.290154, 'C8': 70.360382, 'C9': 35.35893, 'C10': 1472.7482, 'C11': 0.6004592, 'C12': 49.86854}, 'S3': {'C1': 1139.044, 'C2': 4.7850563, 'C3': 1805.6214, 'C4': 1302.8958, 'C5': 2437.3212, 'C6': 103.80369, 'C7': 774.65582, 'C8': 4.5159883, 'C9': 879.70485, 'C10': 162.70557, 'C11': 1208.6135, 'C12': 110.18689}, 'S4': {'C1': 69.269899, 'C2': 2105.4854, 'C3': 869.68202, 'C4': 1494.8986, 'C5': 310.53766, 'C6': 98.154557, 'C7': 103.36918, 'C8': 1758.8784, 'C9': 97.285407, 'C10': 94.650409, 'C11': 1277.2515, 'C12': 21.63619}, 'S5': {'C1': 980.41143, 'C2': 899.31088, 'C3': 1183.0326, 'C4': 402.09862, 'C5': 81.788641, 'C6': 1115.6819, 'C7': 123.80428, 'C8': 1121.1469, 'C9': 0.0024451, 'C10': 1009.6452, 'C11': 35.348018, 'C12': 1625.4346}, 'S6': {'C1': 1246.7825, 'C2': 2105.7967, 'C3': 1014.3393, 'C4': 1494.6681, 'C5': 362.01739, 'C6': 98.171424, 'C7': 2170.4059, 'C8': 97.731877, 'C9': 97.26834, 'C10': 1987.9908, 'C11': 70.943969, 'C12': 389.1598}, 'S7': {'C1': 57.108602, 'C2': 23.836169, 'C3': 78.10573, 'C4': 742.80681, 'C5': 1926.0797, 'C6': 454.379, 'C7': 458.29014, 'C8': 465.93077, 'C9': 28.138607, 'C10': 524.61543, 'C11': 997.53178, 'C12': 104.47794}, 'S8': {'C1': 981.29086, 'C2': 120.9013, 'C3': 1625.8207, 'C4': 1267.8229, 'C5': 2569.6446, 'C6': 13.471812, 'C7': 815.15254, 'C8': 253.4235, 'C9': 43.765629, 'C10': 275.97841, 'C11': 1228.0699, 'C12': 103.48323}, 'S9': {'C1': 30.53278, 'C2': 1444.8595, 'C3': 173.55473, 'C4': 1307.3913, 'C5': 965.20123, 'C6': 1843.7769, 'C7': 1483.6409, 'C8': 85.3221, 'C9': 1353.5009, 'C10': 1485.9154, 'C11': 29.423791, 'C12': 26.61942}, 'S10': {'C1': 94.11094, 'C2': 1422.9971, 'C3': 1470.7769, 'C4': 1419.3382, 'C5': 38.945278, 'C6': 72.201129, 'C7': 2040.4606, 'C8': 1542.7026, 'C9': 1803.8002, 'C10': 72.943658, 'C11': 2181.4542, 'C12': 973.55156}, 'S11': {'C1': 1032.9074, 'C2': 166.30185, 'C3': 1620.4767, 'C4': 64.668341, 'C5': 2000.5092, 'C6': 0.0028958, 'C7': 47.038371, 'C8': 52.992211, 'C9': 1115.6336, 'C10': 129.79338, 'C11': 1295.0978, 'C12': 2330.7682}}
+    if set(customer_demand.keys()) != set(C):
+        raise ValueError('Customer demand keys do not match C')
+    if set(supply_capacity.keys()) != set(S):
+        raise ValueError('Supply capacity keys do not match S')
+    for i in S:
+        if i not in transportation_costs:
+            raise ValueError(f'Missing transportation costs for {i}')
+        if set(transportation_costs[i].keys()) != set(C):
+            raise ValueError(f'Transportation costs for {i} do not match C')
+    m = __lean_capture_v2(gp.Model())
+    x = m.addVars(S, C, lb=0, vtype=GRB.CONTINUOUS, name='')
+    obj = gp.LinExpr()
+    for i in S:
+        for j in C:
+            obj += transportation_costs[i][j] * x[i, j]
+    m.setObjective(obj, GRB.MINIMIZE)
+    for j in C:
+        m.addConstr(gp.quicksum((x[i, j] for i in S)) == customer_demand[j], name='')
+    for i in S:
+        m.addConstr(gp.quicksum((x[i, j] for j in C)) <= supply_capacity[i], name='')
+    m.Params.MIPGap = 0.0001
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal {m.ObjVal}')
+        for i in S:
+            for j in C:
+                v = x[i, j]
+                print(f'{v.VarName} {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+m = solve_walmart_transportation()

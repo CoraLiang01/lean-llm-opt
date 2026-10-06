@@ -1,0 +1,112 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Data extraction from CSVQA_DATA
+    data = CSVQA_DATA
+
+    # Suppliers S
+    suppliers = [rec['values']['Unnamed: 0'] for rec in next(t for t in data['tables'] if t['table_id'] == 'file_1_view_0')['records']]
+    # Branches C
+    branches = [rec['values']['customer'] for rec in next(t for t in data['tables'] if t['table_id'] == 'file_0_view_0')['records']]
+
+    # Fixed costs f_i
+    fixed_costs = {}
+    for rec in next(t for t in data['tables'] if t['table_id'] == 'file_1_view_0')['records']:
+        i = rec['values']['Unnamed: 0']
+        fixed_costs[i] = float(rec['values']['fixed_costs'])
+
+    # Demands d_j
+    demands = {}
+    for rec in next(t for t in data['tables'] if t['table_id'] == 'file_0_view_0')['records']:
+        j = rec['values']['customer']
+        demands[j] = float(rec['values']['demand'])
+
+    # Transportation costs c_{ij}
+    transportation_costs = {}
+    tc_table = next(t for t in data['tables'] if t['table_id'] == 'file_2_view_0')
+    for rec in tc_table['records']:
+        i = rec['values']['Unnamed: 0']
+        for j in branches:
+            if (j not in rec['values']):
+                raise ValueError(f"Missing transportation cost for supplier {i}, branch {j}")
+            transportation_costs[(i, j)] = float(rec['values'][j])
+
+    # Validate coefficient dimensions and identifier coverage
+    for i in suppliers:
+        if i not in fixed_costs:
+            raise ValueError(f"Missing fixed cost for supplier {i}")
+        for j in branches:
+            if (i, j) not in transportation_costs:
+                raise ValueError(f"Missing transportation cost for supplier {i}, branch {j}")
+    for j in branches:
+        if j not in demands:
+            raise ValueError(f"Missing demand for branch {j}")
+
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    y = m.addVars(suppliers, vtype=GRB.BINARY, name='y')
+    x = m.addVars([(i, j) for i in suppliers for j in branches], lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: Minimize total cost
+    m.setObjective(
+        gp.quicksum(fixed_costs[i] * y[i] for i in suppliers) +
+        gp.quicksum(transportation_costs[(i, j)] * x[i, j] for i in suppliers for j in branches),
+        GRB.MINIMIZE
+    )
+
+    # Constraints
+
+    # 1. Demand satisfaction at each branch
+    for j in branches:
+        m.addConstr(gp.quicksum(x[i, j] for i in suppliers) == demands[j], name=f'demand_{j}')
+
+    # 2. Supply only from open suppliers
+    for i in suppliers:
+        for j in branches:
+            m.addConstr(x[i, j] <= demands[j] * y[i], name=f'link_{i}_{j}')
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 30 rows, 30 columns and 75 nonzeros
+Model fingerprint: 0x17dcfbc3
+Variable types: 25 continuous, 5 integer (5 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+02]
+  Objective range  [2e-02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [3e+00, 1e+02]
+Presolve time: 0.00s
+Presolved: 30 rows, 30 columns, 75 nonzeros
+Variable types: 25 continuous, 5 integer (5 binary)
+Found heuristic solution: objective 10364.660000
+
+Root relaxation: objective 1.019996e+04, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    10199.960000 10199.9600  0.00%     -    0s
+
+Explored 1 nodes (3 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 10200 10364.7 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.019996000000e+04, best bound 1.019996000000e+04, gap 0.0000%
+Optimal objective: 10199.96
+Optimal solution: [('C0', 1.0), ('C1', 1.0), ('C2', 1.0), ('C3', -0.0), ('C4', -0.0), ('C5', 0.0), ('C6', 6.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 3.0), ('C15', 143.0), ('C16', 0.0), ('C17', 10.0), ('C18', 25.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0)]

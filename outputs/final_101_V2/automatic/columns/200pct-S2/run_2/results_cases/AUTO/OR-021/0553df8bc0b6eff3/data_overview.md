@@ -1,0 +1,15 @@
+customer_id,customer_newsletter_open_count_2025_q4,customer_product_inquiry_count_2025_q4,customer_support_ticket_count,demand,customer_catalog_download_count_2025_q4
+C1,3,2,17,94,0
+C2,5,6,3,39,0
+C3,8,6,1,65,2
+C4,5,9,5,435,1
+supplier_id,fleet_vehicle_count,capacity_team_training_hours_2025_q4,supply_capacity,production_handbook_revision_count_2025_q4,supply_planning_meeting_count_2025_q4
+S1,24,32,2531,5,4
+S2,12,16,20,5,3
+S3,8,8,210,4,6
+S4,12,32,241,2,3
+supplier_id,carrier_communication_channel,driver_training_session_count_2025_q4,carrier_coordination_meeting_count_2025_q4,transportation_cost_to_C1,operations_region,transportation_cost_to_C2,transportation_cost_to_C3,dispatch_document_review_count_2025_q4,shipping_label_reprint_count_2025_q4,customer_support_staff_count,annual_inspection_count,route_signage_inspection_count_2025_q4,dispatch_document_format,transportation_cost_to_C4
+S1,Portal,1,8,543.756480860856,West,23.685276141764653,23.676386730773032,15,10,20,2,3,Paper,447.75143678673766
+S2,Email,1,4,883.9151090405642,South,0.04977684765576961,0.0350986687216299,15,7,16,1,3,Digital,44.45588531711622
+S3,Phone,7,3,537.3456896658107,West,23.769274659075112,498.95659249465467,30,4,5,2,1,Digital,440.60737890439776
+S4,Phone,5,2,1791.493192397229,East,68.21633865655126,1432.4837339656747,20,15,12,3,2,Digital,1527.7635425462734

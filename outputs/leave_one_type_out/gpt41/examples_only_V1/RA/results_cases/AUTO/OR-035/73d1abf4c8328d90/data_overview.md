@@ -1,0 +1,16 @@
+capacity.csv
+Capacity
+180
+
+products.csv
+ProductName,Value,Weight
+Baguette,888,4
+Croissant,134,2
+Sourdough,129,4
+Rye Bread,370,3
+Brioche,921,2
+Focaccia,765,1
+Ciabatta,154,2
+Pita,837,1
+Bagel,584,3
+English Muffin,365,3

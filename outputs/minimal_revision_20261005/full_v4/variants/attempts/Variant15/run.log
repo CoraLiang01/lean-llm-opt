@@ -1,0 +1,184 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure of this problem. The objective is to minimize total assignment cost. The decision variables x_ij are binary and indicate whether job j is assigned to workstation i. Each job must be assigned to exactly one workstation (exactly-one assignment constraints). Each workstation has a capacity, and the total resource consumed by assigned jobs cannot exceed this capacity (capacity constraints with assignment-resource coefficients). All variables are binary.
+
+I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: binary assignment variables for job-to-workstation assignment, minimize total assignment cost, each job assigned to exactly one workstation, workstation capacity constraints using assignment-specific resource consumption, binary restrictions
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture
+
+[Retrieved example 2]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 5]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP[0m
+Thought:[32;1m[1;3mThought: The problem requires assigning jobs to workstations using binary variables, minimizing total assignment cost. Each job must be assigned to exactly one workstation (exactly-one assignment), and each workstation has a capacity constraint based on the sum of resource consumption for assigned jobs. This is the classic generalized assignment problem: assignment with side constraints (capacities), not a pure one-to-one assignment (as in AP), but not a mixture of multiple interacting mechanisms either. The retrieved examples include a pure assignment problem (AP) with one-to-one matching, but this problem allows multiple jobs per workstation subject to capacity, which is the defining feature of the generalized assignment problem—a canonical extension of AP, but still within the AP family for classification purposes.
+
+Final Answer: AP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract data from CSVQA_DATA
+    tables = {t['table_id']: t for t in CSVQA_DATA['tables']}
+    
+    # Workstations and capacities
+    ws_table = tables['file_0_view_0']
+    workstations = []
+    b = {}
+    for rec in ws_table['records']:
+        i = rec['values']['Workstation']
+        workstations.append(i)
+        b[i] = float(rec['values']['Capacity'])
+    
+    # Jobs
+    jobs = []
+    job_columns = ['J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'J8', 'J9']
+    jobs = job_columns.copy()
+    
+    # Assignment costs c_{ij}
+    cost_table = tables['file_1_view_0']
+    c = {}
+    for rec in cost_table['records']:
+        i = rec['values']['Workstation']
+        for j in jobs:
+            c[(i, j)] = float(rec['values'][j])
+    
+    # Assignment resources a_{ij}
+    res_table = tables['file_2_view_0']
+    a = {}
+    for rec in res_table['records']:
+        i = rec['values']['Workstation']
+        for j in jobs:
+            a[(i, j)] = float(rec['values'][j])
+    
+    # Validate dimensions
+    for i in workstations:
+        for j in jobs:
+            if (i, j) not in c or (i, j) not in a:
+                raise ValueError(f"Missing data for ({i},{j}) in cost or resource matrices.")
+    for i in workstations:
+        if i not in b:
+            raise ValueError(f"Missing capacity for workstation {i}.")
+    
+    # Model
+    m = gp.Model('GeneralizedAssignment')
+    m.setParam('MIPGap', 1e-4)
+    
+    # Decision variables: x_{ij} = 1 if job j assigned to workstation i
+    x_keys = [(i, j) for i in workstations for j in jobs]
+    x = m.addVars(x_keys, vtype=GRB.BINARY, name='x')
+    
+    # Objective: minimize total assignment cost
+    m.setObjective(gp.quicksum(c[(i, j)] * x[i, j] for i in workstations for j in jobs), GRB.MINIMIZE)
+    
+    # Assignment constraints: each job assigned to exactly one workstation
+    m.addConstrs((gp.quicksum(x[i, j] for i in workstations) == 1 for j in jobs), name='assign')
+    
+    # Capacity constraints: total resource used at each workstation <= capacity
+    m.addConstrs((gp.quicksum(a[(i, j)] * x[i, j] for j in jobs) <= b[i] for i in workstations), name='cap')
+    
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 13 rows, 36 columns and 72 nonzeros
+Model fingerprint: 0xff2ba6b6
+Variable types: 0 continuous, 36 integer (36 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 9e+00]
+  Objective range  [5e+00, 2e+01]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 2e+01]
+Found heuristic solution: objective 102.0000000
+Presolve time: 0.00s
+Presolved: 13 rows, 36 columns, 72 nonzeros
+Variable types: 0 continuous, 36 integer (36 binary)
+
+Root relaxation: objective 6.000000e+01, 9 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0      60.0000000   60.00000  0.00%     -    0s
+
+Explored 1 nodes (9 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 60 102 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.000000000000e+01, best bound 6.000000000000e+01, gap 0.0000%
+ObjVal: 60.0
+C0: 1.0
+C1: 1.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: 1.0
+C12: 1.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: 1.0
+C23: 1.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: -0.0
+C32: -0.0
+C33: 1.0
+C34: 1.0
+C35: 1.0
+Optimal objective: 60.0
+Optimal solution: [('C0', 1.0), ('C1', 1.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', 1.0), ('C12', 1.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', 1.0), ('C23', 1.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', -0.0), ('C33', 1.0), ('C34', 1.0), ('C35', 1.0)]

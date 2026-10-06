@@ -1,0 +1,42 @@
+LEGACY_OBSERVATION = 'capacity.csv\nprevious_period_capacity,Capacity\n678,765\n\nproducts.csv\nprevious_period_unit_value,ProductName,Value,previous_period_stock_status,Weight\n2992,Sedan,2524,Balanced,99\n4092,SUV,4614,Overstock,55\n7691,Truck,8416,Balanced,75\n6358,Convertible,5917,Overstock,94\n9278,Minivan,9048,Balanced,80\n965,Coupe,1140,Balanced,82\n8223,Hatchback,8962,Balanced,71\n2008,Station Wagon,1888,Balanced,100\n6946,Electric Car,8487,Overstock,28\n4936,Hybrid Car,4425,Balanced,93\n4330,Luxury Sedan,4717,Stockout,84\n4069,Sports Car,4210,Overstock,83\n1469,Crossover,1226,Stockout,62\n8768,Diesel Truck,7400,Stockout,90\n3976,Compact SUV,4639,Overstock,99\n7747,Luxury SUV,7712,Balanced,96\n3267,Cargo Van,3299,Stockout,21\n8706,Pickup Truck,9895,Balanced,39\n3786,Roadster,4496,Overstock,99\n5413,Muscle Car,4526,Overstock,81\n5080,Off-road Vehicle,5688,Stockout,6\n3144,Camper Van,3007,Balanced,58\n3759,Compact Car,3623,Balanced,37\n8702,Motorcycle,8474,Stockout,15\n8153,Electric SUV,8372,Overstock,37'
+LEGACY_RECORDS = [{'source': 'capacity.csv', 'values': {'previous_period_capacity': '678', 'Capacity': '765'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '2992', 'ProductName': 'Sedan', 'Value': '2524', 'previous_period_stock_status': 'Balanced', 'Weight': '99'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '4092', 'ProductName': 'SUV', 'Value': '4614', 'previous_period_stock_status': 'Overstock', 'Weight': '55'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '7691', 'ProductName': 'Truck', 'Value': '8416', 'previous_period_stock_status': 'Balanced', 'Weight': '75'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '6358', 'ProductName': 'Convertible', 'Value': '5917', 'previous_period_stock_status': 'Overstock', 'Weight': '94'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '9278', 'ProductName': 'Minivan', 'Value': '9048', 'previous_period_stock_status': 'Balanced', 'Weight': '80'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '965', 'ProductName': 'Coupe', 'Value': '1140', 'previous_period_stock_status': 'Balanced', 'Weight': '82'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '8223', 'ProductName': 'Hatchback', 'Value': '8962', 'previous_period_stock_status': 'Balanced', 'Weight': '71'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '2008', 'ProductName': 'Station Wagon', 'Value': '1888', 'previous_period_stock_status': 'Balanced', 'Weight': '100'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '6946', 'ProductName': 'Electric Car', 'Value': '8487', 'previous_period_stock_status': 'Overstock', 'Weight': '28'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '4936', 'ProductName': 'Hybrid Car', 'Value': '4425', 'previous_period_stock_status': 'Balanced', 'Weight': '93'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '4330', 'ProductName': 'Luxury Sedan', 'Value': '4717', 'previous_period_stock_status': 'Stockout', 'Weight': '84'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '4069', 'ProductName': 'Sports Car', 'Value': '4210', 'previous_period_stock_status': 'Overstock', 'Weight': '83'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '1469', 'ProductName': 'Crossover', 'Value': '1226', 'previous_period_stock_status': 'Stockout', 'Weight': '62'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '8768', 'ProductName': 'Diesel Truck', 'Value': '7400', 'previous_period_stock_status': 'Stockout', 'Weight': '90'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '3976', 'ProductName': 'Compact SUV', 'Value': '4639', 'previous_period_stock_status': 'Overstock', 'Weight': '99'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '7747', 'ProductName': 'Luxury SUV', 'Value': '7712', 'previous_period_stock_status': 'Balanced', 'Weight': '96'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '3267', 'ProductName': 'Cargo Van', 'Value': '3299', 'previous_period_stock_status': 'Stockout', 'Weight': '21'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '8706', 'ProductName': 'Pickup Truck', 'Value': '9895', 'previous_period_stock_status': 'Balanced', 'Weight': '39'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '3786', 'ProductName': 'Roadster', 'Value': '4496', 'previous_period_stock_status': 'Overstock', 'Weight': '99'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '5413', 'ProductName': 'Muscle Car', 'Value': '4526', 'previous_period_stock_status': 'Overstock', 'Weight': '81'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '5080', 'ProductName': 'Off-road Vehicle', 'Value': '5688', 'previous_period_stock_status': 'Stockout', 'Weight': '6'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '3144', 'ProductName': 'Camper Van', 'Value': '3007', 'previous_period_stock_status': 'Balanced', 'Weight': '58'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '3759', 'ProductName': 'Compact Car', 'Value': '3623', 'previous_period_stock_status': 'Balanced', 'Weight': '37'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '8702', 'ProductName': 'Motorcycle', 'Value': '8474', 'previous_period_stock_status': 'Stockout', 'Weight': '15'}}, {'source': 'products.csv', 'values': {'previous_period_unit_value': '8153', 'ProductName': 'Electric SUV', 'Value': '8372', 'previous_period_stock_status': 'Overstock', 'Weight': '37'}}]
+import gurobipy as gp
+from gurobipy import GRB
+products = []
+value = {}
+weight = {}
+capacity = None
+for rec in LEGACY_RECORDS:
+    if rec['source'] == 'products.csv':
+        pname = rec['values']['ProductName']
+        products.append(pname)
+        try:
+            value[pname] = int(rec['values']['Value'])
+        except Exception:
+            raise ValueError(f'Missing or invalid Value for {pname}')
+        try:
+            weight[pname] = int(rec['values']['Weight'])
+        except Exception:
+            raise ValueError(f'Missing or invalid Weight for {pname}')
+    elif rec['source'] == 'capacity.csv':
+        if 'Capacity' in rec['values']:
+            try:
+                capacity = int(rec['values']['Capacity'])
+            except Exception:
+                raise ValueError('Missing or invalid Capacity in capacity.csv')
+if capacity is None:
+    raise ValueError('No capacity found in LEGACY_RECORDS')
+if set(value.keys()) != set(products) or set(weight.keys()) != set(products):
+    raise ValueError('Mismatch in product identifiers between value and weight')
+m = gp.Model('Car_Inventory_Optimization')
+x = m.addVars(products, lb=0, vtype=GRB.INTEGER, name='')
+m.setObjective(gp.quicksum((value[i] * x[i] for i in products)), GRB.MAXIMIZE)
+m.addConstr(gp.quicksum((weight[i] * x[i] for i in products)) <= capacity, name='cap')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

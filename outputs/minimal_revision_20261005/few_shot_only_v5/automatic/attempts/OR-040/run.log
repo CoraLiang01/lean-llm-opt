@@ -1,0 +1,116 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read capacity
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/capacity.csv"
+    try:
+        cap_df = pd.read_csv(capacity_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            cap_df = pd.read_csv(capacity_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                cap_df = pd.read_csv(capacity_path, encoding='gbk')
+            except UnicodeDecodeError:
+                cap_df = pd.read_csv(capacity_path, encoding='latin-1')
+    if 'Capacity' not in cap_df.columns:
+        raise ValueError("Missing 'Capacity' column in capacity.csv")
+    if cap_df.shape[0] != 1:
+        raise ValueError("capacity.csv must have exactly one row")
+    C = cap_df['Capacity'].iloc[0]
+
+    # Read products
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/products.csv"
+    try:
+        prod_df = pd.read_csv(products_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            prod_df = pd.read_csv(products_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                prod_df = pd.read_csv(products_path, encoding='gbk')
+            except UnicodeDecodeError:
+                prod_df = pd.read_csv(products_path, encoding='latin-1')
+    required_cols = {'ProductName', 'Value', 'Weight'}
+    if not required_cols.issubset(prod_df.columns):
+        raise ValueError(f"products.csv missing columns: {required_cols - set(prod_df.columns)}")
+    # Remove duplicate ProductName rows by summing Value and Weight
+    prod_df = prod_df.groupby('ProductName', as_index=False).agg({'Value': 'sum', 'Weight': 'sum'})
+    areas = prod_df['ProductName'].tolist()
+    v = dict(zip(prod_df['ProductName'], prod_df['Value']))
+    w = dict(zip(prod_df['ProductName'], prod_df['Weight']))
+
+    # Validate all coefficients
+    for i in areas:
+        if pd.isnull(v[i]) or pd.isnull(w[i]):
+            raise ValueError(f"Missing Value or Weight for area {i}")
+
+    m = gp.Model('NYC_Development')
+    x = m.addVars(areas, lb=0, vtype=GRB.INTEGER, name='x')
+    m.setObjective(gp.quicksum(v[i] * x[i] for i in areas), GRB.MAXIMIZE)
+    m.addConstr(gp.quicksum(w[i] * x[i] for i in areas) <= C, name='capacity')
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 20 columns and 20 nonzeros
+Model fingerprint: 0xba580a49
+Variable types: 0 continuous, 20 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [6e+01, 5e+02]
+  Objective range  [1e+02, 9e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+03, 4e+03]
+Found heuristic solution: objective 10347.000000
+Presolve removed 1 rows and 20 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 74260 10347 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.426000000000e+04, best bound 7.426000000000e+04, gap 0.0000%
+ObjVal: 74260.0
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: 79.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+Optimal objective: 74260.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', 79.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0)]

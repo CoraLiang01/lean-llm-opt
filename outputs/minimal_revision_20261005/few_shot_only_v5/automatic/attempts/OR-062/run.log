@@ -1,0 +1,143 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read demand.csv
+    demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP6/demand.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            demand_df = pd.read_csv(demand_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {demand_path} with tried encodings.")
+
+    # Read fixed_cost.csv
+    fixed_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP6/fixed_cost.csv"
+    for enc in encodings:
+        try:
+            fixed_cost_df = pd.read_csv(fixed_cost_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {fixed_cost_path} with tried encodings.")
+
+    # Read transportation_costs.csv
+    trans_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP6/transportation_costs.csv"
+    for enc in encodings:
+        try:
+            trans_cost_df = pd.read_csv(trans_cost_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {trans_cost_path} with tried encodings.")
+
+    # Prepare sets
+    # Suppliers: from fixed_cost.csv, column 'Unnamed: 0'
+    suppliers = fixed_cost_df['Unnamed: 0'].astype(str).tolist()
+    # Customers: from demand.csv, column 'Customer'
+    customers = demand_df['Customer'].astype(str).tolist()
+
+    # Validate that all customers are in transportation_costs.csv columns (except first column)
+    trans_cost_customers = [col for col in trans_cost_df.columns if col != 'Unnamed: 0']
+    missing_customers = set(customers) - set(trans_cost_customers)
+    if missing_customers:
+        raise ValueError(f"Customers {missing_customers} in demand.csv not found in transportation_costs.csv columns.")
+
+    # Validate that all suppliers are in transportation_costs.csv rows
+    trans_cost_suppliers = trans_cost_df['Unnamed: 0'].astype(str).tolist()
+    missing_suppliers = set(suppliers) - set(trans_cost_suppliers)
+    if missing_suppliers:
+        raise ValueError(f"Suppliers {missing_suppliers} in fixed_cost.csv not found in transportation_costs.csv rows.")
+
+    # Build demand dict
+    demand = {}
+    for _, row in demand_df.iterrows():
+        cust = str(row['Customer'])
+        val = row['demand']
+        if cust in demand:
+            demand[cust] += val
+        else:
+            demand[cust] = val
+
+    # Build fixed_cost dict
+    fixed_cost = {}
+    for _, row in fixed_cost_df.iterrows():
+        sup = str(row['Unnamed: 0'])
+        val = row['fixed_costs']
+        if sup in fixed_cost:
+            fixed_cost[sup] += val
+        else:
+            fixed_cost[sup] = val
+
+    # Build cost dict: cost[supplier][customer]
+    cost = {sup: {} for sup in suppliers}
+    for _, row in trans_cost_df.iterrows():
+        sup = str(row['Unnamed: 0'])
+        if sup not in suppliers:
+            continue
+        for cust in customers:
+            val = row[cust]
+            cost[sup][cust] = val
+
+    # Validate all required cost entries exist
+    for i in suppliers:
+        for j in customers:
+            if j not in cost[i]:
+                raise ValueError(f"Missing transportation cost for supplier {i}, customer {j}.")
+
+    # Big-M: sum of all demand
+    M = sum(demand[j] for j in customers)
+
+    # Model
+    m = gp.Model('Iowa_Liquor_UFLP')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    x = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    y = m.addVars(suppliers, vtype=GRB.BINARY, name='y')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(cost[i][j] * x[i, j] for i in suppliers for j in customers) +
+        gp.quicksum(fixed_cost[i] * y[i] for i in suppliers),
+        GRB.MINIMIZE
+    )
+
+    # Demand satisfaction
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in suppliers) == demand[j] for j in customers),
+        name='demand'
+    )
+
+    # Supplier activation
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in customers) <= M * y[i] for i in suppliers),
+        name='activation'
+    )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v5/frozen_notebook.ipynb:cell29", line 140, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v5/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 88, in <module>
+  File "<string>", line 39, in solve_problem
+ValueError: Customers {'Customer_1', 'Customer_3', 'Customer_2', 'Customer_4', 'Customer_5'} in demand.csv not found in transportation_costs.csv columns.

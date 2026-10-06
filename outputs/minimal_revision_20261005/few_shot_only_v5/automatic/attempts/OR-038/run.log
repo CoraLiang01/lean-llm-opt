@@ -1,0 +1,143 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    csv_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA4/NewCarSalesInNorway1/capacity.csv"
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA4/NewCarSalesInNorway1/products.csv"
+    for enc in csv_encodings:
+        try:
+            capacity_df = pd.read_csv(capacity_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {capacity_path} with tried encodings.")
+    for enc in csv_encodings:
+        try:
+            products_df = pd.read_csv(products_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {products_path} with tried encodings.")
+
+    # Validate required columns
+    if not {'VehicleID', 'VehicleType', 'Capacity'}.issubset(capacity_df.columns):
+        raise ValueError("capacity.csv missing required columns.")
+    if not {'ProductName', 'Value', 'Weight'}.issubset(products_df.columns):
+        raise ValueError("products.csv missing required columns.")
+
+    # Prepare join: match VehicleType (capacity) to ProductName (products)
+    # Use case-insensitive matching
+    capacity_df['VehicleType_cf'] = capacity_df['VehicleType'].astype(str).str.casefold()
+    products_df['ProductName_cf'] = products_df['ProductName'].astype(str).str.casefold()
+    merged = pd.merge(
+        capacity_df,
+        products_df,
+        left_on='VehicleType_cf',
+        right_on='ProductName_cf',
+        how='inner',
+        suffixes=('_cap', '_prod')
+    )
+
+    # Check for missing matches
+    if merged.empty:
+        raise ValueError("No matching vehicle types between capacity.csv and products.csv.")
+
+    # Index set: unique vehicle types (by VehicleID)
+    # Use VehicleID as unique key, but preserve all business identifiers
+    vehicle_keys = []
+    b = {}
+    u = {}
+    vehicle_info = {}
+    for _, row in merged.iterrows():
+        key = row['VehicleID']
+        if key in b:
+            # If duplicate VehicleID, sum capacities and check benefit consistency
+            u[key] += row['Capacity']
+            if b[key] != row['Value']:
+                raise ValueError(f"Conflicting Value for VehicleID {key}")
+        else:
+            vehicle_keys.append(key)
+            b[key] = row['Value']
+            u[key] = row['Capacity']
+            vehicle_info[key] = {
+                'VehicleType': row['VehicleType'],
+                'ProductName': row['ProductName'],
+                'Weight': row['Weight']
+            }
+
+    # Validate all required coefficients present
+    if not (len(vehicle_keys) == len(b) == len(u)):
+        raise ValueError("Mismatch in vehicle key, benefit, or capacity dimensions.")
+
+    # Model
+    m = gp.Model('NewCarSalesInNorway1')
+    x = m.addVars(vehicle_keys, lb=0, ub=[u[k] for k in vehicle_keys], vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total benefit
+    m.setObjective(gp.quicksum(b[k] * x[k] for k in vehicle_keys), GRB.MAXIMIZE)
+
+    # Vehicle-type-specific inventory limits: x_i <= u_i
+    # (Already set as variable upper bounds)
+
+    # Total inventory capacity constraint: sum x_i <= sum u_i
+    m.addConstr(gp.quicksum(x[k] for k in vehicle_keys) <= sum(u[k] for k in vehicle_keys), name='total_capacity')
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for v in m.getVars():
+            print(f'{v.VarName}: {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 10 columns and 10 nonzeros
+Model fingerprint: 0xebaffab5
+Variable types: 0 continuous, 10 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+03, 4e+03]
+  Bounds range     [3e+01, 1e+02]
+  RHS range        [7e+02, 7e+02]
+Found heuristic solution: objective 1314500.0000
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.3145e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.314500000000e+06, best bound 1.314500000000e+06, gap 0.0000%
+ObjVal: 1314500.0
+C0: 100.0
+C1: 80.0
+C2: 120.0
+C3: 90.0
+C4: 50.0
+C5: 30.0
+C6: 110.0
+C7: 40.0
+C8: 60.0
+C9: 35.0
+Optimal objective: 1314500.0
+Optimal solution: [('C0', 100.0), ('C1', 80.0), ('C2', 120.0), ('C3', 90.0), ('C4', 50.0), ('C5', 30.0), ('C6', 110.0), ('C7', 40.0), ('C8', 60.0), ('C9', 35.0)]

@@ -1,0 +1,94 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with robust encoding
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM18/SupermartGrocerySales-RetailAnalyticsDataset.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read CSV at {csv_path} with tried encodings.")
+
+    # Filter for 'Organ' in 'Sub Category' (case-insensitive, exact match)
+    mask = df['Sub Category'].astype(str).str.casefold() == 'organ'
+    organ_df = df[mask].copy()
+
+    # Check required columns
+    required_cols = ['Sub Category', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in organ_df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Drop rows with missing keys or coefficients
+    organ_df = organ_df.dropna(subset=['Revenue', 'Demand', 'Initial Inventory'])
+
+    # Use the original row index as unique identifier if possible, else create a unique key
+    # Here, we use the DataFrame index as the product key
+    items = organ_df.index.tolist()
+
+    # Build parameter dictionaries
+    try:
+        revenue = organ_df['Revenue'].to_dict()
+        demand = organ_df['Demand'].to_dict()
+        inventory = organ_df['Initial Inventory'].to_dict()
+    except Exception as e:
+        raise ValueError(f"Error extracting parameters: {e}")
+
+    # Validate all items have coefficients
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f"Missing coefficients for item {i}")
+
+    m = gp.Model('Supermart_Organ_Revenue')
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 0 rows, 0 columns and 0 nonzeros
+Model fingerprint: 0xbd26a89a
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [0e+00, 0e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [0e+00, 0e+00]
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0   -0.0000000e+00   0.000000e+00   0.000000e+00      0s
+
+Solved in 0 iterations and 0.00 seconds (0.00 work units)
+Optimal objective -0.000000000e+00
+ObjVal: -0.0
+Optimal objective: -0.0
+Optimal solution: []

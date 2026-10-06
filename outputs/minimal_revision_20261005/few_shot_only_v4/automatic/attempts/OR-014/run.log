@@ -1,0 +1,198 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Try reading the CSV with multiple encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM5/PizzaSalesDataset.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read CSV file at {csv_path} with tried encodings.")
+
+    # Check required columns
+    required_cols = ["Product Name", "Revenue", "Demand", "Initial Inventory"]
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Remove duplicate rows by full key, sum repeated rows
+    df_grouped = df.groupby("Product Name", as_index=False).agg({
+        "Revenue": "first",
+        "Demand": "sum",
+        "Initial Inventory": "sum"
+    })
+
+    # Build index set and parameter dictionaries
+    items = df_grouped["Product Name"].tolist()
+    revenue = dict(zip(df_grouped["Product Name"], df_grouped["Revenue"]))
+    demand = dict(zip(df_grouped["Product Name"], df_grouped["Demand"]))
+    inventory = dict(zip(df_grouped["Product Name"], df_grouped["Initial Inventory"]))
+
+    # Validate all coefficients are present and finite
+    for i in items:
+        if pd.isnull(revenue[i]) or pd.isnull(demand[i]) or pd.isnull(inventory[i]):
+            raise ValueError(f"Missing data for product: {i}")
+        if not (isinstance(revenue[i], (int, float)) and isinstance(demand[i], (int, float)) and isinstance(inventory[i], (int, float))):
+            raise ValueError(f"Non-numeric data for product: {i}")
+        if demand[i] < 0 or inventory[i] < 0:
+            raise ValueError(f"Negative demand or inventory for product: {i}")
+
+    m = gp.Model("Pizza_Fulfillment")
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 200 rows, 100 columns and 200 nonzeros
+Model fingerprint: 0x4cf7d932
+Variable types: 0 continuous, 100 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+01, 4e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [6e+01, 2e+04]
+Found heuristic solution: objective 1794269.0000
+Presolve removed 200 rows and 100 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.79427e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.794269000000e+06, best bound 1.794269000000e+06, gap 0.0000%
+ObjVal: 1794269.0
+C0: 1960.0
+C1: 1884.0
+C2: 963.0
+C3: 3729.0
+C4: 970.0
+C5: 550.0
+C6: 1116.0
+C7: 198.0
+C8: 1823.0
+C9: 1858.0
+C10: 992.0
+C11: 375.0
+C12: 1400.0
+C13: 192.0
+C14: 791.0
+C15: 550.0
+C16: 593.0
+C17: 944.0
+C18: 2340.0
+C19: 1586.0
+C20: 2769.0
+C21: 2589.0
+C22: 1163.0
+C23: 733.0
+C24: 2198.0
+C25: 808.0
+C26: 189.0
+C27: 602.0
+C28: 1193.0
+C29: 1815.0
+C30: 956.0
+C31: 2021.0
+C32: 1447.0
+C33: 803.0
+C34: 602.0
+C35: 1482.0
+C36: 1861.0
+C37: 390.0
+C38: 380.0
+C39: 969.0
+C40: 607.0
+C41: 563.0
+C42: 801.0
+C43: 882.0
+C44: 734.0
+C45: 546.0
+C46: 577.0
+C47: 1711.0
+C48: 907.0
+C49: 322.0
+C50: 1123.0
+C51: 853.0
+C52: 939.0
+C53: 765.0
+C54: 788.0
+C55: 1148.0
+C56: 1440.0
+C57: 1857.0
+C58: 1490.0
+C59: 1376.0
+C60: 852.0
+C61: 640.0
+C62: 858.0
+C63: 1183.0
+C64: 844.0
+C65: 1120.0
+C66: 794.0
+C67: 2776.0
+C68: 1209.0
+C69: 1135.0
+C70: 1482.0
+C71: 806.0
+C72: 536.0
+C73: 576.0
+C74: 2009.0
+C75: 1060.0
+C76: 733.0
+C77: 2198.0
+C78: 808.0
+C79: 807.0
+C80: 563.0
+C81: 563.0
+C82: 801.0
+C83: 882.0
+C84: 1120.0
+C85: 876.0
+C86: 563.0
+C87: 533.0
+C88: 794.0
+C89: 2776.0
+C90: 955.0
+C91: 956.0
+C92: 510.0
+C93: 560.0
+C94: 604.0
+C95: 1096.0
+C96: 56.0
+C97: 850.0
+C98: 1265.0
+C99: 921.0
+Optimal objective: 1794269.0
+Optimal solution: [('C0', 1960.0), ('C1', 1884.0), ('C2', 963.0), ('C3', 3729.0), ('C4', 970.0), ('C5', 550.0), ('C6', 1116.0), ('C7', 198.0), ('C8', 1823.0), ('C9', 1858.0), ('C10', 992.0), ('C11', 375.0), ('C12', 1400.0), ('C13', 192.0), ('C14', 791.0), ('C15', 550.0), ('C16', 593.0), ('C17', 944.0), ('C18', 2340.0), ('C19', 1586.0), ('C20', 2769.0), ('C21', 2589.0), ('C22', 1163.0), ('C23', 733.0), ('C24', 2198.0), ('C25', 808.0), ('C26', 189.0), ('C27', 602.0), ('C28', 1193.0), ('C29', 1815.0), ('C30', 956.0), ('C31', 2021.0), ('C32', 1447.0), ('C33', 803.0), ('C34', 602.0), ('C35', 1482.0), ('C36', 1861.0), ('C37', 390.0), ('C38', 380.0), ('C39', 969.0), ('C40', 607.0), ('C41', 563.0), ('C42', 801.0), ('C43', 882.0), ('C44', 734.0), ('C45', 546.0), ('C46', 577.0), ('C47', 1711.0), ('C48', 907.0), ('C49', 322.0), ('C50', 1123.0), ('C51', 853.0), ('C52', 939.0), ('C53', 765.0), ('C54', 788.0), ('C55', 1148.0), ('C56', 1440.0), ('C57', 1857.0), ('C58', 1490.0), ('C59', 1376.0), ('C60', 852.0), ('C61', 640.0), ('C62', 858.0), ('C63', 1183.0), ('C64', 844.0), ('C65', 1120.0), ('C66', 794.0), ('C67', 2776.0), ('C68', 1209.0), ('C69', 1135.0), ('C70', 1482.0), ('C71', 806.0), ('C72', 536.0), ('C73', 576.0), ('C74', 2009.0), ('C75', 1060.0), ('C76', 733.0), ('C77', 2198.0), ('C78', 808.0), ('C79', 807.0), ('C80', 563.0), ('C81', 563.0), ('C82', 801.0), ('C83', 882.0), ('C84', 1120.0), ('C85', 876.0), ('C86', 563.0), ('C87', 533.0), ('C88', 794.0), ('C89', 2776.0), ('C90', 955.0), ('C91', 956.0), ('C92', 510.0), ('C93', 560.0), ('C94', 604.0), ('C95', 1096.0), ('C96', 56.0), ('C97', 850.0), ('C98', 1265.0), ('C99', 921.0)]

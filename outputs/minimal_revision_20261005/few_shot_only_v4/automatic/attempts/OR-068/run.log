@@ -1,0 +1,133 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with fallback encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP3/manager_project_costs.csv"
+    tried_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in tried_encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError(f"Could not decode {csv_path} with tried encodings.")
+
+    # Ensure identifiers are preserved as in the source
+    if 'Unnamed: 0' not in df.columns:
+        raise ValueError("Manager identifier column 'Unnamed: 0' not found in CSV.")
+    managers = df['Unnamed: 0'].tolist()
+    projects = [col for col in df.columns if col != 'Unnamed: 0']
+
+    # Build cost dictionary
+    cost = {}
+    for idx, row in df.iterrows():
+        manager = row['Unnamed: 0']
+        cost[manager] = {}
+        for project in projects:
+            val = row[project]
+            if pd.isnull(val):
+                raise ValueError(f"Missing cost for manager {manager}, project {project}")
+            cost[manager][project] = float(val)
+
+    # Validate dimensions
+    if len(managers) != len(projects):
+        raise ValueError("Number of managers and projects must be equal for assignment problem.")
+    for manager in managers:
+        if set(cost[manager].keys()) != set(projects):
+            raise ValueError(f"Cost data for manager {manager} does not cover all projects.")
+
+    # Model
+    m = gp.Model('Original_RAG_AP')
+    x = m.addVars(managers, projects, vtype=GRB.BINARY, name='x')
+    m.setObjective(gp.quicksum(cost[i][j] * x[i, j] for i in managers for j in projects), GRB.MINIMIZE)
+    m.addConstrs((gp.quicksum(x[i, j] for j in projects) == 1 for i in managers), name='mgr')
+    m.addConstrs((gp.quicksum(x[i, j] for i in managers) == 1 for j in projects), name='prj')
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 12 rows, 36 columns and 72 nonzeros
+Model fingerprint: 0x1b11b8f3
+Variable types: 0 continuous, 36 integer (36 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+03, 3e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 11552.000000
+Presolve time: 0.00s
+Presolved: 12 rows, 36 columns, 72 nonzeros
+Variable types: 0 continuous, 36 integer (36 binary)
+
+Root relaxation: objective 9.089000e+03, 10 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    9089.0000000 9089.00000  0.00%     -    0s
+
+Explored 1 nodes (10 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 9089 11552 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 9.089000000000e+03, best bound 9.089000000000e+03, gap 0.0000%
+ObjVal: 9089.0
+C0: -0.0
+C1: -0.0
+C2: 1.0
+C3: -0.0
+C4: 0.0
+C5: 0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: 1.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: 0.0
+C15: 1.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: 0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: 1.0
+C24: -0.0
+C25: 1.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: 1.0
+C31: -0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+Optimal objective: 9089.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', 1.0), ('C3', -0.0), ('C4', 0.0), ('C5', 0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', 1.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', 0.0), ('C15', 1.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', 0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', 1.0), ('C24', -0.0), ('C25', 1.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', 1.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0)]

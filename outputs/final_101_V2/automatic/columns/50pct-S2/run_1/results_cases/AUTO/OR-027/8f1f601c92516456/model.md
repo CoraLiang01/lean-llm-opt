@@ -1,0 +1,83 @@
+##### Decision Variables
+
+- $y_i \in \{0,1\}$: 1 if service centre $i$ is opened, 0 otherwise, for $i \in I = \{\text{SC1},\ldots,\text{SC10}\}$.
+- $x_{ij} \in \{0,1\}$: 1 if customer $j$ is assigned to centre $i$, 0 otherwise, for $i \in I$, $j \in J = \{\text{C1},\ldots,\text{C15}\}$.
+
+##### Parameters
+
+- Fixed opening costs $f_i$ for each centre $i$:
+
+  $$
+  \begin{aligned}
+  &f_{\text{SC1}} = 385.1 \\
+  &f_{\text{SC2}} = 546.3 \\
+  &f_{\text{SC3}} = 485.2 \\
+  &f_{\text{SC4}} = 448.1 \\
+  &f_{\text{SC5}} = 324.1 \\
+  &f_{\text{SC6}} = 323.9 \\
+  &f_{\text{SC7}} = 296.5 \\
+  &f_{\text{SC8}} = 522.7 \\
+  &f_{\text{SC9}} = 448.7 \\
+  &f_{\text{SC10}} = 478.7 \\
+  \end{aligned}
+  $$
+
+- Service cost $c_{ij}$ for assigning customer $j$ to centre $i$ (full matrix):
+
+  $$
+  \begin{array}{c|cccccccccc}
+  & \text{SC1} & \text{SC2} & \text{SC3} & \text{SC4} & \text{SC5} & \text{SC6} & \text{SC7} & \text{SC8} & \text{SC9} & \text{SC10} \\
+  \hline
+  \text{C1}  & 15.1 & 21.2 & 14.9 & 18.8 & 22.9 & 16.8 & 16.5 & 9.4  & 16.1 & 17.3 \\
+  \text{C2}  & 13.4 & 16.3 & 20.2 & 19.6 & 20.9 & 22.1 & 16.9 & 9.4  & 13.8 & 11.7 \\
+  \text{C3}  & 15.2 & 18.8 & 14.7 & 21.7 & 18.1 & 18.6 & 12.3 & 11.2 & 11.9 & 20.4 \\
+  \text{C4}  & 16.8 & 19.1 & 18.3 & 18.8 & 23.1 & 15.7 & 13.1 & 8.6  & 15.6 & 22.2 \\
+  \text{C5}  & 13.4 & 18.6 & 20.8 & 19.8 & 22.1 & 18.1 & 16.7 & 12.1 & 11.4 & 18.2 \\
+  \text{C6}  & 12.5 & 22.5 & 15.5 & 14.9 & 21.6 & 21.3 & 16.1 & 10.7 & 11.9 & 14.6 \\
+  \text{C7}  & 12.1 & 17.1 & 19.8 & 18.6 & 22.1 & 20.7 & 20.5 & 12.2 & 15.4 & 18.7 \\
+  \text{C8}  & 12.3 & 15.7 & 17.9 & 21.3 & 22.7 & 15.3 & 16.6 & 11.4 & 14.1 & 20.1 \\
+  \text{C9}  & 16.3 & 21.3 & 17.6 & 20.8 & 21.8 & 17.2 & 15.5 & 12.6 & 19.9 & 19.1 \\
+  \text{C10} & 12.1 & 18.7 & 14.4 & 20.1 & 22.7 & 14.1 & 18.1 & 11.4 & 18.1 & 17.4 \\
+  \text{C11} & 16.7 & 18.7 & 15.7 & 19.9 & 24.2 & 18.7 & 14.2 & 13.1 & 14.7 & 16.1 \\
+  \text{C12} & 11.3 & 23.8 & 15.5 & 17.3 & 23.2 & 17.7 & 16.8 & 14.5 & 15.8 & 17.8 \\
+  \text{C13} & 15.1 & 20.5 & 15.1 & 18.4 & 20.6 & 17.9 & 14.5 & 8.5  & 14.9 & 13.9 \\
+  \text{C14} & 8.3  & 20.7 & 14.7 & 20.4 & 20.6 & 14.8 & 14.2 & 11.5 & 14.1 & 15.1 \\
+  \text{C15} & 12.1 & 16.3 & 16.4 & 15.1 & 21.3 & 19.1 & 19.5 & 16.7 & 11.1 & 18.7 \\
+  \end{array}
+  $$
+
+##### Objective Function
+
+Minimise the total cost:
+$$
+\min \sum_{i \in I} f_i y_i + \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij}
+$$
+
+##### Constraints
+
+1. **Assignment:** Each customer is assigned to exactly one centre:
+   $$
+   \sum_{i \in I} x_{ij} = 1, \quad \forall j \in J
+   $$
+
+2. **Open centre assignment:** Customers can only be assigned to open centres:
+   $$
+   x_{ij} \leq y_i, \quad \forall i \in I,\, j \in J
+   $$
+
+3. **Centre capacity:** Each centre serves at most 4 customers:
+   $$
+   \sum_{j \in J} x_{ij} \leq 4 y_i, \quad \forall i \in I
+   $$
+
+4. **Variable domains:**
+   $$
+   x_{ij} \in \{0,1\}, \quad y_i \in \{0,1\}
+   $$
+
+##### Sets
+
+- $I = \{\text{SC1}, \text{SC2}, \text{SC3}, \text{SC4}, \text{SC5}, \text{SC6}, \text{SC7}, \text{SC8}, \text{SC9}, \text{SC10}\}$
+- $J = \{\text{C1}, \text{C2}, \text{C3}, \text{C4}, \text{C5}, \text{C6}, \text{C7}, \text{C8}, \text{C9}, \text{C10}, \text{C11}, \text{C12}, \text{C13}, \text{C14}, \text{C15}\}$
+
+##### All required parameters and matrices are as retrieved above.

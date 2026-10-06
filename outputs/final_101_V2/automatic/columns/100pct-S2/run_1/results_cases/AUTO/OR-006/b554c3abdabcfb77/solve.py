@@ -1,0 +1,40 @@
+LEGACY_OBSERVATION = 'capacity.csv\nannual_maintenance_visits,Capacity\n3,1576\n\nproducts.csv\nshowroom_display_zone,vehicle_catalog_views_last_month,ProductName,Value,warranty_months,Weight\nSouth Wing,410,Sedan,1752,48,15\nCentral Hall,410,SUV,1856,60,87\nCentral Hall,250,Truck,8372,12,36\nNorth Wing,250,Convertible,6168,24,30\nCentral Hall,120,Minivan,9681,24,33\nSouth Wing,120,Coupe,8062,48,72\nCentral Hall,250,Hatchback,3895,12,75\nNorth Wing,250,Station Wagon,3254,24,71\nNorth Wing,920,Electric Car,1701,24,51\nSouth Wing,920,Hybrid Car,6799,12,21\nNorth Wing,410,Luxury Sedan,2724,24,97\nNorth Wing,920,Sports Car,6304,36,52\nNorth Wing,120,Crossover,3255,60,25\nNorth Wing,920,Diesel Truck,1923,36,15\nNorth Wing,120,Compact SUV,4103,24,54\nCentral Hall,410,Luxury SUV,4429,12,57\nSouth Wing,120,Cargo Van,2663,36,18\nCentral Hall,920,Pickup Truck,1691,12,69\nCentral Hall,680,Roadster,5632,24,26\nNorth Wing,680,Muscle Car,4793,24,38\nNorth Wing,920,Off-road Vehicle,1343,36,31\nSouth Wing,120,Camper Van,9124,60,74\nSouth Wing,250,Compact Car,3652,36,82\nNorth Wing,250,Motorcycle,8842,48,49\nNorth Wing,410,Electric SUV,9176,60,64'
+LEGACY_RECORDS = [{'source': 'capacity.csv', 'values': {'annual_maintenance_visits': '3', 'Capacity': '1576'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'South Wing', 'vehicle_catalog_views_last_month': '410', 'ProductName': 'Sedan', 'Value': '1752', 'warranty_months': '48', 'Weight': '15'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'Central Hall', 'vehicle_catalog_views_last_month': '410', 'ProductName': 'SUV', 'Value': '1856', 'warranty_months': '60', 'Weight': '87'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'Central Hall', 'vehicle_catalog_views_last_month': '250', 'ProductName': 'Truck', 'Value': '8372', 'warranty_months': '12', 'Weight': '36'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '250', 'ProductName': 'Convertible', 'Value': '6168', 'warranty_months': '24', 'Weight': '30'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'Central Hall', 'vehicle_catalog_views_last_month': '120', 'ProductName': 'Minivan', 'Value': '9681', 'warranty_months': '24', 'Weight': '33'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'South Wing', 'vehicle_catalog_views_last_month': '120', 'ProductName': 'Coupe', 'Value': '8062', 'warranty_months': '48', 'Weight': '72'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'Central Hall', 'vehicle_catalog_views_last_month': '250', 'ProductName': 'Hatchback', 'Value': '3895', 'warranty_months': '12', 'Weight': '75'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '250', 'ProductName': 'Station Wagon', 'Value': '3254', 'warranty_months': '24', 'Weight': '71'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '920', 'ProductName': 'Electric Car', 'Value': '1701', 'warranty_months': '24', 'Weight': '51'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'South Wing', 'vehicle_catalog_views_last_month': '920', 'ProductName': 'Hybrid Car', 'Value': '6799', 'warranty_months': '12', 'Weight': '21'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '410', 'ProductName': 'Luxury Sedan', 'Value': '2724', 'warranty_months': '24', 'Weight': '97'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '920', 'ProductName': 'Sports Car', 'Value': '6304', 'warranty_months': '36', 'Weight': '52'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '120', 'ProductName': 'Crossover', 'Value': '3255', 'warranty_months': '60', 'Weight': '25'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '920', 'ProductName': 'Diesel Truck', 'Value': '1923', 'warranty_months': '36', 'Weight': '15'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '120', 'ProductName': 'Compact SUV', 'Value': '4103', 'warranty_months': '24', 'Weight': '54'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'Central Hall', 'vehicle_catalog_views_last_month': '410', 'ProductName': 'Luxury SUV', 'Value': '4429', 'warranty_months': '12', 'Weight': '57'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'South Wing', 'vehicle_catalog_views_last_month': '120', 'ProductName': 'Cargo Van', 'Value': '2663', 'warranty_months': '36', 'Weight': '18'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'Central Hall', 'vehicle_catalog_views_last_month': '920', 'ProductName': 'Pickup Truck', 'Value': '1691', 'warranty_months': '12', 'Weight': '69'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'Central Hall', 'vehicle_catalog_views_last_month': '680', 'ProductName': 'Roadster', 'Value': '5632', 'warranty_months': '24', 'Weight': '26'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '680', 'ProductName': 'Muscle Car', 'Value': '4793', 'warranty_months': '24', 'Weight': '38'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '920', 'ProductName': 'Off-road Vehicle', 'Value': '1343', 'warranty_months': '36', 'Weight': '31'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'South Wing', 'vehicle_catalog_views_last_month': '120', 'ProductName': 'Camper Van', 'Value': '9124', 'warranty_months': '60', 'Weight': '74'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'South Wing', 'vehicle_catalog_views_last_month': '250', 'ProductName': 'Compact Car', 'Value': '3652', 'warranty_months': '36', 'Weight': '82'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '250', 'ProductName': 'Motorcycle', 'Value': '8842', 'warranty_months': '48', 'Weight': '49'}}, {'source': 'products.csv', 'values': {'showroom_display_zone': 'North Wing', 'vehicle_catalog_views_last_month': '410', 'ProductName': 'Electric SUV', 'Value': '9176', 'warranty_months': '60', 'Weight': '64'}}]
+import gurobipy as gp
+from gurobipy import GRB
+products = []
+value = {}
+weight = {}
+for rec in LEGACY_RECORDS:
+    if rec['source'] == 'products.csv':
+        pname = rec['values']['ProductName']
+        products.append(pname)
+        try:
+            value[pname] = int(rec['values']['Value'])
+            weight[pname] = int(rec['values']['Weight'])
+        except Exception as e:
+            raise ValueError(f'Missing or invalid Value/Weight for {pname}: {e}')
+capacity = None
+for rec in LEGACY_RECORDS:
+    if rec['source'] == 'capacity.csv':
+        try:
+            capacity = int(rec['values']['Capacity'])
+        except Exception as e:
+            raise ValueError(f'Missing or invalid Capacity: {e}')
+if capacity is None:
+    raise ValueError('No capacity found in LEGACY_RECORDS.')
+for pname in products:
+    if pname not in value or pname not in weight:
+        raise ValueError(f'Missing value or weight for product {pname}')
+m = gp.Model('vehicle_inventory')
+x = m.addVars(products, lb=0, vtype=GRB.INTEGER, name='')
+m.setObjective(gp.quicksum((value[p] * x[p] for p in products)), GRB.MAXIMIZE)
+m.addConstr(gp.quicksum((weight[p] * x[p] for p in products)) <= capacity, name='capacity')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

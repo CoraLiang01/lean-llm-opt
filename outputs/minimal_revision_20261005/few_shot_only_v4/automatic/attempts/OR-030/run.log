@@ -1,0 +1,128 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Try reading the CSV with multiple encodings as specified
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM21/BigMartSales.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not read CSV with supported encodings.")
+
+    # Filter for 'FDK57' in 'Product Name' (case-insensitive, exact match)
+    mask = df['Product Name'].astype(str).str.casefold() == 'fdk57'
+    df_fdk57 = df[mask].copy()
+
+    if df_fdk57.empty:
+        raise ValueError("No rows found for Product Name classified under 'FDK57'.")
+
+    # Check required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df_fdk57.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Use the full row as the unique index if possible, else use row number
+    # But since 'Product Name' is always 'FDK57', use DataFrame index as unique key
+    # If there are other identifiers, they should be included; here, use DataFrame index
+    # For traceability, keep the full row as a dictionary keyed by DataFrame index
+    items = df_fdk57.index.tolist()
+
+    # Extract parameters as dictionaries keyed by DataFrame index
+    try:
+        revenue = df_fdk57['Revenue'].to_dict()
+        demand = df_fdk57['Demand'].to_dict()
+        inventory = df_fdk57['Initial Inventory'].to_dict()
+    except Exception as e:
+        raise ValueError(f"Error extracting parameters: {e}")
+
+    # Validate all coefficients are present and numeric
+    for i in items:
+        for param, dic in [('Revenue', revenue), ('Demand', demand), ('Initial Inventory', inventory)]:
+            if i not in dic:
+                raise ValueError(f"Missing {param} for item {i}")
+            if pd.isnull(dic[i]):
+                raise ValueError(f"Null {param} for item {i}")
+            try:
+                float(dic[i])
+            except Exception:
+                raise ValueError(f"Non-numeric {param} for item {i}: {dic[i]}")
+
+    # Convert all coefficients to float, but keep as int if possible for inventory/demand
+    revenue = {i: float(revenue[i]) for i in items}
+    demand = {i: int(demand[i]) for i in items}
+    inventory = {i: int(inventory[i]) for i in items}
+
+    m = gp.Model('FDK57_Car_Dealership')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    # Inventory constraints: x_i <= I_i
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+
+    # Demand constraints: x_i <= d_i
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 16 rows, 8 columns and 16 nonzeros
+Model fingerprint: 0xff55cc82
+Variable types: 0 continuous, 8 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+02, 1e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+01, 2e+02]
+Found heuristic solution: objective 34856.760000
+Presolve removed 16 rows and 8 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 34856.8 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.485676000000e+04, best bound 3.485676000000e+04, gap 0.0000%
+ObjVal: 34856.759999999995
+C0: 30.0
+C1: 40.0
+C2: 30.0
+C3: 50.0
+C4: 10.0
+C5: 30.0
+C6: 50.0
+C7: 50.0
+Optimal objective: 34856.759999999995
+Optimal solution: [('C0', 30.0), ('C1', 40.0), ('C2', 30.0), ('C3', 50.0), ('C4', 10.0), ('C5', 30.0), ('C6', 50.0), ('C7', 50.0)]

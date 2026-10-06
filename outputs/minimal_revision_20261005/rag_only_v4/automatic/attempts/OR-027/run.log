@@ -1,0 +1,100 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Required table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+    records = table["records"]
+
+    # Build index set I: all unique Sub Category values
+    I = []
+    r = {}
+    d = {}
+    s = {}
+    for rec in records:
+        vals = rec["values"]
+        subcat = vals["Sub Category"]
+        if subcat not in I:
+            I.append(subcat)
+        try:
+            r[subcat] = float(vals["Revenue"])
+            d[subcat] = float(vals["Demand"])
+            s[subcat] = float(vals["Initial Inventory"])
+        except Exception as e:
+            raise RuntimeError(f"Error parsing parameters for Sub Category '{subcat}': {e}")
+
+    # Validate all required parameters are present for each i in I
+    for i in I:
+        if i not in r or i not in d or i not in s:
+            raise RuntimeError(f"Missing parameter for Sub Category '{i}'.")
+
+    # Only include products whose Sub Category contains 'Organ' (case-insensitive)
+    I_organ = [i for i in I if "organ" in i.casefold()]
+    if not I_organ:
+        raise RuntimeError("No Sub Category contains 'Organ'.")
+
+    # Decision variables: x_i for i in I_organ, integer, 0 <= x_i <= min{d_i, s_i}
+    x_ub = {i: min(d[i], s[i]) for i in I_organ}
+
+    m = gp.Model()
+    x = m.addVars(I_organ, lb=0, ub=x_ub, vtype=GRB.INTEGER, name='', obj={i: r[i] for i in I_organ})
+
+    # Constraints: 0 <= x_i <= min{d_i, s_i} (already set via bounds)
+    # No further constraints needed
+
+    # Objective: maximize total revenue
+    m.ModelSense = GRB.MAXIMIZE
+    m.setObjective(gp.quicksum(r[i] * x[i] for i in I_organ))
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for i in I_organ:
+            print(x[i].VarName, x[i].X)
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 0 rows, 3 columns and 0 nonzeros
+Model fingerprint: 0x9b0c28fe
+Variable types: 0 continuous, 3 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [6e+01, 9e+02]
+  Bounds range     [7e+05, 7e+05]
+  RHS range        [0e+00, 0e+00]
+Found heuristic solution: objective 7.842971e+08
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 7.84297e+08 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.842970541100e+08, best bound 7.842970541100e+08, gap 0.0000%
+784297054.11
+C0 678906.0
+C1 749927.0
+C2 699808.0
+Optimal objective: 784297054.11
+Optimal solution: [('C0', 678906.0), ('C1', 749927.0), ('C2', 699808.0)]

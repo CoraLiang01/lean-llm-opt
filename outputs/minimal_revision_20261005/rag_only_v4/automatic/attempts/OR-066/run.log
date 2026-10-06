@@ -1,0 +1,111 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract tables
+    tables = {t['table_id']: t for t in CSVQA_DATA['tables']}
+    # Suppliers (I)
+    supplier_table = tables['file_1_view_0']
+    I = [rec['values']['Unnamed: 0'] for rec in supplier_table['records']]
+    # Supermarkets (J)
+    demand_table = tables['file_0_view_0']
+    J = [rec['values']['customer'] for rec in demand_table['records']]
+    # f_i: fixed cost for each supplier
+    f_i = {}
+    for rec in supplier_table['records']:
+        i = rec['values']['Unnamed: 0']
+        f_i[i] = float(rec['values']['fixed_costs'])
+    # d_j: demand for each supermarket
+    d_j = {}
+    for rec in demand_table['records']:
+        j = rec['values']['customer']
+        d_j[j] = float(rec['values']['demand'])
+    # c_{ij}: transportation cost from supplier i to supermarket j
+    cost_table = tables['file_2_view_0']
+    c_ij = {}
+    for rec in cost_table['records']:
+        i = rec['values']['Unnamed: 0']
+        for j in J:
+            if j not in rec['values']:
+                raise ValueError(f"Missing transportation cost for supplier {i}, supermarket {j}")
+            c_ij[(i, j)] = float(rec['values'][j])
+    # Validate dimensions
+    for i in I:
+        if i not in f_i:
+            raise ValueError(f"Missing fixed cost for supplier {i}")
+        for j in J:
+            if (i, j) not in c_ij:
+                raise ValueError(f"Missing transportation cost for ({i},{j})")
+    for j in J:
+        if j not in d_j:
+            raise ValueError(f"Missing demand for supermarket {j}")
+    # Model
+    m = gp.Model()
+    # Decision variables
+    y = m.addVars(I, vtype=GRB.BINARY, name='y')
+    x = m.addVars([(i, j) for i in I for j in J], lb=0, vtype=GRB.CONTINUOUS, name='x')
+    # Objective
+    m.setObjective(
+        gp.quicksum(f_i[i] * y[i] for i in I) +
+        gp.quicksum(c_ij[(i, j)] * x[i, j] for i in I for j in J),
+        GRB.MINIMIZE
+    )
+    # Constraints
+    # 1. Demand satisfaction at each supermarket
+    for j in J:
+        m.addConstr(gp.quicksum(x[i, j] for i in I) == d_j[j], name=f'demand_{j}')
+    # 2. Supply only from activated suppliers
+    for i in I:
+        for j in J:
+            m.addConstr(x[i, j] <= d_j[j] * y[i], name=f'link_{i}_{j}')
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    # Output
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for v in m.getVars():
+            print(v.VarName, v.X)
+    else:
+        print(m.Status)
+    return m
+
+m = solve_problem(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 6 rows, 6 columns and 12 nonzeros
+Model fingerprint: 0xb10eefce
+Variable types: 4 continuous, 2 integer (2 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+02]
+  Objective range  [7e-02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+02, 2e+02]
+Presolve removed 6 rows and 6 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 11396.5 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.139651000000e+04, best bound 1.139651000000e+04, gap 0.0000%
+11396.51
+C0 0.0
+C1 1.0
+C2 0.0
+C3 0.0
+C4 144.0
+C5 216.0
+Optimal objective: 11396.51
+Optimal solution: [('C0', 0.0), ('C1', 1.0), ('C2', 0.0), ('C3', 0.0), ('C4', 144.0), ('C5', 216.0)]

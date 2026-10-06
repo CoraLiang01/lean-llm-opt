@@ -1,0 +1,205 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract sets
+    products = [rec['values']['Product'] for rec in CSVQA_DATA['tables'][2]['records']]
+    devices = [rec['values']['Device'] for rec in CSVQA_DATA['tables'][1]['records']]
+
+    # Extract profit_p
+    profit_p = {}
+    for rec in CSVQA_DATA['tables'][2]['records']:
+        p = rec['values']['Product']
+        profit_p[p] = float(rec['values']['Unit_Profit'])
+
+    # Extract cap_d
+    cap_d = {}
+    for rec in CSVQA_DATA['tables'][1]['records']:
+        d = rec['values']['Device']
+        cap_d[d] = float(rec['values']['Monthly_Capacity'])
+
+    # Extract time_dp
+    # file_0_view_0: rows indexed by Device, columns by Product
+    time_dp = {}
+    for rec in CSVQA_DATA['tables'][0]['records']:
+        d = rec['values']['Device']
+        for p in products:
+            val = rec['values'][p]
+            time_dp[(d, p)] = float(val)
+
+    # Validate coefficient dimensions
+    for d in devices:
+        if d not in cap_d:
+            raise ValueError(f"Missing capacity for device {d}")
+        for p in products:
+            if (d, p) not in time_dp:
+                raise ValueError(f"Missing processing time for device {d}, product {p}")
+    for p in products:
+        if p not in profit_p:
+            raise ValueError(f"Missing profit for product {p}")
+
+    m = gp.Model()
+    # Decision variables: x_p >= 0, continuous
+    x = m.addVars(products, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: maximize total monthly profit
+    m.setObjective(gp.quicksum(profit_p[p] * x[p] for p in products), GRB.MAXIMIZE)
+
+    # Constraints: device capacity for each device
+    for d in devices:
+        m.addConstr(
+            gp.quicksum(time_dp[(d, p)] * x[p] for p in products) <= cap_d[d],
+            name=f"cap_{d}"
+        )
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    return m
+
+m = solve_problem(CSVQA_DATA)
+if m.Status == GRB.OPTIMAL:
+    print(m.ObjVal)
+    for v in m.getVars():
+        print(v.VarName, v.X)
+else:
+    print(m.Status)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 10 rows, 111 columns and 1069 nonzeros
+Model fingerprint: 0x050b8b67
+Coefficient statistics:
+  Matrix range     [2e-01, 1e+01]
+  Objective range  [5e+00, 5e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e+03, 5e+03]
+Presolve time: 0.00s
+Presolved: 10 rows, 111 columns, 1069 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    2.8661100e+33   1.041087e+33   2.866110e+03      0s
+      17    2.5820154e+04   0.000000e+00   0.000000e+00      0s
+
+Solved in 17 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  2.582015356e+04
+25820.15355597092
+C0 0.0
+C1 0.0
+C2 0.0
+C3 0.0
+C4 16.254369283402035
+C5 0.0
+C6 0.0
+C7 0.0
+C8 0.0
+C9 0.0
+C10 0.0
+C11 0.0
+C12 0.0
+C13 0.0
+C14 0.0
+C15 0.0
+C16 0.0
+C17 0.0
+C18 0.0
+C19 0.0
+C20 0.0
+C21 0.0
+C22 0.0
+C23 0.0
+C24 140.184611481725
+C25 0.0
+C26 0.0
+C27 0.0
+C28 0.0
+C29 0.0
+C30 0.0
+C31 0.0
+C32 0.0
+C33 0.0
+C34 0.0
+C35 0.0
+C36 0.0
+C37 0.0
+C38 0.0
+C39 0.0
+C40 0.0
+C41 0.0
+C42 0.0
+C43 0.0
+C44 0.0
+C45 0.0
+C46 0.0
+C47 24.5930542335453
+C48 0.0
+C49 154.66606491755184
+C50 0.0
+C51 0.0
+C52 0.0
+C53 0.0
+C54 0.0
+C55 0.0
+C56 0.0
+C57 0.0
+C58 0.0
+C59 0.0
+C60 0.0
+C61 0.0
+C62 0.0
+C63 0.0
+C64 0.0
+C65 0.0
+C66 0.0
+C67 0.0
+C68 0.0
+C69 0.0
+C70 0.0
+C71 0.0
+C72 0.0
+C73 0.0
+C74 0.0
+C75 0.0
+C76 0.0
+C77 0.0
+C78 0.0
+C79 0.0
+C80 0.0
+C81 0.0
+C82 111.26976112384763
+C83 0.0
+C84 25.016802752471612
+C85 0.0
+C86 0.0
+C87 0.0
+C88 0.0
+C89 0.0
+C90 0.0
+C91 0.0
+C92 0.0
+C93 0.0
+C94 0.0
+C95 0.0
+C96 0.0
+C97 0.0
+C98 0.0
+C99 0.0
+C100 0.0
+C101 0.0
+C102 0.0
+C103 0.0
+C104 0.0
+C105 0.0
+C106 0.0
+C107 134.45522411545736
+C108 0.0
+C109 0.0
+C110 0.0
+Optimal objective: 25820.15355597092
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 16.254369283402035), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 140.184611481725), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 24.5930542335453), ('C48', 0.0), ('C49', 154.66606491755184), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 111.26976112384763), ('C83', 0.0), ('C84', 25.016802752471612), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 134.45522411545736), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0)]

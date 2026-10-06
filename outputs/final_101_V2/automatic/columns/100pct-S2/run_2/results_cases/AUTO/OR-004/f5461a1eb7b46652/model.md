@@ -1,0 +1,1 @@
+To formulate the complete mathematical model for your assignment problem, I need the actual contents of cost_12x12.csv, including all machine and task identifiers and their associated costs. Please provide the data from cost_12x12.csv so I can retrieve all necessary parameters and generate the full model with all vectors and matrices as required.

@@ -1,0 +1,122 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to determine whether this problem is a clean instance of one of the canonical classes (TP, RA, FLP, AP), Mixture, or Others. The objective is to maximize total revenue by allocating available inventory across product categories, with deterministic demand and inventory limits. The decision variables are fulfillment quantities for each product. The main constraints are inventory limits and possibly demand fulfillment. There are no indications of facility-opening, assignment, transportation flow, or hybrid mechanisms. I should call FileQA to compare structurally similar problems.
+
+Action: FileQA
+
+Action Input: maximize total revenue by allocating available inventory across product categories with deterministic demand, inventory limits, and fulfillment quantity decisions for each product
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A supermarket needs to allocate various products, including high-demand items like the Sony Alpha Refrigerator, Sony Bravia XR, and Sony PlayStation 5, across different retail shelves. The product values and space requirements are provided in the "Products.csv" dataset. Additionally, the store has multiple shelves, each with a total space limit and specific space constraints for Sony and Apple products, as outlined in the "Capacity.csv" file. The goal is to determine the optimal number of units of each Sony product to place on each shelf to maximize total value while ensuring that the space used by Sony products on each shelf does not exceed the brand-specific limits. The decision variables x_ij represent the number of units of product i to be placed on shelf j. The variables x_ij must be nonnegative integers because the products are counted in whole units.
+Type: RA
+
+[Retrieved example 2]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 3]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A financial institution wants to form a revenue-maximizing portfolio by investing in a selection of 10 structured financial products (e.g., CDOs, CLOs, MBS, etc.). Each product provides a specific expected revenue per unit invested, involves exposure to various risk factors (market, credit, interest rate, etc.), and is subject to upper limits on allocation in ProductCharacteristics_IndividualCaps.csv. The portfolio must satisfy the upper exposure limits for the nine risk factors and the All-in Investment budget limit in RiskFactorLimits.csv, and adhere to product-specific allocation caps.
+
+Your task:
+Maximize expected portfolio revenue while satisfying the diversification/risk constraints and allocation bounds.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem's objective is to maximize total revenue by allocating available inventory across product categories, with deterministic demand and inventory limits. The decision variables are fulfillment quantities for each product. The main constraints are inventory limits and possibly demand fulfillment. There are no indications of facility-opening, assignment, transportation flow, or hybrid mechanisms. The retrieved examples include a clean resource allocation model (example 1, labeled RA) that is structurally similar: it allocates products to shelves under capacity constraints to maximize value. The other examples involve transportation flows, production with setup/batch decisions, or portfolio selection with risk constraints, all of which introduce additional mechanisms not present in the current problem. Therefore, the current problem is a clean instance of Resource Allocation.
+
+Final Answer: RA[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = CSVQA_DATA["tables"][0]["records"]
+    products = []
+    revenue = {}
+    demand = {}
+    inventory = {}
+    for rec in data:
+        pname = rec["values"]["Product Name"]
+        products.append(pname)
+        try:
+            revenue[pname] = float(rec["values"]["Revenue"])
+            demand[pname] = int(rec["values"]["Demand"])
+            inventory[pname] = int(rec["values"]["Initial Inventory"])
+        except Exception as e:
+            raise ValueError(f"Invalid data for product '{pname}': {e}")
+
+    # Validate all products have required data
+    for pname in products:
+        if pname not in revenue or pname not in demand or pname not in inventory:
+            raise ValueError(f"Missing data for product '{pname}'")
+
+    m = gp.Model("retail_allocation")
+    m.setParam("MIPGap", 1e-4)
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(products, lb=0, vtype=GRB.INTEGER, name="x")
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in products), GRB.MAXIMIZE)
+
+    # Constraints:
+    # 1. x_i <= demand_i
+    m.addConstrs((x[i] <= demand[i] for i in products), name="demand")
+
+    # 2. x_i <= inventory_i
+    m.addConstrs((x[i] <= inventory[i] for i in products), name="inventory")
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 70 rows, 35 columns and 70 nonzeros
+Model fingerprint: 0x9e2ea968
+Variable types: 0 continuous, 35 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+01, 5e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+02, 2e+03]
+Found heuristic solution: objective 1568955.0000
+Presolve removed 70 rows and 35 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.56896e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.568955000000e+06, best bound 1.568955000000e+06, gap 0.0000%
+Optimal objective: 1568955.0
+Optimal solution: [('C0', 240.0), ('C1', 202.0), ('C2', 216.0), ('C3', 263.0), ('C4', 256.0), ('C5', 281.0), ('C6', 261.0), ('C7', 295.0), ('C8', 290.0), ('C9', 244.0), ('C10', 273.0), ('C11', 220.0), ('C12', 286.0), ('C13', 268.0), ('C14', 262.0), ('C15', 255.0), ('C16', 218.0), ('C17', 278.0), ('C18', 195.0), ('C19', 248.0), ('C20', 269.0), ('C21', 227.0), ('C22', 285.0), ('C23', 208.0), ('C24', 259.0), ('C25', 242.0), ('C26', 213.0), ('C27', 272.0), ('C28', 224.0), ('C29', 251.0), ('C30', 257.0), ('C31', 235.0), ('C32', 291.0), ('C33', 199.0), ('C34', 264.0)]

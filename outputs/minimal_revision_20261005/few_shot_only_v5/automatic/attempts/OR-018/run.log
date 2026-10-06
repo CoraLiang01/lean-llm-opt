@@ -1,0 +1,106 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Try reading the CSV with multiple encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not read CSV with supported encodings.")
+
+    # Check required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Filter for 'Baby' products (case-insensitive substring match)
+    baby_mask = df['Product Name'].str.casefold().str.contains('baby')
+    baby_df = df[baby_mask].copy()
+    if baby_df.empty:
+        raise ValueError("No 'Baby' products found in the data.")
+
+    # Build index set and coefficient dictionaries
+    items = list(baby_df['Product Name'])
+    revenue = dict(zip(baby_df['Product Name'], baby_df['Revenue']))
+    inventory = dict(zip(baby_df['Product Name'], baby_df['Initial Inventory']))
+    demand = dict(zip(baby_df['Product Name'], baby_df['Demand']))
+
+    # Validate all coefficients are present and numeric
+    for i in items:
+        if pd.isnull(revenue[i]) or pd.isnull(inventory[i]) or pd.isnull(demand[i]):
+            raise ValueError(f"Missing data for product: {i}")
+        try:
+            revenue[i] = float(revenue[i])
+            inventory[i] = int(inventory[i])
+            demand[i] = int(demand[i])
+        except Exception:
+            raise ValueError(f"Non-numeric data for product: {i}")
+
+    m = gp.Model('Supermarket_Baby_Revenue')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    # Inventory constraints: x_i <= inventory[i]
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+
+    # Demand constraints: x_i <= demand[i]
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 2 rows, 1 columns and 2 nonzeros
+Model fingerprint: 0x263e7b6b
+Variable types: 0 continuous, 1 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [3e+02, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e+06, 2e+07]
+Found heuristic solution: objective 7.828194e+08
+Presolve removed 2 rows and 1 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 7.82819e+08 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.828194386400e+08, best bound 7.828194386400e+08, gap 0.0000%
+ObjVal: 782819438.64
+C0: 3066513.0
+Optimal objective: 782819438.64
+Optimal solution: [('C0', 3066513.0)]

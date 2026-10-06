@@ -1,0 +1,16 @@
+products.csv
+supplier_service_tier,item_name,ingredient_supplier_rating,item_value,resource_requirement
+Standard,Baguette,4.7,888,4
+Premium,Croissant,3.2,134,2
+Standard,Sourdough,3.2,129,4
+Priority,Rye Bread,3.5,370,3
+Standard,Brioche,4.7,921,2
+Premium,Focaccia,3.5,765,1
+Priority,Ciabatta,3.2,154,2
+Premium,Pita,3.8,837,1
+Premium,Bagel,4.7,584,3
+Standard,English Muffin,4.4,365,3
+
+capacity.csv
+daily_cleaning_cost,resource_capacity
+204.6,180

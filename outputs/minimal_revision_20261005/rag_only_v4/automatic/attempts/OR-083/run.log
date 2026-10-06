@@ -1,0 +1,298 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to select 10 out of 12 available workers and assign each of them to exactly one of 10 tasks, such that each task is completed by one worker and the total working hours (sum of time each assigned worker spends on their assigned task) is minimized. Each worker-task pair has a specific time requirement.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) assignment and selection problem (specifically, a generalized assignment problem with worker selection).
+3.  **Define Index Sets:** The primary indices are:
+    -   Workers (W): The 12 available workers (identified by their row labels, e.g., Worker 1, Worker 2, ..., Worker 12).
+    -   Tasks (T): The 10 tasks (corresponding to columns 'A' through 'J').
+4.  **Define Decision Variables:**
+    -   `assign[w, t]` = 1 if worker w is assigned to task t; 0 otherwise. Type: GRB.BINARY.
+    -   `select[w]` = 1 if worker w is selected as one of the 10 assigned workers; 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   Assignment cost (time required for each worker-task pair) comes from the intersection of each worker row and each task column ('A' through 'J').
+    -   The set of workers is determined by the row labels (excluding any header or caption rows).
+    -   The set of tasks is determined by the columns 'A' through 'J'.
+6.  **Formulate Objective:** Minimize the total working hours, i.e., the sum over all assigned worker-task pairs of (time required for worker w to do task t) × assign[w, t].
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Task Assignment): Each task must be assigned to exactly one worker: For each task t, sum over all workers w of assign[w, t] = 1.
+    -   Constraint 2 (Worker Assignment): Each selected worker is assigned to exactly one task: For each worker w, sum over all tasks t of assign[w, t] ≤ select[w].
+    -   Constraint 3 (Worker Selection): Exactly 10 workers are selected: sum over all workers w of select[w] = 10.
+    -   Constraint 4 (Assignment Only If Selected): A worker can only be assigned to a task if they are selected: For all w and t, assign[w, t] ≤ select[w].
+    -   Constraint 5 (No Unselected Worker Assigned): For all w, if select[w] = 0, then assign[w, t] = 0 for all t.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read the CSV file
+    path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture7/15.csv'
+    df = pd.read_csv(path, sep=',')
+
+    # The first column is 'Task Time Required', which contains the row labels (worker identifiers)
+    # The rest of the columns are task identifiers: 'A' through 'J'
+    # The first row is a caption row: 'Worker' in 'Task Time Required', rest are empty or NaN
+    # The actual workers are the next 12 rows
+
+    # Identify the row with 'Worker' in 'Task Time Required' (caption row)
+    caption_row_idx = df[df['Task Time Required'].astype(str).str.strip().str.casefold() == 'worker'].index
+    if len(caption_row_idx) != 1:
+        raise ValueError("Could not uniquely identify the caption row with 'Worker' in 'Task Time Required'.")
+    caption_row_idx = caption_row_idx[0]
+
+    # The actual worker rows are all rows after the caption row
+    worker_rows = df.loc[caption_row_idx+1:].copy()
+    # Drop any rows that are completely empty (in case of trailing blank lines)
+    worker_rows = worker_rows.dropna(how='all')
+    # The worker identifiers are in 'Task Time Required' column
+    worker_ids = worker_rows['Task Time Required'].astype(str).str.strip().tolist()
+    # There must be exactly 12 workers
+    if len(worker_ids) != 12:
+        raise ValueError(f"Expected 12 workers, found {len(worker_ids)}: {worker_ids}")
+
+    # The task identifiers are the columns 'A' through 'J'
+    task_ids = [col for col in df.columns if col.strip() in list('ABCDEFGHIJ')]
+    if len(task_ids) != 10:
+        raise ValueError(f"Expected 10 tasks (A-J), found {len(task_ids)}: {task_ids}")
+
+    # Build the cost (time) matrix: cost[w, t] = time for worker w to do task t
+    # Ensure all required data is present and numeric
+    cost = {}
+    for w_idx, w in enumerate(worker_ids):
+        row = worker_rows.iloc[w_idx]
+        for t in task_ids:
+            val = row[t]
+            if pd.isnull(val):
+                raise ValueError(f"Missing time value for worker {w}, task {t}")
+            try:
+                cost[(w, t)] = float(val)
+            except Exception as e:
+                raise ValueError(f"Non-numeric time value for worker {w}, task {t}: {val}")
+
+    # Model
+    m = gp.Model("worker_task_assignment")
+
+    # Decision variables
+    assign = m.addVars(worker_ids, task_ids, vtype=GRB.BINARY, name='')  # assign[w, t] = 1 if worker w assigned to task t
+    select = m.addVars(worker_ids, vtype=GRB.BINARY, name='')            # select[w] = 1 if worker w is selected
+
+    # Objective: minimize total working hours
+    m.setObjective(gp.quicksum(cost[(w, t)] * assign[w, t] for w in worker_ids for t in task_ids), GRB.MINIMIZE)
+
+    # Constraint 1: Each task assigned to exactly one worker
+    for t in task_ids:
+        m.addConstr(gp.quicksum(assign[w, t] for w in worker_ids) == 1, name='')
+
+    # Constraint 2: Each selected worker assigned to at most one task
+    for w in worker_ids:
+        m.addConstr(gp.quicksum(assign[w, t] for t in task_ids) <= select[w], name='')
+
+    # Constraint 3: Exactly 10 workers are selected
+    m.addConstr(gp.quicksum(select[w] for w in worker_ids) == 10, name='')
+
+    # Constraint 4: Assignment only if selected (assign[w, t] <= select[w])
+    for w in worker_ids:
+        for t in task_ids:
+            m.addConstr(assign[w, t] <= select[w], name='')
+
+    # Set MIPGap
+    m.setParam('MIPGap', 1e-4)
+
+    # Optimize
+    m.optimize()
+
+    # Output
+    if m.Status == GRB.OPTIMAL:
+        print(f"ObjVal: {m.ObjVal}")
+        for v in m.getVars():
+            print(f"{v.VarName} {v.X}")
+    else:
+        print(f"Solver status: {m.Status}")
+
+    return m
+
+m = solve_problem()
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 143 rows, 132 columns and 504 nonzeros
+Model fingerprint: 0x45d88e4a
+Variable types: 0 continuous, 132 integer (132 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+00, 1e+01]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+01]
+Found heuristic solution: objective 62.0000000
+Presolve removed 120 rows and 0 columns
+Presolve time: 0.00s
+Presolved: 23 rows, 132 columns, 264 nonzeros
+Variable types: 0 continuous, 132 integer (132 binary)
+
+Root relaxation: objective 3.400000e+01, 31 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0      34.0000000   34.00000  0.00%     -    0s
+
+Explored 1 nodes (31 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 34 62 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.400000000000e+01, best bound 3.400000000000e+01, gap 0.0000%
+ObjVal: 34.0
+C0 -0.0
+C1 0.0
+C2 -0.0
+C3 -0.0
+C4 -0.0
+C5 -0.0
+C6 -0.0
+C7 1.0
+C8 -0.0
+C9 -0.0
+C10 1.0
+C11 -0.0
+C12 -0.0
+C13 -0.0
+C14 -0.0
+C15 -0.0
+C16 0.0
+C17 -0.0
+C18 -0.0
+C19 -0.0
+C20 0.0
+C21 1.0
+C22 -0.0
+C23 -0.0
+C24 -0.0
+C25 -0.0
+C26 -0.0
+C27 -0.0
+C28 -0.0
+C29 -0.0
+C30 -0.0
+C31 -0.0
+C32 1.0
+C33 0.0
+C34 -0.0
+C35 -0.0
+C36 -0.0
+C37 -0.0
+C38 -0.0
+C39 -0.0
+C40 -0.0
+C41 -0.0
+C42 -0.0
+C43 -0.0
+C44 -0.0
+C45 0.0
+C46 1.0
+C47 -0.0
+C48 -0.0
+C49 -0.0
+C50 -0.0
+C51 -0.0
+C52 -0.0
+C53 1.0
+C54 -0.0
+C55 -0.0
+C56 -0.0
+C57 -0.0
+C58 0.0
+C59 -0.0
+C60 -0.0
+C61 -0.0
+C62 -0.0
+C63 -0.0
+C64 0.0
+C65 -0.0
+C66 -0.0
+C67 -0.0
+C68 -0.0
+C69 1.0
+C70 -0.0
+C71 0.0
+C72 -0.0
+C73 -0.0
+C74 -0.0
+C75 -0.0
+C76 -0.0
+C77 -0.0
+C78 -0.0
+C79 -0.0
+C80 0.0
+C81 -0.0
+C82 -0.0
+C83 -0.0
+C84 -0.0
+C85 -0.0
+C86 -0.0
+C87 -0.0
+C88 -0.0
+C89 -0.0
+C90 -0.0
+C91 -0.0
+C92 -0.0
+C93 -0.0
+C94 -0.0
+C95 -0.0
+C96 -0.0
+C97 -0.0
+C98 1.0
+C99 -0.0
+C100 -0.0
+C101 -0.0
+C102 -0.0
+C103 -0.0
+C104 -0.0
+C105 1.0
+C106 -0.0
+C107 -0.0
+C108 -0.0
+C109 -0.0
+C110 -0.0
+C111 -0.0
+C112 -0.0
+C113 -0.0
+C114 1.0
+C115 -0.0
+C116 -0.0
+C117 -0.0
+C118 -0.0
+C119 -0.0
+C120 1.0
+C121 1.0
+C122 1.0
+C123 1.0
+C124 1.0
+C125 1.0
+C126 1.0
+C127 -0.0
+C128 -0.0
+C129 1.0
+C130 1.0
+C131 1.0
+Optimal objective: 34.0
+Optimal solution: [('C0', -0.0), ('C1', 0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', 1.0), ('C8', -0.0), ('C9', -0.0), ('C10', 1.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', 0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', 0.0), ('C21', 1.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', 1.0), ('C33', 0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', -0.0), ('C45', 0.0), ('C46', 1.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', -0.0), ('C53', 1.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', 0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', 0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', 1.0), ('C70', -0.0), ('C71', 0.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0), ('C80', 0.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', -0.0), ('C90', -0.0), ('C91', -0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', -0.0), ('C96', -0.0), ('C97', -0.0), ('C98', 1.0), ('C99', -0.0), ('C100', -0.0), ('C101', -0.0), ('C102', -0.0), ('C103', -0.0), ('C104', -0.0), ('C105', 1.0), ('C106', -0.0), ('C107', -0.0), ('C108', -0.0), ('C109', -0.0), ('C110', -0.0), ('C111', -0.0), ('C112', -0.0), ('C113', -0.0), ('C114', 1.0), ('C115', -0.0), ('C116', -0.0), ('C117', -0.0), ('C118', -0.0), ('C119', -0.0), ('C120', 1.0), ('C121', 1.0), ('C122', 1.0), ('C123', 1.0), ('C124', 1.0), ('C125', 1.0), ('C126', 1.0), ('C127', -0.0), ('C128', -0.0), ('C129', 1.0), ('C130', 1.0), ('C131', 1.0)]

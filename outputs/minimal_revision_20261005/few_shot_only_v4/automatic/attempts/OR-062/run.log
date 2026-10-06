@@ -1,0 +1,171 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    def read_csv_try_encodings(path):
+        for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+            try:
+                return pd.read_csv(path, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with tried encodings.")
+
+    # Source schema paths
+    demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP6/demand.csv"
+    fixed_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP6/fixed_cost.csv"
+    trans_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP6/transportation_costs.csv"
+
+    # Read data
+    demand_df = read_csv_try_encodings(demand_path)
+    fixed_cost_df = read_csv_try_encodings(fixed_cost_path)
+    trans_cost_df = read_csv_try_encodings(trans_cost_path)
+
+    # Map suppliers and stores
+    suppliers = list(fixed_cost_df['Unnamed: 0'])
+    stores = [col for col in trans_cost_df.columns if col != 'Unnamed: 0']
+
+    # Demand mapping: demand.csv is in store order
+    if len(demand_df) != len(stores):
+        raise ValueError("Mismatch between number of stores in demand.csv and transportation_costs.csv")
+    demand = dict(zip(stores, demand_df['demand']))
+
+    # Fixed cost mapping
+    fixed_cost = dict(zip(fixed_cost_df['Unnamed: 0'], fixed_cost_df['fixed_costs']))
+
+    # Transportation cost mapping
+    cost = {}
+    for idx, row in trans_cost_df.iterrows():
+        supplier = row['Unnamed: 0']
+        if supplier not in suppliers:
+            continue
+        cost[supplier] = {}
+        for store in stores:
+            cost[supplier][store] = row[store]
+
+    # Validate all required coefficients are present
+    for i in suppliers:
+        if i not in fixed_cost:
+            raise ValueError(f"Missing fixed cost for supplier {i}")
+        if i not in cost:
+            raise ValueError(f"Missing transportation cost row for supplier {i}")
+        for j in stores:
+            if j not in cost[i]:
+                raise ValueError(f"Missing transportation cost for supplier {i}, store {j}")
+    for j in stores:
+        if j not in demand:
+            raise ValueError(f"Missing demand for store {j}")
+
+    # Big-M parameter
+    M = sum(demand[j] for j in stores)
+
+    # Model
+    m = gp.Model('Iowa_Facility_Location')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables
+    x = m.addVars(suppliers, stores, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    y = m.addVars(suppliers, vtype=GRB.BINARY, name='y')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(cost[i][j] * x[i, j] for i in suppliers for j in stores) +
+        gp.quicksum(fixed_cost[i] * y[i] for i in suppliers),
+        GRB.MINIMIZE
+    )
+
+    # Constraints
+    # 1. Demand satisfaction
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in suppliers) == demand[j] for j in stores),
+        name='demand'
+    )
+    # 2. Supplier activation
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in stores) <= M * y[i] for i in suppliers),
+        name='activation'
+    )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 10 rows, 30 columns and 55 nonzeros
+Model fingerprint: 0x712edc9e
+Variable types: 25 continuous, 5 integer (5 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+04]
+  Objective range  [1e+00, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [2e+03, 3e+03]
+Presolve time: 0.00s
+Presolved: 10 rows, 30 columns, 55 nonzeros
+Variable types: 25 continuous, 5 integer (5 binary)
+Found heuristic solution: objective 172804.00000
+
+Root relaxation: objective 1.724336e+05, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 172433.560    0    3 172804.000 172433.560  0.21%     -    0s
+*    0     0               0    172612.46000 172612.460  0.00%     -    0s
+
+Explored 1 nodes (6 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 172612 172804 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.726124600000e+05, best bound 1.726124600000e+05, gap 0.0000%
+ObjVal: 172612.46
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 1889.0
+C7: 2518.0
+C8: 3218.0
+C9: 0.0
+C10: 2397.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 1813.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: -0.0
+C26: 1.0
+C27: 1.0
+C28: 1.0
+C29: -0.0
+Optimal objective: 172612.46
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 1889.0), ('C7', 2518.0), ('C8', 3218.0), ('C9', 0.0), ('C10', 2397.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 1813.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', -0.0), ('C26', 1.0), ('C27', 1.0), ('C28', 1.0), ('C29', -0.0)]

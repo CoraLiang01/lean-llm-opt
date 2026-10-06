@@ -1,0 +1,92 @@
+##### Decision Variables
+
+$y_i \in \{0,1\}$: $=1$ if service center $i$ is opened, $0$ otherwise, for each $i \in I$.
+
+##### Parameters
+
+- $I = \{\text{SC1}, \text{SC2}, \text{SC3}, \text{SC4}, \text{SC5}, \text{SC6}, \text{SC7}, \text{SC8}\}$ (candidate centers)
+- $J = \{\text{D1}, \text{D2}, \text{D3}, \text{D4}, \text{D5}, \text{D6}, \text{D7}, \text{D8}, \text{D9}, \text{D10}\}$ (districts to cover)
+- Opening costs:
+  - $c_{\text{SC1}} = 12$
+  - $c_{\text{SC2}} = 15$
+  - $c_{\text{SC3}} = 18$
+  - $c_{\text{SC4}} = 10$
+  - $c_{\text{SC5}} = 14$
+  - $c_{\text{SC6}} = 13$
+  - $c_{\text{SC7}} = 16$
+  - $c_{\text{SC8}} = 11$
+- Coverage sets (districts covered by each center):
+  - $\text{SC1}: \{\text{D1}, \text{D2}, \text{D4}\}$
+  - $\text{SC2}: \{\text{D2}, \text{D3}, \text{D5}\}$
+  - $\text{SC3}: \{\text{D4}, \text{D5}, \text{D6}\}$
+  - $\text{SC4}: \{\text{D6}, \text{D7}\}$
+  - $\text{SC5}: \{\text{D7}, \text{D8}, \text{D10}\}$
+  - $\text{SC6}: \{\text{D8}, \text{D9}\}$
+  - $\text{SC7}: \{\text{D1}, \text{D9}, \text{D10}\}$
+  - $\text{SC8}: \{\text{D3}, \text{D4}, \text{D8}\}$
+
+Define the coverage matrix $a_{ji}$ as:
+$$
+a_{ji} = \begin{cases}
+1 & \text{if center } i \text{ covers district } j \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+##### Objective Function
+
+$$
+\min \sum_{i \in I} c_i y_i
+$$
+
+##### Constraints
+
+1. **Coverage:** Every district must be covered by at least one opened center:
+   $$
+   \sum_{i \in I} a_{ji} y_i \geq 1, \quad \forall j \in J
+   $$
+   Where $a_{ji}$ is defined as above.
+
+2. **Binary restrictions:**
+   $$
+   y_i \in \{0,1\}, \quad \forall i \in I
+   $$
+
+##### Coverage Matrix $a_{ji}$
+
+| District | SC1 | SC2 | SC3 | SC4 | SC5 | SC6 | SC7 | SC8 |
+|----------|-----|-----|-----|-----|-----|-----|-----|-----|
+| D1       |  1  |  0  |  0  |  0  |  0  |  0  |  1  |  0  |
+| D2       |  1  |  1  |  0  |  0  |  0  |  0  |  0  |  0  |
+| D3       |  0  |  1  |  0  |  0  |  0  |  0  |  0  |  1  |
+| D4       |  1  |  0  |  1  |  0  |  0  |  0  |  0  |  1  |
+| D5       |  0  |  1  |  1  |  0  |  0  |  0  |  0  |  0  |
+| D6       |  0  |  0  |  1  |  1  |  0  |  0  |  0  |  0  |
+| D7       |  0  |  0  |  0  |  1  |  1  |  0  |  0  |  0  |
+| D8       |  0  |  0  |  0  |  0  |  1  |  1  |  0  |  1  |
+| D9       |  0  |  0  |  0  |  0  |  0  |  1  |  1  |  0  |
+| D10      |  0  |  0  |  0  |  0  |  1  |  0  |  1  |  0  |
+
+##### Complete Model
+
+Minimize:
+$$
+12y_{\text{SC1}} + 15y_{\text{SC2}} + 18y_{\text{SC3}} + 10y_{\text{SC4}} + 14y_{\text{SC5}} + 13y_{\text{SC6}} + 16y_{\text{SC7}} + 11y_{\text{SC8}}
+$$
+
+Subject to:
+\[
+\begin{align*}
+y_{\text{SC1}} + y_{\text{SC7}} &\geq 1 &\quad& \text{(D1)} \\
+y_{\text{SC1}} + y_{\text{SC2}} &\geq 1 &\quad& \text{(D2)} \\
+y_{\text{SC2}} + y_{\text{SC8}} &\geq 1 &\quad& \text{(D3)} \\
+y_{\text{SC1}} + y_{\text{SC3}} + y_{\text{SC8}} &\geq 1 &\quad& \text{(D4)} \\
+y_{\text{SC2}} + y_{\text{SC3}} &\geq 1 &\quad& \text{(D5)} \\
+y_{\text{SC3}} + y_{\text{SC4}} &\geq 1 &\quad& \text{(D6)} \\
+y_{\text{SC4}} + y_{\text{SC5}} &\geq 1 &\quad& \text{(D7)} \\
+y_{\text{SC5}} + y_{\text{SC6}} + y_{\text{SC8}} &\geq 1 &\quad& \text{(D8)} \\
+y_{\text{SC6}} + y_{\text{SC7}} &\geq 1 &\quad& \text{(D9)} \\
+y_{\text{SC5}} + y_{\text{SC7}} &\geq 1 &\quad& \text{(D10)} \\
+y_i \in \{0,1\} &&& \forall i \in I
+\end{align*}
+\]

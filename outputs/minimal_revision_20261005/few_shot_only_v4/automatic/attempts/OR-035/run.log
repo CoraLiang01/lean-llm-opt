@@ -1,0 +1,124 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read products.csv
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/products.csv"
+    try:
+        products = pd.read_csv(products_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            products = pd.read_csv(products_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                products = pd.read_csv(products_path, encoding='gbk')
+            except UnicodeDecodeError:
+                products = pd.read_csv(products_path, encoding='latin-1')
+
+    # Read capacity.csv
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/capacity.csv"
+    try:
+        capacity_df = pd.read_csv(capacity_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            capacity_df = pd.read_csv(capacity_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                capacity_df = pd.read_csv(capacity_path, encoding='gbk')
+            except UnicodeDecodeError:
+                capacity_df = pd.read_csv(capacity_path, encoding='latin-1')
+
+    # Validate required columns
+    for col in ['ProductName', 'Value', 'Weight']:
+        if col not in products.columns:
+            raise ValueError(f"Missing column '{col}' in products.csv")
+    if 'Capacity' not in capacity_df.columns:
+        raise ValueError("Missing column 'Capacity' in capacity.csv")
+
+    # Index set I: unique bread types
+    I = products['ProductName'].astype(str).tolist()
+
+    # Map profit and weight by ProductName
+    p = products.set_index('ProductName')['Value'].to_dict()
+    w = products.set_index('ProductName')['Weight'].to_dict()
+
+    # Storage capacity (assume only one row)
+    if len(capacity_df) != 1:
+        raise ValueError("capacity.csv must contain exactly one row for total capacity.")
+    C = float(capacity_df['Capacity'].iloc[0])
+
+    # Validate all required coefficients are present
+    for i in I:
+        if i not in p or pd.isnull(p[i]):
+            raise ValueError(f"Missing or null Value for product '{i}'")
+        if i not in w or pd.isnull(w[i]):
+            raise ValueError(f"Missing or null Weight for product '{i}'")
+
+    # Gurobi model
+    m = gp.Model('Bakery_Bread_Stocking')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total expected profit
+    m.setObjective(gp.quicksum(p[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Storage capacity constraint
+    m.addConstr(gp.quicksum(w[i] * x[i] for i in I) <= C, name='storage')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 10 columns and 10 nonzeros
+Model fingerprint: 0x72fa128d
+Variable types: 0 continuous, 10 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 4e+00]
+  Objective range  [1e+02, 9e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+02, 2e+02]
+Found heuristic solution: objective 39960.000000
+Presolve removed 1 rows and 10 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 150660 39960 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.506600000000e+05, best bound 1.506600000000e+05, gap 0.0000%
+ObjVal: 150660.0
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: 180.0
+C8: -0.0
+C9: -0.0
+Optimal objective: 150660.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', 180.0), ('C8', -0.0), ('C9', -0.0)]

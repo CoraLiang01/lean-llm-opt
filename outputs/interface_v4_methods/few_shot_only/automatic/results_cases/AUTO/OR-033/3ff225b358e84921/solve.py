@@ -1,0 +1,116 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'The company operates in the European market and offers a variety of products with revenue data provided in '
+          'the ‘Revenue’ column. The company aims to maximize total revenue using the initial inventory of products '
+          'classified under ‘Baby’. Inventory levels are provided in the ‘Initial Inventory’ column. Demand quantities '
+          'are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. Decision '
+          'variables x_i represent the number of units of each ‘Baby’ product i that will be fulfilled.',
+ 'relationships': [],
+ 'route': 'NRM',
+ 'tables': [{'columns': ['Product Name', 'Revenue', 'Demand', 'Initial Inventory'],
+             'file_index': 0,
+             'file_name': 'EuropeSalesRecords.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 12,
+             'records': [{'source_row': 0,
+                          'values': {'Demand': '765850',
+                                     'Initial Inventory': '5627060',
+                                     'Product Name': 'Baby Food_255.28',
+                                     'Revenue': '255.28'}},
+                         {'source_row': 1,
+                          'values': {'Demand': '825453',
+                                     'Initial Inventory': '6131330',
+                                     'Product Name': 'Beverages_47.45',
+                                     'Revenue': '47.45'}},
+                         {'source_row': 2,
+                          'values': {'Demand': '627481',
+                                     'Initial Inventory': '4656850',
+                                     'Product Name': 'Cereal_205.7',
+                                     'Revenue': '205.7'}},
+                         {'source_row': 3,
+                          'values': {'Demand': '800987',
+                                     'Initial Inventory': '5913850',
+                                     'Product Name': 'Clothes_109.28',
+                                     'Revenue': '109.28'}},
+                         {'source_row': 4,
+                          'values': {'Demand': '718806',
+                                     'Initial Inventory': '5332910',
+                                     'Product Name': 'Cosmetics_437.2',
+                                     'Revenue': '437.2'}},
+                         {'source_row': 5,
+                          'values': {'Demand': '798999',
+                                     'Initial Inventory': '5916720',
+                                     'Product Name': 'Fruits_9.33',
+                                     'Revenue': '9.33'}},
+                         {'source_row': 6,
+                          'values': {'Demand': '591313',
+                                     'Initial Inventory': '4402490',
+                                     'Product Name': 'Household_668.27',
+                                     'Revenue': '668.27'}},
+                         {'source_row': 7,
+                          'values': {'Demand': '713606',
+                                     'Initial Inventory': '5333760',
+                                     'Product Name': 'Meat_421.89',
+                                     'Revenue': '421.89'}},
+                         {'source_row': 8,
+                          'values': {'Demand': '838862',
+                                     'Initial Inventory': '6176410',
+                                     'Product Name': 'Office Supplies_651.21',
+                                     'Revenue': '651.21'}},
+                         {'source_row': 9,
+                          'values': {'Demand': '756433',
+                                     'Initial Inventory': '5604800',
+                                     'Product Name': 'Personal Care_81.73',
+                                     'Revenue': '81.73'}},
+                         {'source_row': 10,
+                          'values': {'Demand': '655310',
+                                     'Initial Inventory': '4901600',
+                                     'Product Name': 'Snacks_152.58',
+                                     'Revenue': '152.58'}},
+                         {'source_row': 11,
+                          'values': {'Demand': '786187',
+                                     'Initial Inventory': '5825440',
+                                     'Product Name': 'Vegetables_154.06',
+                                     'Revenue': '154.06'}}],
+             'returned_rows': 12,
+             'role': 'file_0',
+             'table_id': 'file_0_view_0'}],
+ 'validation': {'status': 'OK'}}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    data = [{'Product Name': 'Baby Food_255.28', 'Revenue': '255.28', 'Demand': '765850', 'Initial Inventory': '5627060'}, {'Product Name': 'Beverages_47.45', 'Revenue': '47.45', 'Demand': '825453', 'Initial Inventory': '6131330'}, {'Product Name': 'Cereal_205.7', 'Revenue': '205.7', 'Demand': '627481', 'Initial Inventory': '4656850'}, {'Product Name': 'Clothes_109.28', 'Revenue': '109.28', 'Demand': '800987', 'Initial Inventory': '5913850'}, {'Product Name': 'Cosmetics_437.2', 'Revenue': '437.2', 'Demand': '718806', 'Initial Inventory': '5332910'}, {'Product Name': 'Fruits_9.33', 'Revenue': '9.33', 'Demand': '798999', 'Initial Inventory': '5916720'}, {'Product Name': 'Household_668.27', 'Revenue': '668.27', 'Demand': '591313', 'Initial Inventory': '4402490'}, {'Product Name': 'Meat_421.89', 'Revenue': '421.89', 'Demand': '713606', 'Initial Inventory': '5333760'}, {'Product Name': 'Office Supplies_651.21', 'Revenue': '651.21', 'Demand': '838862', 'Initial Inventory': '6176410'}, {'Product Name': 'Personal Care_81.73', 'Revenue': '81.73', 'Demand': '756433', 'Initial Inventory': '5604800'}, {'Product Name': 'Snacks_152.58', 'Revenue': '152.58', 'Demand': '655310', 'Initial Inventory': '4901600'}, {'Product Name': 'Vegetables_154.06', 'Revenue': '154.06', 'Demand': '786187', 'Initial Inventory': '5825440'}]
+    items = []
+    revenue = {}
+    demand = {}
+    inventory = {}
+    for rec in data:
+        pname = rec['Product Name']
+        if pname.startswith('Baby'):
+            items.append(pname)
+            try:
+                revenue[pname] = float(rec['Revenue'])
+                demand[pname] = int(rec['Demand'])
+                inventory[pname] = int(rec['Initial Inventory'])
+            except Exception as e:
+                raise ValueError(f'Invalid data for product {pname}: {e}')
+    if not items:
+        raise ValueError("No products classified under 'Baby' found in the data.")
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f'Missing data for product {i}.')
+    m = gp.Model('Baby_Product_Revenue_Max')
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='')
+    m.setObjective(gp.quicksum((revenue[i] * x[i] for i in items)), GRB.MAXIMIZE)
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='')
+    m.addConstrs((x[i] <= demand[i] for i in items), name='')
+    m.Params.MIPGap = 0.0001
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for v in m.getVars():
+            print(f'{v.VarName}: {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+m = solve_problem()

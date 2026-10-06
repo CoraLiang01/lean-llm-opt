@@ -1,0 +1,96 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            data_table = t
+            break
+    if data_table is None:
+        raise RuntimeError("Required table file_0_view_0 not found in CSVQA_DATA.")
+
+    # Build index set I and parameters
+    I = []
+    r = {}
+    d = {}
+    s = {}
+    for rec in data_table["records"]:
+        pname = rec["values"]["Product Name"]
+        try:
+            revenue = float(rec["values"]["Revenue"])
+            demand = float(rec["values"]["Demand"])
+            inventory = float(rec["values"]["Initial Inventory"])
+        except Exception as e:
+            raise ValueError(f"Invalid data for product {pname}: {e}")
+        I.append(pname)
+        r[pname] = revenue
+        d[pname] = demand
+        s[pname] = inventory
+
+    # Validate all required data present
+    for pname in I:
+        if pname not in r or pname not in d or pname not in s:
+            raise ValueError(f"Missing data for product {pname}")
+
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i for i in I, integer, 0 <= x_i <= min{d_i, s_i}
+    x = m.addVars(
+        I,
+        lb={i: 0 for i in I},
+        ub={i: min(d[i], s[i]) for i in I},
+        vtype=GRB.INTEGER,
+        name=''
+    )
+
+    # Objective: maximize sum_i r_i * x_i
+    m.setObjective(gp.quicksum(r[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraints: 0 <= x_i <= min{d_i, s_i} (already set via bounds)
+    # No further constraints needed
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f"ObjVal {m.ObjVal}")
+        for i in I:
+            print(f"{x[i].VarName} {x[i].X}")
+    else:
+        print(f"Solver status: {m.Status}")
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 0 rows, 1 columns and 0 nonzeros
+Model fingerprint: 0xb5022892
+Variable types: 0 continuous, 1 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [3e+02, 3e+02]
+  Bounds range     [8e+05, 8e+05]
+  RHS range        [0e+00, 0e+00]
+Found heuristic solution: objective 1.955062e+08
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.95506e+08 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.955061880000e+08, best bound 1.955061880000e+08, gap 0.0000%
+ObjVal 195506188.0
+C0 765850.0
+Optimal objective: 195506188.0
+Optimal solution: [('C0', 765850.0)]

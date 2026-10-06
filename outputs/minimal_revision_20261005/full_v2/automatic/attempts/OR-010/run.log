@@ -1,0 +1,207 @@
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/full_v2/frozen_notebook.ipynb:cell13:329: LangChainDeprecationWarning: LangChain agents will continue to be supported, but it is recommended for new use cases to be built with LangGraph. LangGraph offers a more flexible and full-featured framework for building agents, including support for tool-calling, persistence of state, and human-in-the-loop workflows. For details, refer to the [LangGraph documentation](https://langchain-ai.github.io/langgraph/) as well as guides for [Migrating from AgentExecutor](https://python.langchain.com/docs/how_to/migrate_agent/) and LangGraph's [Pre-built ReAct agent](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent/).
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure of the problem. The objective is to maximize total revenue by fulfilling orders for multiple products. The decision variables are the integer quantities of orders fulfilled for each product. The main constraints are: (1) fulfillment cannot exceed initial inventory for each product (fixed, no replenishment), and (2) fulfillment cannot exceed deterministic demand for each product. There is no mention of replenishment, multi-stage decisions, or additional mechanisms. This resembles a finite-inventory allocation to deterministic demand to maximize revenue. I should call FileQA to retrieve structurally similar labeled examples.
+
+Action: FileQA
+
+Action Input: maximize total revenue by choosing non-negative integer order-fulfillment quantities for each product, subject to fixed initial inventory constraints (no replenishment) and deterministic demand constraints, with fulfillment not exceeding either inventory or demand
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: The data of the store offers several styles of Nike shoes is provided in "nike_Shoes_Sales.csv". Through the dataset, the revenue of each shoes is listed in the column "Revenue". Each style has its own demand limit. The store’s objective is to maximize the total revenue based on the fixed initial inventories of the Nike x Olivia Kim brand, which are detailed in column “Initial Inventory.” During the sales horizon, no replenishment is allowed, and there are no in-transit inventories. For this deterministic reference instance, the column “Demand” specifies the known total demand for each style over the entire sales horizon. The instance is eligible for trading when the sum of “Demand” over the four Nike x Olivia Kim styles is at least 100. Sales decisions are made for eligible instances. The decision variables x_i represent the number of customer requests the store intends to fulfill for Nike shoe style i, with each x_i being a positive integer.
+In addition, the four styles share a dispatch capacity of 100 units over the sales horizon: their total fulfilled quantity cannot exceed 100. This capacity is an explicit synthetic scenario assumption, not a measured field in the source CSV.
+Type: NRM
+
+[Retrieved example 2]
+prompt: A supermarket needs to allocate various products, including high-demand items like the Sony Alpha Refrigerator, Sony Bravia XR, and Sony PlayStation 5, across different retail shelves. The product values and space requirements are provided in the "Products.csv" dataset. Additionally, the store has multiple shelves, each with a total space limit and specific space constraints for Sony and Apple products, as outlined in the "Capacity.csv" file. The goal is to determine the optimal number of units of each Sony product to place on each shelf to maximize total value while ensuring that the space used by Sony products on each shelf does not exceed the brand-specific limits. The decision variables x_ij represent the number of units of product i to be placed on shelf j. The variables x_ij must be nonnegative integers because the products are counted in whole units.
+Type: RA
+
+[Retrieved example 3]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP[0m
+Thought:[32;1m[1;3mThought: The problem’s objective is to maximize total revenue by fulfilling orders for each product, with decision variables representing non-negative integer fulfillment quantities. The main constraints are: (1) fulfillment cannot exceed fixed initial inventory (no replenishment), and (2) fulfillment cannot exceed deterministic demand. There are no additional mechanisms such as replenishment, multi-stage decisions, batch sizes, logical dependencies, or production/assignment coupling. The retrieved examples include a nearly identical NRM-labeled problem (example 1) with fixed inventories, deterministic demand, and fulfillment decisions, matching the current structure. Other retrieved examples (RA, Mixture, TP) do not fit as closely, as they involve resource allocation across activities, batch/activation decisions, or transportation flows. The current problem is a clean instance of allocating fixed inventories to deterministic demand to maximize revenue, with no material additional mechanisms.
+
+Final Answer: NRM[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise ValueError("Required table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+    records = table["records"]
+    items = []
+    revenue = {}
+    demand = {}
+    inventory = {}
+
+    for rec in records:
+        vals = rec["values"]
+        prod = vals["Product Name"]
+        try:
+            rev = float(vals["Revenue"])
+            dem = int(vals["Demand"])
+            inv = int(vals["Initial Inventory"])
+        except Exception as e:
+            raise ValueError(f"Invalid data for product '{prod}': {e}")
+        if prod in items:
+            raise ValueError(f"Duplicate product name '{prod}' in data.")
+        items.append(prod)
+        revenue[prod] = rev
+        demand[prod] = dem
+        inventory[prod] = inv
+
+    # Validate all dimensions
+    if not (set(revenue) == set(demand) == set(inventory) == set(items)):
+        raise ValueError("Mismatch in product keys among revenue, demand, and inventory.")
+
+    m = gp.Model('Mobile_Device_Retailer_RevMax')
+    m.Params.MIPGap = 1e-4
+
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for v in m.getVars():
+            print(f'{v.VarName}: {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 142 rows, 71 columns and 142 nonzeros
+Model fingerprint: 0xce667506
+Variable types: 0 continuous, 71 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+02, 1e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+00, 1e+03]
+Found heuristic solution: objective 4003445.2100
+Presolve removed 142 rows and 71 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 4.00345e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.003445210000e+06, best bound 4.003445210000e+06, gap 0.0000%
+ObjVal: 4003445.2099999995
+C0: 10.0
+C1: 6.0
+C2: 75.0
+C3: 121.0
+C4: 130.0
+C5: 112.0
+C6: 125.0
+C7: 54.0
+C8: 75.0
+C9: 102.0
+C10: 48.0
+C11: 4.0
+C12: 125.0
+C13: 9.0
+C14: 132.0
+C15: 29.0
+C16: 43.0
+C17: 5.0
+C18: 40.0
+C19: 48.0
+C20: 87.0
+C21: 79.0
+C22: 20.0
+C23: 33.0
+C24: 60.0
+C25: 25.0
+C26: 42.0
+C27: 52.0
+C28: 116.0
+C29: 95.0
+C30: 66.0
+C31: 25.0
+C32: 78.0
+C33: 138.0
+C34: 32.0
+C35: 28.0
+C36: 84.0
+C37: 102.0
+C38: 112.0
+C39: 7.0
+C40: 62.0
+C41: 109.0
+C42: 81.0
+C43: 131.0
+C44: 26.0
+C45: 109.0
+C46: 65.0
+C47: 121.0
+C48: 90.0
+C49: 31.0
+C50: 24.0
+C51: 122.0
+C52: 101.0
+C53: 76.0
+C54: 100.0
+C55: 125.0
+C56: 45.0
+C57: 80.0
+C58: 64.0
+C59: 98.0
+C60: 102.0
+C61: 40.0
+C62: 110.0
+C63: 59.0
+C64: 97.0
+C65: 90.0
+C66: 43.0
+C67: 96.0
+C68: 21.0
+C69: 55.0
+C70: 30.0
+Optimal objective: 4003445.2099999995
+Optimal solution: [('C0', 10.0), ('C1', 6.0), ('C2', 75.0), ('C3', 121.0), ('C4', 130.0), ('C5', 112.0), ('C6', 125.0), ('C7', 54.0), ('C8', 75.0), ('C9', 102.0), ('C10', 48.0), ('C11', 4.0), ('C12', 125.0), ('C13', 9.0), ('C14', 132.0), ('C15', 29.0), ('C16', 43.0), ('C17', 5.0), ('C18', 40.0), ('C19', 48.0), ('C20', 87.0), ('C21', 79.0), ('C22', 20.0), ('C23', 33.0), ('C24', 60.0), ('C25', 25.0), ('C26', 42.0), ('C27', 52.0), ('C28', 116.0), ('C29', 95.0), ('C30', 66.0), ('C31', 25.0), ('C32', 78.0), ('C33', 138.0), ('C34', 32.0), ('C35', 28.0), ('C36', 84.0), ('C37', 102.0), ('C38', 112.0), ('C39', 7.0), ('C40', 62.0), ('C41', 109.0), ('C42', 81.0), ('C43', 131.0), ('C44', 26.0), ('C45', 109.0), ('C46', 65.0), ('C47', 121.0), ('C48', 90.0), ('C49', 31.0), ('C50', 24.0), ('C51', 122.0), ('C52', 101.0), ('C53', 76.0), ('C54', 100.0), ('C55', 125.0), ('C56', 45.0), ('C57', 80.0), ('C58', 64.0), ('C59', 98.0), ('C60', 102.0), ('C61', 40.0), ('C62', 110.0), ('C63', 59.0), ('C64', 97.0), ('C65', 90.0), ('C66', 43.0), ('C67', 96.0), ('C68', 21.0), ('C69', 55.0), ('C70', 30.0)]

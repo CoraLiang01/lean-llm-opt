@@ -1,0 +1,97 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    def read_csv_with_encodings(path):
+        encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+        for enc in encodings:
+            try:
+                return pd.read_csv(path, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise ValueError(f"Could not decode {path} with tried encodings.")
+
+    # Paths from source schema
+    customer_demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP5/customer_demand.csv"
+    supply_capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP5/supply_capacity.csv"
+    transportation_costs_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP5/transportation_costs.csv"
+
+    # Read data
+    customer_demand_df = read_csv_with_encodings(customer_demand_path)
+    supply_capacity_df = read_csv_with_encodings(supply_capacity_path)
+    transportation_costs_df = read_csv_with_encodings(transportation_costs_path)
+
+    # Get suppliers and customers in source order
+    suppliers = list(supply_capacity_df['Supplier'])
+    customers = list(customer_demand_df['Customers'])
+
+    # Demand and supply dictionaries
+    demand = dict(zip(customer_demand_df['Customers'], customer_demand_df['demand']))
+    supply_capacity = dict(zip(supply_capacity_df['Supplier'], supply_capacity_df['supply_capacity']))
+
+    # Validate cost matrix dimensions and identifiers
+    cost = {}
+    # The first column in transportation_costs_df is supplier name, must match suppliers
+    cost_suppliers = list(transportation_costs_df.iloc[:,0])
+    cost_customers = list(transportation_costs_df.columns[1:])
+    if cost_suppliers != suppliers:
+        raise ValueError("Supplier order in transportation_costs.csv does not match supply_capacity.csv")
+    if cost_customers != customers:
+        raise ValueError("Customer order in transportation_costs.csv does not match customer_demand.csv")
+    # Build cost dict
+    for i, supplier in enumerate(suppliers):
+        row = transportation_costs_df.iloc[i, 1:]
+        cost[supplier] = {}
+        for j, customer in enumerate(customers):
+            val = row.iloc[j]
+            if pd.isnull(val):
+                raise ValueError(f"Missing cost for ({supplier}, {customer})")
+            cost[supplier][customer] = float(val)
+
+    # Model
+    m = gp.Model('TP5')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_{ij} >= 0, continuous
+    x = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: minimize total transportation cost
+    m.setObjective(
+        gp.quicksum(cost[i][j] * x[i, j] for i in suppliers for j in customers),
+        GRB.MINIMIZE
+    )
+
+    # Demand satisfaction: sum_i x_{ij} >= d_j for all j
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in suppliers) >= demand[j] for j in customers),
+        name='demand'
+    )
+
+    # Supply capacity: sum_j x_{ij} <= s_i for all i
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in customers) <= supply_capacity[i] for i in suppliers),
+        name='supply'
+    )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 140, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 54, in <module>
+  File "<string>", line 29, in solve_problem
+ValueError: Supplier order in transportation_costs.csv does not match supply_capacity.csv

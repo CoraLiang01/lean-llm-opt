@@ -1,0 +1,98 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with robust encoding
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM17/SupermarketSales.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not decode CSV with tried encodings.")
+
+    # Check required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Filter for 'Fashion' products (case-insensitive)
+    if 'Product Name' not in df.columns:
+        raise ValueError("Missing 'Product Name' column in data.")
+    mask = df['Product Name'].str.casefold().str.contains('fashion')
+    df_fashion = df[mask].copy()
+    if df_fashion.empty:
+        raise ValueError("No products classified under 'Fashion' found in the dataset.")
+
+    # Remove rows with missing required data
+    df_fashion = df_fashion.dropna(subset=['Product Name', 'Revenue', 'Demand', 'Initial Inventory'])
+
+    # Group by 'Product Name' in case of duplicates, sum numeric fields
+    df_fashion = df_fashion.groupby('Product Name', as_index=False).agg({
+        'Revenue': 'sum',
+        'Demand': 'sum',
+        'Initial Inventory': 'sum'
+    })
+
+    # Build index set I and parameter dictionaries
+    items = df_fashion['Product Name'].tolist()
+    a = dict(zip(items, df_fashion['Revenue']))
+    d = dict(zip(items, df_fashion['Demand']))
+    s = dict(zip(items, df_fashion['Initial Inventory']))
+
+    # Validate all coefficients are present and numeric
+    for i in items:
+        if pd.isnull(a[i]) or pd.isnull(d[i]) or pd.isnull(s[i]):
+            raise ValueError(f"Missing data for product: {i}")
+        if not (isinstance(a[i], (int, float)) and isinstance(d[i], (int, float)) and isinstance(s[i], (int, float))):
+            raise ValueError(f"Non-numeric data for product: {i}")
+
+    # Ensure all demands and inventories are >= 0 and integer
+    for i in items:
+        if d[i] < 0 or s[i] < 0:
+            raise ValueError(f"Negative demand or inventory for product: {i}")
+        d[i] = int(d[i])
+        s[i] = int(s[i])
+
+    m = gp.Model('Fashion_Revenue_Max')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(a[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    # Constraints: x_i <= d_i, x_i <= s_i
+    m.addConstrs((x[i] <= d[i] for i in items), name='demand')
+    m.addConstrs((x[i] <= s[i] for i in items), name='inventory')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 140, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 56, in <module>
+  File "<string>", line 23, in solve_problem
+  File "/opt/miniconda3/envs/lean_llm_opt_4_1/lib/python3.10/site-packages/pandas/core/frame.py", line 3797, in __getitem__
+    if com.is_bool_indexer(key):
+  File "/opt/miniconda3/envs/lean_llm_opt_4_1/lib/python3.10/site-packages/pandas/core/common.py", line 135, in is_bool_indexer
+    raise ValueError(na_msg)
+ValueError: Cannot mask with non-boolean array containing NA / NaN values

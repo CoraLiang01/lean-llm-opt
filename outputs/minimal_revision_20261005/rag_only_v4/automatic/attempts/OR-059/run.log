@@ -1,0 +1,204 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = CSVQA_DATA
+
+    # Table IDs
+    demand_table = "file_0_view_0"
+    fixed_cost_table = "file_1_view_0"
+    trans_cost_table = "file_2_view_0"
+
+    # Suppliers S: from fixed_cost_table["Unnamed: 0"]
+    S = []
+    f = {}
+    for rec in [r for r in data["tables"] if r["table_id"] == fixed_cost_table][0]["records"]:
+        sid = rec["values"]["Unnamed: 0"]
+        S.append(sid)
+        f[sid] = float(rec["values"]["fixed_costs"])
+
+    # Dealerships C: from demand_table["customer"]
+    C = []
+    d = {}
+    for rec in [r for r in data["tables"] if r["table_id"] == demand_table][0]["records"]:
+        cid = rec["values"]["customer"]
+        C.append(cid)
+        d[cid] = float(rec["values"]["demand"])
+
+    # Transportation costs t_{ij}: from trans_cost_table, rows S, columns C
+    t = {}
+    trans_table = [r for r in data["tables"] if r["table_id"] == trans_cost_table][0]
+    for rec in trans_table["records"]:
+        sid = rec["values"]["Unnamed: 0"]
+        for cid in C:
+            t[(sid, cid)] = float(rec["values"][cid])
+
+    # Validate coefficient dimensions and identifier coverage
+    for sid in S:
+        if sid not in f:
+            raise ValueError(f"Missing fixed cost for supplier {sid}")
+    for cid in C:
+        if cid not in d:
+            raise ValueError(f"Missing demand for dealership {cid}")
+    for sid in S:
+        for cid in C:
+            if (sid, cid) not in t:
+                raise ValueError(f"Missing transportation cost for supplier {sid}, dealership {cid}")
+
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    y = m.addVars(S, vtype=GRB.BINARY, name='y')
+    x = m.addVars([(i, j) for i in S for j in C], lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: Minimize total cost
+    m.setObjective(
+        gp.quicksum(f[i] * y[i] for i in S) +
+        gp.quicksum(t[(i, j)] * x[(i, j)] for i in S for j in C),
+        GRB.MINIMIZE
+    )
+
+    # Constraint 1: Demand satisfaction for each dealership
+    m.addConstrs(
+        (gp.quicksum(x[(i, j)] for i in S) == d[j] for j in C),
+        name='demand'
+    )
+
+    # Constraint 2: Supply only from open suppliers
+    m.addConstrs(
+        (x[(i, j)] <= d[j] * y[i] for i in S for j in C),
+        name='open_link'
+    )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for v in m.getVars():
+            print(v.VarName, v.X)
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 81 rows, 80 columns and 216 nonzeros
+Model fingerprint: 0xa0aabf08
+Variable types: 72 continuous, 8 integer (8 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+10]
+  Objective range  [4e-02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [7e+08, 1e+10]
+Warning: Model contains large matrix coefficients
+Warning: Model contains large rhs
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+Presolve time: 0.00s
+Presolved: 81 rows, 80 columns, 216 nonzeros
+Variable types: 72 continuous, 8 integer (8 binary)
+Found heuristic solution: objective 1.862205e+12
+
+Root relaxation: interrupted, 0 iterations, 0.00 seconds (0.00 work units)
+
+Explored 1 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 1: 1.86221e+12 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.862205008777e+12, best bound 1.862205007990e+12, gap 0.0000%
+1862205008776.5698
+C0 1.0
+C1 1.0
+C2 1.0
+C3 1.0
+C4 1.0
+C5 1.0
+C6 1.0
+C7 1.0
+C8 0.0
+C9 0.0
+C10 0.0
+C11 1027326000.0
+C12 0.0
+C13 9058407000.0
+C14 5344367000.0
+C15 0.0
+C16 0.0
+C17 0.0
+C18 0.0
+C19 0.0
+C20 0.0
+C21 0.0
+C22 0.0
+C23 0.0
+C24 677201000.0
+C25 0.0
+C26 0.0
+C27 1600594000.0
+C28 5086889000.0
+C29 0.0
+C30 0.0
+C31 0.0
+C32 0.0
+C33 0.0
+C34 0.0
+C35 0.0
+C36 0.0
+C37 0.0
+C38 0.0
+C39 0.0
+C40 0.0
+C41 0.0
+C42 0.0
+C43 0.0
+C44 4742532000.0
+C45 0.0
+C46 0.0
+C47 0.0
+C48 11926044000.0
+C49 0.0
+C50 0.0
+C51 0.0
+C52 0.0
+C53 0.0
+C54 0.0
+C55 0.0
+C56 0.0
+C57 0.0
+C58 0.0
+C59 0.0
+C60 0.0
+C61 0.0
+C62 0.0
+C63 0.0
+C64 0.0
+C65 0.0
+C66 0.0
+C67 0.0
+C68 0.0
+C69 0.0
+C70 3236493000.0
+C71 0.0
+C72 0.0
+C73 0.0
+C74 0.0
+C75 0.0
+C76 0.0
+C77 0.0
+C78 0.0
+C79 0.0
+Optimal objective: 1862205008776.5698
+Optimal solution: [('C0', 1.0), ('C1', 1.0), ('C2', 1.0), ('C3', 1.0), ('C4', 1.0), ('C5', 1.0), ('C6', 1.0), ('C7', 1.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 1027326000.0), ('C12', 0.0), ('C13', 9058407000.0), ('C14', 5344367000.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 677201000.0), ('C25', 0.0), ('C26', 0.0), ('C27', 1600594000.0), ('C28', 5086889000.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 4742532000.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 11926044000.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 3236493000.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0)]

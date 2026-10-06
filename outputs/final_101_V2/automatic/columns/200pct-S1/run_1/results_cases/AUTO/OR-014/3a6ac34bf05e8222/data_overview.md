@@ -1,0 +1,33 @@
+archived_attachment_count,reference_document_page_count,archive_audit_note_count,ShelfID,archive_revision_number,Capacity
+6,4,3,1,2,5.0
+6,4,5,2,9,7.0
+3,6,2,3,9,6.0
+4,6,3,4,7,8.0
+6,8,3,5,3,5.5
+6,8,3,6,3,9.0
+3,12,1,7,1,6.5
+2,8,1,8,2,7.5
+1,6,3,9,3,8.2
+6,4,5,10,4,5.7
+
+archive_revision_number,reference_document_page_count,ProductName,record_index_style,Value,record_keeper_group,archived_attachment_count,Weight,archive_storage_medium
+8,12,Smartphone,Chronological,200,Team A,4,1.0,Paper
+8,12,Laptop,Alphabetic,1500,Team C,1,5.0,Digital
+8,6,Headphones,Numeric,100,Team B,4,0.5,Hybrid
+1,8,Camera,Alphabetic,800,Team C,3,2.0,Digital
+9,2,Smartwatch,Chronological,250,Team B,2,0.3,Digital
+4,6,Tablet,Alphabetic,600,Team C,2,1.5,Hybrid
+9,2,Bluetooth Speaker,Chronological,150,Team C,1,1.0,Paper
+4,6,Keyboard,Alphabetic,80,Team C,6,0.8,Hybrid
+3,8,Mouse,Numeric,50,Team C,1,0.2,Hybrid
+1,12,Monitor,Chronological,300,Team B,2,3.0,Digital
+7,12,Printer,Numeric,400,Team B,6,4.0,Hybrid
+2,4,External Hard Drive,Chronological,120,Team C,2,0.5,Paper
+5,12,Router,Numeric,60,Team A,2,0.3,Hybrid
+6,6,Power Bank,Alphabetic,40,Team B,2,0.4,Digital
+1,12,Memory Card,Numeric,30,Team B,3,0.05,Digital
+2,12,USB Flash Drive,Alphabetic,25,Team A,1,0.02,Hybrid
+8,12,Smart Home Hub,Chronological,100,Team B,1,0.6,Digital
+9,12,Gaming Console,Chronological,500,Team B,6,4.0,Digital
+6,6,Fitness Tracker,Alphabetic,90,Team B,3,0.2,Paper
+1,12,E-Reader,Numeric,180,Team C,1,0.5,Hybrid

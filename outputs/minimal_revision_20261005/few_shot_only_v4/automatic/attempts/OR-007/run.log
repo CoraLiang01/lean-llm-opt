@@ -1,0 +1,153 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    def read_csv_with_encodings(path):
+        for enc in encodings:
+            try:
+                return pd.read_csv(path, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with tried encodings.")
+
+    # Source schema paths
+    demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP7/customer_demand.csv"
+    supply_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP7/supply_capacity.csv"
+    cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP7/transportation_costs.csv"
+
+    # Read data
+    demand_df = read_csv_with_encodings(demand_path)
+    supply_df = read_csv_with_encodings(supply_path)
+    cost_df = read_csv_with_encodings(cost_path)
+
+    # Clean up column names (strip whitespace, casefold)
+    demand_df.columns = demand_df.columns.str.strip()
+    supply_df.columns = supply_df.columns.str.strip()
+    cost_df.columns = cost_df.columns.str.strip()
+
+    # Index sets
+    J = [str(j) for j in demand_df['customer']]
+    I = [str(i) for i in supply_df['region']]
+
+    # Demand mapping
+    demand = {}
+    for _, row in demand_df.iterrows():
+        key = str(row['customer'])
+        demand[key] = float(row['demand'])
+
+    # Supply mapping
+    supply_capacity = {}
+    for _, row in supply_df.iterrows():
+        key = str(row['region'])
+        supply_capacity[key] = float(row['supply_capacity'])
+
+    # Cost mapping: cost[i][j]
+    # cost_df: first column is warehouse (row index), columns D1..Dn
+    cost = {}
+    for idx, row in cost_df.iterrows():
+        i = str(row.iloc[0])
+        cost[i] = {}
+        for j in J:
+            if j not in cost_df.columns:
+                raise ValueError(f"Store {j} not found in transportation_costs.csv columns.")
+            val = row[j]
+            if pd.isnull(val):
+                raise ValueError(f"Missing cost for ({i},{j}) in transportation_costs.csv.")
+            cost[i][j] = float(val)
+
+    # Validate all indices present
+    if set(I) != set(cost.keys()):
+        raise ValueError("Mismatch between warehouses in supply_capacity.csv and transportation_costs.csv.")
+    for i in I:
+        if set(J) != set(cost[i].keys()):
+            raise ValueError(f"Mismatch between stores in demand and cost for warehouse {i}.")
+
+    # Model
+    m = gp.Model('GreenMart_TP')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x[i,j] >= 0, continuous
+    keys = [(i, j) for i in I for j in J]
+    x = m.addVars(keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: minimize total transportation cost
+    m.setObjective(gp.quicksum(cost[i][j] * x[i, j] for i in I for j in J), GRB.MINIMIZE)
+
+    # Demand satisfaction: sum over i of x[i,j] >= d_j for all j
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in I) >= demand[j] for j in J),
+        name='demand'
+    )
+
+    # Supply capacity: sum over j of x[i,j] <= s_i for all i
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in J) <= supply_capacity[i] for i in I),
+        name='supply'
+    )
+
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 10 rows, 25 columns and 50 nonzeros
+Model fingerprint: 0x8b7262be
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+02, 4e+02]
+Presolve time: 0.00s
+Presolved: 10 rows, 25 columns, 50 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   1.493000e+03   0.000000e+00      0s
+      10    1.0291277e+04   0.000000e+00   0.000000e+00      0s
+
+Solved in 10 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  1.029127701e+04
+ObjVal: 10291.277006657501
+C0: 0.0
+C1: 174.0
+C2: 0.0
+C3: 0.0
+C4: 254.0
+C5: 217.0
+C6: 0.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 211.0
+C11: 3.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 214.0
+C18: 166.0
+C19: 0.0
+C20: 0.0
+C21: 40.0
+C22: 0.0
+C23: 214.0
+C24: 0.0
+Optimal objective: 10291.277006657501
+Optimal solution: [('C0', 0.0), ('C1', 174.0), ('C2', 0.0), ('C3', 0.0), ('C4', 254.0), ('C5', 217.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 211.0), ('C11', 3.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 214.0), ('C18', 166.0), ('C19', 0.0), ('C20', 0.0), ('C21', 40.0), ('C22', 0.0), ('C23', 214.0), ('C24', 0.0)]

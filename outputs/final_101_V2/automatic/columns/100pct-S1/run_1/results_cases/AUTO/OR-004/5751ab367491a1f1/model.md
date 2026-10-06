@@ -1,0 +1,1 @@
+I need the actual contents of cost_12x12.csv to proceed. Please upload or paste the full contents of cost_12x12.csv, and I will retrieve all data and formulate the complete mathematical model as described.

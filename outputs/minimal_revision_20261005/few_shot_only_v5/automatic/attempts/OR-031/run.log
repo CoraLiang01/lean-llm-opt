@@ -1,0 +1,144 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Try reading the CSV with multiple encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM22/DairyGoodsSalesDataset.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not read CSV with supported encodings.")
+
+    # Required columns
+    required_cols = ['Full_Product_Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Remove duplicate rows by all columns (preserve all unique products)
+    df = df.drop_duplicates(subset=required_cols)
+
+    # Group by product name in case of repeated entries, sum numeric fields
+    df_grouped = df.groupby('Full_Product_Name', as_index=False).agg({
+        'Revenue': 'sum',
+        'Demand': 'sum',
+        'Initial Inventory': 'sum'
+    })
+
+    # Build index set and coefficient dictionaries
+    items = df_grouped['Full_Product_Name'].tolist()
+    revenue = dict(zip(df_grouped['Full_Product_Name'], df_grouped['Revenue']))
+    demand = dict(zip(df_grouped['Full_Product_Name'], df_grouped['Demand']))
+    inventory = dict(zip(df_grouped['Full_Product_Name'], df_grouped['Initial Inventory']))
+
+    # Validate all coefficients are present for all items
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f"Missing coefficients for product: {i}")
+
+    # Model
+    m = gp.Model('DairyGoodsSales')
+    # Decision variables: x_i in [0, min{d_i, I_i}], integer
+    x = m.addVars(items,
+                  lb=0,
+                  ub={i: min(demand[i], inventory[i]) for i in items},
+                  vtype=GRB.INTEGER,
+                  name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    # Constraints: x_i <= d_i, x_i <= I_i (already enforced by ub, but add explicit constraints)
+    m.addConstrs((x[i] <= demand[i] for i in items), name='d')
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 80 rows, 40 columns and 80 nonzeros
+Model fingerprint: 0x60c89f43
+Variable types: 0 continuous, 40 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [9e+00, 1e+02]
+  Bounds range     [2e+04, 3e+04]
+  RHS range        [2e+04, 5e+04]
+Found heuristic solution: objective 6.701651e+07
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 6.70165e+07 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.701651128000e+07, best bound 6.701651128000e+07, gap 0.0000%
+ObjVal: 67016511.28
+C0: 29862.0
+C1: 29898.0
+C2: 25208.0
+C3: 30816.0
+C4: 19925.0
+C5: 26482.0
+C6: 30865.0
+C7: 29649.0
+C8: 30929.0
+C9: 21405.0
+C10: 25953.0
+C11: 23825.0
+C12: 31687.0
+C13: 33377.0
+C14: 34914.0
+C15: 33547.0
+C16: 23120.0
+C17: 24667.0
+C18: 25395.0
+C19: 24676.0
+C20: 26707.0
+C21: 26722.0
+C22: 25809.0
+C23: 24391.0
+C24: 30728.0
+C25: 28628.0
+C26: 30568.0
+C27: 23461.0
+C28: 21398.0
+C29: 33619.0
+C30: 26355.0
+C31: 23815.0
+C32: 20787.0
+C33: 29342.0
+C34: 23556.0
+C35: 28753.0
+C36: 24404.0
+C37: 26829.0
+C38: 25562.0
+C39: 28695.0
+Optimal objective: 67016511.28
+Optimal solution: [('C0', 29862.0), ('C1', 29898.0), ('C2', 25208.0), ('C3', 30816.0), ('C4', 19925.0), ('C5', 26482.0), ('C6', 30865.0), ('C7', 29649.0), ('C8', 30929.0), ('C9', 21405.0), ('C10', 25953.0), ('C11', 23825.0), ('C12', 31687.0), ('C13', 33377.0), ('C14', 34914.0), ('C15', 33547.0), ('C16', 23120.0), ('C17', 24667.0), ('C18', 25395.0), ('C19', 24676.0), ('C20', 26707.0), ('C21', 26722.0), ('C22', 25809.0), ('C23', 24391.0), ('C24', 30728.0), ('C25', 28628.0), ('C26', 30568.0), ('C27', 23461.0), ('C28', 21398.0), ('C29', 33619.0), ('C30', 26355.0), ('C31', 23815.0), ('C32', 20787.0), ('C33', 29342.0), ('C34', 23556.0), ('C35', 28753.0), ('C36', 24404.0), ('C37', 26829.0), ('C38', 25562.0), ('C39', 28695.0)]

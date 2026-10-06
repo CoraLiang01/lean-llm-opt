@@ -1,0 +1,255 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/rag_only_v4/frozen_notebook.ipynb:cell25:150: LangChainDeprecationWarning: The class `LLMChain` was deprecated in LangChain 0.1.17 and will be removed in 1.0. Use `RunnableSequence, e.g., `prompt | llm`` instead.
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/rag_only_v4/frozen_notebook.ipynb:cell25:152: LangChainDeprecationWarning: The method `Chain.run` was deprecated in langchain-classic 0.1.0 and will be removed in 1.0. Use `invoke` instead.
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal continuous production quantities of three products (I, II, III) in a factory, considering that each product must be processed through two procedures (A and B) using specific types of equipment, with the goal of maximizing profit. The model must account for processing times, raw material costs, selling prices, available equipment operating times, and equipment operating costs, as well as product-equipment compatibility constraints.
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) production planning problem with assignment constraints.
+3.  **Define Index Sets:** The primary indices are:
+    - Products: {I, II, III}
+    - Equipment: {A1, A2, B1, B2, B3} (filtered by compatibility for each procedure and product)
+    - Procedures: {A, B}
+4.  **Define Decision Variables:**
+    - `q[p]` = Quantity of product p produced (for p in {I, II, III}). Type: GRB.CONTINUOUS.
+    - `x[p,e]` = Amount of product p processed on equipment e (for compatible (p,e) pairs). Type: GRB.CONTINUOUS.
+5.  **Identify Parameters (from Schema):**
+    - Processing time per unit for each (product, equipment) pair: from columns 'Product I', 'Product II', 'Product III' in equipment rows.
+    - Raw material cost per unit for each product: from 'Raw Material Cost (yuan/unit)' row.
+    - Selling price per unit for each product: from 'Unit Price (yuan/unit)' row.
+    - Available equipment operating time: from 'Available Equipment Operating Time' column.
+    - Equipment cost at full load: from 'Equipment Cost at Full Load (yuan)' column.
+6.  **Formulate Objective:** Maximize total profit, defined as:
+    - Total revenue from all products (sum over products of unit price × quantity produced)
+    - Minus total raw material costs (sum over products of raw material cost × quantity produced)
+    - Minus total equipment operating costs (sum over equipment of (actual operating time / full load time) × equipment cost at full load)
+7.  **Formulate Constraints:**
+    - **Procedure Assignment Constraints:** For each product and procedure, ensure that the product is only processed on compatible equipment:
+        - Product I: Procedure A on A1 or A2; Procedure B on B1, B2, or B3.
+        - Product II: Procedure A on A1 or A2; Procedure B only on B1.
+        - Product III: Procedure A only on A2; Procedure B only on B2.
+    - **Production Flow Constraints:** For each product, the amount processed through both procedures must be equal to the total quantity produced (i.e., production is not split or lost between procedures).
+    - **Equipment Time Constraints:** For each equipment, the total processing time assigned to it (sum over all compatible products of processing time per unit × quantity assigned) must not exceed its available operating time.
+    - **Equipment Cost Calculation:** For each equipment, the share of its full load cost is proportional to its actual usage (actual operating time / available time).
+    - **Non-negativity:** All decision variables must be non-negative.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+import gurobipy as gp
+from gurobipy import GRB
+
+# Read CSV
+csv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv'
+df = pd.read_csv(csv_path, sep=',')
+
+# --- Data Extraction ---
+
+# Identify product and equipment rows
+equipment_rows = df['Equipment / Cost'].str.match(r'^(A1|A2|B1|B2|B3)$', case=False, na=False)
+equipment_df = df.loc[equipment_rows].copy()
+
+# Extract product names
+product_names = ['Product I', 'Product II', 'Product III']
+products = ['I', 'II', 'III']
+product_map = dict(zip(product_names, products))
+
+# Map equipment to procedures
+A_equip = ['A1', 'A2']
+B_equip = ['B1', 'B2', 'B3']
+
+# Compatibility: (product, procedure) -> allowed equipment
+compat = {
+    ('I', 'A'): ['A1', 'A2'],
+    ('I', 'B'): ['B1', 'B2', 'B3'],
+    ('II', 'A'): ['A1', 'A2'],
+    ('II', 'B'): ['B1'],
+    ('III', 'A'): ['A2'],
+    ('III', 'B'): ['B2'],
+}
+
+# Extract processing times: (product, equipment) -> time per unit
+proc_time = {}
+for _, row in equipment_df.iterrows():
+    eq = row['Equipment / Cost'].strip()
+    for pname, p in product_map.items():
+        val = row[pname]
+        if not pd.isnull(val):
+            proc_time[(p, eq)] = float(val)
+
+# Extract available equipment operating time and cost at full load
+avail_time = {}
+full_load_cost = {}
+for _, row in equipment_df.iterrows():
+    eq = row['Equipment / Cost'].strip()
+    atime = row['Available Equipment Operating Time']
+    ecost = row['Equipment Cost at Full Load (yuan)']
+    if not pd.isnull(atime):
+        avail_time[eq] = float(atime)
+    if not pd.isnull(ecost):
+        full_load_cost[eq] = float(ecost)
+
+# Extract raw material cost and unit price per product
+def get_param_row(label):
+    idx = df['Equipment / Cost'].str.casefold().str.strip() == label.casefold().strip()
+    if not idx.any():
+        raise ValueError(f"Row '{label}' not found in CSV")
+    return df.loc[idx].iloc[0]
+
+raw_mat_row = get_param_row('Raw Material Cost (yuan/unit)')
+unit_price_row = get_param_row('Unit Price (yuan/unit)')
+
+raw_mat_cost = {}
+unit_price = {}
+for pname, p in product_map.items():
+    val_rm = raw_mat_row[pname]
+    val_up = unit_price_row[pname]
+    if not pd.isnull(val_rm):
+        raw_mat_cost[p] = float(val_rm)
+    if not pd.isnull(val_up):
+        unit_price[p] = float(val_up)
+
+# --- Decision Variables ---
+
+# q[p]: total quantity produced of product p
+# x[p, proc, eq]: amount of product p processed on equipment eq for procedure proc (only for compatible (p,proc,eq))
+# For each product, procedure, and compatible equipment
+
+# Build index sets
+procs = ['A', 'B']
+x_keys = []
+for p in products:
+    for proc in procs:
+        for eq in compat.get((p, proc), []):
+            x_keys.append((p, proc, eq))
+
+# Validate all required coefficients exist
+for (p, proc, eq) in x_keys:
+    if (p, eq) not in proc_time:
+        raise ValueError(f"Missing processing time for product {p}, equipment {eq}")
+
+for eq in set([k[2] for k in x_keys]):
+    if eq not in avail_time or eq not in full_load_cost:
+        raise ValueError(f"Missing available time or cost for equipment {eq}")
+
+for p in products:
+    if p not in raw_mat_cost or p not in unit_price:
+        raise ValueError(f"Missing raw material cost or unit price for product {p}")
+
+# --- Model ---
+
+def solve_problem():
+    m = gp.Model('factory_mixture3')
+    m.Params.MIPGap = 1e-4
+
+    # Variables
+    q = m.addVars(products, lb=0, vtype=GRB.CONTINUOUS, name='q')
+    x = m.addVars(x_keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # For each product and procedure, sum of x[p,proc,eq] over eq = q[p]
+    for p in products:
+        # Procedure A
+        eqs_A = compat.get((p, 'A'), [])
+        m.addConstr(gp.quicksum(x[p, 'A', eq] for eq in eqs_A) == q[p], name=f'flowA_{p}')
+        # Procedure B
+        eqs_B = compat.get((p, 'B'), [])
+        m.addConstr(gp.quicksum(x[p, 'B', eq] for eq in eqs_B) == q[p], name=f'flowB_{p}')
+
+    # Equipment time constraints
+    for eq in set([k[2] for k in x_keys]):
+        # For each equipment, sum over all (p,proc) compatible: proc_time[p,eq] * x[p,proc,eq] <= avail_time[eq]
+        m.addConstr(
+            gp.quicksum(proc_time[(p, eq)] * x[p, proc, eq]
+                        for (p, proc, eq2) in x_keys if eq2 == eq)
+            <= avail_time[eq],
+            name=f'eq_time_{eq}'
+        )
+
+    # Equipment usage time for cost calculation
+    eq_usage_time = {}
+    for eq in set([k[2] for k in x_keys]):
+        eq_usage_time[eq] = m.addVar(lb=0, vtype=GRB.CONTINUOUS, name=f'usage_{eq}')
+        m.addConstr(
+            eq_usage_time[eq] == gp.quicksum(proc_time[(p, eq)] * x[p, proc, eq]
+                                             for (p, proc, eq2) in x_keys if eq2 == eq),
+            name=f'usage_def_{eq}'
+        )
+
+    # Objective: maximize profit
+    # Revenue: sum_p unit_price[p] * q[p]
+    # - Raw material cost: sum_p raw_mat_cost[p] * q[p]
+    # - Equipment cost: sum_eq (eq_usage_time[eq] / avail_time[eq]) * full_load_cost[eq]
+    revenue = gp.quicksum(unit_price[p] * q[p] for p in products)
+    raw_cost = gp.quicksum(raw_mat_cost[p] * q[p] for p in products)
+    eq_cost = gp.quicksum(
+        (eq_usage_time[eq] / avail_time[eq]) * full_load_cost[eq]
+        for eq in eq_usage_time
+    )
+    m.setObjective(revenue - raw_cost - eq_cost, GRB.MAXIMIZE)
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 16 rows, 18 columns and 41 nonzeros
+Model fingerprint: 0x9761d810
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+01]
+  Objective range  [3e-02, 2e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+03, 1e+04]
+Presolve removed 11 rows and 10 columns
+Presolve time: 0.00s
+Presolved: 5 rows, 8 columns, 15 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    2.8747389e+03   7.083242e+02   0.000000e+00      0s
+       6    1.1465665e+03   0.000000e+00   0.000000e+00      0s
+
+Solved in 6 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  1.146566502e+03
+ObjVal: 1146.566502463054
+C0: 1430.0492610837439
+C1: 500.0
+C2: 324.13793103448273
+C3: 1200.0
+C4: 230.0492610837439
+C5: 0.0
+C6: 858.6206896551724
+C7: 571.4285714285714
+C8: 0.0
+C9: 500.0
+C10: 500.0
+C11: 324.13793103448273
+C12: 324.13793103448273
+usage_B2: 7000.0
+usage_A2: 10000.0
+usage_B3: 4000.0
+usage_B1: 4000.0
+usage_A1: 6000.0
+Optimal objective: 1146.566502463054
+Optimal solution: [('C0', 1430.0492610837439), ('C1', 500.0), ('C2', 324.13793103448273), ('C3', 1200.0), ('C4', 230.0492610837439), ('C5', 0.0), ('C6', 858.6206896551724), ('C7', 571.4285714285714), ('C8', 0.0), ('C9', 500.0), ('C10', 500.0), ('C11', 324.13793103448273), ('C12', 324.13793103448273), ('usage_B2', 7000.0), ('usage_A2', 10000.0), ('usage_B3', 4000.0), ('usage_B1', 4000.0), ('usage_A1', 6000.0)]

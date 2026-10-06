@@ -1,0 +1,210 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure of this problem. The objective is to minimize total assignment cost. The decision variables x_ij are binary, indicating whether job j is assigned to team i. Each job must be assigned to exactly one team (one-to-one assignment), and each team's total assigned workload cannot exceed its capacity. The assignment consumes team resources according to assignment_resources.csv. There are no additional mechanisms such as selection-assignment coupling, batch or lot-size decisions, or multi-stage constraints.
+
+Action: FileQA
+
+Action Input: binary assignment variables x_ij indicating assignment of jobs to teams, each job assigned to exactly one team, team capacity constraints based on total assigned workload, objective to minimize total assignment cost, no additional mechanisms
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture
+
+[Retrieved example 2]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP
+
+[Retrieved example 3]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 4]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP[0m
+Thought:[32;1m[1;3mThought: The problem requires assigning each job to exactly one team, with binary assignment variables x_ij. The objective is to minimize total assignment cost. Each job must be assigned to exactly one team, and each team's total assigned workload (summed over assigned jobs) cannot exceed its capacity. There are no additional mechanisms such as selection-assignment coupling, batch or lot-size decisions, or multi-stage constraints. The structure matches the generalized assignment problem, which is a classic extension of the assignment problem where assignment is subject to resource/capacity constraints on the agents/teams. The retrieved examples include a standard assignment problem (AP) with one-to-one matching and a generalized assignment structure with capacity constraints, which is still considered AP when no additional mechanisms are present.
+
+Final Answer: AP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = CSVQA_DATA
+
+    # Teams (Machines)
+    machine_table = None
+    for t in data["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            machine_table = t
+            break
+    if machine_table is None:
+        raise ValueError("Machine table not found")
+    machines = [rec["values"]["Machine"] for rec in machine_table["records"]]
+
+    # Jobs
+    jobs = ["J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8"]
+
+    # Capacity K_i
+    capacity = {}
+    for rec in machine_table["records"]:
+        machine = rec["values"]["Machine"]
+        cap = rec["values"]["Capacity"]
+        try:
+            capacity[machine] = float(cap)
+        except Exception:
+            raise ValueError(f"Invalid capacity for machine {machine}: {cap}")
+
+    # Assignment cost c_{ij}
+    cost_table = None
+    for t in data["tables"]:
+        if t["table_id"] == "file_1_view_0":
+            cost_table = t
+            break
+    if cost_table is None:
+        raise ValueError("Cost table not found")
+    cost = {}
+    for rec in cost_table["records"]:
+        machine = rec["values"]["Machine"]
+        cost[machine] = {}
+        for job in jobs:
+            cij = rec["values"][job]
+            try:
+                cost[machine][job] = float(cij)
+            except Exception:
+                raise ValueError(f"Invalid cost for machine {machine}, job {job}: {cij}")
+
+    # Assignment resource r_{ij}
+    resource_table = None
+    for t in data["tables"]:
+        if t["table_id"] == "file_2_view_0":
+            resource_table = t
+            break
+    if resource_table is None:
+        raise ValueError("Resource table not found")
+    resource = {}
+    for rec in resource_table["records"]:
+        machine = rec["values"]["Machine"]
+        resource[machine] = {}
+        for job in jobs:
+            rij = rec["values"][job]
+            try:
+                resource[machine][job] = float(rij)
+            except Exception:
+                raise ValueError(f"Invalid resource for machine {machine}, job {job}: {rij}")
+
+    # Validate all data present
+    for i in machines:
+        if i not in capacity:
+            raise ValueError(f"Missing capacity for machine {i}")
+        if i not in cost or i not in resource:
+            raise ValueError(f"Missing cost/resource for machine {i}")
+        for j in jobs:
+            if j not in cost[i]:
+                raise ValueError(f"Missing cost for machine {i}, job {j}")
+            if j not in resource[i]:
+                raise ValueError(f"Missing resource for machine {i}, job {j}")
+
+    # Model
+    m = gp.Model('GeneralizedAssignment')
+    x = m.addVars(machines, jobs, vtype=GRB.BINARY, name='x')
+
+    # Objective: minimize total assignment cost
+    m.setObjective(gp.quicksum(cost[i][j] * x[i, j] for i in machines for j in jobs), GRB.MINIMIZE)
+
+    # Assignment constraints: each job assigned to exactly one team
+    m.addConstrs((gp.quicksum(x[i, j] for i in machines) == 1 for j in jobs), name='assign')
+
+    # Capacity constraints: team capacity not exceeded
+    m.addConstrs((gp.quicksum(resource[i][j] * x[i, j] for j in jobs) <= capacity[i] for i in machines), name='cap')
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 12 rows, 32 columns and 64 nonzeros
+Model fingerprint: 0xfff7efd5
+Variable types: 0 continuous, 32 integer (32 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 9e+00]
+  Objective range  [5e+00, 3e+01]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+01]
+Found heuristic solution: objective 88.0000000
+Presolve time: 0.00s
+Presolved: 12 rows, 32 columns, 64 nonzeros
+Variable types: 0 continuous, 32 integer (32 binary)
+
+Root relaxation: objective 5.600000e+01, 8 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0      56.0000000   56.00000  0.00%     -    0s
+
+Explored 1 nodes (8 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 56 88 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.600000000000e+01, best bound 5.600000000000e+01, gap 0.0000%
+ObjVal: 56.0
+C0: 1.0
+C1: 1.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: 1.0
+C11: 1.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: 1.0
+C21: 1.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: 1.0
+C31: 1.0
+Optimal objective: 56.0
+Optimal solution: [('C0', 1.0), ('C1', 1.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', 1.0), ('C11', 1.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', 1.0), ('C21', 1.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', 1.0), ('C31', 1.0)]

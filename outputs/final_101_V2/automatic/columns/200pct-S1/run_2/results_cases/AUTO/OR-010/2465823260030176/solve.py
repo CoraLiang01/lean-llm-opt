@@ -1,0 +1,35 @@
+LEGACY_OBSERVATION = 'capacity.csv\nreference_document_page_count,archive_audit_note_count,SectionID,archived_attachment_count,archive_revision_number,Capacity\n6,5,1,1,3,100\n8,3,2,1,7,150\n2,1,3,3,3,120\n12,4,4,2,4,130\n2,4,5,3,6,90\n6,2,6,3,4,110\n12,3,7,1,3,160\n4,1,8,3,8,140\n\nproducts.csv\nrecord_keeper_group,reference_document_page_count,archive_storage_medium,ProductName,Value,archive_revision_number,record_index_style,Weight,archived_attachment_count\nTeam B,2,Digital,1,10,1,Numeric,2,4\nTeam A,4,Hybrid,2,15,4,Numeric,3,3\nTeam C,8,Digital,3,8,2,Alphabetic,1,2\nTeam A,8,Paper,4,12,9,Numeric,2,2\nTeam A,12,Paper,5,20,3,Numeric,4,2\nTeam C,6,Paper,6,25,7,Chronological,5,2\nTeam A,12,Paper,7,5,2,Alphabetic,1,3\nTeam C,2,Hybrid,8,30,3,Numeric,6,3\nTeam C,8,Digital,9,18,7,Chronological,3,1\nTeam A,8,Hybrid,10,22,5,Alphabetic,4,2'
+LEGACY_RECORDS = [{'source': 'capacity.csv', 'values': {'reference_document_page_count': '6', 'archive_audit_note_count': '5', 'SectionID': '1', 'archived_attachment_count': '1', 'archive_revision_number': '3', 'Capacity': '100'}}, {'source': 'capacity.csv', 'values': {'reference_document_page_count': '8', 'archive_audit_note_count': '3', 'SectionID': '2', 'archived_attachment_count': '1', 'archive_revision_number': '7', 'Capacity': '150'}}, {'source': 'capacity.csv', 'values': {'reference_document_page_count': '2', 'archive_audit_note_count': '1', 'SectionID': '3', 'archived_attachment_count': '3', 'archive_revision_number': '3', 'Capacity': '120'}}, {'source': 'capacity.csv', 'values': {'reference_document_page_count': '12', 'archive_audit_note_count': '4', 'SectionID': '4', 'archived_attachment_count': '2', 'archive_revision_number': '4', 'Capacity': '130'}}, {'source': 'capacity.csv', 'values': {'reference_document_page_count': '2', 'archive_audit_note_count': '4', 'SectionID': '5', 'archived_attachment_count': '3', 'archive_revision_number': '6', 'Capacity': '90'}}, {'source': 'capacity.csv', 'values': {'reference_document_page_count': '6', 'archive_audit_note_count': '2', 'SectionID': '6', 'archived_attachment_count': '3', 'archive_revision_number': '4', 'Capacity': '110'}}, {'source': 'capacity.csv', 'values': {'reference_document_page_count': '12', 'archive_audit_note_count': '3', 'SectionID': '7', 'archived_attachment_count': '1', 'archive_revision_number': '3', 'Capacity': '160'}}, {'source': 'capacity.csv', 'values': {'reference_document_page_count': '4', 'archive_audit_note_count': '1', 'SectionID': '8', 'archived_attachment_count': '3', 'archive_revision_number': '8', 'Capacity': '140'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team B', 'reference_document_page_count': '2', 'archive_storage_medium': 'Digital', 'ProductName': '1', 'Value': '10', 'archive_revision_number': '1', 'record_index_style': 'Numeric', 'Weight': '2', 'archived_attachment_count': '4'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'reference_document_page_count': '4', 'archive_storage_medium': 'Hybrid', 'ProductName': '2', 'Value': '15', 'archive_revision_number': '4', 'record_index_style': 'Numeric', 'Weight': '3', 'archived_attachment_count': '3'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'reference_document_page_count': '8', 'archive_storage_medium': 'Digital', 'ProductName': '3', 'Value': '8', 'archive_revision_number': '2', 'record_index_style': 'Alphabetic', 'Weight': '1', 'archived_attachment_count': '2'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'reference_document_page_count': '8', 'archive_storage_medium': 'Paper', 'ProductName': '4', 'Value': '12', 'archive_revision_number': '9', 'record_index_style': 'Numeric', 'Weight': '2', 'archived_attachment_count': '2'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'reference_document_page_count': '12', 'archive_storage_medium': 'Paper', 'ProductName': '5', 'Value': '20', 'archive_revision_number': '3', 'record_index_style': 'Numeric', 'Weight': '4', 'archived_attachment_count': '2'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'reference_document_page_count': '6', 'archive_storage_medium': 'Paper', 'ProductName': '6', 'Value': '25', 'archive_revision_number': '7', 'record_index_style': 'Chronological', 'Weight': '5', 'archived_attachment_count': '2'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'reference_document_page_count': '12', 'archive_storage_medium': 'Paper', 'ProductName': '7', 'Value': '5', 'archive_revision_number': '2', 'record_index_style': 'Alphabetic', 'Weight': '1', 'archived_attachment_count': '3'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'reference_document_page_count': '2', 'archive_storage_medium': 'Hybrid', 'ProductName': '8', 'Value': '30', 'archive_revision_number': '3', 'record_index_style': 'Numeric', 'Weight': '6', 'archived_attachment_count': '3'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'reference_document_page_count': '8', 'archive_storage_medium': 'Digital', 'ProductName': '9', 'Value': '18', 'archive_revision_number': '7', 'record_index_style': 'Chronological', 'Weight': '3', 'archived_attachment_count': '1'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'reference_document_page_count': '8', 'archive_storage_medium': 'Hybrid', 'ProductName': '10', 'Value': '22', 'archive_revision_number': '5', 'record_index_style': 'Alphabetic', 'Weight': '4', 'archived_attachment_count': '2'}}]
+import gurobipy as gp
+from gurobipy import GRB
+sections = []
+capacities = {}
+products = []
+values = {}
+weights = {}
+for rec in LEGACY_RECORDS:
+    if rec['source'] == 'capacity.csv':
+        sid = str(rec['values']['SectionID'])
+        sections.append(sid)
+        capacities[sid] = int(rec['values']['Capacity'])
+    elif rec['source'] == 'products.csv':
+        pid = str(rec['values']['ProductName'])
+        products.append(pid)
+        values[pid] = int(rec['values']['Value'])
+        weights[pid] = int(rec['values']['Weight'])
+if len(sections) != len(capacities):
+    raise ValueError('Section count and capacity count mismatch')
+if len(products) != len(values) or len(products) != len(weights):
+    raise ValueError('Product count and value/weight count mismatch')
+m = gp.Model('Supermarket_Section_Allocation')
+x = m.addVars(sections, products, lb=0, vtype=GRB.INTEGER, name='')
+m.setObjective(gp.quicksum((values[j] * x[i, j] for i in sections for j in products)), GRB.MAXIMIZE)
+m.addConstrs((gp.quicksum((weights[j] * x[i, j] for j in products)) <= capacities[i] for i in sections), name='')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')

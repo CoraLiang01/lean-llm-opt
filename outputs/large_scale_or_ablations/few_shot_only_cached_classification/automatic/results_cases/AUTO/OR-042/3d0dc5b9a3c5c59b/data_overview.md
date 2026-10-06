@@ -1,0 +1,26 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/capacity.csv
+ Capacity
+     4120
+
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/products.csv
+                     ProductName  Value  Weight
+                          NSAIDs    585      50
+             Antirheumatic Drugs    557     329
+         Acetic Acid Derivatives    963     410
+                     Antibiotics    301     452
+                 Antiviral Drugs    425     350
+               Antifungal Agents    260     159
+                 Antidepressants    848     353
+                  Antipsychotics    461     291
+                  Antihistamines    840     302
+                 Corticosteroids    999      50
+                   Beta Blockers    392     250
+        Calcium Channel Blockers    874     178
+                  ACE Inhibitors    695     313
+Angiotensin II Receptor Blockers    405     378
+                       Diuretics    320      94
+                         Statins    913      97
+                         Insulin    754     470
+                  Anticoagulants    428     341
+             Antiepileptic Drugs    711     121
+                     Antiemetics    998      61

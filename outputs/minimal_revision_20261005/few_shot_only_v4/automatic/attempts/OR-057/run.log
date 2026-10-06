@@ -1,0 +1,98 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read capacity.csv
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA16/VideoGameSalesWithRatings1/capacity.csv"
+    try:
+        cap = pd.read_csv(capacity_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            cap = pd.read_csv(capacity_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                cap = pd.read_csv(capacity_path, encoding='gbk')
+            except UnicodeDecodeError:
+                cap = pd.read_csv(capacity_path, encoding='latin-1')
+    if not {'PlatformID', 'Capacity'}.issubset(cap.columns):
+        raise ValueError("capacity.csv must contain columns: PlatformID, Capacity")
+    platforms = cap['PlatformID'].astype(str).tolist()
+    c = cap.set_index('PlatformID')['Capacity'].to_dict()
+    # Ensure all capacities are present and numeric
+    for pid in platforms:
+        if pid not in c or pd.isnull(c[pid]):
+            raise ValueError(f"Missing capacity for platform {pid}")
+        try:
+            c[pid] = float(c[pid])
+        except Exception:
+            raise ValueError(f"Non-numeric capacity for platform {pid}: {c[pid]}")
+
+    # Read products.csv
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA16/VideoGameSalesWithRatings1/products.csv"
+    try:
+        prod = pd.read_csv(products_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            prod = pd.read_csv(products_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                prod = pd.read_csv(products_path, encoding='gbk')
+            except UnicodeDecodeError:
+                prod = pd.read_csv(products_path, encoding='latin-1')
+    if not {'ProductName', 'Value', 'Weight'}.issubset(prod.columns):
+        raise ValueError("products.csv must contain columns: ProductName, Value, Weight")
+    games = prod['ProductName'].astype(str).tolist()
+    v = prod.set_index('ProductName')['Value'].to_dict()
+    w = prod.set_index('ProductName')['Weight'].to_dict()
+    # Ensure all values and weights are present and numeric
+    for g in games:
+        if g not in v or pd.isnull(v[g]):
+            raise ValueError(f"Missing value for game {g}")
+        if g not in w or pd.isnull(w[g]):
+            raise ValueError(f"Missing weight for game {g}")
+        try:
+            v[g] = float(v[g])
+        except Exception:
+            raise ValueError(f"Non-numeric value for game {g}: {v[g]}")
+        try:
+            w[g] = float(w[g])
+        except Exception:
+            raise ValueError(f"Non-numeric weight for game {g}: {w[g]}")
+
+    # Build model
+    m = gp.Model('VideoGame_Platform_Allocation')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables: x[platform, game] >= 0, integer
+    keys = [(i, j) for i in platforms for j in games]
+    x = m.addVars(keys, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total value
+    m.setObjective(gp.quicksum(v[j] * x[i, j] for i in platforms for j in games), GRB.MAXIMIZE)
+
+    # Platform capacity constraints
+    m.addConstrs(
+        (gp.quicksum(w[j] * x[i, j] for j in games) <= c[i] for i in platforms),
+        name='platform_capacity'
+    )
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 140, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 65, in <module>
+  File "<string>", line 23, in solve_problem
+ValueError: Missing capacity for platform 1

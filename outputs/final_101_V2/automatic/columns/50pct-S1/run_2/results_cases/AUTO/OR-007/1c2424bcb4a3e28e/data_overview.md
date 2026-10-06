@@ -1,0 +1,27 @@
+archive_revision_number,ProductName,Value,record_keeper_group,Weight
+9,,765,,
+7,Sedan,2524,Team A,99
+3,SUV,4614,Team C,55
+9,Truck,8416,Team B,75
+8,Convertible,5917,Team C,94
+4,Minivan,9048,Team B,80
+6,Coupe,1140,Team B,82
+5,Hatchback,8962,Team C,71
+7,Station Wagon,1888,Team C,100
+8,Electric Car,8487,Team B,28
+1,Hybrid Car,4425,Team C,93
+8,Luxury Sedan,4717,Team C,84
+1,Sports Car,4210,Team A,83
+8,Crossover,1226,Team B,62
+7,Diesel Truck,7400,Team B,90
+6,Compact SUV,4639,Team B,99
+9,Luxury SUV,7712,Team B,96
+4,Cargo Van,3299,Team C,21
+8,Pickup Truck,9895,Team A,39
+7,Roadster,4496,Team A,99
+3,Muscle Car,4526,Team B,81
+5,Off-road Vehicle,5688,Team C,6
+1,Camper Van,3007,Team C,58
+4,Compact Car,3623,Team A,37
+8,Motorcycle,8474,Team C,15
+3,Electric SUV,8372,Team B,37

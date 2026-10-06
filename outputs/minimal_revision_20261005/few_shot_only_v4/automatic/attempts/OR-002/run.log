@@ -1,0 +1,236 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with fallback encodings
+    csvs = [
+        ("/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP2/customer_demand.csv", ["customer", "demand"]),
+        ("/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP2/supply_capacity.csv", ["Unnamed: 0", "supply_capacity"]),
+        ("/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP2/transportation_costs.csv", ["Unnamed: 0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12"])
+    ]
+    def read_csv_with_fallback(path, **kwargs):
+        for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+            try:
+                return pd.read_csv(path, encoding=enc, **kwargs)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with supported encodings.")
+    # Read customer demand
+    df_demand = read_csv_with_fallback(csvs[0][0])
+    if not set(csvs[0][1]).issubset(df_demand.columns):
+        raise ValueError(f"Missing columns in {csvs[0][0]}")
+    customers = df_demand['customer'].astype(str).tolist()
+    demand = df_demand.set_index('customer')['demand'].to_dict()
+    # Read supply capacity
+    df_supply = read_csv_with_fallback(csvs[1][0])
+    if not set(csvs[1][1]).issubset(df_supply.columns):
+        raise ValueError(f"Missing columns in {csvs[1][0]}")
+    stores = df_supply['Unnamed: 0'].astype(str).tolist()
+    supply_capacity = df_supply.set_index('Unnamed: 0')['supply_capacity'].to_dict()
+    # Read transportation costs
+    df_cost = read_csv_with_fallback(csvs[2][0])
+    if not set(csvs[2][1]).issubset(df_cost.columns):
+        raise ValueError(f"Missing columns in {csvs[2][0]}")
+    # Ensure store and customer order matches
+    cost = {}
+    for _, row in df_cost.iterrows():
+        store = str(row['Unnamed: 0'])
+        if store not in stores:
+            continue
+        cost[store] = {}
+        for cust in customers:
+            if cust not in df_cost.columns:
+                raise ValueError(f"Customer {cust} not found in cost columns")
+            cost[store][cust] = float(row[cust])
+    # Validate all required coefficients are present
+    for i in stores:
+        if i not in cost:
+            raise ValueError(f"Missing cost row for store {i}")
+        for j in customers:
+            if j not in cost[i]:
+                raise ValueError(f"Missing cost coefficient for ({i},{j})")
+    # Validate all demand and supply keys
+    for j in customers:
+        if j not in demand:
+            raise ValueError(f"Missing demand for customer {j}")
+    for i in stores:
+        if i not in supply_capacity:
+            raise ValueError(f"Missing supply capacity for store {i}")
+    # Build model
+    m = gp.Model('Walmart_TP')
+    m.Params.MIPGap = 1e-4
+    x = m.addVars(stores, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    m.setObjective(gp.quicksum(cost[i][j] * x[i, j] for i in stores for j in customers), GRB.MINIMIZE)
+    m.addConstrs((gp.quicksum(x[i, j] for i in stores) >= demand[j] for j in customers), name='demand')
+    m.addConstrs((gp.quicksum(x[i, j] for j in customers) <= supply_capacity[i] for i in stores), name='supply')
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 23 rows, 132 columns and 264 nonzeros
+Model fingerprint: 0x69dd5c92
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e-03, 3e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e+00, 1e+04]
+Presolve time: 0.00s
+Presolved: 23 rows, 132 columns, 264 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   1.084300e+04   0.000000e+00      0s
+      44    6.4644207e+06   0.000000e+00   0.000000e+00      0s
+
+Solved in 44 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  6.464420700e+06
+ObjVal: 6464420.6996351
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 4.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 575.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 1148.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 315.0
+C31: 41.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 178.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 228.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 35.0
+C68: 0.0
+C69: 0.0
+C70: 15.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 3.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 0.0
+C83: 0.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 5607.0
+C91: 0.0
+C92: 66.0
+C93: 0.0
+C94: 0.0
+C95: 475.0
+C96: 0.0
+C97: 0.0
+C98: 6.0
+C99: 0.0
+C100: 0.0
+C101: 0.0
+C102: 0.0
+C103: 0.0
+C104: 0.0
+C105: 0.0
+C106: 0.0
+C107: 0.0
+C108: 11.0
+C109: 0.0
+C110: 45.0
+C111: 833.0
+C112: 154.0
+C113: 551.0
+C114: 0.0
+C115: 0.0
+C116: 0.0
+C117: 174.0
+C118: 0.0
+C119: 205.0
+C120: 0.0
+C121: 0.0
+C122: 0.0
+C123: 0.0
+C124: 0.0
+C125: 0.0
+C126: 174.0
+C127: 0.0
+C128: 0.0
+C129: 0.0
+C130: 0.0
+C131: 0.0
+Optimal objective: 6464420.6996351
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 4.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 575.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 1148.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 315.0), ('C31', 41.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 178.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 228.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 35.0), ('C68', 0.0), ('C69', 0.0), ('C70', 15.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 3.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 5607.0), ('C91', 0.0), ('C92', 66.0), ('C93', 0.0), ('C94', 0.0), ('C95', 475.0), ('C96', 0.0), ('C97', 0.0), ('C98', 6.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 0.0), ('C108', 11.0), ('C109', 0.0), ('C110', 45.0), ('C111', 833.0), ('C112', 154.0), ('C113', 551.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 174.0), ('C118', 0.0), ('C119', 205.0), ('C120', 0.0), ('C121', 0.0), ('C122', 0.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 174.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0)]

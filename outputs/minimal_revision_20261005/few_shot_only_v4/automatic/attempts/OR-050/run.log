@@ -1,0 +1,99 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    def read_csv_with_encodings(path):
+        encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+        for enc in encodings:
+            try:
+                return pd.read_csv(path, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise ValueError(f"Could not decode {path} with tried encodings.")
+
+    # Source schema paths
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture1/RetailSalesAnalysis/capacity.csv"
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture1/RetailSalesAnalysis/products.csv"
+
+    # Read data
+    cap_df = read_csv_with_encodings(capacity_path)
+    prod_df = read_csv_with_encodings(products_path)
+
+    # Validate required columns
+    if not {'ShelfID', 'Capacity'}.issubset(cap_df.columns):
+        raise ValueError("capacity.csv missing required columns.")
+    if not {'ProductName', 'Value', 'Weight'}.issubset(prod_df.columns):
+        raise ValueError("products.csv missing required columns.")
+
+    # Build sets
+    S = cap_df['ShelfID'].astype(str).tolist()
+    P = prod_df['ProductName'].astype(str).tolist()
+
+    # Map parameters
+    c_s = cap_df.set_index('ShelfID')['Capacity'].to_dict()
+    v_p = prod_df.set_index('ProductName')['Value'].to_dict()
+    w_p = prod_df.set_index('ProductName')['Weight'].to_dict()
+
+    # Validate all keys present
+    for s in S:
+        if s not in c_s:
+            raise ValueError(f"Missing capacity for shelf {s}")
+    for p in P:
+        if p not in v_p or p not in w_p:
+            raise ValueError(f"Missing value or weight for product {p}")
+
+    # Identify first product (p*)
+    first_product_row = prod_df.iloc[0]
+    p_star = str(first_product_row['ProductName'])
+
+    # Build index set for variables
+    keys = [(s, p) for s in S for p in P]
+
+    # Model
+    m = gp.Model('Retail_Product_Shelf_Allocation')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables: x_{sp} >= 0, integer
+    x = m.addVars(keys, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total value
+    m.setObjective(
+        gp.quicksum(v_p[p] * x[s, p] for s, p in keys),
+        GRB.MAXIMIZE
+    )
+
+    # Shelf capacity constraints
+    for s in S:
+        m.addConstr(
+            gp.quicksum(w_p[p] * x[s, p] for p in P) <= c_s[s],
+            name=f'cap_{s}'
+        )
+
+    # Minimum allocation of first product
+    m.addConstr(
+        gp.quicksum(x[s, p_star] for s in S) >= 5,
+        name='min_first_product'
+    )
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 140, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 46, in <module>
+  File "<string>", line 30, in solve_problem
+ValueError: Missing capacity for shelf 1

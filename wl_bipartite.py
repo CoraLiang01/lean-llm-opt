@@ -20,6 +20,7 @@ def read_linear_model(path, env):
     variables, rows = model.getVars(), model.getConstrs()
     output = {"A": matrix, "types": np.asarray(model.getAttr("VType", variables)),
               "senses": np.asarray(model.getAttr("Sense", rows)),
+              "row_names": model.getAttr("ConstrName", rows),
               "n": matrix.shape[1], "m": matrix.shape[0], "nnz": matrix.nnz}
     model.dispose()
     return output

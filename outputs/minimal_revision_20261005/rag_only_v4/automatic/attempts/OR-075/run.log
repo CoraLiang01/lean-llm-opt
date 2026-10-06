@@ -1,0 +1,247 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to select a subset of 110 potential investment projects to maximize the total expected Net Present Value (NPV), subject to a total capital investment budget and several strategic project dependencies (mutual exclusivity, pre-requisite, and contingent selection).
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem (specifically, a binary project selection/knapsack problem with logical constraints).
+3.  **Define Index Sets:** The primary index is the set of all projects, indexed by `i` (where `i` ranges over all 110 projects in the CSV).
+4.  **Define Decision Variables:**
+    -   `x[i]` = 1 if project `i` is selected for investment, 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'NPV (k$)' column provides the expected net present value for each project.
+    -   Constraint coefficients: 'Capital (k$)' column provides the required capital investment for each project.
+    -   Constraint RHS (limits): The total capital investment limit is 1,000 k$ (from the query).
+    -   Project IDs and Names are used to identify specific projects for dependency constraints (e.g., Project 4, 7, 6, 1, 10, 5).
+6.  **Formulate Objective:** Maximize the sum of selected projects' NPVs, i.e., maximize sum over all projects of `NPV[i] * x[i]`.
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Budget Constraint): The total capital invested in selected projects cannot exceed 1,000 k$. Formally, sum over all projects of `Capital[i] * x[i] <= 1,000`.
+    -   Constraint 2 (Mutually Exclusive Constraint): At most one of Project 4 (R&D Initiative Alpha) or Project 7 (Global Expansion Pilot) can be selected. Formally, `x[4] + x[7] <= 1`.
+    -   Constraint 3 (Pre-requisite Constraint): Project 6 (System Automation) can only be selected if Project 1 (Infrastructure Upgrade) is also selected. Formally, `x[6] <= x[1]`.
+    -   Constraint 4 (Contingent Constraint): Project 10 (Customer Experience Platform) can only be selected if Project 5 (Staff Training Program) is also selected. Formally, `x[10] <= x[5]`.
+    -   Constraint 5 (Binary Selection): Each `x[i]` is binary (0 or 1) for all projects.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+# Read project data
+project_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture4/project.csv'
+df = pd.read_csv(project_path, sep=',')
+
+# Normalize and validate project index set
+if df['Project ID'].isnull().any():
+    raise ValueError("Missing Project ID in project.csv")
+project_ids = df['Project ID'].astype(int).tolist()
+if len(set(project_ids)) != 110:
+    raise ValueError("Expected 110 unique Project IDs, got %d" % len(set(project_ids)))
+
+# Map: Project ID -> NPV, Capital, Name
+npv = dict(zip(df['Project ID'].astype(int), df['NPV (k$)'].astype(int)))
+capital = dict(zip(df['Project ID'].astype(int), df['Capital (k$)'].astype(int)))
+proj_name = dict(zip(df['Project ID'].astype(int), df['Project Name'].astype(str)))
+
+# Validate all required projects for constraints exist
+required_ids = [1, 4, 5, 6, 7, 10]
+for pid in required_ids:
+    if pid not in project_ids:
+        raise ValueError(f"Required Project ID {pid} not found in project.csv")
+
+def solve_problem():
+    m = gp.Model("project_selection")
+
+    # Decision variables: x[i] = 1 if project i is selected, 0 otherwise
+    x = m.addVars(project_ids, vtype=GRB.BINARY, name='', lb=0, ub=1)
+
+    # Objective: maximize total expected NPV
+    m.setObjective(gp.quicksum(npv[i] * x[i] for i in project_ids), GRB.MAXIMIZE)
+
+    # Constraint 1: Budget constraint
+    m.addConstr(gp.quicksum(capital[i] * x[i] for i in project_ids) <= 1000, name='budget')
+
+    # Constraint 2: Mutually exclusive (Project 4 or 7)
+    m.addConstr(x[4] + x[7] <= 1, name='mutual_excl_4_7')
+
+    # Constraint 3: Pre-requisite (6 requires 1)
+    m.addConstr(x[6] <= x[1], name='prereq_6_1')
+
+    # Constraint 4: Contingent (10 requires 5)
+    m.addConstr(x[10] <= x[5], name='contingent_10_5')
+
+    # Set MIPGap
+    m.setParam('MIPGap', 1e-4)
+
+    m.optimize()
+
+    # Output as required
+    if m.Status == GRB.OPTIMAL:
+        print(f"ObjVal: {m.ObjVal}")
+        for i in project_ids:
+            print(f"x[{i}] {x[i].VarName} {x[i].X}")
+    else:
+        print(f"Solver status: {m.Status}")
+
+    return m
+
+m = solve_problem()
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 4 rows, 110 columns and 116 nonzeros
+Model fingerprint: 0xa55f6aab
+Variable types: 0 continuous, 110 integer (110 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+02]
+  Objective range  [1e+01, 2e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+03]
+Found heuristic solution: objective 1322.0000000
+Presolve time: 0.00s
+Presolved: 4 rows, 110 columns, 116 nonzeros
+Variable types: 0 continuous, 110 integer (110 binary)
+
+Root relaxation: objective 1.514516e+03, 1 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 1514.51579    0    1 1322.00000 1514.51579  14.6%     -    0s
+H    0     0                    1356.0000000 1514.51579  11.7%     -    0s
+H    0     0                    1506.0000000 1514.51579  0.57%     -    0s
+H    0     0                    1514.0000000 1514.51579  0.03%     -    0s
+     0     0 1514.51579    0    1 1514.00000 1514.51579  0.03%     -    0s
+
+Explored 1 nodes (1 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 4: 1514 1506 1356 1322 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.514000000000e+03, best bound 1.514000000000e+03, gap 0.0000%
+ObjVal: 1514.0
+x[1] C0 -0.0
+x[2] C1 -0.0
+x[3] C2 0.0
+x[4] C3 -0.0
+x[5] C4 -0.0
+x[6] C5 -0.0
+x[7] C6 -0.0
+x[8] C7 -0.0
+x[9] C8 -0.0
+x[10] C9 -0.0
+x[11] C10 -0.0
+x[12] C11 -0.0
+x[13] C12 -0.0
+x[14] C13 -0.0
+x[15] C14 -0.0
+x[16] C15 -0.0
+x[17] C16 1.0
+x[18] C17 1.0
+x[19] C18 -0.0
+x[20] C19 -0.0
+x[21] C20 -0.0
+x[22] C21 -0.0
+x[23] C22 -0.0
+x[24] C23 -0.0
+x[25] C24 -0.0
+x[26] C25 1.0
+x[27] C26 1.0
+x[28] C27 -0.0
+x[29] C28 -0.0
+x[30] C29 -0.0
+x[31] C30 -0.0
+x[32] C31 -0.0
+x[33] C32 -0.0
+x[34] C33 1.0
+x[35] C34 -0.0
+x[36] C35 0.0
+x[37] C36 -0.0
+x[38] C37 -0.0
+x[39] C38 -0.0
+x[40] C39 -0.0
+x[41] C40 -0.0
+x[42] C41 -0.0
+x[43] C42 -0.0
+x[44] C43 -0.0
+x[45] C44 1.0
+x[46] C45 -0.0
+x[47] C46 -0.0
+x[48] C47 -0.0
+x[49] C48 -0.0
+x[50] C49 -0.0
+x[51] C50 -0.0
+x[52] C51 0.0
+x[53] C52 -0.0
+x[54] C53 -0.0
+x[55] C54 -0.0
+x[56] C55 -0.0
+x[57] C56 -0.0
+x[58] C57 1.0
+x[59] C58 -0.0
+x[60] C59 -0.0
+x[61] C60 -0.0
+x[62] C61 -0.0
+x[63] C62 -0.0
+x[64] C63 -0.0
+x[65] C64 -0.0
+x[66] C65 0.0
+x[67] C66 1.0
+x[68] C67 -0.0
+x[69] C68 -0.0
+x[70] C69 -0.0
+x[71] C70 -0.0
+x[72] C71 -0.0
+x[73] C72 -0.0
+x[74] C73 -0.0
+x[75] C74 -0.0
+x[76] C75 -0.0
+x[77] C76 -0.0
+x[78] C77 1.0
+x[79] C78 1.0
+x[80] C79 -0.0
+x[81] C80 -0.0
+x[82] C81 -0.0
+x[83] C82 -0.0
+x[84] C83 -0.0
+x[85] C84 -0.0
+x[86] C85 -0.0
+x[87] C86 -0.0
+x[88] C87 -0.0
+x[89] C88 -0.0
+x[90] C89 1.0
+x[91] C90 1.0
+x[92] C91 -0.0
+x[93] C92 -0.0
+x[94] C93 -0.0
+x[95] C94 -0.0
+x[96] C95 0.0
+x[97] C96 -0.0
+x[98] C97 0.0
+x[99] C98 -0.0
+x[100] C99 -0.0
+x[101] C100 -0.0
+x[102] C101 -0.0
+x[103] C102 -0.0
+x[104] C103 -0.0
+x[105] C104 -0.0
+x[106] C105 -0.0
+x[107] C106 -0.0
+x[108] C107 -0.0
+x[109] C108 -0.0
+x[110] C109 -0.0
+Optimal objective: 1514.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', 0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', 1.0), ('C17', 1.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', 1.0), ('C26', 1.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', -0.0), ('C33', 1.0), ('C34', -0.0), ('C35', 0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', 1.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', 0.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', 1.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', -0.0), ('C65', 0.0), ('C66', 1.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', -0.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', 1.0), ('C78', 1.0), ('C79', -0.0), ('C80', -0.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', 1.0), ('C90', 1.0), ('C91', -0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', 0.0), ('C96', -0.0), ('C97', 0.0), ('C98', -0.0), ('C99', -0.0), ('C100', -0.0), ('C101', -0.0), ('C102', -0.0), ('C103', -0.0), ('C104', -0.0), ('C105', -0.0), ('C106', -0.0), ('C107', -0.0), ('C108', -0.0), ('C109', -0.0)]

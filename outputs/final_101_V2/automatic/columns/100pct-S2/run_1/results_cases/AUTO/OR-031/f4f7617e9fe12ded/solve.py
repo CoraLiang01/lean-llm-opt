@@ -1,0 +1,31 @@
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+energy_path = '/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete 20260928/100pct/S2/Large-scale-or/Mixture_testing/Mixture5/energy.csv'
+energy_df = pd.read_csv(energy_path, sep=',')
+valid_techs = {'coal', 'gas', 'renewables'}
+energy_df = energy_df[energy_df['tech'].astype(str).str.casefold().isin(valid_techs)]
+option_ids = energy_df['option'].astype(str).tolist()
+if not set(['option', 'gen_per_lot', 'cost_per_lot']).issubset(energy_df.columns):
+    raise KeyError('Missing required columns in energy.csv')
+gen_per_lot = energy_df.set_index('option')['gen_per_lot'].astype(float).to_dict()
+cost_per_lot = energy_df.set_index('option')['cost_per_lot'].astype(float).to_dict()
+for oid in option_ids:
+    if oid not in gen_per_lot or oid not in cost_per_lot:
+        raise ValueError(f'Missing coefficients for option {oid}')
+m = gp.Model('ElectricityLotProcurement')
+x = m.addVars(option_ids, vtype=gp.GRB.INTEGER, lb=0, name='')
+m.setObjective(gp.quicksum((cost_per_lot[oid] * x[oid] for oid in option_ids)), gp.GRB.MINIMIZE)
+m.addConstr(gp.quicksum((gen_per_lot[oid] * x[oid] for oid in option_ids)) >= 200, name='demand')
+m.optimize()
+if m.status == gp.GRB.OPTIMAL:
+    print(f'Optimal total procurement cost: {m.objVal:.2f}')
+    print('Lot purchase plan:')
+    for oid in option_ids:
+        val = x[oid].X
+        if val >= 1e-06:
+            print(f"  Option {oid}: {int(round(val))} lots (tech: {energy_df.loc[energy_df['option'] == oid, 'tech'].values[0]}, gen_per_lot: {gen_per_lot[oid]}, cost_per_lot: {cost_per_lot[oid]:.2f})")
+    total_gen = sum((gen_per_lot[oid] * x[oid].X for oid in option_ids))
+    print(f'Total generation purchased: {total_gen:.2f} (demand required: 200)')
+else:
+    print(f'No optimal solution found. Status: {m.status}')

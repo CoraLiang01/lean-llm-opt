@@ -1,0 +1,16 @@
+products.csv
+previous_period_stock_status,item_name,previous_period_unit_value,item_value,previous_period_resource_requirement,resource_requirement
+Stockout,Baguette,1044,888,5,4
+Overstock,Croissant,142,134,3,2
+Balanced,Sourdough,141,129,5,4
+Overstock,Rye Bread,311,370,4,3
+Stockout,Brioche,753,921,3,2
+Overstock,Focaccia,770,765,2,1
+Overstock,Ciabatta,129,154,3,2
+Balanced,Pita,914,837,2,1
+Stockout,Bagel,668,584,2,3
+Stockout,English Muffin,314,365,4,3
+
+capacity.csv
+previous_period_capacity,resource_capacity
+205,180

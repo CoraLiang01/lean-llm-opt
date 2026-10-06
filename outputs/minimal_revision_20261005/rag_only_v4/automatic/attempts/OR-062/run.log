@@ -1,0 +1,171 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Data extraction from CSVQA_DATA
+    data = CSVQA_DATA
+
+    # Suppliers (F): from file_1_view_0["Unnamed: 0"] and file_2_view_0["Unnamed: 0"]
+    suppliers = []
+    supplier_fixed_cost = {}
+    for rec in data["tables"]:
+        if rec["table_id"] == "file_1_view_0":
+            for r in rec["records"]:
+                s = r["values"]["Unnamed: 0"]
+                suppliers.append(s)
+                supplier_fixed_cost[s] = float(r["values"]["fixed_costs"])
+            break
+
+    # Stores (S): from file_2_view_0 columns (excluding "Unnamed: 0")
+    stores = []
+    for rec in data["tables"]:
+        if rec["table_id"] == "file_2_view_0":
+            stores = [c for c in rec["columns"] if c != "Unnamed: 0"]
+            break
+
+    # Demand at each store: file_0_view_0, mapping Customer_1... to store names
+    # Map: Customer_1 -> CLARINDA, Customer_2 -> FORT MADISON, etc.
+    customer_to_store = dict(zip(
+        [f"Customer_{i+1}" for i in range(len(stores))],
+        stores
+    ))
+    store_demand = {}
+    for rec in data["tables"]:
+        if rec["table_id"] == "file_0_view_0":
+            for r in rec["records"]:
+                cust = r["values"]["Customer"]
+                store = customer_to_store[cust]
+                store_demand[store] = float(r["values"]["demand"])
+            break
+
+    # Transportation cost c_{ij}: file_2_view_0, row i (supplier), column j (store)
+    transportation_cost = {}
+    for rec in data["tables"]:
+        if rec["table_id"] == "file_2_view_0":
+            for r in rec["records"]:
+                supplier = r["values"]["Unnamed: 0"]
+                for store in stores:
+                    transportation_cost[(supplier, store)] = float(r["values"][store])
+            break
+
+    # Validate coefficient dimensions and identifier coverage
+    for s in suppliers:
+        if s not in supplier_fixed_cost:
+            raise ValueError(f"Missing fixed cost for supplier {s}")
+    for store in stores:
+        if store not in store_demand:
+            raise ValueError(f"Missing demand for store {store}")
+    for s in suppliers:
+        for store in stores:
+            if (s, store) not in transportation_cost:
+                raise ValueError(f"Missing transportation cost for ({s}, {store})")
+
+    # Model
+    m = gp.Model("facility_location")
+
+    # Decision variables
+    y = m.addVars(suppliers, vtype=GRB.BINARY, name='y')
+    x = m.addVars(suppliers, stores, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(supplier_fixed_cost[i] * y[i] for i in suppliers) +
+        gp.quicksum(transportation_cost[(i, j)] * x[i, j] for i in suppliers for j in stores),
+        GRB.MINIMIZE
+    )
+
+    # Constraints
+
+    # 1. Demand satisfaction at each store
+    for j in stores:
+        m.addConstr(gp.quicksum(x[i, j] for i in suppliers) == store_demand[j], name='demand_' + j)
+
+    # 2. Supply only from open suppliers
+    for i in suppliers:
+        for j in stores:
+            m.addConstr(x[i, j] <= store_demand[j] * y[i], name='link_%s_%s' % (i, j))
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for v in m.getVars():
+            print(v.VarName, v.X)
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 30 rows, 30 columns and 75 nonzeros
+Model fingerprint: 0xa3ebcee2
+Variable types: 25 continuous, 5 integer (5 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 3e+03]
+  Objective range  [1e+00, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [2e+03, 3e+03]
+Presolve time: 0.00s
+Presolved: 30 rows, 30 columns, 75 nonzeros
+Variable types: 25 continuous, 5 integer (5 binary)
+Found heuristic solution: objective 172804.00000
+
+Root relaxation: objective 1.726125e+05, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    172612.46000 172612.460  0.00%     -    0s
+
+Explored 1 nodes (3 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 172612 172804 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.726124600000e+05, best bound 1.726124600000e+05, gap 0.0000%
+172612.46
+C0 -0.0
+C1 1.0
+C2 1.0
+C3 1.0
+C4 -0.0
+C5 0.0
+C6 0.0
+C7 0.0
+C8 0.0
+C9 0.0
+C10 0.0
+C11 1889.0
+C12 2518.0
+C13 3218.0
+C14 0.0
+C15 2397.0
+C16 0.0
+C17 0.0
+C18 0.0
+C19 0.0
+C20 0.0
+C21 0.0
+C22 0.0
+C23 0.0
+C24 1813.0
+C25 0.0
+C26 0.0
+C27 0.0
+C28 0.0
+C29 0.0
+Optimal objective: 172612.46
+Optimal solution: [('C0', -0.0), ('C1', 1.0), ('C2', 1.0), ('C3', 1.0), ('C4', -0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 1889.0), ('C12', 2518.0), ('C13', 3218.0), ('C14', 0.0), ('C15', 2397.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 1813.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0)]

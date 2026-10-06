@@ -1,0 +1,156 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with fallback encodings
+    csvs = [
+        ("/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv", ["Customers", "demand"]),
+        ("/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv", ["Suppliers", "supply_capacity"]),
+        ("/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv", None)
+    ]
+    def read_csv(path, **kwargs):
+        for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+            try:
+                return pd.read_csv(path, encoding=enc, **kwargs)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with supported encodings.")
+
+    # Customers and demands
+    df_demand = read_csv(csvs[0][0])
+    if not set(['Customers', 'demand']).issubset(df_demand.columns):
+        raise ValueError("customer_demand.csv missing required columns.")
+    customers = df_demand['Customers'].tolist()
+    demand = dict(zip(df_demand['Customers'], df_demand['demand']))
+
+    # Suppliers and supply capacities
+    df_supply = read_csv(csvs[1][0])
+    if not set(['Suppliers', 'supply_capacity']).issubset(df_supply.columns):
+        raise ValueError("supply_capacity.csv missing required columns.")
+    suppliers = df_supply['Suppliers'].tolist()
+    supply_capacity = dict(zip(df_supply['Suppliers'], df_supply['supply_capacity']))
+
+    # Transportation costs
+    df_cost = read_csv(csvs[2][0])
+    # The first column is supplier names, rest are customer columns
+    if df_cost.columns[0].casefold() not in {'suppliers', 'supplier', 'unnamed: 0'}:
+        raise ValueError("First column of transportation_costs.csv must be supplier names.")
+    cost_suppliers = df_cost.iloc[:,0].tolist()
+    cost_customers = df_cost.columns[1:].tolist()
+    # Validate axes
+    if [s.casefold() for s in cost_suppliers] != [s.casefold() for s in suppliers]:
+        raise ValueError("Supplier order mismatch between supply_capacity.csv and transportation_costs.csv.")
+    if [c.casefold() for c in cost_customers] != [c.casefold() for c in customers]:
+        raise ValueError("Customer order mismatch between customer_demand.csv and transportation_costs.csv.")
+    # Build cost dict
+    cost = {}
+    for i, s in enumerate(suppliers):
+        row = df_cost.iloc[i,1:].tolist()
+        if len(row) != len(customers):
+            raise ValueError(f"Row {i} in transportation_costs.csv does not match number of customers.")
+        cost[s] = dict(zip(customers, row))
+
+    # Validate all coefficients present
+    for s in suppliers:
+        if s not in supply_capacity:
+            raise ValueError(f"Supplier {s} missing in supply_capacity.")
+        if s not in cost:
+            raise ValueError(f"Supplier {s} missing in cost matrix.")
+        for c in customers:
+            if c not in cost[s]:
+                raise ValueError(f"Customer {c} missing in cost matrix for supplier {s}.")
+    for c in customers:
+        if c not in demand:
+            raise ValueError(f"Customer {c} missing in demand.")
+
+    # Model
+    m = gp.Model('FreshMart_TP')
+    m.Params.MIPGap = 1e-4
+
+    x = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    m.setObjective(
+        gp.quicksum(cost[i][j] * x[i, j] for i in suppliers for j in customers),
+        GRB.MINIMIZE
+    )
+
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in suppliers) >= demand[j] for j in customers),
+        name='demand'
+    )
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in customers) <= supply_capacity[i] for i in suppliers),
+        name='supply'
+    )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 11 rows, 30 columns and 60 nonzeros
+Model fingerprint: 0x311c9173
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 4e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [6e+01, 2e+02]
+Presolve time: 0.00s
+Presolved: 11 rows, 30 columns, 60 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   4.800000e+02   0.000000e+00      0s
+       6    6.6000000e+02   0.000000e+00   0.000000e+00      0s
+
+Solved in 6 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  6.600000000e+02
+ObjVal: 660.0
+C0: 0.0
+C1: 0.0
+C2: 60.0
+C3: 0.0
+C4: 0.0
+C5: 95.0
+C6: 70.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 80.0
+C14: 0.0
+C15: 0.0
+C16: 85.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 90.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+Optimal objective: 660.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 60.0), ('C3', 0.0), ('C4', 0.0), ('C5', 95.0), ('C6', 70.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 80.0), ('C14', 0.0), ('C15', 0.0), ('C16', 85.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 90.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0)]

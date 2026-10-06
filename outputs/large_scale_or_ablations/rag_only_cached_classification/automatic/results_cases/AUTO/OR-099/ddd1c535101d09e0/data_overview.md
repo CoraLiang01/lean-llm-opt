@@ -1,0 +1,20 @@
+Here is all the data from TransportationCost.csv, preserving the original facility (warehouse) and customer (store) IDs, matrix orientation, and source-row positions:
+
+| Source Row | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 | W9 | W10 | W11 |
+|------------|----|----|----|----|----|----|----|----|----|-----|-----|
+| W1         | 12 | 11 | 14 | 15 | 17 | 13 | 12 | 16 | 16 | 14  | 15  |
+| W2         | 17 | 19 | 15 | 20 | 18 | 14 | 17 | 15 | 13 | 15  | 16  |
+| W3         | 13 | 14 | 12 | 14 | 16 | 15 | 11 | 14 | 16 | 18  | 17  |
+| W4         | 18 | 16 | 17 | 13 | 18 | 17 | 14 | 19 | 16 | 13  | 18  |
+| W5         | 10 | 13 | 12 | 19 | 15 | 11 | 12 | 14 | 12 | 15  | 17  |
+| W6         | 15 | 12 | 14 | 16 | 13 | 17 | 16 | 16 | 14 | 18  | 19  |
+| W7         | 14 | 13 | 15 | 17 | 12 | 13 | 14 | 15 | 12 | 16  | 14  |
+| W8         | 19 | 16 | 18 | 20 | 17 | 19 | 16 | 18 | 15 | 15  | 18  |
+| W9         | 17 | 18 | 12 | 14 | 16 | 15 | 14 | 17 | 21 | 15  | 18  |
+| W10        | 14 | 13 | 15 | 17 | 16 | 18 | 14 | 19 | 15 | 17  | 19  |
+| W11        | 15 | 13 | 16 | 17 | 11 | 13 | 14 | 15 | 19 | 21  | 13  |
+
+- Each row corresponds to a warehouse (W1 to W11).
+- Each column corresponds to a store (W1 to W11).
+- The value at (Wi, Wj) is the transportation cost from warehouse i to store j.
+- The matrix is not transposed or altered; all IDs and positions are preserved as in the source.

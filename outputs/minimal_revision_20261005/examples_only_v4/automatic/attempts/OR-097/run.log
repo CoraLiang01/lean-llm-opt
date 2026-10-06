@@ -1,0 +1,655 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mQuestion: A fund manager holds a portfolio of 6 assets and is considering using 120 European option types for hedging. Each option’s per-contract cost, delta, gamma, vega, and trading limits are given in OptionCharacteristics.csv. The underlying asset(s) each option refers to are given in Option_AssetReferenceMatrix.csv, with A[i,j]=1 if option i references asset j and 0 otherwise. (Note: some options may reference more than one asset.)
+
+    Variables:
+    Let x_i be the integer number of contracts (positive for buy/long, negative for sell/short) for option i,\ i=1,\dots,120.
+
+    Objective:
+    Minimize total hedging cost:
+    \min \sum_{i=1}^{120} \text{Cost}[i] \cdot |x_i|
+
+    Subject to:
+
+    For each Greek G \in \{\Delta,\Gamma,\text{Vega}\}, the net portfolio exposure after hedging must satisfy:
+    \bigg| G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G[i] \cdot A[i,j] \cdot x_i \bigg| \leq \text{Tolerance}_G
+
+    Where:
+    • G_{\text{initial}} is the initial exposure for that Greek (given).
+    • G[i] is the per-contract Greek exposure of option i (from OptionCharacteristics.csv).
+    • A[i,j] is from Option_AssetReferenceMatrix.csv.
+    • \text{Tolerance}_G is the band for each risk metric (given).
+
+    Trading limits:
+    \text{MaxShort}[i] \leq x_i \leq \text{MaxLong}[i], \quad i=1,\dots,120
+
+    Data provided:
+    • OptionCharacteristics.csv: Option, Cost, Delta, Gamma, Vega, MaxLong, MaxShort
+    • Option_AssetReferenceMatrix.csv: binary matrix (120 × 6) showing which option references which asset (A[i,j])
+    • Initial net Delta = 0.25, Gamma = 0.08, Vega = 0.17
+    • Risk band tolerances: |\Delta| \le 0.06,\ |\Gamma| \le 0.05,\ |\text{Vega}| \le 0.07
+
+    Task:
+    Find the optimal integer positions x_i,\ i=1,\dots,120 that minimize total hedging cost, such that all risk exposures after hedging are within their respective bands, while respecting per-option trading limits and using the asset-reference information in the constraints.
+
+Thought: I need to identify the mathematical structure: the objective is to minimize total hedging cost (sum over absolute values of integer positions times per-contract cost). Decision variables are integer positions in each option (can be positive or negative, i.e., buy or sell). The main constraints are that, for each Greek (Delta, Gamma, Vega), the net exposure after hedging (initial plus sum over all options and assets, weighted by the asset-reference matrix and per-contract Greek) must be within a given tolerance band. There are also per-option trading limits (upper and lower bounds on x_i). The asset-reference matrix means that each option can affect multiple assets, and each Greek constraint is a sum over all options and all assets they reference.
+
+This is not a standard resource allocation, transportation, assignment, or facility location problem. The constraints involve risk exposures (Greeks) and are not simple additive resource or flow constraints. The asset-reference matrix introduces a coupling between options and assets, and the Greeks are coupled across options and assets. The use of absolute values in the objective and integer variables adds further complexity.
+
+I should call FileQA to retrieve structurally similar labeled optimization problems.
+
+Action: FileQA
+
+Action Input: integer option-position selection to minimize total hedging cost, subject to risk-exposure (Greek) constraints for Delta, Gamma, Vega, each as absolute-value band constraints on net exposure after hedging, with per-option trading limits, and an asset-reference matrix coupling options to multiple assets
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A supermarket needs to allocate various products, including high-demand items like the Sony Alpha Refrigerator, Sony Bravia XR, and Sony PlayStation 5, across different retail shelves. The product values and space requirements are provided in the "Products.csv" dataset. Additionally, the store has multiple shelves, each with a total space limit and specific space constraints for Sony and Apple products, as outlined in the "Capacity.csv" file. The goal is to determine the optimal number of units of each Sony product to place on each shelf to maximize total value while ensuring that the space used by Sony products on each shelf does not exceed the brand-specific limits. The decision variables x_ij represent the number of units of product i to be placed on shelf j. The variables x_ij must be nonnegative integers because the products are counted in whole units.
+Type: RA
+
+[Retrieved example 2]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP
+
+[Retrieved example 3]
+prompt: The data of the store offers several styles of Nike shoes is provided in "nike_Shoes_Sales.csv". Through the dataset, the revenue of each shoes is listed in the column "Revenue". Each style has its own demand limit. The store’s objective is to maximize the total revenue based on the fixed initial inventories of the Nike x Olivia Kim brand, which are detailed in column “Initial Inventory.” During the sales horizon, no replenishment is allowed, and there are no in-transit inventories. For this deterministic reference instance, the column “Demand” specifies the known total demand for each style over the entire sales horizon. The instance is eligible for trading when the sum of “Demand” over the four Nike x Olivia Kim styles is at least 100. Sales decisions are made for eligible instances. The decision variables x_i represent the number of customer requests the store intends to fulfill for Nike shoe style i, with each x_i being a positive integer.
+In addition, the four styles share a dispatch capacity of 100 units over the sales horizon: their total fulfilled quantity cannot exceed 100. This capacity is an explicit synthetic scenario assumption, not a measured field in the source CSV.
+Type: NRM
+
+[Retrieved example 4]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others
+
+[Retrieved example 5]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP[0m
+Thought:[32;1m[1;3mThought: The objective is to minimize total hedging cost by choosing integer positions in options, subject to risk-exposure constraints (Delta, Gamma, Vega) that are coupled through an asset-reference matrix, and per-option trading limits. The constraints are not simple additive resource or flow constraints; instead, they involve absolute-value band constraints on net exposures, with each option potentially affecting multiple assets and Greeks. This is not a clean instance of RA, TP, FLP, AP, or NRM. The asset-reference matrix and the multi-Greek band constraints introduce a non-standard coupling between decision variables and constraints, and the risk-control structure is not a textbook archetype. The retrieved examples do not match this structure, and the formulation contains interacting constraint families (risk bands, asset-option coupling, integer/bounded positions). This is a hybrid, non-standard optimization model with materially interacting mechanisms.
+
+Final Answer: Mixture[0m
+
+[1m> Finished chain.[0m
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+**Objective Function:**
+$$
+\min Z = 200\,x_{1} + 250\,x_{2} + 380\,x_{3} + 350\,x_{4} + 50\,y_{3} + 50\,y_{4}
+$$
+
+**Constraints:**
+
+Flour demand constraint:
+$$
+30\,x_{1} + 20\,x_{2} + 40\,x_{3} + 10\,x_{4} = 100
+$$
+
+Rice demand constraint:
+$$
+20\,x_{1} + 30\,x_{2} + 10\,x_{3} + 40\,x_{4} = 80
+$$
+
+Supplier usage constraints for new suppliers:
+$$
+x_{3} \leq M\,y_{3}
+$$
+$$
+x_{4} \leq M\,y_{4}
+$$
+
+Existing-supplier order bounds (zero orders are allowed):
+$$
+x_{1} \geq 0
+$$
+$$
+x_{2} \geq 0
+$$
+
+Non-negativity for new suppliers:
+$$
+x_{3} \geq 0
+$$
+$$
+x_{4} \geq 0
+$$
+
+Binary variables for new supplier selection:
+$$
+y_{3} \in \{0,1\}
+$$
+$$
+y_{4} \in \{0,1\}
+$$
+
+Where $M$ is a sufficiently large constant (e.g., $M = 100$).
+
+**Decision Variables:**
+$$
+x_{i} \geq 0, \quad i = 1,2,3,4
+$$
+$$
+y_{j} \in \{0,1\}, \quad j = 3,4
+$$
+
+**Retrieved Information**
+
+- Supplier 1: Existing Supplier, Flour per batch = 30, Rice per batch = 20, Price per batch = 200, No new-supplier activation fee
+- Supplier 2: Existing Supplier, Flour per batch = 20, Rice per batch = 30, Price per batch = 250, No new-supplier activation fee
+- Supplier 3: New Supplier, Flour per batch = 40, Rice per batch = 10, Price per batch = 380, Administrative fee = 50
+- Supplier 4: New Supplier, Flour per batch = 10, Rice per batch = 40, Price per batch = 350, Administrative fee = 50
+
+- Demand: Flour = 100 kg, Rice = 80 kg
+
+- $x_{i}$: Continuous batch equivalents ordered from supplier $i$ ($i=1,2,3,4$)
+- $y_{j}$: Binary variable indicating if new supplier $j$ ($j=3,4$) is selected (1 if selected, 0 otherwise)
+
+Secondary objective, with strictly lower lexicographic priority than total cost: minimize y_3 + y_4. Existing suppliers are available with nonnegative continuous orders, including zero. Fractional batches are allowed for all suppliers. Supplier type and If new supplier consistently identify 1/2 as existing and 3/4 as new. The New supplier administrative fee field applies only where If new supplier is Yes; the stored values for suppliers 1/2 are inactive in this model.
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A factory needs to rent a warehouse to store materials for the next 4 months. The required warehouse area for each month is listed in 39-1.csv.The longer the rental contract period, the greater the discount on warehouse rental fees. The specific data is listed in 39-2.csv.
+
+The warehouse rental contract can be processed at the beginning of each month, and each contract specifies the rental area and period. Therefore, the factory can rent a contract on any month, and each time, they can sign one contract or multiple contracts with different rental areas and rental periods. The overall goal is to minimize the rental fees paid. Try to establish a linear programming mathematical model based on the above requirements.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+28\, (x_{1,1} + x_{2,1} + x_{3,1} + x_{4,1})
++ 45\, (x_{1,2} + x_{2,2} + x_{3,2})
++ 60\, (x_{1,3} + x_{2,3})
++ 73\, x_{1,4}
+$$
+
+**subject to**
+
+$$
+x_{1,1} + x_{1,2} + x_{1,3} + x_{1,4} \geq 1500 
+\quad (\text{month 1})
+$$
+
+$$
+x_{1,2} + x_{1,3} + x_{1,4} + x_{2,1} + x_{2,2} + x_{2,3} \geq 1000 
+\quad (\text{month 2})
+$$
+
+$$
+x_{1,3} + x_{1,4} + x_{2,2} + x_{2,3} + x_{3,1} + x_{3,2} \geq 2000 
+\quad (\text{month 3})
+$$
+
+$$
+x_{1,4} + x_{2,3} + x_{3,2} + x_{4,1} \geq 1200 
+\quad (\text{month 4})
+$$
+
+**where**
+
+$$
+x_{s,p} \geq 0 
+\quad \text{for } s \in \{1,2,3,4\},\ p \in \{1,2,3,4\}
+\quad \text{only if } s+p-1 \leq 4
+$$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal integer number of contracts to buy or sell for each of 120 European options, in order to minimize total hedging cost, while ensuring that the post-hedge portfolio exposures to Delta, Gamma, and Vega (across 6 assets) are within specified risk tolerances, and that all per-option trading limits are respected. The model must use the per-option cost and Greeks, as well as the mapping of which options reference which assets.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with absolute value terms in the objective (due to |x_i|), and linear constraints.
+3.  **Define Index Sets:** The primary indices are:
+    - Options: \( i = 1, \dots, 120 \) (from OptionCharacteristics.csv)
+    - Assets: \( j = 1, \dots, 6 \) (from Option_AssetReferenceMatrix.csv)
+    - Greeks: \( G \in \{\Delta, \Gamma, \text{Vega}\} \)
+4.  **Define Decision Variables:**
+    -   `x[i]` = Integer number of contracts for option \( i \) (positive for buy/long, negative for sell/short). Type: GRB.INTEGER.
+    -   `z[i]` = Auxiliary variable representing the absolute value of \( x[i] \) (i.e., \( z[i] = |x[i]| \)). Type: GRB.INTEGER (or GRB.CONTINUOUS if fractional contracts were allowed, but here integer).
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'Cost' column from OptionCharacteristics.csv (per-contract cost for each option).
+    -   Constraint coefficients:
+        - 'Delta', 'Gamma', 'Vega' columns from OptionCharacteristics.csv (per-contract Greek exposures).
+        - Asset mapping: Option_AssetReferenceMatrix.csv, columns 'Asset_1' to 'Asset_6' (A[i,j], binary, 1 if option i references asset j).
+    -   Constraint RHS (limits):
+        - Initial net Greeks: Delta = 0.25, Gamma = 0.08, Vega = 0.17 (provided in query).
+        - Risk band tolerances: |\Delta| ≤ 0.06, |\Gamma| ≤ 0.05, |\text{Vega}| ≤ 0.07 (provided in query).
+        - Trading limits: 'MaxLong' and 'MaxShort' columns from OptionCharacteristics.csv (per option).
+6.  **Formulate Objective:** Minimize total hedging cost, i.e., minimize the sum over all options of (per-contract cost × absolute number of contracts traded):  
+    \[
+    \text{Minimize} \quad \sum_{i=1}^{120} \text{Cost}[i] \cdot z[i]
+    \]
+    where \( z[i] = |x[i]| \).
+7.  **Formulate Constraints:**
+    -   **Absolute value linking:** For each option \( i \):
+        - \( z[i] \geq x[i] \)
+        - \( z[i] \geq -x[i] \)
+        - (Ensures \( z[i] = |x[i]| \))
+    -   **Trading limits:** For each option \( i \):
+        - \( \text{MaxShort}[i] \leq x[i] \leq \text{MaxLong}[i] \)
+    -   **Greek risk constraints:** For each Greek \( G \in \{\Delta, \Gamma, \text{Vega}\} \):
+        - Compute the total post-hedge exposure as:
+            \[
+            G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G[i] \cdot A[i,j] \cdot x[i]
+            \]
+        - Impose the risk band:
+            \[
+            \left| G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G[i] \cdot A[i,j] \cdot x[i] \right| \leq \text{Tolerance}_G
+            \]
+        - This is implemented as two linear inequalities for each Greek:
+            - \( G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G[i] \cdot A[i,j] \cdot x[i] \leq \text{Tolerance}_G \)
+            - \( G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G[i] \cdot A[i,j] \cdot x[i] \geq -\text{Tolerance}_G \)
+    -   **Variable types:** All \( x[i] \) are integer variables; all \( z[i] \) are integer and non-negative.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+
+# File paths
+opt_char_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture16/OptionCharacteristics.csv'
+asset_ref_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture16/Option_AssetReferenceMatrix.csv'
+
+# Read OptionCharacteristics.csv
+opt_df = pd.read_csv(opt_char_path, sep=',')
+# Read Option_AssetReferenceMatrix.csv
+asset_ref_df = pd.read_csv(asset_ref_path, sep=',')
+
+# --- Index sets ---
+# Options: use Option column as business key (string, e.g., 'Opt_1')
+options = list(opt_df['Option'])
+n_options = len(options)
+# Assets: columns 'Asset_1'...'Asset_6'
+asset_cols = [col for col in asset_ref_df.columns if col.startswith('Asset_')]
+assets = asset_cols  # e.g., ['Asset_1', ..., 'Asset_6']
+n_assets = len(assets)
+
+# --- Data validation ---
+# Ensure all Option keys in asset_ref_df match those in opt_df
+asset_ref_options = asset_ref_df['Unnamed: 0'].astype(str).str.strip()
+opt_df_options = pd.Series(options).astype(str).str.strip()
+if not set(asset_ref_options) == set(opt_df_options):
+    raise ValueError("Mismatch between Option identifiers in OptionCharacteristics.csv and Option_AssetReferenceMatrix.csv.")
+
+# Map Option to row index for fast lookup
+option_to_idx = {opt: i for i, opt in enumerate(options)}
+asset_ref_df = asset_ref_df.set_index('Unnamed: 0')
+asset_ref_df.index = asset_ref_df.index.astype(str).str.strip()
+opt_df = opt_df.set_index('Option')
+opt_df.index = opt_df.index.astype(str).str.strip()
+
+# --- Parameters ---
+# Cost, Greeks, Trading limits
+cost = opt_df['Cost'].to_dict()
+delta = opt_df['Delta'].to_dict()
+gamma = opt_df['Gamma'].to_dict()
+vega  = opt_df['Vega'].to_dict()
+maxlong = opt_df['MaxLong'].to_dict()
+maxshort = opt_df['MaxShort'].to_dict()
+
+# Asset reference matrix: A[option, asset] = 0/1
+A = {}
+for opt in options:
+    for asset in assets:
+        A[(opt, asset)] = int(asset_ref_df.loc[opt, asset])
+
+# Greeks and tolerances
+greeks = ['Delta', 'Gamma', 'Vega']
+greek_param = {
+    'Delta': {'col': delta, 'init': 0.25, 'tol': 0.06},
+    'Gamma': {'col': gamma, 'init': 0.08, 'tol': 0.05},
+    'Vega':  {'col': vega,  'init': 0.17, 'tol': 0.07},
+}
+
+# --- Model ---
+m = gp.Model('OptionHedging')
+m.Params.MIPGap = 1e-4
+
+# --- Variables ---
+# x[opt]: integer, can be negative (short), bounded by MaxShort/MaxLong
+x = m.addVars(options, vtype=gp.GRB.INTEGER, lb={opt: maxshort[opt] for opt in options},
+              ub={opt: maxlong[opt] for opt in options}, name='x')
+# z[opt]: integer, >= |x[opt]|
+z = m.addVars(options, vtype=gp.GRB.INTEGER, lb=0, name='z')
+
+# --- Absolute value linking constraints ---
+for opt in options:
+    m.addConstr(z[opt] >= x[opt], name=f'abs1_{opt}')
+    m.addConstr(z[opt] >= -x[opt], name=f'abs2_{opt}')
+
+# --- Greek risk constraints ---
+for greek in greeks:
+    g_col = greek_param[greek]['col']
+    g_init = greek_param[greek]['init']
+    g_tol = greek_param[greek]['tol']
+    # Compute: g_init + sum_{i=options} sum_{j=assets} G[i] * A[i,j] * x[i]
+    expr = g_init + gp.quicksum(
+        g_col[opt] * A[(opt, asset)] * x[opt]
+        for opt in options for asset in assets
+    )
+    m.addConstr(expr <= g_tol, name=f'{greek}_upper')
+    m.addConstr(expr >= -g_tol, name=f'{greek}_lower')
+
+# --- Objective ---
+m.setObjective(gp.quicksum(cost[opt] * z[opt] for opt in options), gp.GRB.MINIMIZE)
+
+# --- Optimize ---
+m.optimize()
+
+# --- Output ---
+if m.status == gp.GRB.OPTIMAL:
+    print(f'ObjVal: {m.objVal}')
+    for opt in options:
+        print(f'{x[opt].VarName} {x[opt].X}')
+        print(f'{z[opt].VarName} {z[opt].X}')
+else:
+    print(f'Solver status: {m.status}')
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 246 rows, 240 columns and 1196 nonzeros
+Model fingerprint: 0x7d49bb53
+Variable types: 0 continuous, 240 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e-02, 1e+00]
+  Objective range  [3e+00, 1e+01]
+  Bounds range     [5e+00, 1e+01]
+  RHS range        [3e-02, 3e-01]
+Found heuristic solution: objective 9245.0000000
+Presolve added 2 rows and 2 columns
+Presolve time: 0.00s
+Presolved: 248 rows, 242 columns, 1084 nonzeros
+Variable types: 0 continuous, 242 integer (0 binary)
+
+Root relaxation: objective 8.359328e-01, 170 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0    0.83593    0    6 9245.00000    0.83593   100%     -    0s
+H    0     0                      67.0000000    0.83593  98.8%     -    0s
+H    0     0                      57.0000000    0.83593  98.5%     -    0s
+H    0     0                      17.0000000    0.83593  95.1%     -    0s
+H    0     0                      16.0000000    0.83593  94.8%     -    0s
+H    0     0                      12.0000000    0.83593  93.0%     -    0s
+H    0     0                      10.0000000    0.83593  91.6%     -    0s
+     0     0    2.79875    0    8   10.00000    2.79875  72.0%     -    0s
+     0     0    2.79875    0    6   10.00000    2.79875  72.0%     -    0s
+     0     0    2.79875    0    8   10.00000    2.79875  72.0%     -    0s
+H    0     0                       7.0000000    2.88371  58.8%     -    0s
+     0     0    3.06867    0   10    7.00000    3.06867  56.2%     -    0s
+     0     0    3.06867    0    6    7.00000    3.06867  56.2%     -    0s
+     0     0    3.06867    0    8    7.00000    3.06867  56.2%     -    0s
+     0     0    3.06867    0   10    7.00000    3.06867  56.2%     -    0s
+     0     0    3.07622    0   10    7.00000    3.07622  56.1%     -    0s
+     0     0    3.09069    0   10    7.00000    3.09069  55.8%     -    0s
+     0     2    3.68790    0   10    7.00000    3.68790  47.3%     -    0s
+*   88     0              14       6.0000000    4.49503  25.1%   7.1    0s
+
+Cutting planes:
+  Gomory: 3
+  Zero half: 1
+
+Explored 98 nodes (1170 simplex iterations) in 0.11 seconds (0.04 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 9: 6 7 10 ... 9245
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.000000000000e+00, best bound 6.000000000000e+00, gap 0.0000%
+ObjVal: 6.0
+C0 0.0
+C120 0.0
+C1 -0.0
+C121 0.0
+C2 0.0
+C122 0.0
+C3 0.0
+C123 0.0
+C4 0.0
+C124 0.0
+C5 0.0
+C125 0.0
+C6 0.0
+C126 0.0
+C7 0.0
+C127 -0.0
+C8 0.0
+C128 0.0
+C9 0.0
+C129 0.0
+C10 0.0
+C130 0.0
+C11 0.0
+C131 0.0
+C12 0.0
+C132 0.0
+C13 0.0
+C133 0.0
+C14 0.0
+C134 0.0
+C15 0.0
+C135 0.0
+C16 0.0
+C136 -0.0
+C17 0.0
+C137 0.0
+C18 0.0
+C138 0.0
+C19 0.0
+C139 -0.0
+C20 0.0
+C140 0.0
+C21 0.0
+C141 0.0
+C22 0.0
+C142 0.0
+C23 0.0
+C143 -0.0
+C24 0.0
+C144 0.0
+C25 0.0
+C145 0.0
+C26 -0.0
+C146 0.0
+C27 0.0
+C147 0.0
+C28 0.0
+C148 0.0
+C29 0.0
+C149 0.0
+C30 0.0
+C150 0.0
+C31 0.0
+C151 0.0
+C32 0.0
+C152 -0.0
+C33 0.0
+C153 0.0
+C34 0.0
+C154 0.0
+C35 0.0
+C155 0.0
+C36 0.0
+C156 0.0
+C37 0.0
+C157 0.0
+C38 0.0
+C158 -0.0
+C39 0.0
+C159 0.0
+C40 0.0
+C160 0.0
+C41 0.0
+C161 0.0
+C42 0.0
+C162 0.0
+C43 0.0
+C163 -0.0
+C44 0.0
+C164 0.0
+C45 0.0
+C165 -0.0
+C46 0.0
+C166 0.0
+C47 0.0
+C167 0.0
+C48 0.0
+C168 0.0
+C49 0.0
+C169 0.0
+C50 0.0
+C170 -0.0
+C51 0.0
+C171 0.0
+C52 0.0
+C172 0.0
+C53 0.0
+C173 0.0
+C54 0.0
+C174 -0.0
+C55 0.0
+C175 0.0
+C56 0.0
+C176 0.0
+C57 0.0
+C177 0.0
+C58 0.0
+C178 0.0
+C59 0.0
+C179 -0.0
+C60 0.0
+C180 0.0
+C61 0.0
+C181 0.0
+C62 0.0
+C182 0.0
+C63 0.0
+C183 0.0
+C64 0.0
+C184 0.0
+C65 0.0
+C185 0.0
+C66 0.0
+C186 -0.0
+C67 0.0
+C187 -0.0
+C68 0.0
+C188 0.0
+C69 0.0
+C189 -0.0
+C70 0.0
+C190 0.0
+C71 0.0
+C191 -0.0
+C72 0.0
+C192 -0.0
+C73 0.0
+C193 0.0
+C74 0.0
+C194 0.0
+C75 0.0
+C195 0.0
+C76 0.0
+C196 0.0
+C77 0.0
+C197 0.0
+C78 -0.0
+C198 0.0
+C79 0.0
+C199 0.0
+C80 0.0
+C200 0.0
+C81 0.0
+C201 -0.0
+C82 0.0
+C202 0.0
+C83 -1.0
+C203 1.0
+C84 0.0
+C204 0.0
+C85 0.0
+C205 0.0
+C86 0.0
+C206 0.0
+C87 0.0
+C207 0.0
+C88 0.0
+C208 0.0
+C89 0.0
+C209 0.0
+C90 0.0
+C210 -0.0
+C91 0.0
+C211 0.0
+C92 0.0
+C212 0.0
+C93 0.0
+C213 0.0
+C94 0.0
+C214 0.0
+C95 0.0
+C215 0.0
+C96 0.0
+C216 0.0
+C97 0.0
+C217 0.0
+C98 0.0
+C218 0.0
+C99 -0.0
+C219 0.0
+C100 0.0
+C220 0.0
+C101 0.0
+C221 0.0
+C102 0.0
+C222 0.0
+C103 0.0
+C223 0.0
+C104 -0.0
+C224 0.0
+C105 0.0
+C225 0.0
+C106 0.0
+C226 0.0
+C107 0.0
+C227 0.0
+C108 0.0
+C228 0.0
+C109 0.0
+C229 -0.0
+C110 0.0
+C230 -0.0
+C111 0.0
+C231 0.0
+C112 0.0
+C232 -0.0
+C113 0.0
+C233 -0.0
+C114 0.0
+C234 0.0
+C115 0.0
+C235 0.0
+C116 0.0
+C236 0.0
+C117 0.0
+C237 0.0
+C118 0.0
+C238 0.0
+C119 0.0
+C239 0.0
+Optimal objective: 6.0
+Optimal solution: [('C0', 0.0), ('C1', -0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', -0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', -0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', -1.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', -0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', -0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 0.0), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0), ('C111', 0.0), ('C112', 0.0), ('C113', 0.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 0.0), ('C118', 0.0), ('C119', 0.0), ('C120', 0.0), ('C121', 0.0), ('C122', 0.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', -0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0), ('C132', 0.0), ('C133', 0.0), ('C134', 0.0), ('C135', 0.0), ('C136', -0.0), ('C137', 0.0), ('C138', 0.0), ('C139', -0.0), ('C140', 0.0), ('C141', 0.0), ('C142', 0.0), ('C143', -0.0), ('C144', 0.0), ('C145', 0.0), ('C146', 0.0), ('C147', 0.0), ('C148', 0.0), ('C149', 0.0), ('C150', 0.0), ('C151', 0.0), ('C152', -0.0), ('C153', 0.0), ('C154', 0.0), ('C155', 0.0), ('C156', 0.0), ('C157', 0.0), ('C158', -0.0), ('C159', 0.0), ('C160', 0.0), ('C161', 0.0), ('C162', 0.0), ('C163', -0.0), ('C164', 0.0), ('C165', -0.0), ('C166', 0.0), ('C167', 0.0), ('C168', 0.0), ('C169', 0.0), ('C170', -0.0), ('C171', 0.0), ('C172', 0.0), ('C173', 0.0), ('C174', -0.0), ('C175', 0.0), ('C176', 0.0), ('C177', 0.0), ('C178', 0.0), ('C179', -0.0), ('C180', 0.0), ('C181', 0.0), ('C182', 0.0), ('C183', 0.0), ('C184', 0.0), ('C185', 0.0), ('C186', -0.0), ('C187', -0.0), ('C188', 0.0), ('C189', -0.0), ('C190', 0.0), ('C191', -0.0), ('C192', -0.0), ('C193', 0.0), ('C194', 0.0), ('C195', 0.0), ('C196', 0.0), ('C197', 0.0), ('C198', 0.0), ('C199', 0.0), ('C200', 0.0), ('C201', -0.0), ('C202', 0.0), ('C203', 1.0), ('C204', 0.0), ('C205', 0.0), ('C206', 0.0), ('C207', 0.0), ('C208', 0.0), ('C209', 0.0), ('C210', -0.0), ('C211', 0.0), ('C212', 0.0), ('C213', 0.0), ('C214', 0.0), ('C215', 0.0), ('C216', 0.0), ('C217', 0.0), ('C218', 0.0), ('C219', 0.0), ('C220', 0.0), ('C221', 0.0), ('C222', 0.0), ('C223', 0.0), ('C224', 0.0), ('C225', 0.0), ('C226', 0.0), ('C227', 0.0), ('C228', 0.0), ('C229', -0.0), ('C230', -0.0), ('C231', 0.0), ('C232', -0.0), ('C233', -0.0), ('C234', 0.0), ('C235', 0.0), ('C236', 0.0), ('C237', 0.0), ('C238', 0.0), ('C239', 0.0)]

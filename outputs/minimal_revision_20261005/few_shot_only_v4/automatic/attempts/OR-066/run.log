@@ -1,0 +1,145 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    def read_csv_with_encodings(path, **kwargs):
+        for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+            try:
+                return pd.read_csv(path, encoding=enc, **kwargs)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with supported encodings.")
+
+    # Source paths
+    demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv"
+    fixed_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv"
+    trans_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv"
+
+    # Read data
+    demand_df = read_csv_with_encodings(demand_path)
+    fixed_cost_df = read_csv_with_encodings(fixed_cost_path)
+    trans_cost_df = read_csv_with_encodings(trans_cost_path)
+
+    # Prepare sets
+    customers = demand_df['customer'].astype(str).tolist()
+    suppliers = fixed_cost_df['Unnamed: 0'].astype(str).tolist()
+
+    # Demand: {customer: demand}
+    demand = {}
+    for _, row in demand_df.iterrows():
+        cust = str(row['customer'])
+        if cust in demand:
+            demand[cust] += float(row['demand'])
+        else:
+            demand[cust] = float(row['demand'])
+
+    # Fixed costs: {supplier: fixed_cost}
+    fixed_cost = {}
+    for _, row in fixed_cost_df.iterrows():
+        sup = str(row['Unnamed: 0'])
+        if sup in fixed_cost:
+            fixed_cost[sup] += float(row['fixed_costs']) if sup in fixed_cost else float(row['fixed_costs'])
+        else:
+            fixed_cost[sup] = float(row['fixed_costs'])
+
+    # Transportation costs: {supplier: {customer: cost}}
+    cost = {sup: {} for sup in suppliers}
+    for _, row in trans_cost_df.iterrows():
+        sup = str(row['Unnamed: 0'])
+        if sup not in suppliers:
+            continue
+        for cust in customers:
+            if cust not in row:
+                raise ValueError(f"Missing transportation cost for supplier {sup}, customer {cust}")
+            cost[sup][cust] = float(row[cust])
+
+    # Validate all indices are covered
+    for cust in customers:
+        if cust not in demand:
+            raise ValueError(f"Demand missing for customer {cust}")
+    for sup in suppliers:
+        if sup not in fixed_cost:
+            raise ValueError(f"Fixed cost missing for supplier {sup}")
+        for cust in customers:
+            if cust not in cost[sup]:
+                raise ValueError(f"Transportation cost missing for supplier {sup}, customer {cust}")
+
+    # Big-M
+    M = sum(demand[cust] for cust in customers)
+
+    # Model
+    m = gp.Model('UFLP')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    x = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    y = m.addVars(suppliers, vtype=GRB.BINARY, name='y')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(cost[sup][cust] * x[sup, cust] for sup in suppliers for cust in customers) +
+        gp.quicksum(fixed_cost[sup] * y[sup] for sup in suppliers),
+        GRB.MINIMIZE
+    )
+
+    # Constraints
+    # 1. Demand satisfaction
+    m.addConstrs(
+        (gp.quicksum(x[sup, cust] for sup in suppliers) == demand[cust] for cust in customers),
+        name='demand'
+    )
+    # 2. Supplier activation
+    m.addConstrs(
+        (gp.quicksum(x[sup, cust] for cust in customers) <= M * y[sup] for sup in suppliers),
+        name='activation'
+    )
+
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 4 rows, 6 columns and 10 nonzeros
+Model fingerprint: 0x85a718da
+Variable types: 4 continuous, 2 integer (2 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 4e+02]
+  Objective range  [7e-02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+02, 2e+02]
+Presolve removed 4 rows and 6 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 11396.5 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.139651000000e+04, best bound 1.139651000000e+04, gap 0.0000%
+ObjVal: 11396.51
+C0: 0.0
+C1: 0.0
+C2: 144.0
+C3: 216.0
+C4: 0.0
+C5: 1.0
+Optimal objective: 11396.51
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 144.0), ('C3', 216.0), ('C4', 0.0), ('C5', 1.0)]

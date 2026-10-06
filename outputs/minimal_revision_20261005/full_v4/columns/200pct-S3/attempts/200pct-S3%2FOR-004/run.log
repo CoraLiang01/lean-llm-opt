@@ -1,0 +1,308 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure. The objective is to minimize total assignment cost. The decision variables are assignment indicators between machines and tasks. The constraints enforce that each machine is assigned to exactly one task and each task to exactly one machine, forming a one-to-one matching. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: one-to-one assignment of machines to tasks with assignment costs, each machine assigned to one task, each task assigned to one machine, minimize total cost
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP
+
+[Retrieved example 2]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 5]
+prompt: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem requires a one-to-one assignment of machines to tasks, minimizing total assignment cost, with constraints that each machine is assigned to exactly one task and each task to exactly one machine. The retrieved examples include a structurally identical manager-to-project assignment problem labeled AP (Assignment Problem). There are no additional mechanisms, logical dependencies, or hybrid constraint families present.
+
+Final Answer: AP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise ValueError("Cost matrix table not found.")
+
+    # Get Machines and Tasks from the table
+    machine_records = table["records"]
+    machines = [rec["values"]["assignee_id"] for rec in machine_records]
+    # Map columns to tasks
+    task_columns = [
+        "assignment_cost_to_project_A",
+        "assignment_cost_to_project_B",
+        "assignment_cost_to_project_C",
+        "assignment_cost_to_project_D",
+        "assignment_cost_to_project_E",
+        "assignment_cost_to_project_F",
+        "assignment_cost_to_project_G",
+        "assignment_cost_to_project_H",
+        "assignment_cost_to_project_I",
+        "assignment_cost_to_project_J",
+        "assignment_cost_to_project_K",
+        "assignment_cost_to_project_L"
+    ]
+    # Extract task names from columns
+    tasks = []
+    for col in task_columns:
+        # e.g., "assignment_cost_to_project_A" -> "A"
+        if col.startswith("assignment_cost_to_project_"):
+            tasks.append(col[len("assignment_cost_to_project_"):])
+        else:
+            raise ValueError(f"Unexpected column name: {col}")
+
+    # Build cost dictionary: cost[machine][task]
+    cost = {}
+    for rec in machine_records:
+        machine = rec["values"]["assignee_id"]
+        cost[machine] = {}
+        for col, task in zip(task_columns, tasks):
+            val = rec["values"][col]
+            try:
+                cost[machine][task] = float(val)
+            except Exception:
+                raise ValueError(f"Invalid cost value for {machine}, {task}: {val}")
+
+    # Validate dimensions
+    if set(cost.keys()) != set(machines):
+        raise ValueError("Mismatch in machine keys.")
+    for m in machines:
+        if set(cost[m].keys()) != set(tasks):
+            raise ValueError(f"Missing cost entries for machine {m}.")
+
+    # Build model
+    m = gp.Model('Original_RAG_AP')
+    x = m.addVars(machines, tasks, vtype=GRB.BINARY, name='x')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(cost[i][j] * x[i, j] for i in machines for j in tasks),
+        GRB.MINIMIZE
+    )
+
+    # Assignment constraints
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in tasks) == 1 for i in machines),
+        name='mach'
+    )
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in machines) == 1 for j in tasks),
+        name='task'
+    )
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 24 rows, 144 columns and 288 nonzeros
+Model fingerprint: 0x7ae27bf1
+Variable types: 0 continuous, 144 integer (144 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [7e+01, 2e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 1609.1000000
+Presolve time: 0.00s
+Presolved: 24 rows, 144 columns, 288 nonzeros
+Variable types: 0 continuous, 144 integer (144 binary)
+
+Root relaxation: objective 1.577600e+03, 39 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    1577.6000000 1577.60000  0.00%     -    0s
+
+Explored 1 nodes (39 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 1577.6 1609.1 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.577600000000e+03, best bound 1.577600000000e+03, gap 0.0000%
+ObjVal: 1577.6
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: 0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: 1.0
+C11: -0.0
+C12: 0.0
+C13: 1.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: -0.0
+C32: 1.0
+C33: -0.0
+C34: -0.0
+C35: 0.0
+C36: -0.0
+C37: -0.0
+C38: 1.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: -0.0
+C43: 0.0
+C44: -0.0
+C45: 0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: -0.0
+C52: -0.0
+C53: -0.0
+C54: -0.0
+C55: -0.0
+C56: -0.0
+C57: -0.0
+C58: 0.0
+C59: 1.0
+C60: 0.0
+C61: -0.0
+C62: -0.0
+C63: -0.0
+C64: 0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: 0.0
+C69: 1.0
+C70: -0.0
+C71: -0.0
+C72: -0.0
+C73: -0.0
+C74: -0.0
+C75: 0.0
+C76: -0.0
+C77: -0.0
+C78: 1.0
+C79: -0.0
+C80: -0.0
+C81: -0.0
+C82: -0.0
+C83: -0.0
+C84: -0.0
+C85: -0.0
+C86: -0.0
+C87: -0.0
+C88: -0.0
+C89: 1.0
+C90: -0.0
+C91: -0.0
+C92: -0.0
+C93: -0.0
+C94: -0.0
+C95: 0.0
+C96: -0.0
+C97: -0.0
+C98: -0.0
+C99: -0.0
+C100: -0.0
+C101: -0.0
+C102: -0.0
+C103: 1.0
+C104: -0.0
+C105: -0.0
+C106: -0.0
+C107: -0.0
+C108: 1.0
+C109: -0.0
+C110: -0.0
+C111: -0.0
+C112: -0.0
+C113: -0.0
+C114: -0.0
+C115: -0.0
+C116: -0.0
+C117: -0.0
+C118: -0.0
+C119: -0.0
+C120: -0.0
+C121: -0.0
+C122: -0.0
+C123: 1.0
+C124: -0.0
+C125: -0.0
+C126: -0.0
+C127: -0.0
+C128: -0.0
+C129: -0.0
+C130: -0.0
+C131: -0.0
+C132: -0.0
+C133: 0.0
+C134: -0.0
+C135: -0.0
+C136: 1.0
+C137: 0.0
+C138: -0.0
+C139: -0.0
+C140: -0.0
+C141: -0.0
+C142: -0.0
+C143: -0.0
+Optimal objective: 1577.6
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', 0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', 1.0), ('C11', -0.0), ('C12', 0.0), ('C13', 1.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', 1.0), ('C33', -0.0), ('C34', -0.0), ('C35', 0.0), ('C36', -0.0), ('C37', -0.0), ('C38', 1.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', 0.0), ('C44', -0.0), ('C45', 0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', 0.0), ('C59', 1.0), ('C60', 0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', 0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', 0.0), ('C69', 1.0), ('C70', -0.0), ('C71', -0.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', 0.0), ('C76', -0.0), ('C77', -0.0), ('C78', 1.0), ('C79', -0.0), ('C80', -0.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', 1.0), ('C90', -0.0), ('C91', -0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', 0.0), ('C96', -0.0), ('C97', -0.0), ('C98', -0.0), ('C99', -0.0), ('C100', -0.0), ('C101', -0.0), ('C102', -0.0), ('C103', 1.0), ('C104', -0.0), ('C105', -0.0), ('C106', -0.0), ('C107', -0.0), ('C108', 1.0), ('C109', -0.0), ('C110', -0.0), ('C111', -0.0), ('C112', -0.0), ('C113', -0.0), ('C114', -0.0), ('C115', -0.0), ('C116', -0.0), ('C117', -0.0), ('C118', -0.0), ('C119', -0.0), ('C120', -0.0), ('C121', -0.0), ('C122', -0.0), ('C123', 1.0), ('C124', -0.0), ('C125', -0.0), ('C126', -0.0), ('C127', -0.0), ('C128', -0.0), ('C129', -0.0), ('C130', -0.0), ('C131', -0.0), ('C132', -0.0), ('C133', 0.0), ('C134', -0.0), ('C135', -0.0), ('C136', 1.0), ('C137', 0.0), ('C138', -0.0), ('C139', -0.0), ('C140', -0.0), ('C141', -0.0), ('C142', -0.0), ('C143', -0.0)]

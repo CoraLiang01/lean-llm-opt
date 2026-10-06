@@ -1,0 +1,14 @@
+archive_revision_number,Capacity
+1,875
+
+ProductName,Weight,archive_revision_number,Value,record_keeper_group
+Spinach,230,1,64,Team A
+Shiitake Mushrooms,637,1,75,Team B
+Apples,773,1,68,Team C
+Carrots,653,8,11,Team C
+Basil,755,5,91,Team A
+Potatoes,670,3,31,Team B
+Green Beans,505,3,90,Team C
+Blueberries,821,4,56,Team B
+Oranges,83,5,10,Team B
+Watermelons,249,8,24,Team B

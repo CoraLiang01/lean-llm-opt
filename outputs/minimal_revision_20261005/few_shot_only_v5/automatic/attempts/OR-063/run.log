@@ -1,0 +1,223 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read demand
+    demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP7/demand.csv"
+    try:
+        demand_df = pd.read_csv(demand_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            demand_df = pd.read_csv(demand_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                demand_df = pd.read_csv(demand_path, encoding='gbk')
+            except UnicodeDecodeError:
+                demand_df = pd.read_csv(demand_path, encoding='latin-1')
+    if 'customer' not in demand_df.columns or 'demand' not in demand_df.columns:
+        raise ValueError("Missing required columns in demand.csv")
+    customers = demand_df['customer'].astype(str).tolist()
+    demand = {}
+    for _, row in demand_df.iterrows():
+        key = str(row['customer'])
+        if key in demand:
+            demand[key] += float(row['demand'])
+        else:
+            demand[key] = float(row['demand'])
+
+    # Read fixed costs
+    fixed_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP7/fixed_cost.csv"
+    try:
+        fixed_cost_df = pd.read_csv(fixed_cost_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            fixed_cost_df = pd.read_csv(fixed_cost_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                fixed_cost_df = pd.read_csv(fixed_cost_path, encoding='gbk')
+            except UnicodeDecodeError:
+                fixed_cost_df = pd.read_csv(fixed_cost_path, encoding='latin-1')
+    # The warehouse/facility identifier is in 'Unnamed: 0'
+    if 'Unnamed: 0' not in fixed_cost_df.columns or 'fixed_costs' not in fixed_cost_df.columns:
+        raise ValueError("Missing required columns in fixed_cost.csv")
+    warehouses = fixed_cost_df['Unnamed: 0'].astype(str).tolist()
+    fixed_cost = {}
+    for _, row in fixed_cost_df.iterrows():
+        key = str(row['Unnamed: 0'])
+        if key in fixed_cost:
+            fixed_cost[key] += float(row['fixed_costs'])
+        else:
+            fixed_cost[key] = float(row['fixed_costs'])
+
+    # Read transportation costs
+    trans_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP7/transportation_costs.csv"
+    try:
+        trans_cost_df = pd.read_csv(trans_cost_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            trans_cost_df = pd.read_csv(trans_cost_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                trans_cost_df = pd.read_csv(trans_cost_path, encoding='gbk')
+            except UnicodeDecodeError:
+                trans_cost_df = pd.read_csv(trans_cost_path, encoding='latin-1')
+    if 'Unnamed: 0' not in trans_cost_df.columns:
+        raise ValueError("Missing required columns in transportation_costs.csv")
+    # The warehouse/facility identifier is in 'Unnamed: 0'
+    # The customer columns are the rest (e.g., C1, C2, ...)
+    cost = {}
+    for _, row in trans_cost_df.iterrows():
+        i = str(row['Unnamed: 0'])
+        cost[i] = {}
+        for j in customers:
+            if j not in trans_cost_df.columns:
+                raise ValueError(f"Customer {j} not found in transportation_costs.csv columns")
+            cost[i][j] = float(row[j])
+
+    # Validate all indices
+    for i in warehouses:
+        if i not in fixed_cost:
+            raise ValueError(f"Warehouse {i} missing fixed cost")
+        if i not in cost:
+            raise ValueError(f"Warehouse {i} missing in transportation costs")
+        for j in customers:
+            if j not in cost[i]:
+                raise ValueError(f"Cost for warehouse {i}, customer {j} missing")
+    for j in customers:
+        if j not in demand:
+            raise ValueError(f"Customer {j} missing demand")
+
+    # Big-M: sum of all demands
+    M = sum(demand[j] for j in customers)
+
+    m = gp.Model('Bandcamp_Warehouse_Selection')
+    m.Params.MIPGap = 1e-4
+
+    x = m.addVars(warehouses, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    y = m.addVars(warehouses, vtype=GRB.BINARY, name='y')
+
+    m.setObjective(
+        gp.quicksum(cost[i][j] * x[i, j] for i in warehouses for j in customers) +
+        gp.quicksum(fixed_cost[i] * y[i] for i in warehouses),
+        GRB.MINIMIZE
+    )
+
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in warehouses) == demand[j] for j in customers),
+        name='demand'
+    )
+
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in customers) <= M * y[i] for i in warehouses),
+        name='activation'
+    )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for v in m.getVars():
+            print(f'{v.VarName}: {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 14 rows, 56 columns and 105 nonzeros
+Model fingerprint: 0xd197f524
+Variable types: 49 continuous, 7 integer (7 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 4e+04]
+  Objective range  [7e-01, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [6e+02, 2e+04]
+Presolve time: 0.00s
+Presolved: 14 rows, 56 columns, 105 nonzeros
+Variable types: 49 continuous, 7 integer (7 binary)
+Found heuristic solution: objective 778479.87000
+
+Root relaxation: objective 7.778970e+05, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 777896.997    0    3 778479.870 777896.997  0.07%     -    0s
+*    0     0               0    778095.44000 778095.440  0.00%     -    0s
+
+Explored 1 nodes (6 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 778095 778480 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.780954400000e+05, best bound 7.780954400000e+05, gap 0.0000%
+ObjVal: 778095.44
+C0: 0.0
+C1: 776.0
+C2: 16214.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 732.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 17106.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 1083.0
+C36: 0.0
+C37: 0.0
+C38: 553.0
+C39: 0.0
+C40: 594.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 1.0
+C50: 1.0
+C51: -0.0
+C52: -0.0
+C53: -0.0
+C54: 1.0
+C55: -0.0
+Optimal objective: 778095.44
+Optimal solution: [('C0', 0.0), ('C1', 776.0), ('C2', 16214.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 732.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 17106.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 1083.0), ('C36', 0.0), ('C37', 0.0), ('C38', 553.0), ('C39', 0.0), ('C40', 594.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 1.0), ('C50', 1.0), ('C51', -0.0), ('C52', -0.0), ('C53', -0.0), ('C54', 1.0), ('C55', -0.0)]

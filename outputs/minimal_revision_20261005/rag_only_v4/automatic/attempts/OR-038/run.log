@@ -1,0 +1,105 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract tables
+    tables = {t['table_id']: t for t in CSVQA_DATA['tables']}
+    cap_table = tables['file_0_view_0']
+    prod_table = tables['file_1_view_0']
+
+    # Build index set V: intersection of VehicleType and ProductName by exact string equality
+    vehicle_types = [rec['values']['VehicleType'] for rec in cap_table['records']]
+    product_names = [rec['values']['ProductName'] for rec in prod_table['records']]
+    V = [v for v in vehicle_types if v in product_names]
+
+    # Build parameter dictionaries
+    c = {}
+    for rec in cap_table['records']:
+        vt = rec['values']['VehicleType']
+        if vt in V:
+            c[vt] = int(rec['values']['Capacity'])
+    b = {}
+    for rec in prod_table['records']:
+        pn = rec['values']['ProductName']
+        if pn in V:
+            b[pn] = float(rec['values']['Value'])
+
+    # Validate all V have both c and b
+    for i in V:
+        if i not in c or i not in b:
+            raise ValueError(f"Missing data for vehicle type {i}")
+
+    # Total daily inventory capacity
+    C_total = sum(c[i] for i in V)
+
+    # Model
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(V, lb=0, ub=GRB.INFINITY, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize sum_i b_i x_i
+    m.setObjective(gp.quicksum(b[i] * x[i] for i in V), GRB.MAXIMIZE)
+
+    # Per-vehicle-type daily inventory limits: x_i <= c_i
+    m.addConstrs((x[i] <= c[i] for i in V), name='per_type_limit')
+
+    # Total daily inventory capacity: sum_i x_i <= C_total
+    m.addConstr(gp.quicksum(x[i] for i in V) <= C_total, name='total_capacity')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for i in V:
+            print(x[i].VarName, x[i].X)
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 11 rows, 10 columns and 20 nonzeros
+Model fingerprint: 0xabdc4944
+Variable types: 0 continuous, 10 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+03, 4e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e+01, 7e+02]
+Found heuristic solution: objective 1314500.0000
+Presolve removed 11 rows and 10 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.3145e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.314500000000e+06, best bound 1.314500000000e+06, gap 0.0000%
+1314500.0
+C0 100.0
+C1 80.0
+C2 120.0
+C3 90.0
+C4 50.0
+C5 30.0
+C6 110.0
+C7 40.0
+C8 60.0
+C9 35.0
+Optimal objective: 1314500.0
+Optimal solution: [('C0', 100.0), ('C1', 80.0), ('C2', 120.0), ('C3', 90.0), ('C4', 50.0), ('C5', 30.0), ('C6', 110.0), ('C7', 40.0), ('C8', 60.0), ('C9', 35.0)]

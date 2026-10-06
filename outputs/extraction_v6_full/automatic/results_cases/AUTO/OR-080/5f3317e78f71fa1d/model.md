@@ -1,0 +1,41 @@
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal activation, startup, and transported-weight schedule for 10 candidate trucks over 4 periods to meet customer demand (with a 10% spare-capacity buffer), minimize total startup and transportation costs, and respect operational constraints such as minimum up/down times, ramping limits, and truck capacities.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with fixed-charge (startup) and ramping constraints.
+3.  **Define Index Sets:** The primary indices are:
+    - Trucks: \( i \in \{1,2,\ldots,10\} \) (from 'truck_id')
+    - Periods: \( t \in \{1,2,3,4\} \)
+4.  **Define Decision Variables:**
+    -   `x[i,t]` = Amount of goods (kg) transported by truck \(i\) in period \(t\). Type: GRB.CONTINUOUS (≥ 0).
+    -   `y[i,t]` = 1 if truck \(i\) is active (on) in period \(t\), 0 otherwise. Type: GRB.BINARY.
+    -   `z[i,t]` = 1 if truck \(i\) is started up (turned on) at the start of period \(t\), 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   Truck maximum capacity: `Q` (per truck, from 'Q' column).
+    -   Startup cost: `S` (per truck, from 'S' column).
+    -   Unit transportation cost: `C` (per truck, from 'C' column).
+    -   Customer demand per period: `d1`, `d2`, `d3`, `d4` (from columns 'd1'–'d4'; same for all trucks).
+6.  **Formulate Objective:** Minimize total cost, which is the sum over all trucks and periods of:
+    -   Startup costs: \(\sum_{i,t} S[i] \cdot z[i,t]\)
+    -   Transportation costs: \(\sum_{i,t} C[i] \cdot x[i,t]\)
+    -   So, Objective: Minimize \(\sum_{i=1}^{10} \sum_{t=1}^{4} [S[i] \cdot z[i,t} + C[i] \cdot x[i,t]]\)
+7.  **Formulate Constraints:**
+    -   **Demand Satisfaction:** For each period \(t\), the total transported weight must meet or exceed customer demand:
+        - \(\sum_{i=1}^{10} x[i,t] \geq d_t\)  (where \(d_t\) is from 'd1', 'd2', etc.)
+    -   **Spare-Capacity Buffer:** For each period \(t\), total transported weight cannot exceed 90% of the combined capacity of active trucks:
+        - \(\sum_{i=1}^{10} x[i,t] \leq 0.9 \cdot \sum_{i=1}^{10} Q[i] \cdot y[i,t]\)
+    -   **Truck Capacity:** For each truck \(i\) and period \(t\), transported weight cannot exceed truck capacity if active, and must be zero if inactive:
+        - \(0 \leq x[i,t] \leq Q[i] \cdot y[i,t]\)
+    -   **Startup Variable Linking:** For each truck \(i\) and period \(t\), startup occurs if truck is off in \(t-1\) and on in \(t\):
+        - For \(t=1\): \(z[i,1] = y[i,1]\) (since all trucks are initially off)
+        - For \(t>1\): \(z[i,t] \geq y[i,t] - y[i,t-1]\)
+    -   **Minimum Up-Time:** Once a truck is started, it must remain active for at least two consecutive periods. For each truck \(i\) and period \(t=1,2,3\):
+        - If \(z[i,t]=1\), then \(y[i,t+1]=1\)
+        - No truck may be started in period 4: \(z[i,4]=0\)
+    -   **Minimum Down-Time:** If a truck is shut down (on in \(t-1\), off in \(t\)), it must remain off in \(t\) and \(t+1\), and cannot be restarted before \(t+2\):
+        - For \(t=1,2\): If \(y[i,t]=1\) and \(y[i,t+1]=0\), then \(y[i,t+2]=0\)
+        - (Enforced via logical constraints or equivalent inequalities)
+    -   **Ramping (Change in Load):** For each truck \(i\) and periods \(t=1,2,3\), the change in transported weight between adjacent periods cannot exceed 300 kg:
+        - \(|x[i,t+1] - x[i,t]| \leq 300\)
+        - For \(t=1\), since all trucks are initially off, treat \(x[i,0]=0\): \(|x[i,1] - 0| \leq 300\)
+    -   **No Restart in Period 4:** No truck may be started in period 4: \(z[i,4]=0\)
+    -   **Non-negativity and Binary:** All \(x[i,t] \geq 0\); all \(y[i,t}, z[i,t] \in \{0,1\}\)
+[Abstract Model Plan END]

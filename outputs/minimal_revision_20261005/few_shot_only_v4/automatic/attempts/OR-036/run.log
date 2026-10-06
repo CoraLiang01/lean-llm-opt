@@ -1,0 +1,133 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read products.csv
+    product_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/products.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            products = pd.read_csv(product_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {product_path} with tried encodings.")
+
+    # Read capacity.csv
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/capacity.csv"
+    for enc in encodings:
+        try:
+            capacity_df = pd.read_csv(capacity_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {capacity_path} with tried encodings.")
+
+    # Validate required columns
+    for col in ['ProductName', 'Value', 'Weight']:
+        if col not in products.columns:
+            raise ValueError(f"Missing column '{col}' in products.csv")
+    if 'Capacity' not in capacity_df.columns:
+        raise ValueError("Missing column 'Capacity' in capacity.csv")
+
+    # Index set I
+    I = products['ProductName'].tolist()
+
+    # Coefficient dictionaries
+    v = products.set_index('ProductName')['Value'].to_dict()
+    w = products.set_index('ProductName')['Weight'].to_dict()
+
+    # Validate all keys present
+    if set(v.keys()) != set(I) or set(w.keys()) != set(I):
+        raise ValueError("Mismatch in ProductName keys between Value/Weight and I.")
+
+    # Capacity (single value)
+    if len(capacity_df) != 1:
+        raise ValueError("capacity.csv must have exactly one row.")
+    C = float(capacity_df.iloc[0]['Capacity'])
+
+    # Build model
+    m = gp.Model('CarSales_Inventory')
+    x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total benefit
+    m.setObjective(gp.quicksum(v[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Capacity constraint
+    m.addConstr(gp.quicksum(w[i] * x[i] for i in I) <= C, name='capacity')
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 25 columns and 25 nonzeros
+Model fingerprint: 0xc5325f9d
+Variable types: 0 continuous, 25 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [2e+01, 1e+02]
+  Objective range  [1e+03, 1e+04]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+03, 2e+03]
+Found heuristic solution: objective 183960.00000
+Presolve removed 1 rows and 25 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 509925 183960 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.099250000000e+05, best bound 5.099250000000e+05, gap 0.0000%
+ObjVal: 509925.0
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: 0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: 75.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: 0.0
+C14: -0.0
+C15: -0.0
+C16: 0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+Optimal objective: 509925.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', 0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', 75.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', 0.0), ('C14', -0.0), ('C15', -0.0), ('C16', 0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0)]

@@ -1,0 +1,228 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with fallback encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP4/manager_project_costs.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError(f"Could not decode {csv_path} with tried encodings.")
+
+    # Extract manager and project identifiers
+    if 'Manager' not in df.columns:
+        raise ValueError("Missing 'Manager' column in CSV.")
+    managers = list(df['Manager'])
+    project_cols = [col for col in df.columns if col.startswith('Project ') and col.endswith(' Cost')]
+    if len(project_cols) != 11:
+        raise ValueError("Expected 11 project cost columns, found: %s" % project_cols)
+    projects = [col.replace(' Cost', '') for col in project_cols]
+
+    # Build cost dictionary: cost[manager][project]
+    cost = {}
+    for idx, row in df.iterrows():
+        manager = row['Manager']
+        cost[manager] = {}
+        for col in project_cols:
+            project = col.replace(' Cost', '')
+            val = row[col]
+            if pd.isnull(val):
+                raise ValueError(f"Missing cost for manager {manager}, project {project}")
+            cost[manager][project] = float(val)
+
+    # Validate dimensions
+    if len(managers) != 11 or len(projects) != 11:
+        raise ValueError("Expected 11 managers and 11 projects.")
+
+    # Build model
+    m = gp.Model('Manager_Project_Assignment')
+    x = m.addVars(managers, projects, vtype=GRB.BINARY, name='x')
+
+    # Objective
+    m.setObjective(gp.quicksum(cost[i][j] * x[i, j] for i in managers for j in projects), GRB.MINIMIZE)
+
+    # Assignment constraints
+    m.addConstrs((gp.quicksum(x[i, j] for j in projects) == 1 for i in managers), name='assign_mgr')
+    m.addConstrs((gp.quicksum(x[i, j] for i in managers) == 1 for j in projects), name='assign_proj')
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 22 rows, 121 columns and 242 nonzeros
+Model fingerprint: 0xe24378b2
+Variable types: 0 continuous, 121 integer (121 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+02, 3e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 16727.000000
+Presolve time: 0.00s
+Presolved: 22 rows, 121 columns, 242 nonzeros
+Variable types: 0 continuous, 121 integer (121 binary)
+
+Root relaxation: objective 4.903000e+03, 22 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    4903.0000000 4903.00000  0.00%     -    0s
+
+Explored 1 nodes (22 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 4903 16727 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.903000000000e+03, best bound 4.903000000000e+03, gap 0.0000%
+ObjVal: 4903.0
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: 1.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: 1.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: 0.0
+C23: 1.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: 0.0
+C30: -0.0
+C31: -0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: 0.0
+C36: -0.0
+C37: 1.0
+C38: -0.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: -0.0
+C43: -0.0
+C44: 1.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: -0.0
+C52: -0.0
+C53: 0.0
+C54: -0.0
+C55: -0.0
+C56: -0.0
+C57: -0.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: 1.0
+C62: -0.0
+C63: 0.0
+C64: -0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: -0.0
+C72: -0.0
+C73: -0.0
+C74: 0.0
+C75: -0.0
+C76: 1.0
+C77: -0.0
+C78: -0.0
+C79: -0.0
+C80: 1.0
+C81: -0.0
+C82: -0.0
+C83: 0.0
+C84: -0.0
+C85: -0.0
+C86: -0.0
+C87: -0.0
+C88: -0.0
+C89: -0.0
+C90: -0.0
+C91: -0.0
+C92: -0.0
+C93: 0.0
+C94: -0.0
+C95: -0.0
+C96: -0.0
+C97: 1.0
+C98: -0.0
+C99: -0.0
+C100: 0.0
+C101: -0.0
+C102: -0.0
+C103: -0.0
+C104: -0.0
+C105: -0.0
+C106: -0.0
+C107: 1.0
+C108: -0.0
+C109: -0.0
+C110: -0.0
+C111: 0.0
+C112: 1.0
+C113: -0.0
+C114: -0.0
+C115: -0.0
+C116: -0.0
+C117: -0.0
+C118: -0.0
+C119: -0.0
+C120: -0.0
+Optimal objective: 4903.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', 1.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', 1.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', 0.0), ('C23', 1.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', 0.0), ('C30', -0.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', 0.0), ('C36', -0.0), ('C37', 1.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', 1.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', -0.0), ('C53', 0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', 1.0), ('C62', -0.0), ('C63', 0.0), ('C64', -0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', -0.0), ('C72', -0.0), ('C73', -0.0), ('C74', 0.0), ('C75', -0.0), ('C76', 1.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0), ('C80', 1.0), ('C81', -0.0), ('C82', -0.0), ('C83', 0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', -0.0), ('C90', -0.0), ('C91', -0.0), ('C92', -0.0), ('C93', 0.0), ('C94', -0.0), ('C95', -0.0), ('C96', -0.0), ('C97', 1.0), ('C98', -0.0), ('C99', -0.0), ('C100', 0.0), ('C101', -0.0), ('C102', -0.0), ('C103', -0.0), ('C104', -0.0), ('C105', -0.0), ('C106', -0.0), ('C107', 1.0), ('C108', -0.0), ('C109', -0.0), ('C110', -0.0), ('C111', 0.0), ('C112', 1.0), ('C113', -0.0), ('C114', -0.0), ('C115', -0.0), ('C116', -0.0), ('C117', -0.0), ('C118', -0.0), ('C119', -0.0), ('C120', -0.0)]

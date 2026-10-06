@@ -1,0 +1,77 @@
+{
+  "problem_id": "OR-086",
+  "query": "Develop a mathematical optimization model to determine the optimal daily production plan for a wine company that maximizes total net profit. The company produces three distinct wine brands by blending three grades of raw wine material.\n\nThe necessary input data is provided in two files: 30-1.csv contains the daily supply limits and unit costs for the three raw grades, while 30-2.csv provides the selling prices and the blending requirements for all three brands.\n\nThe model should incorporate the following constraints. First, the Blending Requirements constraints specify upper-bound and lower-bound proportion requirements for selected raw grades in each wine brand. Second, the Raw Material Supply constraints require that the total amount of each raw grade used across all brands cannot exceed its corresponding daily supply limit. Third, the Minimum Production constraint requires that the Red brand must have a daily production level of at least 2,000 kg.\n\nThe objective is to determine the quantity of each raw grade allocated to each brand, defined as the decision variables, so as to maximize total net profit, calculated as total sales revenue minus total raw material cost.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-1.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-2.csv",
+  "input_kind": "external_csv",
+  "true_label": "Mixture",
+  "true_route": "Others",
+  "label_objective": 4500.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "Mixture",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal daily allocation of three raw wine grades to three wine brands, maximizing total net profit (sales revenue minus raw material cost), subject to blending requirements for each brand, raw material supply limits, and a minimum production requirement for the Red brand.\n2.  **Identify Model Type:** Based on the query, this is a Blending Linear Programming (LP) problem.\n3.  **Define Index Sets:** The primary indices are:\n    - Raw Grades: {I, II, III}\n    - Brands: {Red, Yellow, Blue}\n4.  **Define Decision Variables:**\n    -   `x[g, b]` = Amount (kg) of raw grade `g` used in brand `b`. Type: GRB.CONTINUOUS (non-negative real numbers).\n5.  **Identify Parameters (from Schema):**\n    -   From 30-1.csv (all rows required):\n        - `Supply[g]`: Daily supply limit for grade `g` (\"Daily Supply (kg)\")\n        - `Cost[g]`: Unit cost for grade `g` (\"Cost (CNY/kg)\")\n    -   From 30-2.csv (all rows required):\n        - `Price[b]`: Selling price for brand `b` (\"Selling Price (CNY/kg)\")\n        - `BlendReq[b]`: Blending requirements for brand `b` (\"Blending Requirements\")\n6.  **Formulate Objective:** Maximize total net profit, calculated as:\n        sum over all brands b [ sum over all grades g (Price[b] * x[g, b]) ] \n        minus \n        sum over all grades g [ sum over all brands b (Cost[g] * x[g, b]) ]\n    That is, maximize total sales revenue from all brands minus total raw material cost.\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Blending Requirements for Each Brand): For each brand, the proportion of selected grades in the blend must satisfy specified upper and lower bounds. For example:\n        - For Red: \n            - Proportion of Grade I in Red < 10%: x[I, Red] / total_Red < 0.10\n            - Proportion of Grade II in Red > 50%: x[II, Red] / total_Red > 0.50\n        - For Yellow:\n            - Proportion of Grade III in Yellow < 70%: x[III, Yellow] / total_Yellow < 0.70\n            - Proportion of Grade I in Yellow > 20%: x[I, Yellow] / total_Yellow > 0.20\n        - For Blue:\n            - Proportion of Grade I in Blue < 50%: x[I, Blue] / total_Blue < 0.50\n            - Proportion of Grade II in Blue > 10%: x[II, Blue] / total_Blue > 0.10\n        (Where total_{Brand} = sum over g of x[g, Brand]; if total_{Brand} = 0, proportions are undefined, so model should ensure total_{Brand} \u2265 0.)\n    -   Constraint 2 (Raw Material Supply Limits): For each grade, the total amount used across all brands cannot exceed its daily supply:\n        - For each grade g: sum over brands b of x[g, b] \u2264 Supply[g]\n    -   Constraint 3 (Minimum Production for Red): The total daily production of the Red brand must be at least 2,000 kg:\n        - sum over grades g of x[g, Red] \u2265 2,000\n    -   Constraint 4 (Non-negativity): All x[g, b] \u2265 0\n[Abstract Model Plan END]",
+  "csvqa_observation": "{\"tables\": [{\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-1.csv\", \"columns\": [\"Grade\", \"Daily Supply (kg)\", \"Cost (CNY/kg)\"], \"records\": [{\"Grade\": \"I\", \"Daily Supply (kg)\": \"1500\", \"Cost (CNY/kg)\": \"6\"}, {\"Grade\": \"II\", \"Daily Supply (kg)\": \"2000\", \"Cost (CNY/kg)\": \"4.5\"}, {\"Grade\": \"III\", \"Daily Supply (kg)\": \"1000\", \"Cost (CNY/kg)\": \"3\"}]}, {\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-2.csv\", \"columns\": [\"Brand\", \"Blending Requirements\", \"Selling Price (CNY/kg)\"], \"records\": [{\"Brand\": \"Red\", \"Blending Requirements\": \"I less than 10%  II more than 50%\", \"Selling Price (CNY/kg)\": \"5.5\"}, {\"Brand\": \"Yellow\", \"Blending Requirements\": \"III less than 70%  I more than 20%\", \"Selling Price (CNY/kg)\": \"5\"}, {\"Brand\": \"Blue\", \"Blending Requirements\": \"I less than 50%  II more than 10%\", \"Selling Price (CNY/kg)\": \"4.8\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"1d96f69864c9259dd24c6ca759c8995d2baee28956af2813b01cf8d4771f5fd6\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\n\ndef solve_blending():\n    path_30_1 = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-1.csv'\n    path_30_2 = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-2.csv'\n    df_grades = pd.read_csv(path_30_1, sep=',')\n    df_brands = pd.read_csv(path_30_2, sep=',')\n    grades = list(df_grades['Grade'].astype(str))\n    brands = list(df_brands['Brand'].astype(str))\n    if set(grades) != set(['I', 'II', 'III']):\n        raise ValueError(f'Grades in CSV do not match required set: {grades}')\n    if set(brands) != set(['Red', 'Yellow', 'Blue']):\n        raise ValueError(f'Brands in CSV do not match required set: {brands}')\n    supply = df_grades.set_index('Grade')['Daily Supply (kg)'].astype(float).to_dict()\n    cost = df_grades.set_index('Grade')['Cost (CNY/kg)'].astype(float).to_dict()\n    price = df_brands.set_index('Brand')['Selling Price (CNY/kg)'].astype(float).to_dict()\n    blend_reqs = {b: [] for b in brands}\n    for b in brands:\n        req_str = df_brands.loc[df_brands['Brand'].astype(str) == b, 'Blending Requirements'].values[0]\n        reqs = re.findall('Grade\\\\s+([IVX]+)\\\\s*([<>]=?)\\\\s*([\\\\d.]+)%', req_str)\n        for (g, op, val) in reqs:\n            g = g.strip()\n            if g not in grades:\n                raise ValueError(f\"Unknown grade '{g}' in blending requirements for brand '{b}'\")\n            val = float(val) / 100.0\n            if op == '<':\n                blend_reqs[b].append((g, 'le', val))\n            elif op == '<=':\n                blend_reqs[b].append((g, 'le', val))\n            elif op == '>':\n                blend_reqs[b].append((g, 'ge', val))\n            elif op == '>=':\n                blend_reqs[b].append((g, 'ge', val))\n            else:\n                raise ValueError(f\"Unknown operator '{op}' in blending requirements for brand '{b}'\")\n    m = gp.Model('wine_blending')\n    m.Params.MIPGap = 0.0001\n    x = m.addVars(grades, brands, lb=0.0, vtype=gp.GRB.CONTINUOUS, name='')\n    total_revenue = gp.quicksum((price[b] * gp.quicksum((x[g, b] for g in grades)) for b in brands))\n    total_cost = gp.quicksum((cost[g] * gp.quicksum((x[g, b] for b in brands)) for g in grades))\n    m.setObjective(total_revenue - total_cost, gp.GRB.MAXIMIZE)\n    for b in brands:\n        total_b = gp.quicksum((x[g, b] for g in grades))\n        for (g, sense, bound) in blend_reqs[b]:\n            if sense == 'le':\n                m.addConstr(x[g, b] - bound * total_b <= 0, name=f'blend_{g}_{b}_le')\n            elif sense == 'ge':\n                m.addConstr(x[g, b] - bound * total_b >= 0, name=f'blend_{g}_{b}_ge')\n            else:\n                raise ValueError(f\"Unknown sense '{sense}' in blending requirements.\")\n    for g in grades:\n        m.addConstr(gp.quicksum((x[g, b] for b in brands)) <= supply[g], name=f'supply_{g}')\n    m.addConstr(gp.quicksum((x[g, 'Red'] for g in grades)) >= 2000, name='minprod_Red')\n    m.optimize()\n    if m.status == gp.GRB.OPTIMAL:\n        print(f'ObjVal: {m.objVal:.6f}')\n        for g in grades:\n            for b in brands:\n                print(f'{x[g, b].VarName} {x[g, b].X:.6f}')\n    else:\n        print(f'Solver status: {m.status}')\n    return m\nm = solve_blending()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 4500.0,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      0.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      2000.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      0.0
+    ],
+    [
+      "C6",
+      1000.0
+    ],
+    [
+      "C7",
+      0.0
+    ],
+    [
+      "C8",
+      0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 23.861,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "27b17404536910dec6442e66cce5a76d0dc4c391b243142a3f5b75e5f9962a4d",
+  "notebook_source_sha256": "ca75246b8f02347a00b9413f8ee67866fa21b9565b6428566289860bfe9febd3",
+  "cache_fingerprint": "e9d449f9ba4f2841eab04106393315ea472564db2815ac8853ea695c6f6bd314",
+  "evaluated_utc": "2026-10-05T15:30:41.643490+00:00"
+}

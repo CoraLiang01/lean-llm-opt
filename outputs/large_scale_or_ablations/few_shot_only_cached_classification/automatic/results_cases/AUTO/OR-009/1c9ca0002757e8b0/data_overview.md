@@ -1,0 +1,20 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP9/customer_demand.csv
+customer  demand
+      C1      94
+      C2      39
+      C3      65
+      C4     435
+
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP9/supply_capacity.csv
+Unnamed: 0  supply_capacity
+        S1             2531
+        S2               20
+        S3              210
+        S4              241
+
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP9/transportation_costs.csv
+Unnamed: 0                C1                 C2                 C3                 C4
+        S1  543.756480860856 23.685276141764653 23.676386730773032 447.75143678673766
+        S2 883.9151090405642 0.0497768476557696 0.0350986687216299  44.45588531711622
+        S3 537.3456896658107 23.769274659075112  498.9565924946546 440.60737890439776
+        S4 1791.493192397229  68.21633865655126  1432.483733965675 1527.7635425462734

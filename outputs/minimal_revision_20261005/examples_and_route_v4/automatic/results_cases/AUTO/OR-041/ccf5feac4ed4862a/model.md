@@ -1,0 +1,15 @@
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine how much real estate to develop in each area of New York (e.g., Queens, Brooklyn, etc.) in order to maximize total development benefits, subject to an overall development capacity constraint.
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) resource allocation/knapsack-type problem.
+3.  **Define Index Sets:** The primary index is Areas (each row in products.csv, e.g., Queens, Brooklyn, etc.).
+4.  **Define Decision Variables:**
+    -   `x[i]` = Scale of development per day in area i (e.g., number of real estate units or development scale in area i). Type: GRB.CONTINUOUS (unless otherwise specified; the query does not require integer or binary variables).
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'Value' column from products.csv (development benefit per area).
+    -   Constraint coefficients: 'Weight' column from products.csv (resource usage per unit development in each area).
+    -   Constraint RHS: 'Capacity' from capacity.csv (total available development capacity).
+6.  **Formulate Objective:** Maximize the total development benefit, i.e., maximize sum over all areas i of (Value[i] * x[i]).
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Overall Development Capacity): The total resource usage across all areas cannot exceed the overall capacity, i.e., sum over all areas i of (Weight[i] * x[i]) ≤ Capacity.
+    -   Constraint 2 (Non-negativity): For all areas i, x[i] ≥ 0.
+[Abstract Model Plan END]

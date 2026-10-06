@@ -1,0 +1,135 @@
+CSVQA_DATA = {'bindings': [{'index_columns': ['ProductName'],
+               'parameter': 'benefit',
+               'table_id': 'file_1_view_0',
+               'value_column': 'Value'},
+              {'index_columns': ['VehicleID', 'VehicleType'],
+               'parameter': 'capacity',
+               'table_id': 'file_0_view_0',
+               'value_column': 'Capacity'}],
+ 'ignored_file_indices': [],
+ 'query': 'In the context of New Car Sales in Norway, a car dealership is planning its inventory-replenishment '
+          'strategy. For each vehicle type (e.g., sedans, SUVs, electric vehicles, etc.), the dealership has a '
+          '“products.csv” file that records the benefit coefficient for that type. Each vehicle type has a daily '
+          'inventory limit, provided in “capacity.csv.” The objective is to decide how many units of each vehicle type '
+          'to order each day so as to maximize total benefit while ensuring that the sum of all ordered units does not '
+          'exceed the total inventory capacity. The decision variable x_i represents the number of vehicles of type i '
+          'to be ordered per day.The decision variables must be integers.',
+ 'relationships': [],
+ 'route': 'RA',
+ 'tables': [{'columns': ['VehicleID', 'VehicleType', 'Capacity'],
+             'file_index': 0,
+             'file_name': 'capacity.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 10,
+             'records': [{'source_row': 0, 'values': {'Capacity': '100', 'VehicleID': '1', 'VehicleType': 'Sedans'}},
+                         {'source_row': 1, 'values': {'Capacity': '80', 'VehicleID': '2', 'VehicleType': 'SUVs'}},
+                         {'source_row': 2,
+                          'values': {'Capacity': '120', 'VehicleID': '3', 'VehicleType': 'Electric Vehicles'}},
+                         {'source_row': 3,
+                          'values': {'Capacity': '90', 'VehicleID': '4', 'VehicleType': 'Hybrid Vehicles'}},
+                         {'source_row': 4, 'values': {'Capacity': '50', 'VehicleID': '5', 'VehicleType': 'Trucks'}},
+                         {'source_row': 5,
+                          'values': {'Capacity': '30', 'VehicleID': '6', 'VehicleType': 'Sports Cars'}},
+                         {'source_row': 6,
+                          'values': {'Capacity': '110', 'VehicleID': '7', 'VehicleType': 'Compact Cars'}},
+                         {'source_row': 7,
+                          'values': {'Capacity': '40', 'VehicleID': '8', 'VehicleType': 'Luxury Sedans'}},
+                         {'source_row': 8, 'values': {'Capacity': '60', 'VehicleID': '9', 'VehicleType': 'Vans'}},
+                         {'source_row': 9,
+                          'values': {'Capacity': '35', 'VehicleID': '10', 'VehicleType': 'Pickup Trucks'}}],
+             'returned_rows': 10,
+             'role': 'capacity',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['ProductName', 'Value'],
+             'file_index': 1,
+             'file_name': 'products.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 10,
+             'records': [{'source_row': 0, 'values': {'ProductName': 'Sedans', 'Value': '1200'}},
+                         {'source_row': 1, 'values': {'ProductName': 'SUVs', 'Value': '1800'}},
+                         {'source_row': 2, 'values': {'ProductName': 'Electric Vehicles', 'Value': '2500'}},
+                         {'source_row': 3, 'values': {'ProductName': 'Hybrid Vehicles', 'Value': '2000'}},
+                         {'source_row': 4, 'values': {'ProductName': 'Trucks', 'Value': '1500'}},
+                         {'source_row': 5, 'values': {'ProductName': 'Sports Cars', 'Value': '3000'}},
+                         {'source_row': 6, 'values': {'ProductName': 'Compact Cars', 'Value': '1000'}},
+                         {'source_row': 7, 'values': {'ProductName': 'Luxury Sedans', 'Value': '3500'}},
+                         {'source_row': 8, 'values': {'ProductName': 'Vans', 'Value': '1600'}},
+                         {'source_row': 9, 'values': {'ProductName': 'Pickup Trucks', 'Value': '1700'}}],
+             'returned_rows': 10,
+             'role': 'products',
+             'table_id': 'file_1_view_0'}],
+ 'validation': {'binding_checks': [{'index_columns': ['ProductName'],
+                                    'key_count': 10,
+                                    'parameter': 'benefit',
+                                    'status': 'OK',
+                                    'table_id': 'file_1_view_0',
+                                    'value_column': 'Value'},
+                                   {'index_columns': ['VehicleID', 'VehicleType'],
+                                    'key_count': 10,
+                                    'parameter': 'capacity',
+                                    'status': 'OK',
+                                    'table_id': 'file_0_view_0',
+                                    'value_column': 'Capacity'}],
+                'matrix_checks': [],
+                'status': 'OK'}}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    data = CSVQA_DATA
+    cap_table = None
+    for t in data['tables']:
+        if t['table_id'] == 'file_0_view_0':
+            cap_table = t
+            break
+    if cap_table is None:
+        raise RuntimeError('Capacity table not found.')
+    ben_table = None
+    for t in data['tables']:
+        if t['table_id'] == 'file_1_view_0':
+            ben_table = t
+            break
+    if ben_table is None:
+        raise RuntimeError('Benefit table not found.')
+    benefit = {}
+    for rec in ben_table['records']:
+        pname = rec['values']['ProductName']
+        val = rec['values']['Value']
+        benefit[pname] = float(val)
+    capacity = {}
+    vehicle_types = []
+    for rec in cap_table['records']:
+        vid = rec['values']['VehicleID']
+        vtype = rec['values']['VehicleType']
+        cap = rec['values']['Capacity']
+        key = (vid, vtype)
+        capacity[key] = int(cap)
+        vehicle_types.append((vid, vtype))
+    I = []
+    b_i = {}
+    u_i = {}
+    for rec in cap_table['records']:
+        vid = rec['values']['VehicleID']
+        vtype = rec['values']['VehicleType']
+        cap = int(rec['values']['Capacity'])
+        if vtype not in benefit:
+            raise RuntimeError(f"VehicleType/ProductName '{vtype}' not found in products.csv")
+        I.append((vid, vtype))
+        b_i[vid, vtype] = benefit[vtype]
+        u_i[vid, vtype] = cap
+    C = sum((u_i[i] for i in I))
+    m = gp.Model('car_inventory')
+    m.Params.MIPGap = 0.0001
+    x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+    m.setObjective(gp.quicksum((b_i[i] * x[i] for i in I)), GRB.MAXIMIZE)
+    m.addConstrs((x[i] <= u_i[i] for i in I), name='per_type_limit')
+    m.addConstr(gp.quicksum((x[i] for i in I)) <= C, name='total_capacity')
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for i in I:
+            print(f'x[{i[0]},{i[1]}]: {x[i].X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+m = solve_problem()

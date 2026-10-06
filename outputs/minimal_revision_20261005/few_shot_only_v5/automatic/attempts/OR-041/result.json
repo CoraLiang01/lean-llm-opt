@@ -1,0 +1,121 @@
+{
+  "problem_id": "OR-041",
+  "query": "A property developer is planning to develop real estate in New York.There are several areas to choose from, such as Queens and Brooklyn.However, due to limited resources and focus, the developer is not able to develop all the real estate in all the areas and has to select a few for development.The development benefit data for real estate in each area is recorded in the \u2018products.csv\u2019 file.The developer has an overall development capacity limit, which is detailed in the \u2018capacity.csv\u2019 file.The goal is to decide how many real estate in each areas are to be developed, in order to maximise the overall benefits while adhering to the overall development capacity.The decision variable x_i represents the scale of development per day in area i.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 3912.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "RA",
+  "assigned_route": "RA",
+  "generated_model": "**Abstract Mathematical Model**\n\n**Index Sets:**\n- $I$: Set of areas (from products.csv, column ProductName)\n\n**Parameters:**\n- $v_i$: Development benefit of area $i$ (from products.csv, column Value)\n- $w_i$: Resource requirement per unit scale in area $i$ (from products.csv, column Weight)\n- $C$: Overall development capacity (from capacity.csv, column Capacity)\n\n**Decision Variables:**\n- $x_i \\in \\mathbb{Z}_{\\geq 0}$: Scale of development per day in area $i$\n\n**Objective:**\n\\[\n\\max \\sum_{i \\in I} v_i x_i\n\\]\n\n**Constraints:**\n\\[\n\\sum_{i \\in I} w_i x_i \\leq C\n\\]\n\\[\nx_i \\in \\mathbb{Z}_{\\geq 0} \\quad \\forall i \\in I\n\\]\n\n---\n\n**Data Mapping**\n\n- $I$: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/products.csv, column ProductName\n- $v_i$: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/products.csv, column Value\n- $w_i$: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/products.csv, column Weight\n- $C$: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/capacity.csv, column Capacity",
+  "csvqa_observation": "{\"tables\": [{\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/capacity.csv\", \"columns\": [\"Capacity\"], \"records\": [{\"Capacity\": \"586\"}]}, {\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/products.csv\", \"columns\": [\"ProductName\", \"Value\", \"Weight\"], \"records\": [{\"ProductName\": \"Queens\", \"Value\": \"469\", \"Weight\": \"954\"}, {\"ProductName\": \"Brooklyn\", \"Value\": \"290\", \"Weight\": \"650\"}, {\"ProductName\": \"Manhattan\", \"Value\": \"236\", \"Weight\": \"961\"}, {\"ProductName\": \"Bronx\", \"Value\": \"235\", \"Weight\": \"950\"}, {\"ProductName\": \"Staten Island\", \"Value\": \"745\", \"Weight\": \"379\"}, {\"ProductName\": \"Harlem\", \"Value\": \"684\", \"Weight\": \"776\"}, {\"ProductName\": \"Upper East Side\", \"Value\": \"444\", \"Weight\": \"381\"}, {\"ProductName\": \"Lower Manhattan\", \"Value\": \"172\", \"Weight\": \"808\"}, {\"ProductName\": \"Midtown\", \"Value\": \"1000\", \"Weight\": \"937\"}, {\"ProductName\": \"Long Island City\", \"Value\": \"336\", \"Weight\": \"608\"}, {\"ProductName\": \"Williamsburg\", \"Value\": \"546\", \"Weight\": \"912\"}, {\"ProductName\": \"Bushwick\", \"Value\": \"535\", \"Weight\": \"391\"}, {\"ProductName\": \"Flatbush\", \"Value\": \"539\", \"Weight\": \"465\"}, {\"ProductName\": \"Greenpoint\", \"Value\": \"831\", \"Weight\": \"490\"}, {\"ProductName\": \"Park Slope\", \"Value\": \"139\", \"Weight\": \"918\"}, {\"ProductName\": \"Astoria\", \"Value\": \"432\", \"Weight\": \"787\"}, {\"ProductName\": \"Jackson Heights\", \"Value\": \"627\", \"Weight\": \"347\"}, {\"ProductName\": \"Flushing\", \"Value\": \"629\", \"Weight\": \"274\"}, {\"ProductName\": \"Sunnyside\", \"Value\": \"292\", \"Weight\": \"642\"}, {\"ProductName\": \"Ditmars\", \"Value\": \"978\", \"Weight\": \"130\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "DIRECT_FULL_SOURCE",
+  "csvqa_trace": "{\"status\": \"DIRECT_FULL_SOURCE\", \"planner_attempt_count\": 0, \"repair_count\": 0, \"retry_count\": 0, \"fallback_count\": 0}",
+  "solve_code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_problem():\n    capacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/capacity.csv'\n    decode_errors = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']\n    for enc in decode_errors:\n        try:\n            capacity_df = pd.read_csv(capacity_path, encoding=enc)\n            break\n        except Exception:\n            continue\n    else:\n        raise RuntimeError(f'Could not read {capacity_path} with tried encodings.')\n    if 'Capacity' not in capacity_df.columns:\n        raise ValueError(\"Missing 'Capacity' column in capacity.csv\")\n    if len(capacity_df) != 1:\n        raise ValueError('Expected exactly one row in capacity.csv')\n    C = capacity_df['Capacity'].iloc[0]\n    products_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/products.csv'\n    for enc in decode_errors:\n        try:\n            products_df = pd.read_csv(products_path, encoding=enc)\n            break\n        except Exception:\n            continue\n    else:\n        raise RuntimeError(f'Could not read {products_path} with tried encodings.')\n    required_cols = {'ProductName', 'Value', 'Weight'}\n    if not required_cols.issubset(products_df.columns):\n        raise ValueError(f'Missing columns in products.csv: {required_cols - set(products_df.columns)}')\n    grouped = products_df.groupby('ProductName', as_index=False).agg({'Value': 'sum', 'Weight': 'sum'})\n    areas = list(grouped['ProductName'])\n    v = dict(zip(grouped['ProductName'], grouped['Value']))\n    w = dict(zip(grouped['ProductName'], grouped['Weight']))\n    if any((pd.isnull(v[a]) or pd.isnull(w[a]) for a in areas)):\n        raise ValueError('Null value in Value or Weight columns for some area.')\n    m = gp.Model('NYC_Development')\n    x = m.addVars(areas, lb=0, vtype=GRB.INTEGER, name='')\n    m.setObjective(gp.quicksum((v[a] * x[a] for a in areas)), GRB.MAXIMIZE)\n    m.addConstr(gp.quicksum((w[a] * x[a] for a in areas)) <= C, name='capacity')\n    m.Params.MIPGap = 0.0001\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal: {m.ObjVal}')\n        for var in m.getVars():\n            print(f'{var.VarName}: {var.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_problem()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 3912.0,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      0.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      4.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      0.0
+    ],
+    [
+      "C11",
+      0.0
+    ],
+    [
+      "C12",
+      0.0
+    ],
+    [
+      "C13",
+      0.0
+    ],
+    [
+      "C14",
+      0.0
+    ],
+    [
+      "C15",
+      0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      0.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 19.671,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "27b17404536910dec6442e66cce5a76d0dc4c391b243142a3f5b75e5f9962a4d",
+  "notebook_source_sha256": "13a5f2abf66442c954b2ce06b303b962896bdd9cbaf36538bd0bc16fee954594",
+  "cache_fingerprint": "c5eddc7f9361a35b308e1a177bb1dead50257c34ab1af9e844ed9d663793679d",
+  "evaluated_utc": "2026-10-05T16:15:15.998286+00:00"
+}

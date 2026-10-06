@@ -1,0 +1,324 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure: the objective is to maximize net profit (sales revenue minus variable costs minus fixed operating cost) by choosing nonnegative continuous production quantities for each product. There are two resource constraints: labor and material capacities. The only fixed cost is a constant weekly operating cost, not tied to any selection or batch decision. There are no batch, lot, assignment, selection, byproduct, blending, or multi-stage mechanisms. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: maximize net profit by choosing nonnegative continuous production quantities for multiple products, subject to labor and material capacity constraints, with a fixed weekly operating cost subtracted from the objective, and no batch, selection, assignment, byproduct, blending, or multi-stage mechanisms
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 2]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A specialty chemical factory produces three premium products (A, B, C) by blending three raw materials (1, 2, 3). The factory supplies custom formulations to high-end manufacturers:
+
+Product A is a precision industrial lubricant requiring ≥50% Material 1 and ≤25% Material 2
+Product B is an aerospace-grade adhesive requiring ≥25% Material 1 and ≤50% Material 2
+Product C is a general-purpose compound with no material restrictions
+Raw material costs and availability are in raw_materials.csv, while product specifications and selling prices are in products.csv. Determine the optimal blending plan to maximize daily profit.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The objective is to maximize net profit by choosing nonnegative continuous production quantities for each product, subject to labor and material capacity constraints, with a fixed weekly operating cost subtracted from the objective. There are no batch, selection, assignment, byproduct, blending, or multi-stage mechanisms. The fixed cost is a constant and does not introduce a selection or activation decision. The decision variables are continuous production quantities, and the constraints are standard resource capacities. The retrieved examples are all labeled Mixture, but each contains additional mechanisms such as device activation, batch sizes, blending, or multi-stage production, which are not present in the current problem. The current problem is a clean single-stage resource allocation with only ordinary capacity constraints and a fixed cost in the objective. Therefore, it fits the Resource Allocation (RA) class.
+
+Final Answer: RA[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Data extraction
+    table = [r["values"] for r in CSVQA_DATA["tables"][0]["records"]]
+    products = [row["Product Name"] for row in table]
+    labor = {row["Product Name"]: float(row["Labor per unit"]) for row in table}
+    material = {row["Product Name"]: float(row["Material per unit"]) for row in table}
+    selling_price = {row["Product Name"]: float(row["Selling Price"]) for row in table}
+    variable_cost = {row["Product Name"]: float(row["Variable Cost"]) for row in table}
+    L = 1650
+    M = 1850
+    F = 4500
+
+    m = gp.Model('RedBeanClothingFactory')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, continuous
+    x = m.addVars(products, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: maximize net profit
+    m.setObjective(
+        gp.quicksum((selling_price[i] - variable_cost[i]) * x[i] for i in products) - F,
+        GRB.MAXIMIZE
+    )
+
+    # Labor capacity constraint
+    m.addConstr(
+        gp.quicksum(labor[i] * x[i] for i in products) <= L,
+        name='labor_capacity'
+    )
+
+    # Material capacity constraint
+    m.addConstr(
+        gp.quicksum(material[i] * x[i] for i in products) <= M,
+        name='material_capacity'
+    )
+
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 2 rows, 198 columns and 396 nonzeros
+Model fingerprint: 0x1db95b2b
+Coefficient statistics:
+  Matrix range     [2e+00, 9e+00]
+  Objective range  [4e+01, 1e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+03, 2e+03]
+Presolve removed 0 rows and 132 columns
+Presolve time: 0.00s
+Presolved: 2 rows, 66 columns, 132 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    3.0206897e+04   2.329657e+01   0.000000e+00      0s
+       4    2.4877395e+04   0.000000e+00   0.000000e+00      0s
+
+Solved in 4 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  2.487739464e+04
+ObjVal: 24877.394636015328
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 0.0
+C7: 159.00383141762453
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 0.0
+C68: 0.0
+C69: 0.0
+C70: 0.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 0.0
+C83: 0.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 0.0
+C96: 0.0
+C97: 0.0
+C98: 0.0
+C99: 0.0
+C100: 0.0
+C101: 0.0
+C102: 0.0
+C103: 0.0
+C104: 0.0
+C105: 0.0
+C106: 0.0
+C107: 0.0
+C108: 0.0
+C109: 0.0
+C110: 0.0
+C111: 0.0
+C112: 204.9808429118774
+C113: 0.0
+C114: 0.0
+C115: 0.0
+C116: 0.0
+C117: 0.0
+C118: 0.0
+C119: 0.0
+C120: 0.0
+C121: 0.0
+C122: 0.0
+C123: 0.0
+C124: 0.0
+C125: 0.0
+C126: 0.0
+C127: 0.0
+C128: 0.0
+C129: 0.0
+C130: 0.0
+C131: 0.0
+C132: 0.0
+C133: 0.0
+C134: 0.0
+C135: 0.0
+C136: 0.0
+C137: 0.0
+C138: 0.0
+C139: 0.0
+C140: 0.0
+C141: 0.0
+C142: 0.0
+C143: 0.0
+C144: 0.0
+C145: 0.0
+C146: 0.0
+C147: 0.0
+C148: 0.0
+C149: 0.0
+C150: 0.0
+C151: 0.0
+C152: 0.0
+C153: 0.0
+C154: 0.0
+C155: 0.0
+C156: 0.0
+C157: 0.0
+C158: 0.0
+C159: 0.0
+C160: 0.0
+C161: 0.0
+C162: 0.0
+C163: 0.0
+C164: 0.0
+C165: 0.0
+C166: 0.0
+C167: 0.0
+C168: 0.0
+C169: 0.0
+C170: 0.0
+C171: 0.0
+C172: 0.0
+C173: 0.0
+C174: 0.0
+C175: 0.0
+C176: 0.0
+C177: 0.0
+C178: 0.0
+C179: 0.0
+C180: 0.0
+C181: 0.0
+C182: 0.0
+C183: 0.0
+C184: 0.0
+C185: 0.0
+C186: 0.0
+C187: 0.0
+C188: 0.0
+C189: 0.0
+C190: 0.0
+C191: 0.0
+C192: 0.0
+C193: 0.0
+C194: 0.0
+C195: 0.0
+C196: 0.0
+C197: 0.0
+Optimal objective: 24877.394636015328
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 159.00383141762453), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 0.0), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0), ('C111', 0.0), ('C112', 204.9808429118774), ('C113', 0.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 0.0), ('C118', 0.0), ('C119', 0.0), ('C120', 0.0), ('C121', 0.0), ('C122', 0.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0), ('C132', 0.0), ('C133', 0.0), ('C134', 0.0), ('C135', 0.0), ('C136', 0.0), ('C137', 0.0), ('C138', 0.0), ('C139', 0.0), ('C140', 0.0), ('C141', 0.0), ('C142', 0.0), ('C143', 0.0), ('C144', 0.0), ('C145', 0.0), ('C146', 0.0), ('C147', 0.0), ('C148', 0.0), ('C149', 0.0), ('C150', 0.0), ('C151', 0.0), ('C152', 0.0), ('C153', 0.0), ('C154', 0.0), ('C155', 0.0), ('C156', 0.0), ('C157', 0.0), ('C158', 0.0), ('C159', 0.0), ('C160', 0.0), ('C161', 0.0), ('C162', 0.0), ('C163', 0.0), ('C164', 0.0), ('C165', 0.0), ('C166', 0.0), ('C167', 0.0), ('C168', 0.0), ('C169', 0.0), ('C170', 0.0), ('C171', 0.0), ('C172', 0.0), ('C173', 0.0), ('C174', 0.0), ('C175', 0.0), ('C176', 0.0), ('C177', 0.0), ('C178', 0.0), ('C179', 0.0), ('C180', 0.0), ('C181', 0.0), ('C182', 0.0), ('C183', 0.0), ('C184', 0.0), ('C185', 0.0), ('C186', 0.0), ('C187', 0.0), ('C188', 0.0), ('C189', 0.0), ('C190', 0.0), ('C191', 0.0), ('C192', 0.0), ('C193', 0.0), ('C194', 0.0), ('C195', 0.0), ('C196', 0.0), ('C197', 0.0)]

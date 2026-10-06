@@ -1,0 +1,12 @@
+{"values": {"customer_id": "C1", "document_page_count": "2", "archive_revision_number": "6", "demand": "94"}}
+{"values": {"customer_id": "C2", "document_page_count": "6", "archive_revision_number": "2", "demand": "39"}}
+{"values": {"customer_id": "C3", "document_page_count": "8", "archive_revision_number": "6", "demand": "65"}}
+{"values": {"customer_id": "C4", "document_page_count": "6", "archive_revision_number": "5", "demand": "435"}}
+{"values": {"supplier_id": "S1", "archive_revision_number": "2", "document_page_count": "2", "supply_capacity": "2531"}}
+{"values": {"supplier_id": "S2", "archive_revision_number": "3", "document_page_count": "12", "supply_capacity": "20"}}
+{"values": {"supplier_id": "S3", "archive_revision_number": "6", "document_page_count": "2", "supply_capacity": "210"}}
+{"values": {"supplier_id": "S4", "archive_revision_number": "4", "document_page_count": "4", "supply_capacity": "241"}}
+{"values": {"supplier_id": "S1", "archive_storage_medium": "Paper", "record_view_count": "12", "transportation_cost_to_C1": "543.756480860856", "record_display_theme": "Azure", "transportation_cost_to_C2": "23.685276141764653", "transportation_cost_to_C3": "23.676386730773032", "document_page_count": "2", "archive_revision_number": "4", "transportation_cost_to_C4": "447.75143678673766"}}
+{"values": {"supplier_id": "S2", "archive_storage_medium": "Hybrid", "record_view_count": "76", "transportation_cost_to_C1": "883.9151090405642", "record_display_theme": "Amber", "transportation_cost_to_C2": "0.04977684765576961", "transportation_cost_to_C3": "0.0350986687216299", "document_page_count": "8", "archive_revision_number": "4", "transportation_cost_to_C4": "44.45588531711622"}}
+{"values": {"supplier_id": "S3", "archive_storage_medium": "Digital", "record_view_count": "76", "transportation_cost_to_C1": "537.3456896658107", "record_display_theme": "Amber", "transportation_cost_to_C2": "23.769274659075112", "transportation_cost_to_C3": "498.95659249465467", "document_page_count": "4", "archive_revision_number": "1", "transportation_cost_to_C4": "440.60737890439776"}}
+{"values": {"supplier_id": "S4", "archive_storage_medium": "Paper", "record_view_count": "12", "transportation_cost_to_C1": "1791.493192397229", "record_display_theme": "Olive", "transportation_cost_to_C2": "68.21633865655126", "transportation_cost_to_C3": "1432.4837339656747", "document_page_count": "12", "archive_revision_number": "3", "transportation_cost_to_C4": "1527.7635425462734"}}

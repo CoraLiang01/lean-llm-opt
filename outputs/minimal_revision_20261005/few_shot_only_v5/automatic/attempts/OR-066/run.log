@@ -1,0 +1,159 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    def read_csv_try_encodings(path, **kwargs):
+        for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+            try:
+                return pd.read_csv(path, encoding=enc, **kwargs)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with supported encodings.")
+
+    # File paths from Source Schema
+    demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv"
+    fixed_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv"
+    trans_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv"
+
+    # Read demand
+    demand_df = read_csv_try_encodings(demand_path)
+    if 'customer' not in demand_df.columns or 'demand' not in demand_df.columns:
+        raise ValueError("demand.csv must have columns 'customer' and 'demand'")
+    customers = demand_df['customer'].astype(str).tolist()
+    demand = demand_df.groupby('customer')['demand'].sum().to_dict()
+
+    # Read fixed costs
+    fixed_df = read_csv_try_encodings(fixed_cost_path)
+    # Accept either 'Unnamed: 0' or 'supplier' as index
+    if 'Unnamed: 0' in fixed_df.columns:
+        supplier_col = 'Unnamed: 0'
+    elif 'supplier' in fixed_df.columns:
+        supplier_col = 'supplier'
+    else:
+        raise ValueError("fixed_cost.csv must have a supplier column")
+    if 'fixed_costs' not in fixed_df.columns:
+        raise ValueError("fixed_cost.csv must have column 'fixed_costs'")
+    suppliers = fixed_df[supplier_col].astype(str).tolist()
+    fixed_cost = fixed_df.set_index(supplier_col)['fixed_costs'].to_dict()
+
+    # Read transportation costs
+    trans_df = read_csv_try_encodings(trans_cost_path)
+    # The first column is supplier, rest are customer columns
+    if 'Unnamed: 0' in trans_df.columns:
+        trans_supplier_col = 'Unnamed: 0'
+    elif 'supplier' in trans_df.columns:
+        trans_supplier_col = 'supplier'
+    else:
+        raise ValueError("transportation_costs.csv must have a supplier column")
+    # Remove any unnamed index column if present
+    cost_customer_cols = [col for col in trans_df.columns if col != trans_supplier_col]
+    # Validate all customers present
+    missing_customers = set(customers) - set(cost_customer_cols)
+    if missing_customers:
+        raise ValueError(f"transportation_costs.csv missing columns for customers: {missing_customers}")
+    # Validate all suppliers present
+    missing_suppliers = set(suppliers) - set(trans_df[trans_supplier_col].astype(str))
+    if missing_suppliers:
+        raise ValueError(f"transportation_costs.csv missing rows for suppliers: {missing_suppliers}")
+    # Build cost dict: cost[supplier][customer]
+    cost = {}
+    for _, row in trans_df.iterrows():
+        s = str(row[trans_supplier_col])
+        if s not in suppliers:
+            continue
+        cost[s] = {}
+        for c in customers:
+            cost[s][c] = float(row[c])
+
+    # Validate all required coefficients present
+    for s in suppliers:
+        if s not in fixed_cost:
+            raise ValueError(f"Missing fixed cost for supplier {s}")
+        if s not in cost:
+            raise ValueError(f"Missing transportation cost row for supplier {s}")
+        for c in customers:
+            if c not in cost[s]:
+                raise ValueError(f"Missing transportation cost for supplier {s}, customer {c}")
+    for c in customers:
+        if c not in demand:
+            raise ValueError(f"Missing demand for customer {c}")
+
+    # Big-M
+    M = sum(demand.values())
+
+    # Model
+    m = gp.Model('UFLP')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    x = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    y = m.addVars(suppliers, vtype=GRB.BINARY, name='y')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(cost[s][c] * x[s, c] for s in suppliers for c in customers) +
+        gp.quicksum(fixed_cost[s] * y[s] for s in suppliers),
+        GRB.MINIMIZE
+    )
+
+    # Constraints
+    # 1. Demand satisfaction
+    m.addConstrs(
+        (gp.quicksum(x[s, c] for s in suppliers) == demand[c] for c in customers),
+        name='demand'
+    )
+    # 2. Supplier activation
+    m.addConstrs(
+        (gp.quicksum(x[s, c] for c in customers) <= M * y[s] for s in suppliers),
+        name='activation'
+    )
+
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for v in m.getVars():
+            print(f'{v.VarName}: {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 4 rows, 6 columns and 10 nonzeros
+Model fingerprint: 0x85a718da
+Variable types: 4 continuous, 2 integer (2 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 4e+02]
+  Objective range  [7e-02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+02, 2e+02]
+Presolve removed 4 rows and 6 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 11396.5 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.139651000000e+04, best bound 1.139651000000e+04, gap 0.0000%
+ObjVal: 11396.51
+C0: 0.0
+C1: 0.0
+C2: 144.0
+C3: 216.0
+C4: 0.0
+C5: 1.0
+Optimal objective: 11396.51
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 144.0), ('C3', 216.0), ('C4', 0.0), ('C5', 1.0)]

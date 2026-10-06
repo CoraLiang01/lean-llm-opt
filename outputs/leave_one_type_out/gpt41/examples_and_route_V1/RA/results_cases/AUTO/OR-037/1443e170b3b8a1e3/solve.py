@@ -1,0 +1,32 @@
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+products_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA3/CarSales2/products.csv'
+capacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA3/CarSales2/capacity.csv'
+products_df = pd.read_csv(products_path, sep=',')
+capacity_df = pd.read_csv(capacity_path, sep=',')
+product_ids = products_df['ProductName'].astype(str).tolist()
+value_dict = dict(zip(products_df['ProductName'].astype(str), products_df['Value'].astype(int)))
+weight_dict = dict(zip(products_df['ProductName'].astype(str), products_df['Weight'].astype(int)))
+if capacity_df.shape[0] != 1 or 'Capacity' not in capacity_df.columns:
+    raise ValueError("capacity.csv must have exactly one row and a 'Capacity' column.")
+capacity = int(capacity_df['Capacity'].iloc[0])
+if set(value_dict.keys()) != set(product_ids) or set(weight_dict.keys()) != set(product_ids):
+    raise ValueError('Mismatch in product identifiers between value and weight dictionaries.')
+m = gp.Model('CarSalesInventoryReplenishment')
+x = m.addVars(product_ids, vtype=gp.GRB.INTEGER, lb=0, name='')
+m.setObjective(gp.quicksum((value_dict[i] * x[i] for i in product_ids)), gp.GRB.MAXIMIZE)
+m.addConstr(gp.quicksum((weight_dict[i] * x[i] for i in product_ids)) <= capacity, name='capacity')
+m.optimize()
+if m.status == gp.GRB.OPTIMAL:
+    print(f'Optimal total value/cost: {m.objVal:.2f}')
+    print('--- Optimal Daily Ordering Plan ---')
+    for i in product_ids:
+        qty = int(round(x[i].X))
+        if qty > 0:
+            print(f'{i}: {qty} units (Profit per unit: {value_dict[i]}, Weight per unit: {weight_dict[i]})')
+    total_weight = sum((weight_dict[i] * int(round(x[i].X)) for i in product_ids))
+    print(f'Total inventory used: {total_weight} / {capacity}')
+else:
+    print(f'No optimal solution found. Status: {m.status}')

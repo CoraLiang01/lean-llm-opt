@@ -1,0 +1,280 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read capacity.csv
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv"
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            capacity_df = pd.read_csv(capacity_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError(f"Could not decode {capacity_path} with tried encodings.")
+    for enc in encodings:
+        try:
+            products_df = pd.read_csv(products_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError(f"Could not decode {products_path} with tried encodings.")
+
+    # Validate required columns
+    if not {'PlatformId', 'Capacity'}.issubset(capacity_df.columns):
+        raise ValueError("capacity.csv missing required columns.")
+    if not {'ProductName', 'Value', 'Weight'}.issubset(products_df.columns):
+        raise ValueError("products.csv missing required columns.")
+
+    # Build index sets
+    platforms = list(capacity_df['PlatformId'].astype(str))
+    genres = list(products_df['ProductName'].astype(str))
+
+    # Build parameter dictionaries
+    c = {}
+    for _, row in capacity_df.iterrows():
+        pid = str(row['PlatformId'])
+        if pid in c:
+            raise ValueError(f"Duplicate PlatformId {pid} in capacity.csv")
+        c[pid] = row['Capacity']
+    v = {}
+    w = {}
+    for _, row in products_df.iterrows():
+        pname = str(row['ProductName'])
+        if pname in v or pname in w:
+            raise ValueError(f"Duplicate ProductName {pname} in products.csv")
+        v[pname] = row['Value']
+        w[pname] = row['Weight']
+
+    # Validate all platforms and genres have coefficients
+    if set(platforms) != set(c.keys()):
+        raise ValueError("Mismatch in platform identifiers between index set and capacity dictionary.")
+    if set(genres) != set(v.keys()) or set(genres) != set(w.keys()):
+        raise ValueError("Mismatch in genre identifiers between index set and value/weight dictionaries.")
+
+    # Decision variable keys: (platform, genre)
+    keys = [(i, j) for i in platforms for j in genres]
+
+    m = gp.Model('VideoGameStore')
+    x = m.addVars(keys, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total value
+    m.setObjective(gp.quicksum(v[j] * x[i, j] for i in platforms for j in genres), GRB.MAXIMIZE)
+
+    # Platform memory capacity constraints
+    m.addConstrs(
+        (gp.quicksum(w[j] * x[i, j] for j in genres) <= c[i] for i in platforms),
+        name='platform_capacity'
+    )
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 10 rows, 150 columns and 150 nonzeros
+Model fingerprint: 0x695e2ad0
+Variable types: 0 continuous, 150 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+02, 8e+02]
+  Objective range  [1e+01, 9e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [6e+02, 2e+03]
+Found heuristic solution: objective 1452.0000000
+Presolve removed 9 rows and 146 columns
+Presolve time: 0.01s
+Presolved: 1 rows, 4 columns, 4 nonzeros
+Found heuristic solution: objective 5034.0000000
+Variable types: 0 continuous, 4 integer (1 binary)
+Found heuristic solution: objective 5376.0000000
+
+Root relaxation: objective 5.468046e+03, 1 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 5468.04615    0    1 5376.00000 5468.04615  1.71%     -    0s
+H    0     0                    5430.0000000 5468.04615  0.70%     -    0s
+H    0     0                    5433.0000000 5468.04615  0.65%     -    0s
+     0     0 5468.04615    0    1 5433.00000 5468.04615  0.65%     -    0s
+
+Explored 1 nodes (1 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 5: 5433 5430 5376 ... 1452
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.433000000000e+03, best bound 5.433000000000e+03, gap 0.0000%
+ObjVal: 5433.0
+C0: -0.0
+C1: 0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: 9.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: 0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: 12.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: 0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: -0.0
+C41: 11.0
+C42: -0.0
+C43: -0.0
+C44: -0.0
+C45: -0.0
+C46: 1.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: -0.0
+C52: -0.0
+C53: -0.0
+C54: -0.0
+C55: -0.0
+C56: 6.0
+C57: -0.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: 1.0
+C62: -0.0
+C63: -0.0
+C64: -0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: 8.0
+C72: -0.0
+C73: -0.0
+C74: -0.0
+C75: -0.0
+C76: -0.0
+C77: -0.0
+C78: -0.0
+C79: -0.0
+C80: -0.0
+C81: -0.0
+C82: 0.0
+C83: 0.0
+C84: -0.0
+C85: 0.0
+C86: 4.0
+C87: -0.0
+C88: -0.0
+C89: 0.0
+C90: -0.0
+C91: 0.0
+C92: -0.0
+C93: -0.0
+C94: -0.0
+C95: -0.0
+C96: -0.0
+C97: -0.0
+C98: 0.0
+C99: -0.0
+C100: 0.0
+C101: 5.0
+C102: -0.0
+C103: -0.0
+C104: -0.0
+C105: -0.0
+C106: 1.0
+C107: -0.0
+C108: -0.0
+C109: -0.0
+C110: -0.0
+C111: -0.0
+C112: -0.0
+C113: -0.0
+C114: -0.0
+C115: -0.0
+C116: 9.0
+C117: -0.0
+C118: -0.0
+C119: -0.0
+C120: -0.0
+C121: 2.0
+C122: -0.0
+C123: -0.0
+C124: -0.0
+C125: -0.0
+C126: 0.0
+C127: -0.0
+C128: -0.0
+C129: -0.0
+C130: 0.0
+C131: 6.0
+C132: -0.0
+C133: -0.0
+C134: -0.0
+C135: -0.0
+C136: 2.0
+C137: -0.0
+C138: -0.0
+C139: -0.0
+C140: -0.0
+C141: -0.0
+C142: -0.0
+C143: -0.0
+C144: -0.0
+C145: -0.0
+C146: 5.0
+C147: -0.0
+C148: -0.0
+C149: -0.0
+Optimal objective: 5433.0
+Optimal solution: [('C0', -0.0), ('C1', 0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', 9.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', 0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', 12.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', 0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', 11.0), ('C42', -0.0), ('C43', -0.0), ('C44', -0.0), ('C45', -0.0), ('C46', 1.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', 6.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', 1.0), ('C62', -0.0), ('C63', -0.0), ('C64', -0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', 8.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0), ('C80', -0.0), ('C81', -0.0), ('C82', 0.0), ('C83', 0.0), ('C84', -0.0), ('C85', 0.0), ('C86', 4.0), ('C87', -0.0), ('C88', -0.0), ('C89', 0.0), ('C90', -0.0), ('C91', 0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', -0.0), ('C96', -0.0), ('C97', -0.0), ('C98', 0.0), ('C99', -0.0), ('C100', 0.0), ('C101', 5.0), ('C102', -0.0), ('C103', -0.0), ('C104', -0.0), ('C105', -0.0), ('C106', 1.0), ('C107', -0.0), ('C108', -0.0), ('C109', -0.0), ('C110', -0.0), ('C111', -0.0), ('C112', -0.0), ('C113', -0.0), ('C114', -0.0), ('C115', -0.0), ('C116', 9.0), ('C117', -0.0), ('C118', -0.0), ('C119', -0.0), ('C120', -0.0), ('C121', 2.0), ('C122', -0.0), ('C123', -0.0), ('C124', -0.0), ('C125', -0.0), ('C126', 0.0), ('C127', -0.0), ('C128', -0.0), ('C129', -0.0), ('C130', 0.0), ('C131', 6.0), ('C132', -0.0), ('C133', -0.0), ('C134', -0.0), ('C135', -0.0), ('C136', 2.0), ('C137', -0.0), ('C138', -0.0), ('C139', -0.0), ('C140', -0.0), ('C141', -0.0), ('C142', -0.0), ('C143', -0.0), ('C144', -0.0), ('C145', -0.0), ('C146', 5.0), ('C147', -0.0), ('C148', -0.0), ('C149', -0.0)]

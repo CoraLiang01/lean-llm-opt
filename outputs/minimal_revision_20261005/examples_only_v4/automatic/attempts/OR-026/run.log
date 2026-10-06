@@ -1,0 +1,191 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to determine whether this is a clean instance of NRM, RA, or another class. The objective is to maximize total revenue from fulfilling demand for 'Fashion' products, subject to initial inventory levels. Decision variables are fulfillment quantities for each product. Demand is deterministic and known. There is no mention of replenishment, production, or additional mechanisms. I should call FileQA to compare with structurally similar problems.
+
+Action: FileQA
+
+Action Input: maximize total revenue by fulfilling deterministic known demand for fashion products, subject to initial inventory constraints, with decision variables as fulfilled units per product and no replenishment
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A supermarket needs to allocate various products, including high-demand items like the Sony Alpha Refrigerator, Sony Bravia XR, and Sony PlayStation 5, across different retail shelves. The product values and space requirements are provided in the "Products.csv" dataset. Additionally, the store has multiple shelves, each with a total space limit and specific space constraints for Sony and Apple products, as outlined in the "Capacity.csv" file. The goal is to determine the optimal number of units of each Sony product to place on each shelf to maximize total value while ensuring that the space used by Sony products on each shelf does not exceed the brand-specific limits. The decision variables x_ij represent the number of units of product i to be placed on shelf j. The variables x_ij must be nonnegative integers because the products are counted in whole units.
+Type: RA
+
+[Retrieved example 2]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 4]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem's objective is to maximize total revenue by fulfilling deterministic, known demand for 'Fashion' products, subject to initial inventory constraints. The decision variables are the number of units of each product to fulfill. There is no replenishment, production, or additional mechanism—just allocation of existing inventory to demand. The retrieved examples include resource allocation (RA) models with similar structure (example 1), as well as mixture models that involve batch sizes, setup costs, or production activation, which are not present here. There is no transportation, facility location, or assignment structure. This is a clean allocation of fixed inventory to deterministic demand to maximize revenue, matching the NRM definition.
+
+Final Answer: NRM[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract the relevant table
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Required table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+    # Build index set I: all products where "Product Name" contains 'Fashion accessories_'
+    I = []
+    product_data = {}
+    for rec in table["records"]:
+        pname = rec["values"]["Product Name"]
+        if "fashion accessories_".casefold() in pname.casefold():
+            key = pname
+            I.append(key)
+            try:
+                r = float(rec["values"]["Revenue"])
+                d = int(rec["values"]["Demand"])
+                s = int(rec["values"]["Initial Inventory"])
+            except Exception as e:
+                raise RuntimeError(f"Invalid data for product '{pname}': {e}")
+            product_data[key] = {"Revenue": r, "Demand": d, "Initial Inventory": s}
+
+    # Validate all required data present
+    for i in I:
+        if i not in product_data:
+            raise RuntimeError(f"Missing data for product {i}")
+
+    # Build bounds for each x_i
+    lb = {}
+    ub = {}
+    obj = {}
+    for i in I:
+        d = product_data[i]["Demand"]
+        s = product_data[i]["Initial Inventory"]
+        r = product_data[i]["Revenue"]
+        lb[i] = 0
+        ub[i] = min(d, s)
+        obj[i] = r
+
+    m = gp.Model()
+    # Decision variables: x_i integer, 0 <= x_i <= min{d_i, s_i}
+    x = m.addVars(I, lb=lb, ub=ub, obj=obj, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.ModelSense = GRB.MAXIMIZE
+    m.setObjective(gp.quicksum(obj[i] * x[i] for i in I))
+
+    # Constraints: 0 <= x_i <= min{d_i, s_i} (already set by bounds)
+    # No further constraints needed
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for i in I:
+            print(x[i].VarName, x[i].X)
+    else:
+        print(m.Status)
+    return m
+
+m = solve_problem(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 0 rows, 49 columns and 0 nonzeros
+Model fingerprint: 0xabd6a207
+Variable types: 0 continuous, 49 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [1e+01, 4e+01]
+  Bounds range     [2e+00, 1e+01]
+  RHS range        [0e+00, 0e+00]
+Found heuristic solution: objective 8851.7500000
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 8851.75 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 8.851750000000e+03, best bound 8.851750000000e+03, gap 0.0000%
+8851.75
+C0 12.0
+C1 2.0
+C2 10.0
+C3 2.0
+C4 2.0
+C5 5.0
+C6 2.0
+C7 2.0
+C8 11.0
+C9 2.0
+C10 6.0
+C11 9.0
+C12 14.0
+C13 6.0
+C14 8.0
+C15 6.0
+C16 14.0
+C17 2.0
+C18 14.0
+C19 11.0
+C20 2.0
+C21 3.0
+C22 8.0
+C23 10.0
+C24 10.0
+C25 7.0
+C26 11.0
+C27 11.0
+C28 5.0
+C29 3.0
+C30 8.0
+C31 13.0
+C32 7.0
+C33 14.0
+C34 4.0
+C35 2.0
+C36 2.0
+C37 14.0
+C38 2.0
+C39 6.0
+C40 2.0
+C41 2.0
+C42 3.0
+C43 14.0
+C44 12.0
+C45 7.0
+C46 6.0
+C47 13.0
+C48 14.0
+Optimal objective: 8851.75
+Optimal solution: [('C0', 12.0), ('C1', 2.0), ('C2', 10.0), ('C3', 2.0), ('C4', 2.0), ('C5', 5.0), ('C6', 2.0), ('C7', 2.0), ('C8', 11.0), ('C9', 2.0), ('C10', 6.0), ('C11', 9.0), ('C12', 14.0), ('C13', 6.0), ('C14', 8.0), ('C15', 6.0), ('C16', 14.0), ('C17', 2.0), ('C18', 14.0), ('C19', 11.0), ('C20', 2.0), ('C21', 3.0), ('C22', 8.0), ('C23', 10.0), ('C24', 10.0), ('C25', 7.0), ('C26', 11.0), ('C27', 11.0), ('C28', 5.0), ('C29', 3.0), ('C30', 8.0), ('C31', 13.0), ('C32', 7.0), ('C33', 14.0), ('C34', 4.0), ('C35', 2.0), ('C36', 2.0), ('C37', 14.0), ('C38', 2.0), ('C39', 6.0), ('C40', 2.0), ('C41', 2.0), ('C42', 3.0), ('C43', 14.0), ('C44', 12.0), ('C45', 7.0), ('C46', 6.0), ('C47', 13.0), ('C48', 14.0)]

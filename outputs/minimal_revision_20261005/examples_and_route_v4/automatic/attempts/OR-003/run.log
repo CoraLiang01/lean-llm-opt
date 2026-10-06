@@ -1,0 +1,234 @@
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/examples_and_route_v4/frozen_notebook.ipynb:cell13:329: LangChainDeprecationWarning: LangChain agents will continue to be supported, but it is recommended for new use cases to be built with LangGraph. LangGraph offers a more flexible and full-featured framework for building agents, including support for tool-calling, persistence of state, and human-in-the-loop workflows. For details, refer to the [LangGraph documentation](https://langchain-ai.github.io/langgraph/) as well as guides for [Migrating from AgentExecutor](https://python.langchain.com/docs/how_to/migrate_agent/) and LangGraph's [Pre-built ReAct agent](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent/).
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure of the problem. The objective is to minimize total transportation cost by allocating goods from suppliers (with supply capacities) to customer groups (with demands), ensuring all demands are met and no supplier exceeds its capacity. The decision variables are the shipment quantities from each supplier to each customer group. There are no additional mechanisms such as vehicle-count coupling, batch decisions, or multi-stage constraints mentioned. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: minimize total transportation cost by allocating goods from multiple suppliers (with supply capacities) to customer groups (with demands), determining shipment quantities from each supplier to each customer group, ensuring all demands are met and no supplier exceeds its capacity
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others
+
+[Retrieved example 2]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP
+
+[Retrieved example 3]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: A specialty chemical factory produces three premium products (A, B, C) by blending three raw materials (1, 2, 3). The factory supplies custom formulations to high-end manufacturers:
+
+Product A is a precision industrial lubricant requiring ≥50% Material 1 and ≤25% Material 2
+Product B is an aerospace-grade adhesive requiring ≥25% Material 1 and ≤50% Material 2
+Product C is a general-purpose compound with no material restrictions
+Raw material costs and availability are in raw_materials.csv, while product specifications and selling prices are in products.csv. Determine the optimal blending plan to maximize daily profit.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem's objective is to minimize total transportation cost by allocating goods from multiple suppliers (with supply capacities) to customer groups (with demands), determining shipment quantities from each supplier to each customer group. The main constraints are that all customer demands must be met and no supplier's capacity is exceeded. The decision variables are the shipment quantities from each supplier to each customer group. There are no additional mechanisms such as supplier activation, fixed charges, batch decisions, blending, or multi-stage constraints. The retrieved examples include some with additional mechanisms (fixed supplier activation costs, blending, production planning), but none of these mechanisms are present in the current problem. The structure matches a clean transportation problem, but since TP is not an available workflow, I must select the most appropriate available label. Among the available options, this is a clean resource allocation of supplier capacities to customer demands via shipment quantities, with an additive cost objective and standard capacity and demand constraints, and no material hybrid or non-standard coupling.
+
+Final Answer: RA[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract tables
+    tables = {t['table_id']: t for t in CSVQA_DATA['tables']}
+    # Customers and demands
+    cust_table = tables['file_0_view_0']
+    customers = [r['values']['customer'] for r in cust_table['records']]
+    demand = {r['values']['customer']: float(r['values']['demand']) for r in cust_table['records']}
+    # Suppliers and capacities
+    supp_table = tables['file_1_view_0']
+    suppliers = [r['values']['Unnamed: 0'] for r in supp_table['records']]
+    supply_capacity = {r['values']['Unnamed: 0']: float(r['values']['supply_capacity']) for r in supp_table['records']}
+    # Transportation costs
+    cost_table = tables['file_2_view_0']
+    # Validate matrix shape and axes
+    if len(cost_table['records']) != len(suppliers):
+        raise ValueError("Mismatch in number of suppliers in cost matrix")
+    for r in cost_table['records']:
+        if set(customers) - set(r['values'].keys()):
+            raise ValueError("Cost matrix missing customer columns")
+    # Build cost dictionary
+    tsc = {}
+    for r in cost_table['records']:
+        s = r['values']['Unnamed: 0']
+        for c in customers:
+            tsc[(s, c)] = float(r['values'][c])
+    # Validate all required data present
+    for s in suppliers:
+        if s not in supply_capacity:
+            raise ValueError(f"Missing supply capacity for supplier {s}")
+        for c in customers:
+            if (s, c) not in tsc:
+                raise ValueError(f"Missing transportation cost for ({s},{c})")
+    for c in customers:
+        if c not in demand:
+            raise ValueError(f"Missing demand for customer {c}")
+    # Model
+    m = gp.Model('transportation')
+    m.setParam('MIPGap', 1e-4)
+    # Decision variables: x_{sc} >= 0, continuous
+    x_keys = [(s, c) for s in suppliers for c in customers]
+    x = m.addVars(x_keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    # Objective: minimize total transportation cost
+    m.setObjective(gp.quicksum(tsc[(s, c)] * x[s, c] for s in suppliers for c in customers), GRB.MINIMIZE)
+    # Supply capacity constraints
+    m.addConstrs(
+        (gp.quicksum(x[s, c] for c in customers) <= supply_capacity[s] for s in suppliers),
+        name='supply_capacity'
+    )
+    # Demand satisfaction constraints
+    m.addConstrs(
+        (gp.quicksum(x[s, c] for s in suppliers) == demand[c] for c in customers),
+        name='demand'
+    )
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 20 rows, 100 columns and 200 nonzeros
+Model fingerprint: 0x0df5a65b
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [6e-03, 2e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+02, 3e+02]
+Presolve time: 0.00s
+Presolved: 20 rows, 100 columns, 200 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    1.9571527e+04   9.120000e+02   0.000000e+00      0s
+      10    3.6778511e+04   0.000000e+00   0.000000e+00      0s
+
+Solved in 10 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  3.677851094e+04
+ObjVal: 36778.51094448115
+C0: 0.0
+C1: 120.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 0.0
+C7: 0.0
+C8: 168.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 168.0
+C20: 216.0
+C21: 0.0
+C22: 0.0
+C23: 24.0
+C24: 0.0
+C25: 24.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 216.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 216.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 144.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 168.0
+C68: 0.0
+C69: 0.0
+C70: 0.0
+C71: 0.0
+C72: 48.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 48.0
+C82: 0.0
+C83: 192.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 168.0
+C96: 0.0
+C97: 0.0
+C98: 0.0
+C99: 0.0
+Optimal objective: 36778.51094448115
+Optimal solution: [('C0', 0.0), ('C1', 120.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 168.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 168.0), ('C20', 216.0), ('C21', 0.0), ('C22', 0.0), ('C23', 24.0), ('C24', 0.0), ('C25', 24.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 216.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 216.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 144.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 168.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 48.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 48.0), ('C82', 0.0), ('C83', 192.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 168.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0)]

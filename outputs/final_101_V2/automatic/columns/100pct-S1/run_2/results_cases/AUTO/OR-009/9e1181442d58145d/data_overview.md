@@ -1,0 +1,24 @@
+archive_revision_number,Capacity
+7,586
+
+record_keeper_group,archived_attachment_count,archive_revision_number,ProductName,Value,Weight
+Team B,6,9,Queens,469,954
+Team C,3,6,Brooklyn,290,650
+Team C,1,1,Manhattan,236,961
+Team B,1,2,Bronx,235,950
+Team B,6,6,Staten Island,745,379
+Team B,3,9,Harlem,684,776
+Team A,1,2,Upper East Side,444,381
+Team C,3,5,Lower Manhattan,172,808
+Team B,2,9,Midtown,1000,937
+Team B,3,1,Long Island City,336,608
+Team B,2,3,Williamsburg,546,912
+Team C,6,1,Bushwick,535,391
+Team A,3,5,Flatbush,539,465
+Team C,2,7,Greenpoint,831,490
+Team A,1,6,Park Slope,139,918
+Team B,6,1,Astoria,432,787
+Team C,6,1,Jackson Heights,627,347
+Team C,2,7,Flushing,629,274
+Team A,4,6,Sunnyside,292,642
+Team B,2,7,Ditmars,978,130

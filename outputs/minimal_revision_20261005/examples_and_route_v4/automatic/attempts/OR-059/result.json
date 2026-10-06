@@ -1,0 +1,368 @@
+{
+  "problem_id": "OR-059",
+  "query": "In the context of Colorado Motor Vehicle Sales, multiple car dealerships require inventory, and several suppliers located in different cities can provide the necessary vehicles. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in \u201cfixed_cost.csv.\u201d Each dealership needs to source a certain number of vehicles from these suppliers. For each dealership, the transportation cost per vehicle from each supplier is recorded in \u201ctransportation_costs.csv.\u201d Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to open so that the demand of all dealerships is met while minimizing the total cost. The decision variables y_i are binary, indicating whether a supplier is operational (open). The decision variables x_{ij} represent the quantity of vehicles that dealership S_j sources from supplier F_i. For each dealership, x_{ij} represents the proportion of the total supply obtained from different suppliers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP2/demand.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP2/fixed_cost.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP2/transportation_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "FLP",
+  "true_route": "FLP",
+  "label_objective": 1862205008487.07,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine which vehicle suppliers to open (incurring fixed costs) and how much each dealership should source from each supplier, so that all dealerships\u2019 vehicle demands are met at minimum total cost (fixed supplier opening costs plus transportation costs).\n2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem, specifically a Fixed-Charge Facility Location (Uncapacitated Facility Location) problem.\n3.  **Define Index Sets:** The primary indices are:\n    - Suppliers (Facilities): S = {S1, S2, ..., S8} (from fixed_cost.csv and transportation_costs.csv)\n    - Dealerships (Customers): C = {C1, C2, ..., C9} (from demand.csv and transportation_costs.csv)\n4.  **Define Decision Variables:**\n    -   `x[i,j]` = Number of vehicles supplied from supplier S_i to dealership C_j. Type: GRB.CONTINUOUS (nonnegative, can be fractional if not otherwise restricted).\n    -   `y[i]` = 1 if supplier S_i is opened (operational), 0 otherwise. Type: GRB.BINARY.\n5.  **Identify Parameters (from Schema):**\n    -   Fixed supplier opening costs: from fixed_cost.csv, column 'fixed_costs', indexed by supplier S_i.\n    -   Transportation cost per vehicle: from transportation_costs.csv, columns 'C1'...'C9', indexed by supplier S_i and dealership C_j.\n    -   Dealership demand: from demand.csv, column 'demand', indexed by dealership C_j.\n6.  **Formulate Objective:** Minimize the total cost, which is the sum of:\n    - The fixed opening costs for all suppliers that are opened: sum over i of fixed_costs[i] * y[i]\n    - The transportation costs for all vehicles shipped: sum over i,j of transportation_costs[i][j] * x[i,j]\n    - So, Objective: Minimize sum_i (fixed_costs[i] * y[i]) + sum_{i,j} (transportation_costs[i][j] * x[i,j])\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand Satisfaction): For each dealership C_j, the total vehicles received from all suppliers must equal its demand:\n        - sum over i of x[i,j] = demand[j], for all j in C\n    -   Constraint 2 (Supplier Activation): For each supplier S_i and dealership C_j, vehicles can only be supplied if the supplier is open:\n        - x[i,j] \u2264 M_j * y[i], for all i in S, j in C\n        - (Where M_j is a sufficiently large number, e.g., the total demand of dealership C_j)\n    -   Constraint 3 (Nonnegativity): x[i,j] \u2265 0 for all i, j\n    -   Constraint 4 (Binary): y[i] \u2208 {0,1} for all i\n    -   (No explicit supplier capacity constraints are given, so each supplier can serve any or all dealerships if opened.)\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP2/demand.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 9\nColumns: ['customer', 'demand']\nParsed column types: {'customer': 'object', 'demand': 'int64'}\nPreview only (first 10 rows):\ncustomer      demand\n      C1  4742532000\n      C2  1600594000\n      C3  5086889000\n      C4  1027326000\n      C5 11926044000\n      C6  9058407000\n      C7  5344367000\n      C8   677201000\n      C9  3236493000\nFull-file column statistics: {\"customer\": {\"missing\": 0, \"unique_nonempty\": 9}, \"demand\": {\"missing\": 0, \"unique_nonempty\": 9, \"numeric_range\": [677201000.0, 11926044000.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"demand.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"fixed_cost.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"transportation_costs.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP2/fixed_cost.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 8\nColumns: ['Unnamed: 0', 'fixed_costs']\nParsed column types: {'Unnamed: 0': 'object', 'fixed_costs': 'float64'}\nPreview only (first 10 rows):\nUnnamed: 0 fixed_costs\n        S1      100.64\n        S2       98.72\n        S3      100.18\n        S4       96.58\n        S5       95.75\n        S6       99.06\n        S7      101.78\n        S8       93.86\nFull-file column statistics: {\"Unnamed: 0\": {\"missing\": 0, \"unique_nonempty\": 8}, \"fixed_costs\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [93.86, 101.78]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"fixed_cost.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"transportation_costs.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP2/transportation_costs.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 8\nColumns: ['Unnamed: 0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9']\nParsed column types: {'Unnamed: 0': 'object', 'C1': 'float64', 'C2': 'float64', 'C3': 'float64', 'C4': 'float64', 'C5': 'float64', 'C6': 'float64', 'C7': 'float64', 'C8': 'float64', 'C9': 'float64'}\nPreview only (first 10 rows):\nUnnamed: 0      C1      C2      C3      C4      C5      C6      C7      C8      C9\n        S1 1091.04   85.72   99.08  747.35  893.86   23.65   15.11   15.03  497.88\n        S2   58.88 1617.16 1786.44  951.81   56.45  642.77   16.69    0.63    11.2\n        S3  110.47    0.04   38.89 1397.95 2361.45  107.62  1598.5   76.41 1382.84\n        S4 1458.85 1049.27  597.32  1731.9   69.09 1227.17 1187.55 1017.16   52.15\n        S5    0.38 2315.52 1313.06 1253.71   50.24   29.19   60.17 1077.35   70.11\n        S6    58.2 1395.81    84.6  830.64 1003.86  631.17   31.13     1.4  246.24\n        S7 1255.23 1382.31   78.79  829.02   67.31  877.35  185.28  221.98    0.05\n        S8 1990.09    1.23   38.97 1396.35  112.54  107.54 1596.74   76.32 1183.79\nFull-file column statistics: {\"Unnamed: 0\": {\"missing\": 0, \"unique_nonempty\": 8}, \"C1\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [0.38, 1990.09]}, \"C2\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [0.04, 2315.52]}, \"C3\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [38.89, 1786.44]}, \"C4\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [747.35, 1731.9]}, \"C5\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [50.24, 2361.45]}, \"C6\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [23.65, 1227.17]}, \"C7\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [15.11, 1598.5]}, \"C8\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [0.63, 1077.35]}, \"C9\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [0.05, 1382.84]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"fixed_cost.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"transportation_costs.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"3fb674546c738e8d3c251b28e416dc19c25fad4c95072b545b5730a04637069b\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\n\ndef solve_uflp():\n    demand_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP2/demand.csv'\n    fixed_cost_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP2/fixed_cost.csv'\n    trans_cost_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP2/transportation_costs.csv'\n    demand_df = pd.read_csv(demand_path, sep=',')\n    fixed_cost_df = pd.read_csv(fixed_cost_path, sep=',')\n    trans_cost_df = pd.read_csv(trans_cost_path, sep=',')\n    suppliers_fc = fixed_cost_df['Unnamed: 0'].astype(str).str.strip().tolist()\n    suppliers_tc = trans_cost_df['Unnamed: 0'].astype(str).str.strip().tolist()\n    if set(suppliers_fc) != set(suppliers_tc):\n        raise ValueError('Supplier sets in fixed_cost.csv and transportation_costs.csv do not match.')\n    suppliers = suppliers_fc\n    customers_demand = demand_df['customer'].astype(str).str.strip().tolist()\n    customers_tc = [c for c in trans_cost_df.columns if c.startswith('C')]\n    if set(customers_demand) != set(customers_tc):\n        raise ValueError('Customer sets in demand.csv and transportation_costs.csv do not match.')\n    customers = customers_demand\n    fixed_costs = dict(zip(fixed_cost_df['Unnamed: 0'].astype(str).str.strip(), fixed_cost_df['fixed_costs']))\n    demand = dict(zip(demand_df['customer'].astype(str).str.strip(), demand_df['demand']))\n    trans_cost = {}\n    for (idx, row) in trans_cost_df.iterrows():\n        s = str(row['Unnamed: 0']).strip()\n        for c in customers:\n            if c not in trans_cost_df.columns:\n                raise ValueError(f'Customer {c} not found in transportation_costs.csv columns.')\n            cost = row[c]\n            trans_cost[s, c] = float(cost)\n    for s in suppliers:\n        if s not in fixed_costs:\n            raise ValueError(f'Missing fixed cost for supplier {s}')\n        for c in customers:\n            if (s, c) not in trans_cost:\n                raise ValueError(f'Missing transportation cost for supplier {s}, customer {c}')\n    for c in customers:\n        if c not in demand:\n            raise ValueError(f'Missing demand for customer {c}')\n    m = gp.Model('UFLP_Colorado_Motor_Vehicle_Sales')\n    m.Params.MIPGap = 0.0001\n    x = m.addVars([(s, c) for s in suppliers for c in customers], lb=0.0, vtype=gp.GRB.CONTINUOUS, name='')\n    y = m.addVars(suppliers, vtype=gp.GRB.BINARY, name='')\n    obj = gp.quicksum((fixed_costs[s] * y[s] for s in suppliers)) + gp.quicksum((trans_cost[s, c] * x[s, c] for s in suppliers for c in customers))\n    m.setObjective(obj, gp.GRB.MINIMIZE)\n    for c in customers:\n        m.addConstr(gp.quicksum((x[s, c] for s in suppliers)) == demand[c], name=f'demand_{c}')\n    for s in suppliers:\n        for c in customers:\n            m.addConstr(x[s, c] <= demand[c] * y[s], name=f'link_{s}_{c}')\n    m.optimize()\n    if m.Status == gp.GRB.OPTIMAL:\n        print(f'ObjVal {m.ObjVal}')\n        for v in m.getVars():\n            print(f'{v.VarName} {v.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_uflp()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 1862205008776.57,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      0.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      1027326000.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      9058407000.0
+    ],
+    [
+      "C6",
+      5344367000.0
+    ],
+    [
+      "C7",
+      0.0
+    ],
+    [
+      "C8",
+      0.0
+    ],
+    [
+      "C9",
+      0.0
+    ],
+    [
+      "C10",
+      0.0
+    ],
+    [
+      "C11",
+      0.0
+    ],
+    [
+      "C12",
+      0.0
+    ],
+    [
+      "C13",
+      0.0
+    ],
+    [
+      "C14",
+      0.0
+    ],
+    [
+      "C15",
+      0.0
+    ],
+    [
+      "C16",
+      677201000.0
+    ],
+    [
+      "C17",
+      0.0
+    ],
+    [
+      "C18",
+      0.0
+    ],
+    [
+      "C19",
+      1600594000.0
+    ],
+    [
+      "C20",
+      5086889000.0
+    ],
+    [
+      "C21",
+      0.0
+    ],
+    [
+      "C22",
+      0.0
+    ],
+    [
+      "C23",
+      0.0
+    ],
+    [
+      "C24",
+      0.0
+    ],
+    [
+      "C25",
+      0.0
+    ],
+    [
+      "C26",
+      0.0
+    ],
+    [
+      "C27",
+      0.0
+    ],
+    [
+      "C28",
+      0.0
+    ],
+    [
+      "C29",
+      0.0
+    ],
+    [
+      "C30",
+      0.0
+    ],
+    [
+      "C31",
+      0.0
+    ],
+    [
+      "C32",
+      0.0
+    ],
+    [
+      "C33",
+      0.0
+    ],
+    [
+      "C34",
+      0.0
+    ],
+    [
+      "C35",
+      0.0
+    ],
+    [
+      "C36",
+      4742532000.0
+    ],
+    [
+      "C37",
+      0.0
+    ],
+    [
+      "C38",
+      0.0
+    ],
+    [
+      "C39",
+      0.0
+    ],
+    [
+      "C40",
+      11926044000.0
+    ],
+    [
+      "C41",
+      0.0
+    ],
+    [
+      "C42",
+      0.0
+    ],
+    [
+      "C43",
+      0.0
+    ],
+    [
+      "C44",
+      0.0
+    ],
+    [
+      "C45",
+      0.0
+    ],
+    [
+      "C46",
+      0.0
+    ],
+    [
+      "C47",
+      0.0
+    ],
+    [
+      "C48",
+      0.0
+    ],
+    [
+      "C49",
+      0.0
+    ],
+    [
+      "C50",
+      0.0
+    ],
+    [
+      "C51",
+      0.0
+    ],
+    [
+      "C52",
+      0.0
+    ],
+    [
+      "C53",
+      0.0
+    ],
+    [
+      "C54",
+      0.0
+    ],
+    [
+      "C55",
+      0.0
+    ],
+    [
+      "C56",
+      0.0
+    ],
+    [
+      "C57",
+      0.0
+    ],
+    [
+      "C58",
+      0.0
+    ],
+    [
+      "C59",
+      0.0
+    ],
+    [
+      "C60",
+      0.0
+    ],
+    [
+      "C61",
+      0.0
+    ],
+    [
+      "C62",
+      3236493000.0
+    ],
+    [
+      "C63",
+      0.0
+    ],
+    [
+      "C64",
+      0.0
+    ],
+    [
+      "C65",
+      0.0
+    ],
+    [
+      "C66",
+      0.0
+    ],
+    [
+      "C67",
+      0.0
+    ],
+    [
+      "C68",
+      0.0
+    ],
+    [
+      "C69",
+      0.0
+    ],
+    [
+      "C70",
+      0.0
+    ],
+    [
+      "C71",
+      0.0
+    ],
+    [
+      "C72",
+      1.0
+    ],
+    [
+      "C73",
+      1.0
+    ],
+    [
+      "C74",
+      1.0
+    ],
+    [
+      "C75",
+      1.0
+    ],
+    [
+      "C76",
+      1.0
+    ],
+    [
+      "C77",
+      1.0
+    ],
+    [
+      "C78",
+      1.0
+    ],
+    [
+      "C79",
+      1.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "loto_variant": "examples_and_route",
+  "held_out_type": "FLP",
+  "disabled_workflow_route": "FLP",
+  "allowed_labels": "TP,NRM,RA,AP,Mixture,Others",
+  "reference_sha256": "6b2987f96aeacece9f458d55aca072436922aec963be16223ac30a8890f79097",
+  "reference_count_after": 14,
+  "route_allowed": true,
+  "classification_correct": false,
+  "solution_correct": true,
+  "seconds": 34.646,
+  "classification_source": "computed",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "27b17404536910dec6442e66cce5a76d0dc4c391b243142a3f5b75e5f9962a4d",
+  "notebook_source_sha256": "4d58c52ec5896bf68857d7f4054b4725779ed4be6e4c81da76d753e7ebcd44d7",
+  "cache_fingerprint": "da377ea69dac90487ce3c7f0b7d964ca72d52624145c451e9408b01f72585018",
+  "evaluated_utc": "2026-10-05T15:30:40.763266+00:00"
+}

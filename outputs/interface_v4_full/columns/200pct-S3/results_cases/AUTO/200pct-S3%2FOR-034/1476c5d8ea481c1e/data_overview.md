@@ -1,0 +1,21 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete 20260928/200pct/S3/Large-scale-or/Others_example/Others3/value.csv
+CSV delimiter: comma; first line consumed as header.
+Total rows: 140
+Columns: ['item', 'display_campaign_previous_season', 'value', 'value_two_seasons_ago', 'value_previous_season', 'weight', 'price_review_group_previous_season', 'weight_previous_packaging', 'category_previous_season']
+Parsed column types: {'item': 'int64', 'display_campaign_previous_season': 'object', 'value': 'int64', 'value_two_seasons_ago': 'int64', 'value_previous_season': 'int64', 'weight': 'int64', 'price_review_group_previous_season': 'object', 'weight_previous_packaging': 'int64', 'category_previous_season': 'object'}
+Preview only (first 10 rows):
+item display_campaign_previous_season value value_two_seasons_ago value_previous_season weight price_review_group_previous_season weight_previous_packaging category_previous_season
+   1                     FeatureFocus    10                     8                     9      2                     InternalReview                         3                Equipment
+   2                       ValueFocus    40                    37                    44      5                        JointReview                         6                Household
+   3                       ValueFocus    30                    26                    29      4                        JointReview                         5                 Supplies
+   4                       ValueFocus    50                    59                    58      8                        JointReview                         7                 Supplies
+   5                      BundleFocus    35                    37                    34      7                     InternalReview                         8                 Supplies
+   6                      BundleFocus     6                     7                     7      1                        JointReview                         2                 Supplies
+   7                       ValueFocus    33                    35                    34      8                        JointReview                         7                 Supplies
+   8                      BundleFocus    57                    51                    51      7                     SupplierReview                         8                Equipment
+   9                     FeatureFocus    42                    36                    41      5                     SupplierReview                         6                Household
+  10                      BundleFocus    24                    26                    27      5                     SupplierReview                         6                Household
+Full-file column statistics: {"item": {"missing": 0, "unique_nonempty": 140, "numeric_range": [1.0, 140.0]}, "display_campaign_previous_season": {"missing": 0, "unique_nonempty": 3}, "value": {"missing": 0, "unique_nonempty": 62, "numeric_range": [4.0, 82.0]}, "value_two_seasons_ago": {"missing": 0, "unique_nonempty": 59, "numeric_range": [4.0, 85.0]}, "value_previous_season": {"missing": 0, "unique_nonempty": 63, "numeric_range": [5.0, 82.0]}, "weight": {"missing": 0, "unique_nonempty": 10, "numeric_range": [1.0, 10.0]}, "price_review_group_previous_season": {"missing": 0, "unique_nonempty": 3}, "weight_previous_packaging": {"missing": 0, "unique_nonempty": 10, "numeric_range": [2.0, 11.0]}, "category_previous_season": {"missing": 0, "unique_nonempty": 4}}
+Matching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.
+Counts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.
+Query-name evidence: [{"term": "value", "matching_columns": [{"column": "display_campaign_previous_season", "exact": 0, "prefix": 43, "contains": 43, "examples": ["ValueFocus"]}], "exact_matching_columns": 0}, {"term": "weight", "matching_columns": [], "exact_matching_columns": 0}]

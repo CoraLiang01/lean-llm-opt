@@ -1,0 +1,387 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure. The problem involves selecting a subset of warehouse locations (facility-opening decisions with fixed costs), assigning customer demand to opened warehouses (assignment/shipment decisions), and minimizing the sum of fixed opening and variable transportation costs. Each warehouse has a capacity constraint. I should call FileQA once to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: facility-opening decisions with fixed costs, assignment of customer demand to opened facilities, warehouse capacity constraints, and minimization of total fixed and variable transportation costs
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 2]
+prompt: A factory needs to rent a warehouse to store materials for the next 4 months. The required warehouse area for each month is listed in 39-1.csv.The longer the rental contract period, the greater the discount on warehouse rental fees. The specific data is listed in 39-2.csv.
+
+The warehouse rental contract can be processed at the beginning of each month, and each contract specifies the rental area and period. Therefore, the factory can rent a contract on any month, and each time, they can sign one contract or multiple contracts with different rental areas and rental periods. The overall goal is to minimize the rental fees paid. Try to establish a linear programming mathematical model based on the above requirements.
+Type: Others
+
+[Retrieved example 3]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem involves selecting which warehouses to open (facility-opening decisions with fixed costs), assigning customer demand to opened warehouses (assignment/shipment decisions), and minimizing the sum of fixed opening and variable transportation costs. Each warehouse has a capacity constraint. The retrieved examples include a canonical transportation problem (TP) with only shipment quantities, but the current problem adds facility-opening (location) decisions with fixed costs, which is the defining feature of the Facility Location Problem (FLP). The other retrieved examples either lack the facility-opening mechanism or involve additional production or batch mechanisms not present here. The current formulation matches the canonical FLP structure.
+
+Final Answer: FLP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract tables
+    tables = {t['table_id']: t for t in CSVQA_DATA['tables']}
+    # Warehouses
+    warehouse_table = tables['file_1_view_0']
+    W = []
+    f_w = {}
+    cap_w = {}
+    for rec in warehouse_table['records']:
+        w = rec['values']['Warehouse ID']
+        W.append(w)
+        f_w[w] = float(rec['values']['Fixed_Cost'])
+        cap_w[w] = float(rec['values']['Capacity'])
+    # Customers
+    customer_table = tables['file_2_view_0']
+    C = []
+    d_c = {}
+    for rec in customer_table['records']:
+        c = rec['values']['Customer ID']
+        C.append(c)
+        d_c[c] = float(rec['values']['Demand'])
+    # Transportation cost matrix
+    cost_table = tables['file_0_view_0']
+    t_wc = {}
+    # Validate matrix dimensions and coverage
+    cost_rows = [rec['values']['Warehouse ID'] for rec in cost_table['records']]
+    cost_cols = [col for col in cost_table['columns'] if col != 'Warehouse ID']
+    if set(W) != set(cost_rows):
+        raise ValueError("Warehouse IDs in cost matrix do not match warehouse table")
+    if set(C) != set(cost_cols):
+        raise ValueError("Customer IDs in cost matrix do not match customer table")
+    for rec in cost_table['records']:
+        w = rec['values']['Warehouse ID']
+        for c in C:
+            if c not in rec['values']:
+                raise ValueError(f"Missing cost for warehouse {w}, customer {c}")
+            t_wc[(w, c)] = float(rec['values'][c])
+    # Validate all required data present
+    for w in W:
+        if w not in f_w or w not in cap_w:
+            raise ValueError(f"Missing fixed cost or capacity for warehouse {w}")
+    for c in C:
+        if c not in d_c:
+            raise ValueError(f"Missing demand for customer {c}")
+    for w in W:
+        for c in C:
+            if (w, c) not in t_wc:
+                raise ValueError(f"Missing transportation cost for ({w},{c})")
+    # Model
+    m = gp.Model()
+    # Decision variables
+    y = m.addVars(W, vtype=GRB.BINARY, name='y')
+    x = m.addVars([(w, c) for w in W for c in C], lb=0, vtype=GRB.CONTINUOUS, name='x')
+    # Objective
+    m.setObjective(
+        gp.quicksum(f_w[w] * y[w] for w in W) +
+        gp.quicksum(t_wc[(w, c)] * x[(w, c)] for w in W for c in C),
+        GRB.MINIMIZE
+    )
+    # Constraints
+    # 1. Demand satisfaction
+    for c in C:
+        m.addConstr(gp.quicksum(x[(w, c)] for w in W) == d_c[c], name='demand_'+c)
+    # 2. Warehouse capacity
+    for w in W:
+        m.addConstr(gp.quicksum(x[(w, c)] for c in C) <= cap_w[w] * y[w], name='cap_'+w)
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    return m
+
+m = solve_problem(CSVQA_DATA)
+if m.Status == GRB.OPTIMAL:
+    print(m.ObjVal)
+    for v in m.getVars():
+        print(v.VarName, v.X)
+else:
+    print(m.Status)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 30 rows, 210 columns and 410 nonzeros
+Model fingerprint: 0x1a0e1743
+Variable types: 200 continuous, 10 integer (10 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+03]
+  Objective range  [5e+00, 4e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [3e+02, 1e+03]
+Presolve time: 0.00s
+Presolved: 30 rows, 210 columns, 410 nonzeros
+Variable types: 200 continuous, 10 integer (10 binary)
+Found heuristic solution: objective 103290.00000
+
+Root relaxation: objective 9.960000e+04, 16 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 99600.0000    0    4 103290.000 99600.0000  3.57%     -    0s
+     0     0 99670.0000    0    3 103290.000 99670.0000  3.50%     -    0s
+H    0     0                    103090.00000 99670.0000  3.32%     -    0s
+     0     0 102812.430    0    3 103090.000 102812.430  0.27%     -    0s
+     0     0 102837.500    0    2 103090.000 102837.500  0.24%     -    0s
+     0     0 102930.964    0    1 103090.000 102930.964  0.15%     -    0s
+     0     0     cutoff    0      103090.000 103090.000  0.00%     -    0s
+
+Cutting planes:
+  Gomory: 1
+  Implied bound: 2
+  MIR: 1
+
+Explored 1 nodes (40 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 103090 103290 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.030900000000e+05, best bound 1.030900000000e+05, gap 0.0000%
+103090.0
+C0 1.0
+C1 1.0
+C2 0.0
+C3 1.0
+C4 1.0
+C5 1.0
+C6 1.0
+C7 1.0
+C8 1.0
+C9 1.0
+C10 0.0
+C11 0.0
+C12 0.0
+C13 0.0
+C14 0.0
+C15 0.0
+C16 80.0
+C17 0.0
+C18 0.0
+C19 0.0
+C20 0.0
+C21 0.0
+C22 0.0
+C23 0.0
+C24 0.0
+C25 920.0
+C26 0.0
+C27 0.0
+C28 0.0
+C29 0.0
+C30 0.0
+C31 0.0
+C32 0.0
+C33 0.0
+C34 0.0
+C35 950.0
+C36 0.0
+C37 0.0
+C38 0.0
+C39 0.0
+C40 0.0
+C41 0.0
+C42 0.0
+C43 0.0
+C44 130.0
+C45 0.0
+C46 0.0
+C47 0.0
+C48 0.0
+C49 350.0
+C50 0.0
+C51 0.0
+C52 0.0
+C53 0.0
+C54 0.0
+C55 0.0
+C56 0.0
+C57 0.0
+C58 0.0
+C59 0.0
+C60 0.0
+C61 0.0
+C62 0.0
+C63 0.0
+C64 0.0
+C65 0.0
+C66 0.0
+C67 0.0
+C68 0.0
+C69 0.0
+C70 800.0
+C71 0.0
+C72 0.0
+C73 0.0
+C74 0.0
+C75 0.0
+C76 0.0
+C77 0.0
+C78 0.0
+C79 0.0
+C80 870.0
+C81 0.0
+C82 0.0
+C83 0.0
+C84 0.0
+C85 0.0
+C86 0.0
+C87 0.0
+C88 0.0
+C89 330.0
+C90 0.0
+C91 0.0
+C92 0.0
+C93 0.0
+C94 450.0
+C95 0.0
+C96 0.0
+C97 0.0
+C98 0.0
+C99 0.0
+C100 30.0
+C101 0.0
+C102 0.0
+C103 0.0
+C104 0.0
+C105 0.0
+C106 320.0
+C107 0.0
+C108 0.0
+C109 0.0
+C110 0.0
+C111 600.0
+C112 0.0
+C113 0.0
+C114 0.0
+C115 0.0
+C116 270.0
+C117 0.0
+C118 400.0
+C119 0.0
+C120 0.0
+C121 0.0
+C122 650.0
+C123 0.0
+C124 0.0
+C125 0.0
+C126 0.0
+C127 0.0
+C128 0.0
+C129 0.0
+C130 0.0
+C131 0.0
+C132 0.0
+C133 0.0
+C134 0.0
+C135 0.0
+C136 0.0
+C137 800.0
+C138 0.0
+C139 0.0
+C140 0.0
+C141 0.0
+C142 0.0
+C143 480.0
+C144 0.0
+C145 0.0
+C146 0.0
+C147 0.0
+C148 520.0
+C149 0.0
+C150 0.0
+C151 0.0
+C152 0.0
+C153 0.0
+C154 0.0
+C155 0.0
+C156 0.0
+C157 0.0
+C158 0.0
+C159 750.0
+C160 0.0
+C161 0.0
+C162 0.0
+C163 0.0
+C164 350.0
+C165 0.0
+C166 0.0
+C167 0.0
+C168 0.0
+C169 0.0
+C170 0.0
+C171 0.0
+C172 500.0
+C173 0.0
+C174 0.0
+C175 0.0
+C176 0.0
+C177 0.0
+C178 0.0
+C179 0.0
+C180 0.0
+C181 0.0
+C182 0.0
+C183 340.0
+C184 0.0
+C185 0.0
+C186 0.0
+C187 780.0
+C188 0.0
+C189 0.0
+C190 0.0
+C191 0.0
+C192 0.0
+C193 700.0
+C194 0.0
+C195 0.0
+C196 0.0
+C197 50.0
+C198 0.0
+C199 0.0
+C200 0.0
+C201 550.0
+C202 0.0
+C203 0.0
+C204 0.0
+C205 0.0
+C206 0.0
+C207 0.0
+C208 0.0
+C209 0.0
+Optimal objective: 103090.0
+Optimal solution: [('C0', 1.0), ('C1', 1.0), ('C2', 0.0), ('C3', 1.0), ('C4', 1.0), ('C5', 1.0), ('C6', 1.0), ('C7', 1.0), ('C8', 1.0), ('C9', 1.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 80.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 920.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 950.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 130.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 350.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 800.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 870.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 330.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 450.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 30.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 320.0), ('C107', 0.0), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0), ('C111', 600.0), ('C112', 0.0), ('C113', 0.0), ('C114', 0.0), ('C115', 0.0), ('C116', 270.0), ('C117', 0.0), ('C118', 400.0), ('C119', 0.0), ('C120', 0.0), ('C121', 0.0), ('C122', 650.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0), ('C132', 0.0), ('C133', 0.0), ('C134', 0.0), ('C135', 0.0), ('C136', 0.0), ('C137', 800.0), ('C138', 0.0), ('C139', 0.0), ('C140', 0.0), ('C141', 0.0), ('C142', 0.0), ('C143', 480.0), ('C144', 0.0), ('C145', 0.0), ('C146', 0.0), ('C147', 0.0), ('C148', 520.0), ('C149', 0.0), ('C150', 0.0), ('C151', 0.0), ('C152', 0.0), ('C153', 0.0), ('C154', 0.0), ('C155', 0.0), ('C156', 0.0), ('C157', 0.0), ('C158', 0.0), ('C159', 750.0), ('C160', 0.0), ('C161', 0.0), ('C162', 0.0), ('C163', 0.0), ('C164', 350.0), ('C165', 0.0), ('C166', 0.0), ('C167', 0.0), ('C168', 0.0), ('C169', 0.0), ('C170', 0.0), ('C171', 0.0), ('C172', 500.0), ('C173', 0.0), ('C174', 0.0), ('C175', 0.0), ('C176', 0.0), ('C177', 0.0), ('C178', 0.0), ('C179', 0.0), ('C180', 0.0), ('C181', 0.0), ('C182', 0.0), ('C183', 340.0), ('C184', 0.0), ('C185', 0.0), ('C186', 0.0), ('C187', 780.0), ('C188', 0.0), ('C189', 0.0), ('C190', 0.0), ('C191', 0.0), ('C192', 0.0), ('C193', 700.0), ('C194', 0.0), ('C195', 0.0), ('C196', 0.0), ('C197', 50.0), ('C198', 0.0), ('C199', 0.0), ('C200', 0.0), ('C201', 550.0), ('C202', 0.0), ('C203', 0.0), ('C204', 0.0), ('C205', 0.0), ('C206', 0.0), ('C207', 0.0), ('C208', 0.0), ('C209', 0.0)]

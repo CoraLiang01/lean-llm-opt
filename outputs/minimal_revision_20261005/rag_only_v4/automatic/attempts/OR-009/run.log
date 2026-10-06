@@ -1,0 +1,122 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = CSVQA_DATA
+
+    # Get sets S (plants) and C (customers)
+    plants_table = next(t for t in data["tables"] if t["table_id"] == "file_1_view_0")
+    outlets_table = next(t for t in data["tables"] if t["table_id"] == "file_0_view_0")
+    cost_table = next(t for t in data["tables"] if t["table_id"] == "file_2_view_0")
+
+    S = [rec["values"]["Unnamed: 0"] for rec in plants_table["records"]]
+    C = [rec["values"]["customer"] for rec in outlets_table["records"]]
+
+    # Parameters
+    demand_c = {}
+    for rec in outlets_table["records"]:
+        c = rec["values"]["customer"]
+        demand_c[c] = float(rec["values"]["demand"])
+
+    supply_capacity_s = {}
+    for rec in plants_table["records"]:
+        s = rec["values"]["Unnamed: 0"]
+        supply_capacity_s[s] = float(rec["values"]["supply_capacity"])
+
+    # cost_sc: (s, c) -> cost
+    cost_sc = {}
+    for rec in cost_table["records"]:
+        s = rec["values"]["Unnamed: 0"]
+        for c in C:
+            if c not in rec["values"]:
+                raise ValueError(f"Missing cost for plant {s} to customer {c}")
+            cost_sc[(s, c)] = float(rec["values"][c])
+
+    # Validate dimensions
+    for s in S:
+        for c in C:
+            if (s, c) not in cost_sc:
+                raise ValueError(f"Missing cost coefficient for ({s},{c})")
+    for c in C:
+        if c not in demand_c:
+            raise ValueError(f"Missing demand for customer {c}")
+    for s in S:
+        if s not in supply_capacity_s:
+            raise ValueError(f"Missing supply capacity for plant {s}")
+
+    # Model
+    m = gp.Model("brewco_transportation")
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_sc >= 0
+    x = m.addVars([(s, c) for s in S for c in C], lb=0, vtype=GRB.CONTINUOUS, name='', obj=0)
+
+    # Objective: Minimize total transportation cost
+    m.setObjective(gp.quicksum(cost_sc[(s, c)] * x[s, c] for s in S for c in C), GRB.MINIMIZE)
+
+    # Constraints
+
+    # 1. Demand satisfaction at each outlet
+    for c in C:
+        m.addConstr(gp.quicksum(x[s, c] for s in S) == demand_c[c], name='')
+
+    # 2. Plant capacity limits
+    for s in S:
+        m.addConstr(gp.quicksum(x[s, c] for c in C) <= supply_capacity_s[s], name='')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for v in m.getVars():
+            print(v.VarName, v.X)
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 8 rows, 16 columns and 32 nonzeros
+Model fingerprint: 0xb710a845
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [4e-02, 2e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+01, 3e+03]
+Presolve removed 8 rows and 16 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    2.3878151e+05   0.000000e+00   0.000000e+00      0s
+
+Solved in 0 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  2.387815119e+05
+238781.5119254966
+C0 94.0
+C1 39.0
+C2 65.0
+C3 205.0
+C4 0.0
+C5 0.0
+C6 0.0
+C7 20.0
+C8 0.0
+C9 0.0
+C10 0.0
+C11 210.0
+C12 0.0
+C13 0.0
+C14 0.0
+C15 0.0
+Optimal objective: 238781.5119254966
+Optimal solution: [('C0', 94.0), ('C1', 39.0), ('C2', 65.0), ('C3', 205.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 20.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 210.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0)]

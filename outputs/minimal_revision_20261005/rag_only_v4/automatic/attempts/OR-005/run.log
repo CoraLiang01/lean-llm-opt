@@ -1,0 +1,199 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract sets and parameters
+    # Customers and their demands
+    customer_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            customer_table = t
+            break
+    if customer_table is None:
+        raise RuntimeError("Customer demand table not found")
+    D = []
+    demand_j = {}
+    for rec in customer_table["records"]:
+        cust = rec["values"]["Customers"]
+        D.append(cust)
+        demand_j[cust] = float(rec["values"]["demand"])
+
+    # Suppliers and their capacities
+    supplier_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_1_view_0":
+            supplier_table = t
+            break
+    if supplier_table is None:
+        raise RuntimeError("Supplier capacity table not found")
+    S = []
+    supply_capacity_i = {}
+    for rec in supplier_table["records"]:
+        sup = rec["values"]["Supplier"]
+        S.append(sup)
+        supply_capacity_i[sup] = float(rec["values"]["supply_capacity"])
+
+    # Transportation cost matrix
+    cost_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_2_view_0":
+            cost_table = t
+            break
+    if cost_table is None:
+        raise RuntimeError("Transportation cost table not found")
+    # Row mapping: supply1 -> supplier1, etc.
+    row_id_mapping = None
+    for rel in CSVQA_DATA.get("relationships", []):
+        if rel.get("matrix_table_id") == "file_2_view_0":
+            row_id_mapping = rel.get("row_id_mapping", None)
+            break
+    # Build cost dictionary c_{ij}
+    c_ij = {}
+    for rec in cost_table["records"]:
+        row_raw = rec["values"]["Unnamed: 0"]
+        if row_id_mapping is not None:
+            i = row_id_mapping.get(row_raw, row_raw)
+        else:
+            i = row_raw
+        for j in D:
+            if j not in rec["values"]:
+                raise RuntimeError(f"Missing cost for {i},{j}")
+            c_ij[(i, j)] = float(rec["values"][j])
+
+    # Validate dimensions
+    for i in S:
+        for j in D:
+            if (i, j) not in c_ij:
+                raise RuntimeError(f"Missing cost coefficient for ({i},{j})")
+    for j in D:
+        if j not in demand_j:
+            raise RuntimeError(f"Missing demand for {j}")
+    for i in S:
+        if i not in supply_capacity_i:
+            raise RuntimeError(f"Missing supply capacity for {i}")
+
+    # Model
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_{ij} >= 0
+    x_keys = [(i, j) for i in S for j in D]
+    x = m.addVars(x_keys, lb=0, vtype=GRB.CONTINUOUS, name='', obj=[c_ij[(i, j)] for (i, j) in x_keys])
+
+    # Demand satisfaction: sum_i x_{ij} == demand_j for all j
+    for j in D:
+        m.addConstr(gp.quicksum(x[i, j] for i in S) == demand_j[j], name='')
+
+    # Supply capacity: sum_j x_{ij} <= supply_capacity_i for all i
+    for i in S:
+        m.addConstr(gp.quicksum(x[i, j] for j in D) <= supply_capacity_i[i], name='')
+
+    # Objective: minimize total transportation cost
+    m.ModelSense = GRB.MINIMIZE
+    # (Objective already set via obj= in addVars)
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for (i, j) in x_keys:
+            print(f"{x[i, j].VarName} {x[i, j].X}")
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 16 rows, 64 columns and 128 nonzeros
+Model fingerprint: 0x74630408
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [3e-02, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [9e+00, 7e+01]
+Presolve time: 0.00s
+Presolved: 16 rows, 64 columns, 128 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    7.3509510e+01   1.330000e+02   0.000000e+00      0s
+      13    2.7109342e+03   0.000000e+00   0.000000e+00      0s
+
+Solved in 13 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  2.710934184e+03
+2710.9341837593297
+C0 9.0
+C1 0.0
+C2 0.0
+C3 10.0
+C4 0.0
+C5 4.0
+C6 0.0
+C7 37.0
+C8 0.0
+C9 0.0
+C10 22.0
+C11 0.0
+C12 0.0
+C13 0.0
+C14 0.0
+C15 0.0
+C16 0.0
+C17 16.0
+C18 0.0
+C19 0.0
+C20 0.0
+C21 0.0
+C22 0.0
+C23 0.0
+C24 0.0
+C25 11.0
+C26 3.0
+C27 0.0
+C28 0.0
+C29 0.0
+C30 0.0
+C31 0.0
+C32 0.0
+C33 0.0
+C34 0.0
+C35 0.0
+C36 0.0
+C37 19.0
+C38 0.0
+C39 0.0
+C40 0.0
+C41 0.0
+C42 31.0
+C43 0.0
+C44 0.0
+C45 39.0
+C46 0.0
+C47 0.0
+C48 0.0
+C49 0.0
+C50 0.0
+C51 7.0
+C52 43.0
+C53 0.0
+C54 10.0
+C55 0.0
+C56 0.0
+C57 39.0
+C58 0.0
+C59 0.0
+C60 0.0
+C61 0.0
+C62 0.0
+C63 0.0
+Optimal objective: 2710.9341837593297
+Optimal solution: [('C0', 9.0), ('C1', 0.0), ('C2', 0.0), ('C3', 10.0), ('C4', 0.0), ('C5', 4.0), ('C6', 0.0), ('C7', 37.0), ('C8', 0.0), ('C9', 0.0), ('C10', 22.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 16.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 11.0), ('C26', 3.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 19.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 31.0), ('C43', 0.0), ('C44', 0.0), ('C45', 39.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 7.0), ('C52', 43.0), ('C53', 0.0), ('C54', 10.0), ('C55', 0.0), ('C56', 0.0), ('C57', 39.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0)]

@@ -1,0 +1,119 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read capacity
+    cap_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/capacity.csv"
+    prod_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/products.csv"
+    # Try encodings for capacity
+    for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+        try:
+            cap_df = pd.read_csv(cap_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError("Could not read capacity.csv with supported encodings.")
+    # Try encodings for products
+    for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+        try:
+            prod_df = pd.read_csv(prod_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError("Could not read products.csv with supported encodings.")
+
+    # Validate columns
+    if 'Capacity' not in cap_df.columns:
+        raise ValueError("Missing 'Capacity' column in capacity.csv")
+    for col in ['ProductName', 'Value', 'Weight']:
+        if col not in prod_df.columns:
+            raise ValueError(f"Missing '{col}' column in products.csv")
+
+    # Extract capacity (assume single row, single value)
+    if len(cap_df) != 1:
+        raise ValueError("capacity.csv must have exactly one row for total capacity.")
+    C = cap_df.iloc[0]['Capacity']
+    if pd.isnull(C):
+        raise ValueError("Capacity value is missing in capacity.csv.")
+
+    # Extract products, profits, weights
+    prod_df = prod_df.copy()
+    prod_df['ProductName'] = prod_df['ProductName'].astype(str)
+    prod_df['Value'] = pd.to_numeric(prod_df['Value'], errors='raise')
+    prod_df['Weight'] = pd.to_numeric(prod_df['Weight'], errors='raise')
+    # Remove duplicates by summing Value and Weight for same ProductName
+    prod_grouped = prod_df.groupby('ProductName', as_index=False).agg({'Value': 'sum', 'Weight': 'sum'})
+    items = list(prod_grouped['ProductName'])
+    profit = dict(zip(prod_grouped['ProductName'], prod_grouped['Value']))
+    weight = dict(zip(prod_grouped['ProductName'], prod_grouped['Weight']))
+
+    # Validate all coefficients
+    if any(pd.isnull(profit[i]) or pd.isnull(weight[i]) for i in items):
+        raise ValueError("Missing Value or Weight for some products.")
+
+    m = gp.Model('BakeryOrder')
+    m.setParam('MIPGap', 1e-4)
+
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    m.setObjective(gp.quicksum(profit[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    m.addConstr(gp.quicksum(weight[i] * x[i] for i in items) <= C, name='storage')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 10 columns and 10 nonzeros
+Model fingerprint: 0xae695105
+Variable types: 0 continuous, 10 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 4e+00]
+  Objective range  [1e+02, 9e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+02, 2e+02]
+Found heuristic solution: objective 35040.000000
+Presolve removed 1 rows and 10 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 150660 35040 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.506600000000e+05, best bound 1.506600000000e+05, gap 0.0000%
+ObjVal: 150660.0
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: 180.0
+C8: -0.0
+C9: -0.0
+Optimal objective: 150660.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', 180.0), ('C8', -0.0), ('C9', -0.0)]

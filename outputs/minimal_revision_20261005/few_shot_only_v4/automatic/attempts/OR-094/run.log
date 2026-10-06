@@ -1,0 +1,249 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Try reading the CSV with multiple encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture13/workstation_times.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError("Could not read CSV with any supported encoding.")
+
+    # Identify workstations and radio models
+    if 'Workstation' not in df.columns:
+        raise ValueError("Missing 'Workstation' column in CSV.")
+    if 'Maintenance_Percent' not in df.columns:
+        raise ValueError("Missing 'Maintenance_Percent' column in CSV.")
+
+    # Workstations: unique values in 'Workstation' column (as strings)
+    workstations = [str(w) for w in df['Workstation'].unique()]
+    # Radio models: columns HiFi1_Minutes ... HiFi101_Minutes
+    radio_model_cols = [col for col in df.columns if col.startswith('HiFi') and col.endswith('_Minutes')]
+    if len(radio_model_cols) != 101:
+        raise ValueError(f"Expected 101 radio model columns, found {len(radio_model_cols)}.")
+    # Model names: HiFi1, ..., HiFi101
+    radio_models = [col.replace('_Minutes', '') for col in radio_model_cols]
+
+    # Build t_{w,m}: processing time per unit of model m at workstation w
+    # t[(w, m)] = value
+    t = {}
+    for idx, row in df.iterrows():
+        w = str(row['Workstation'])
+        for col in radio_model_cols:
+            m = col.replace('_Minutes', '')
+            val = row[col]
+            if pd.isnull(val):
+                raise ValueError(f"Missing processing time for workstation {w}, model {m}.")
+            t[(w, m)] = float(val)
+
+    # Build q_w: maintenance percent for each workstation
+    q = {}
+    for idx, row in df.iterrows():
+        w = str(row['Workstation'])
+        val = row['Maintenance_Percent']
+        if pd.isnull(val):
+            raise ValueError(f"Missing Maintenance_Percent for workstation {w}.")
+        q[w] = float(val)
+
+    # C: total available minutes per workstation per day
+    C = 1440.0
+
+    # E_w: effective daily capacity for each workstation
+    E = {}
+    for w in workstations:
+        if w not in q:
+            raise ValueError(f"Missing maintenance percent for workstation {w}.")
+        E[w] = C * (1.0 - q[w] / 100.0)
+
+    # Validate all t[(w, m)] for all w, m
+    for w in workstations:
+        for m in radio_models:
+            if (w, m) not in t:
+                raise ValueError(f"Missing processing time for workstation {w}, model {m}.")
+
+    # Build model
+    m = gp.Model('Radio_Idle_Min')
+    # Decision variables: x_m >= 0, integer
+    x = m.addVars(radio_models, lb=0, vtype=GRB.INTEGER, name='x')
+    # Idle time variables: s_w >= 0, continuous
+    s = m.addVars(workstations, lb=0, vtype=GRB.CONTINUOUS, name='s')
+
+    # Objective: minimize total idle time
+    m.setObjective(gp.quicksum(s[w] for w in workstations), GRB.MINIMIZE)
+
+    # Constraints: s_w = E_w - sum_m t_{w,m} x_m, for all w
+    for w in workstations:
+        m.addConstr(
+            s[w] == E[w] - gp.quicksum(t[(w, m)] * x[m] for m in radio_models),
+            name=f'idle_def_{w}'
+        )
+
+    # Nonnegativity of idle time is enforced by lb=0 in variable definition
+
+    # Nonnegativity and integrality of production is enforced by vtype=GRB.INTEGER, lb=0
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 3 rows, 104 columns and 306 nonzeros
+Model fingerprint: 0x64f6fdbe
+Variable types: 3 continuous, 101 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 9e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 1e+03]
+Found heuristic solution: objective 3801.6000000
+Presolve removed 0 rows and 10 columns
+Presolve time: 0.00s
+Presolved: 3 rows, 94 columns, 276 nonzeros
+Variable types: 0 continuous, 94 integer (0 binary)
+
+Root relaxation: objective 6.000000e-01, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0    0.60000    0    3 3801.60000    0.60000   100%     -    0s
+H    0     0                       0.6000000    0.60000  0.00%     -    0s
+     0     0    0.60000    0    3    0.60000    0.60000  0.00%     -    0s
+
+Explored 1 nodes (3 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 0.6 3801.6 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.000000000000e-01, best bound 6.000000000000e-01, gap 0.0000%
+ObjVal: 0.6000000000000001
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: 58.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: -0.0
+C43: 0.0
+C44: -0.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: 1.0
+C52: 1.0
+C53: -0.0
+C54: -0.0
+C55: -0.0
+C56: -0.0
+C57: -0.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: -0.0
+C62: -0.0
+C63: -0.0
+C64: 0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: 7.0
+C72: -0.0
+C73: -0.0
+C74: -0.0
+C75: -0.0
+C76: -0.0
+C77: -0.0
+C78: -0.0
+C79: -0.0
+C80: -0.0
+C81: -0.0
+C82: -0.0
+C83: -0.0
+C84: -0.0
+C85: -0.0
+C86: -0.0
+C87: -0.0
+C88: -0.0
+C89: -0.0
+C90: -0.0
+C91: 0.0
+C92: -0.0
+C93: -0.0
+C94: -0.0
+C95: -0.0
+C96: -0.0
+C97: 2.0
+C98: 89.0
+C99: 21.0
+C100: 23.0
+C101: 0.0
+C102: 0.4
+C103: 0.2
+Optimal objective: 0.6000000000000001
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', 58.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', 0.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', 1.0), ('C52', 1.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', 0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', 7.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0), ('C80', -0.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', -0.0), ('C90', -0.0), ('C91', 0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', -0.0), ('C96', -0.0), ('C97', 2.0), ('C98', 89.0), ('C99', 21.0), ('C100', 23.0), ('C101', 0.0), ('C102', 0.4), ('C103', 0.2)]

@@ -1,0 +1,246 @@
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/full_v3/frozen_notebook.ipynb:cell13:329: LangChainDeprecationWarning: LangChain agents will continue to be supported, but it is recommended for new use cases to be built with LangGraph. LangGraph offers a more flexible and full-featured framework for building agents, including support for tool-calling, persistence of state, and human-in-the-loop workflows. For details, refer to the [LangGraph documentation](https://langchain-ai.github.io/langgraph/) as well as guides for [Migrating from AgentExecutor](https://python.langchain.com/docs/how_to/migrate_agent/) and LangGraph's [Pre-built ReAct agent](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent/).
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure of the problem. The objective is to minimize total transportation cost by allocating goods from suppliers (with supply capacities) to customer groups (with demands), ensuring all demands are met and no supplier exceeds its capacity. The decision variables are the shipment quantities from each supplier to each customer group. There are no additional mechanisms such as vehicle counts, batch sizes, or logical dependencies. I should call FileQA once to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: minimize total transportation cost by allocating goods from multiple suppliers (with supply capacities) to customer groups (with demands), determining shipment quantities from each supplier to each customer group, ensuring all demands are met and no supplier exceeds its capacity
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 2]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others
+
+[Retrieved example 3]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP
+
+[Retrieved example 4]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A specialty chemical factory produces three premium products (A, B, C) by blending three raw materials (1, 2, 3). The factory supplies custom formulations to high-end manufacturers:
+
+Product A is a precision industrial lubricant requiring ≥50% Material 1 and ≤25% Material 2
+Product B is an aerospace-grade adhesive requiring ≥25% Material 1 and ≤50% Material 2
+Product C is a general-purpose compound with no material restrictions
+Raw material costs and availability are in raw_materials.csv, while product specifications and selling prices are in products.csv. Determine the optimal blending plan to maximize daily profit.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem's objective is to minimize total transportation cost by allocating goods from multiple suppliers (with supply capacities) to customer groups (with demands), determining shipment quantities from each supplier to each customer group, ensuring all demands are met and no supplier exceeds its capacity. The decision variables are the shipment quantities between each supplier and customer group. The constraints are: (1) each supplier cannot ship more than its capacity, and (2) each customer group must receive its full demand. There are no additional mechanisms such as fixed supplier activation costs, batch sizes, blending, or logical dependencies. The retrieved examples confirm that this structure matches the canonical transportation problem (TP) archetype.
+
+Final Answer: TP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = CSVQA_DATA
+
+    # Get suppliers and their capacities
+    supply_table = next(t for t in data["tables"] if t["table_id"] == "file_1_view_0")
+    suppliers = []
+    supply_capacity = {}
+    for rec in supply_table["records"]:
+        i = rec["values"]["Unnamed: 0"]
+        suppliers.append(i)
+        supply_capacity[i] = float(rec["values"]["supply_capacity"])
+
+    # Get customers and their demands
+    demand_table = next(t for t in data["tables"] if t["table_id"] == "file_0_view_0")
+    customers = []
+    demand = {}
+    for rec in demand_table["records"]:
+        j = rec["values"]["customer"]
+        customers.append(j)
+        demand[j] = float(rec["values"]["demand"])
+
+    # Get cost matrix and ensure mapping is correct
+    cost_table = next(t for t in data["tables"] if t["table_id"] == "file_2_view_0")
+    # Use relationships for mapping
+    rel = next(r for r in data["relationships"] if r["matrix_table_id"] == "file_2_view_0")
+    row_id_mapping = rel["row_id_mapping"]
+    column_id_mapping = rel["column_id_mapping"]
+
+    # Build cost dictionary: cost[i][j]
+    cost = {}
+    for rec in cost_table["records"]:
+        i_raw = rec["values"]["Unnamed: 0"]
+        i = row_id_mapping[i_raw]
+        cost[i] = {}
+        for j_raw in column_id_mapping:
+            j = column_id_mapping[j_raw]
+            cost[i][j] = float(rec["values"][j_raw])
+
+    # Validate dimensions and identifier coverage
+    if set(suppliers) != set(cost.keys()):
+        raise ValueError("Mismatch between suppliers and cost matrix rows")
+    for i in suppliers:
+        if set(customers) != set(cost[i].keys()):
+            raise ValueError(f"Mismatch between customers and cost matrix columns for supplier {i}")
+    if set(suppliers) != set(supply_capacity.keys()):
+        raise ValueError("Mismatch between suppliers and supply_capacity")
+    if set(customers) != set(demand.keys()):
+        raise ValueError("Mismatch between customers and demand")
+
+    # Build model
+    m = gp.Model('Original_RAG_TP')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x[i,j] >= 0, continuous
+    x = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: minimize total transportation cost
+    m.setObjective(gp.quicksum(cost[i][j] * x[i, j] for i in suppliers for j in customers), GRB.MINIMIZE)
+
+    # Demand satisfaction: sum_i x[i,j] >= d_j for all j
+    m.addConstrs((gp.quicksum(x[i, j] for i in suppliers) >= demand[j] for j in customers), name='demand')
+
+    # Supply capacity: sum_j x[i,j] <= s_i for all i
+    m.addConstrs((gp.quicksum(x[i, j] for j in customers) <= supply_capacity[i] for i in suppliers), name='supply')
+
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 20 rows, 100 columns and 200 nonzeros
+Model fingerprint: 0x645cd0d0
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [6e-03, 2e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+02, 3e+02]
+Presolve time: 0.00s
+Presolved: 20 rows, 100 columns, 200 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   1.920000e+03   0.000000e+00      0s
+      20    3.6778511e+04   0.000000e+00   0.000000e+00      0s
+
+Solved in 20 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  3.677851094e+04
+ObjVal: 36778.51094448115
+C0: 0.0
+C1: 120.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 0.0
+C7: 0.0
+C8: 168.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 168.0
+C20: 216.0
+C21: 0.0
+C22: 0.0
+C23: 24.0
+C24: 0.0
+C25: 24.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 216.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 216.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 144.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 168.0
+C68: 0.0
+C69: 0.0
+C70: 0.0
+C71: 0.0
+C72: 48.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 48.0
+C82: 0.0
+C83: 192.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 168.0
+C96: 0.0
+C97: 0.0
+C98: 0.0
+C99: 0.0
+Optimal objective: 36778.51094448115
+Optimal solution: [('C0', 0.0), ('C1', 120.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 168.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 168.0), ('C20', 216.0), ('C21', 0.0), ('C22', 0.0), ('C23', 24.0), ('C24', 0.0), ('C25', 24.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 216.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 216.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 144.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 168.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 48.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 48.0), ('C82', 0.0), ('C83', 192.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 168.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0)]

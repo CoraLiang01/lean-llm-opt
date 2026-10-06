@@ -1,0 +1,40 @@
+##### Objective Function:
+
+$\quad \min \sum_{m \in M} \sum_{p \in P} c_{mp} \, x_{mp}$
+
+##### Constraints
+
+###### 1. Each manager is assigned to exactly one project:
+
+$\sum_{p \in P} x_{mp} = 1 \quad \forall m \in M$
+
+###### 2. Each project is assigned to exactly one manager:
+
+$\sum_{m \in M} x_{mp} = 1 \quad \forall p \in P$
+
+###### 3. Variable domains:
+
+$x_{mp} \in \{0,1\} \quad \forall m \in M,\, p \in P$
+
+##### Retrieved Information
+
+{
+  "cost": {
+    "table_id": "file_0_view_0",
+    "row_index_set": "manager",
+    "row_id_column": "Unnamed: 1",
+    "column_index_set": "project",
+    "column_id_columns": ["P1", "P2", "P3"],
+    "matrix": "c_{mp}"
+  },
+  "managers": {
+    "table_id": "file_0_view_0",
+    "row_id_column": "Unnamed: 1",
+    "values": ["MA", "MB", "MC"]
+  },
+  "projects": {
+    "table_id": "file_0_view_0",
+    "column_id_columns": ["P1", "P2", "P3"],
+    "values": ["P1", "P2", "P3"]
+  }
+}

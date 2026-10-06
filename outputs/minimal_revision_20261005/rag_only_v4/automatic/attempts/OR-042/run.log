@@ -1,0 +1,122 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Extract data from CSVQA_DATA
+    # Table: file_1_view_0 (products.csv)
+    products_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_1_view_0":
+            products_table = t
+            break
+    if products_table is None:
+        raise RuntimeError("Missing products table (file_1_view_0)")
+    product_records = products_table["records"]
+    I = []
+    v = {}
+    w = {}
+    for rec in product_records:
+        pname = rec["values"]["ProductName"]
+        I.append(pname)
+        try:
+            v[pname] = float(rec["values"]["Value"])
+            w[pname] = float(rec["values"]["Weight"])
+        except Exception as e:
+            raise RuntimeError(f"Invalid Value/Weight for {pname}: {e}")
+
+    # Table: file_0_view_0 (capacity.csv)
+    capacity_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            capacity_table = t
+            break
+    if capacity_table is None:
+        raise RuntimeError("Missing capacity table (file_0_view_0)")
+    capacity_records = capacity_table["records"]
+    if not capacity_records or "Capacity" not in capacity_records[0]["values"]:
+        raise RuntimeError("Missing Capacity value in capacity table")
+    try:
+        C = float(capacity_records[0]["values"]["Capacity"])
+    except Exception as e:
+        raise RuntimeError(f"Invalid Capacity value: {e}")
+
+    # Validate all products have v and w
+    for i in I:
+        if i not in v or i not in w:
+            raise RuntimeError(f"Missing Value or Weight for product {i}")
+
+    # Build model
+    m = gp.Model("pharmacy_inventory")
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize sum_i v_i * x_i
+    m.setObjective(gp.quicksum(v[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraint: sum_i w_i * x_i <= C
+    m.addConstr(gp.quicksum(w[i] * x[i] for i in I) <= C, name='capacity')
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for i in I:
+            print(x[i].VarName, x[i].X)
+    else:
+        print(m.Status)
+    return m
+
+m = solve_problem(CSVQA_DATA)
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 20 columns and 20 nonzeros
+Model fingerprint: 0xf58bd490
+Variable types: 0 continuous, 20 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [5e+01, 5e+02]
+  Objective range  [3e+02, 1e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+03, 4e+03]
+Found heuristic solution: objective 47970.000000
+Presolve removed 1 rows and 20 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 81918 47970 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 8.191800000000e+04, best bound 8.191800000000e+04, gap 0.0000%
+81918.0
+C0 -0.0
+C1 -0.0
+C2 -0.0
+C3 -0.0
+C4 -0.0
+C5 -0.0
+C6 -0.0
+C7 -0.0
+C8 -0.0
+C9 82.0
+C10 -0.0
+C11 -0.0
+C12 -0.0
+C13 -0.0
+C14 -0.0
+C15 -0.0
+C16 -0.0
+C17 -0.0
+C18 -0.0
+C19 -0.0
+Optimal objective: 81918.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', 82.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0)]

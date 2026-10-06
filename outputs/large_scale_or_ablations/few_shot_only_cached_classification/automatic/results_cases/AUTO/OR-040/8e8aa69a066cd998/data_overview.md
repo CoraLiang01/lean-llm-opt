@@ -1,0 +1,26 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/capacity.csv
+ Capacity
+     4466
+
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/products.csv
+     ProductName  Value  Weight
+          Queens    443     104
+        Brooklyn    522     368
+       Manhattan    300     483
+           Bronx    767     165
+   Staten Island    300     105
+          Harlem    309     123
+ Upper East Side    598     131
+ Lower Manhattan    460     341
+         Midtown    318     258
+Long Island City    126     469
+    Williamsburg    593     387
+        Bushwick    871     425
+        Flatbush    858     482
+      Greenpoint    321     495
+      Park Slope    275     305
+         Astoria    700     377
+ Jackson Heights    685     318
+        Flushing    940      56
+       Sunnyside    522     213
+         Ditmars    763     472

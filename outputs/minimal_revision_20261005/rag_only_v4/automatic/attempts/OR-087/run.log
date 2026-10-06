@@ -1,0 +1,336 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine an optimal monthly production plan for 80 products over 22 days, maximizing total profit. The plan must account for product-specific maximum demand, selling prices, production costs, daily production quotas, fixed activation costs for each production line, and minimum batch size restrictions. All production and activation decisions are integer (multiples of 100 kg and binary, respectively).
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with fixed-charge (activation cost) and batch-size constraints.
+3.  **Define Index Sets:** The primary index is Products (i = 1,...,80), corresponding to columns A1–A80 in the CSV files.
+4.  **Define Decision Variables:**
+    -   `x[i]` = Total quantity of product i to produce in the month (in integer units of 100 kg). Type: GRB.INTEGER.
+    -   `y[i]` = 1 if production line for product i is activated (i.e., product i is produced at all), 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   From 36-1.csv:
+        -   Maximum Demand: Row 'Maximum Demand (100 kg units)', columns A1–A80.
+        -   Selling Price: Row 'Selling Price ($/100 kg)', columns A1–A80.
+        -   Production Cost: Row 'Production Cost ($/100 kg)', columns A1–A80.
+        -   Production Quota (max per day): Row 'Production Quota (max per day)', columns A1–A80.
+    -   From 36-2.csv:
+        -   Activation Cost: Row 'Activation Cost ($)', columns A1–A80.
+    -   From 36-3.csv:
+        -   Minimum Batch Size: Row 'Minimum Batch Size (100 kg units)', columns A1–A80.
+    -   The number of production days: 22 (given in the query).
+6.  **Formulate Objective:** Maximize total profit, defined as:
+        -   Total Revenue: sum over i of (Selling Price[i] * x[i])
+        -   Minus Total Production Cost: sum over i of (Production Cost[i] * x[i])
+        -   Minus Total Activation Cost: sum over i of (Activation Cost[i] * y[i])
+        -   Objective: Maximize sum_i [(Selling Price[i] - Production Cost[i]) * x[i] - Activation Cost[i] * y[i]]
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Demand Limit): For each product i, x[i] ≤ Maximum Demand[i]
+        -   Ensures production does not exceed market demand.
+    -   Constraint 2 (Production Capacity): For each product i, x[i] ≤ Production Quota[i] * 22
+        -   Ensures total monthly production does not exceed what can be produced in 22 days at the product’s daily quota.
+    -   Constraint 3 (Minimum Batch Size): For each product i, x[i] = 0 or x[i] ≥ Minimum Batch Size[i]
+        -   Enforced via: x[i] ≥ Minimum Batch Size[i] * y[i]
+        -   Ensures that if a product is produced, at least the minimum batch size is made.
+    -   Constraint 4 (Linking): For each product i, x[i] ≤ (Production Quota[i] * 22) * y[i]
+        -   Ensures that if y[i] = 0, then x[i] = 0; if y[i] = 1, x[i] can be up to the maximum allowed.
+    -   Constraint 5 (Integrality): For each product i, x[i] ∈ {0, 1, 2, ...} (integer), y[i] ∈ {0, 1} (binary)
+        -   Ensures all variables are integer as required.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # File paths
+    path_36_1 = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture9/36-1.csv'
+    path_36_2 = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture9/36-2.csv'
+    path_36_3 = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture9/36-3.csv'
+
+    # Read CSVs
+    df1 = pd.read_csv(path_36_1, sep=',')
+    df2 = pd.read_csv(path_36_2, sep=',')
+    df3 = pd.read_csv(path_36_3, sep=',')
+
+    # Products: columns A1-A80
+    product_cols = [f'A{i}' for i in range(1, 81)]
+    products = product_cols.copy()  # business keys
+
+    # Extract parameters from 36-1.csv
+    # Each row is a parameter, columns are products
+    def get_row_by_label(df, label):
+        # Use case-insensitive, whitespace-insensitive matching
+        mask = df['Product'].str.casefold().str.replace(r'\s+', '', regex=True) == label.casefold().replace(' ', '')
+        matches = df[mask]
+        if matches.shape[0] != 1:
+            raise ValueError(f"Row label '{label}' not found uniquely in 36-1.csv")
+        return matches.iloc[0][product_cols]
+
+    max_demand = get_row_by_label(df1, 'Maximum Demand (100 kg units)').astype(float).to_dict()
+    selling_price = get_row_by_label(df1, 'Selling Price ($/100 kg)').astype(float).to_dict()
+    prod_cost = get_row_by_label(df1, 'Production Cost ($/100 kg)').astype(float).to_dict()
+    prod_quota = get_row_by_label(df1, 'Production Quota (max per day)').astype(float).to_dict()
+
+    # Extract activation cost from 36-2.csv
+    # Only one row, columns are products
+    if df2.shape[0] != 1:
+        raise ValueError("36-2.csv must have exactly one row")
+    activation_cost = df2.iloc[0][product_cols].astype(float).to_dict()
+
+    # Extract minimum batch size from 36-3.csv
+    if df3.shape[0] != 1:
+        raise ValueError("36-3.csv must have exactly one row")
+    min_batch = df3.iloc[0][product_cols].astype(float).to_dict()
+
+    # Validate all products have all parameters
+    for p in products:
+        for param, d in [('max_demand', max_demand), ('selling_price', selling_price), ('prod_cost', prod_cost),
+                         ('prod_quota', prod_quota), ('activation_cost', activation_cost), ('min_batch', min_batch)]:
+            if p not in d:
+                raise ValueError(f"Missing {param} for product {p}")
+
+    num_days = 22
+
+    # Model
+    m = gp.Model('production_plan')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables
+    x = m.addVars(products, vtype=GRB.INTEGER, lb=0, name='x')  # units of 100kg
+    y = m.addVars(products, vtype=GRB.BINARY, name='y')
+
+    # Objective: maximize profit
+    expr = gp.LinExpr()
+    for p in products:
+        expr += (selling_price[p] - prod_cost[p]) * x[p] - activation_cost[p] * y[p]
+    m.setObjective(expr, GRB.MAXIMIZE)
+
+    # Constraints
+    for p in products:
+        # 1. Demand limit
+        m.addConstr(x[p] <= max_demand[p], name='demand_'+p)
+        # 2. Production capacity
+        m.addConstr(x[p] <= prod_quota[p] * num_days, name='capacity_'+p)
+        # 3. Minimum batch size (if produced)
+        m.addConstr(x[p] >= min_batch[p] * y[p], name='minbatch_'+p)
+        # 4. Linking: if not activated, x=0; if activated, x up to max
+        m.addConstr(x[p] <= prod_quota[p] * num_days * y[p], name='link_'+p)
+        # 5. Integrality is enforced by variable types
+
+    m.optimize()
+
+    # Output as required
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for p in products:
+            print(f'x[{p}] {x[p].X}')
+        for p in products:
+            print(f'y[{p}] {y[p].X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 320 rows, 160 columns and 480 nonzeros
+Model fingerprint: 0xa6ed438c
+Variable types: 0 continuous, 160 integer (80 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+04]
+  Objective range  [2e+01, 2e+05]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [3e+03, 2e+04]
+Found heuristic solution: objective -0.0000000
+Presolve removed 320 rows and 160 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 6.24306e+06 -0 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.243055960000e+06, best bound 6.243055960000e+06, gap 0.0000%
+ObjVal: 6243055.959999999
+x[A1] 5732.0
+x[A2] 5607.0
+x[A3] 4653.0
+x[A4] 6264.0
+x[A5] 3835.0
+x[A6] 0.0
+x[A7] 4731.0
+x[A8] 6431.0
+x[A9] 4033.0
+x[A10] 6795.0
+x[A11] 3277.0
+x[A12] 0.0
+x[A13] 4828.0
+x[A14] 5647.0
+x[A15] 6142.0
+x[A16] 6544.0
+x[A17] 5648.0
+x[A18] 6468.0
+x[A19] 5362.0
+x[A20] 3705.0
+x[A21] 6558.0
+x[A22] 5599.0
+x[A23] 5135.0
+x[A24] 5222.0
+x[A25] 6672.0
+x[A26] 5897.0
+x[A27] 4701.0
+x[A28] 0.0
+x[A29] 5893.0
+x[A30] 5120.0
+x[A31] 5825.0
+x[A32] 4940.0
+x[A33] 5163.0
+x[A34] 3976.0
+x[A35] 3755.0
+x[A36] 6781.0
+x[A37] 5046.0
+x[A38] 0.0
+x[A39] 6503.0
+x[A40] 5496.0
+x[A41] 0.0
+x[A42] 3099.0
+x[A43] 0.0
+x[A44] 6249.0
+x[A45] 3755.0
+x[A46] 0.0
+x[A47] 3659.0
+x[A48] 6219.0
+x[A49] 5958.0
+x[A50] 3423.0
+x[A51] 6360.0
+x[A52] 6337.0
+x[A53] 5745.0
+x[A54] 0.0
+x[A55] 3544.0
+x[A56] 5591.0
+x[A57] 0.0
+x[A58] 5292.0
+x[A59] 0.0
+x[A60] 5723.0
+x[A61] 5558.0
+x[A62] 6531.0
+x[A63] 5930.0
+x[A64] 0.0
+x[A65] 5076.0
+x[A66] 0.0
+x[A67] 5176.0
+x[A68] 5176.0
+x[A69] 4956.0
+x[A70] 6125.0
+x[A71] 4925.0
+x[A72] 6622.0
+x[A73] 6560.0
+x[A74] 3756.0
+x[A75] 0.0
+x[A76] 5383.0
+x[A77] 0.0
+x[A78] 4641.0
+x[A79] 6114.0
+x[A80] 4466.0
+y[A1] 1.0
+y[A2] 1.0
+y[A3] 1.0
+y[A4] 1.0
+y[A5] 1.0
+y[A6] 0.0
+y[A7] 1.0
+y[A8] 1.0
+y[A9] 1.0
+y[A10] 1.0
+y[A11] 1.0
+y[A12] 0.0
+y[A13] 1.0
+y[A14] 1.0
+y[A15] 1.0
+y[A16] 1.0
+y[A17] 1.0
+y[A18] 1.0
+y[A19] 1.0
+y[A20] 1.0
+y[A21] 1.0
+y[A22] 1.0
+y[A23] 1.0
+y[A24] 1.0
+y[A25] 1.0
+y[A26] 1.0
+y[A27] 1.0
+y[A28] 0.0
+y[A29] 1.0
+y[A30] 1.0
+y[A31] 1.0
+y[A32] 1.0
+y[A33] 1.0
+y[A34] 1.0
+y[A35] 1.0
+y[A36] 1.0
+y[A37] 1.0
+y[A38] 0.0
+y[A39] 1.0
+y[A40] 1.0
+y[A41] 0.0
+y[A42] 1.0
+y[A43] 0.0
+y[A44] 1.0
+y[A45] 1.0
+y[A46] 0.0
+y[A47] 1.0
+y[A48] 1.0
+y[A49] 1.0
+y[A50] 1.0
+y[A51] 1.0
+y[A52] 1.0
+y[A53] 1.0
+y[A54] 0.0
+y[A55] 1.0
+y[A56] 1.0
+y[A57] 0.0
+y[A58] 1.0
+y[A59] 0.0
+y[A60] 1.0
+y[A61] 1.0
+y[A62] 1.0
+y[A63] 1.0
+y[A64] 0.0
+y[A65] 1.0
+y[A66] 0.0
+y[A67] 1.0
+y[A68] 1.0
+y[A69] 1.0
+y[A70] 1.0
+y[A71] 1.0
+y[A72] 1.0
+y[A73] 1.0
+y[A74] 1.0
+y[A75] 0.0
+y[A76] 1.0
+y[A77] 0.0
+y[A78] 1.0
+y[A79] 1.0
+y[A80] 1.0
+Optimal objective: 6243055.959999999
+Optimal solution: [('C0', 5732.0), ('C1', 5607.0), ('C2', 4653.0), ('C3', 6264.0), ('C4', 3835.0), ('C5', 0.0), ('C6', 4731.0), ('C7', 6431.0), ('C8', 4033.0), ('C9', 6795.0), ('C10', 3277.0), ('C11', 0.0), ('C12', 4828.0), ('C13', 5647.0), ('C14', 6142.0), ('C15', 6544.0), ('C16', 5648.0), ('C17', 6468.0), ('C18', 5362.0), ('C19', 3705.0), ('C20', 6558.0), ('C21', 5599.0), ('C22', 5135.0), ('C23', 5222.0), ('C24', 6672.0), ('C25', 5897.0), ('C26', 4701.0), ('C27', 0.0), ('C28', 5893.0), ('C29', 5120.0), ('C30', 5825.0), ('C31', 4940.0), ('C32', 5163.0), ('C33', 3976.0), ('C34', 3755.0), ('C35', 6781.0), ('C36', 5046.0), ('C37', 0.0), ('C38', 6503.0), ('C39', 5496.0), ('C40', 0.0), ('C41', 3099.0), ('C42', 0.0), ('C43', 6249.0), ('C44', 3755.0), ('C45', 0.0), ('C46', 3659.0), ('C47', 6219.0), ('C48', 5958.0), ('C49', 3423.0), ('C50', 6360.0), ('C51', 6337.0), ('C52', 5745.0), ('C53', 0.0), ('C54', 3544.0), ('C55', 5591.0), ('C56', 0.0), ('C57', 5292.0), ('C58', 0.0), ('C59', 5723.0), ('C60', 5558.0), ('C61', 6531.0), ('C62', 5930.0), ('C63', 0.0), ('C64', 5076.0), ('C65', 0.0), ('C66', 5176.0), ('C67', 5176.0), ('C68', 4956.0), ('C69', 6125.0), ('C70', 4925.0), ('C71', 6622.0), ('C72', 6560.0), ('C73', 3756.0), ('C74', 0.0), ('C75', 5383.0), ('C76', 0.0), ('C77', 4641.0), ('C78', 6114.0), ('C79', 4466.0), ('C80', 1.0), ('C81', 1.0), ('C82', 1.0), ('C83', 1.0), ('C84', 1.0), ('C85', 0.0), ('C86', 1.0), ('C87', 1.0), ('C88', 1.0), ('C89', 1.0), ('C90', 1.0), ('C91', 0.0), ('C92', 1.0), ('C93', 1.0), ('C94', 1.0), ('C95', 1.0), ('C96', 1.0), ('C97', 1.0), ('C98', 1.0), ('C99', 1.0), ('C100', 1.0), ('C101', 1.0), ('C102', 1.0), ('C103', 1.0), ('C104', 1.0), ('C105', 1.0), ('C106', 1.0), ('C107', 0.0), ('C108', 1.0), ('C109', 1.0), ('C110', 1.0), ('C111', 1.0), ('C112', 1.0), ('C113', 1.0), ('C114', 1.0), ('C115', 1.0), ('C116', 1.0), ('C117', 0.0), ('C118', 1.0), ('C119', 1.0), ('C120', 0.0), ('C121', 1.0), ('C122', 0.0), ('C123', 1.0), ('C124', 1.0), ('C125', 0.0), ('C126', 1.0), ('C127', 1.0), ('C128', 1.0), ('C129', 1.0), ('C130', 1.0), ('C131', 1.0), ('C132', 1.0), ('C133', 0.0), ('C134', 1.0), ('C135', 1.0), ('C136', 0.0), ('C137', 1.0), ('C138', 0.0), ('C139', 1.0), ('C140', 1.0), ('C141', 1.0), ('C142', 1.0), ('C143', 0.0), ('C144', 1.0), ('C145', 0.0), ('C146', 1.0), ('C147', 1.0), ('C148', 1.0), ('C149', 1.0), ('C150', 1.0), ('C151', 1.0), ('C152', 1.0), ('C153', 1.0), ('C154', 0.0), ('C155', 1.0), ('C156', 0.0), ('C157', 1.0), ('C158', 1.0), ('C159', 1.0)]

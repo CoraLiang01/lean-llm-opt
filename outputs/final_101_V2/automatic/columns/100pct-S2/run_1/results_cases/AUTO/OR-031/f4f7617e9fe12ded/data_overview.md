@@ -1,0 +1,21 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete 20260928/100pct/S2/Large-scale-or/Mixture_testing/Mixture5/energy.csv
+CSV delimiter: comma; first line consumed as header.
+Total rows: 131
+Columns: ['SupplierNewsletterCountLastYear', 'option', 'tech', 'SupplierReviewMeetingCount', 'gen_per_lot', 'cost_per_lot', 'SupplierContactChannel', 'SupplierServiceRegion']
+Parsed column types: {'SupplierNewsletterCountLastYear': 'int64', 'option': 'object', 'tech': 'object', 'SupplierReviewMeetingCount': 'int64', 'gen_per_lot': 'int64', 'cost_per_lot': 'float64', 'SupplierContactChannel': 'object', 'SupplierServiceRegion': 'object'}
+Preview only (first 10 rows):
+SupplierNewsletterCountLastYear   option tech SupplierReviewMeetingCount gen_per_lot cost_per_lot SupplierContactChannel SupplierServiceRegion
+                             10 coal_001 coal                         13          45        37.62              Telephone                 South
+                             11 coal_002 coal                         22          55        44.43            AccountDesk                 North
+                             13 coal_003 coal                          8          45        34.76                 Portal                 South
+                             11 coal_004 coal                         18          40        33.17            AccountDesk                 North
+                             18 coal_005 coal                         27          50        40.83              Telephone                 South
+                             19 coal_006 coal                         28          40         33.5                 Portal               Central
+                             15 coal_007 coal                         22          55        42.73            AccountDesk                 South
+                              8 coal_008 coal                         30          45        34.86                 Portal                 South
+                             11 coal_009 coal                         29          45        36.09                 Portal               Central
+                              4 coal_010 coal                         10          50        39.16              Telephone                 South
+Full-file column statistics: {"SupplierNewsletterCountLastYear": {"missing": 0, "unique_nonempty": 30, "numeric_range": [1.0, 30.0]}, "option": {"missing": 0, "unique_nonempty": 131}, "tech": {"missing": 0, "unique_nonempty": 3}, "SupplierReviewMeetingCount": {"missing": 0, "unique_nonempty": 30, "numeric_range": [1.0, 30.0]}, "gen_per_lot": {"missing": 0, "unique_nonempty": 10, "numeric_range": [15.0, 60.0]}, "cost_per_lot": {"missing": 0, "unique_nonempty": 127, "numeric_range": [18.04, 49.81]}, "SupplierContactChannel": {"missing": 0, "unique_nonempty": 3}, "SupplierServiceRegion": {"missing": 0, "unique_nonempty": 3}}
+Matching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.
+Counts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.
+Query-name evidence: [{"term": "coal", "matching_columns": [{"column": "option", "exact": 0, "prefix": 34, "contains": 34, "examples": ["coal_001", "coal_002", "coal_003"]}, {"column": "tech", "exact": 34, "prefix": 34, "contains": 34, "examples": ["coal"]}], "exact_matching_columns": 1}, {"term": "gas", "matching_columns": [{"column": "option", "exact": 0, "prefix": 56, "contains": 56, "examples": ["gas_001", "gas_002", "gas_003"]}, {"column": "tech", "exact": 56, "prefix": 56, "contains": 56, "examples": ["gas"]}], "exact_matching_columns": 1}, {"term": "lot", "matching_columns": [], "exact_matching_columns": 0}, {"term": "renewables", "matching_columns": [{"column": "option", "exact": 0, "prefix": 41, "contains": 41, "examples": ["renewables_001", "renewables_002", "renewables_003"]}, {"column": "tech", "exact": 41, "prefix": 41, "contains": 41, "examples": ["renewables"]}], "exact_matching_columns": 1}]

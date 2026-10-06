@@ -1,0 +1,31 @@
+capacity.csv
+annual_maintenance_visits,Capacity
+3,1576
+
+products.csv
+showroom_display_zone,ProductName,Value,warranty_months,Weight
+South Wing,Sedan,1752,48,15
+Central Hall,SUV,1856,60,87
+Central Hall,Truck,8372,12,36
+North Wing,Convertible,6168,24,30
+Central Hall,Minivan,9681,24,33
+South Wing,Coupe,8062,48,72
+Central Hall,Hatchback,3895,12,75
+North Wing,Station Wagon,3254,24,71
+North Wing,Electric Car,1701,24,51
+South Wing,Hybrid Car,6799,12,21
+North Wing,Luxury Sedan,2724,24,97
+North Wing,Sports Car,6304,36,52
+North Wing,Crossover,3255,60,25
+North Wing,Diesel Truck,1923,36,15
+North Wing,Compact SUV,4103,24,54
+Central Hall,Luxury SUV,4429,12,57
+South Wing,Cargo Van,2663,36,18
+Central Hall,Pickup Truck,1691,12,69
+Central Hall,Roadster,5632,24,26
+North Wing,Muscle Car,4793,24,38
+North Wing,Off-road Vehicle,1343,36,31
+South Wing,Camper Van,9124,60,74
+South Wing,Compact Car,3652,36,82
+North Wing,Motorcycle,8842,48,49
+North Wing,Electric SUV,9176,60,64

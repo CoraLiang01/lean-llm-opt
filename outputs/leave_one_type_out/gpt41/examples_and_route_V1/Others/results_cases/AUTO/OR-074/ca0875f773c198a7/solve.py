@@ -1,0 +1,28 @@
+LEGACY_OBSERVATION = 'Time,Requirement\n2:00am - 2:30am,2\n2:30am - 3:00am,3\n3:00am - 3:30am,4\n3:30am - 4:00am,6\n4:00am - 4:30am,5\n4:30am - 5:00am,4\n5:00am - 5:30am,5\n5:30am - 6:00am,6\n6:00am - 6:30am,7\n6:30am - 7:00am,8\n7:00am - 7:30am,9\n7:30am - 8:00am,9\n8:00am - 8:30am,8\n8:30am - 9:00am,8\n9:00am - 9:30am,9\n9:30am - 10:00am,9\n10:00am - 10:30am,10\n10:30am - 11:00am,12\n11:00am - 11:30am,11\n11:30am - 12:00pm,11\n12:00pm - 12:30pm,12\n12:30pm - 1:00pm,11\n1:00pm - 1:30pm,10\n1:30pm - 2:00pm,9\n2:00pm - 2:30pm,8\n2:30pm - 3:00pm,7\n3:00pm - 3:30pm,6\n3:30pm - 4:00pm,5\n4:00pm - 4:30pm,5\n4:30pm - 5:00pm,6\n5:00pm - 5:30pm,7\n5:30pm - 6:00pm,8\n6:00pm - 6:30pm,9\n6:30pm - 7:00pm,10\n7:00pm - 7:30pm,9\n7:30pm - 8:00pm,8\n8:00pm - 8:30pm,7\n8:30pm - 9:00pm,6\n9:00pm - 9:30pm,5\n9:30pm - 10:00pm,4\n10:00pm - 10:30pm,4\n10:30pm - 11:00pm,3\n11:00pm - 11:30pm,3\n11:30pm - 12:00am,3\n12:00am - 12:30am,3\n12:30am - 1:00am,4\n1:00am - 1:30am,4\n1:30am - 2:00am,4'
+LEGACY_RECORDS = [{'source': '', 'values': {'Time': '2:00am - 2:30am', 'Requirement': '2'}}, {'source': '', 'values': {'Time': '2:30am - 3:00am', 'Requirement': '3'}}, {'source': '', 'values': {'Time': '3:00am - 3:30am', 'Requirement': '4'}}, {'source': '', 'values': {'Time': '3:30am - 4:00am', 'Requirement': '6'}}, {'source': '', 'values': {'Time': '4:00am - 4:30am', 'Requirement': '5'}}, {'source': '', 'values': {'Time': '4:30am - 5:00am', 'Requirement': '4'}}, {'source': '', 'values': {'Time': '5:00am - 5:30am', 'Requirement': '5'}}, {'source': '', 'values': {'Time': '5:30am - 6:00am', 'Requirement': '6'}}, {'source': '', 'values': {'Time': '6:00am - 6:30am', 'Requirement': '7'}}, {'source': '', 'values': {'Time': '6:30am - 7:00am', 'Requirement': '8'}}, {'source': '', 'values': {'Time': '7:00am - 7:30am', 'Requirement': '9'}}, {'source': '', 'values': {'Time': '7:30am - 8:00am', 'Requirement': '9'}}, {'source': '', 'values': {'Time': '8:00am - 8:30am', 'Requirement': '8'}}, {'source': '', 'values': {'Time': '8:30am - 9:00am', 'Requirement': '8'}}, {'source': '', 'values': {'Time': '9:00am - 9:30am', 'Requirement': '9'}}, {'source': '', 'values': {'Time': '9:30am - 10:00am', 'Requirement': '9'}}, {'source': '', 'values': {'Time': '10:00am - 10:30am', 'Requirement': '10'}}, {'source': '', 'values': {'Time': '10:30am - 11:00am', 'Requirement': '12'}}, {'source': '', 'values': {'Time': '11:00am - 11:30am', 'Requirement': '11'}}, {'source': '', 'values': {'Time': '11:30am - 12:00pm', 'Requirement': '11'}}, {'source': '', 'values': {'Time': '12:00pm - 12:30pm', 'Requirement': '12'}}, {'source': '', 'values': {'Time': '12:30pm - 1:00pm', 'Requirement': '11'}}, {'source': '', 'values': {'Time': '1:00pm - 1:30pm', 'Requirement': '10'}}, {'source': '', 'values': {'Time': '1:30pm - 2:00pm', 'Requirement': '9'}}, {'source': '', 'values': {'Time': '2:00pm - 2:30pm', 'Requirement': '8'}}, {'source': '', 'values': {'Time': '2:30pm - 3:00pm', 'Requirement': '7'}}, {'source': '', 'values': {'Time': '3:00pm - 3:30pm', 'Requirement': '6'}}, {'source': '', 'values': {'Time': '3:30pm - 4:00pm', 'Requirement': '5'}}, {'source': '', 'values': {'Time': '4:00pm - 4:30pm', 'Requirement': '5'}}, {'source': '', 'values': {'Time': '4:30pm - 5:00pm', 'Requirement': '6'}}, {'source': '', 'values': {'Time': '5:00pm - 5:30pm', 'Requirement': '7'}}, {'source': '', 'values': {'Time': '5:30pm - 6:00pm', 'Requirement': '8'}}, {'source': '', 'values': {'Time': '6:00pm - 6:30pm', 'Requirement': '9'}}, {'source': '', 'values': {'Time': '6:30pm - 7:00pm', 'Requirement': '10'}}, {'source': '', 'values': {'Time': '7:00pm - 7:30pm', 'Requirement': '9'}}, {'source': '', 'values': {'Time': '7:30pm - 8:00pm', 'Requirement': '8'}}, {'source': '', 'values': {'Time': '8:00pm - 8:30pm', 'Requirement': '7'}}, {'source': '', 'values': {'Time': '8:30pm - 9:00pm', 'Requirement': '6'}}, {'source': '', 'values': {'Time': '9:00pm - 9:30pm', 'Requirement': '5'}}, {'source': '', 'values': {'Time': '9:30pm - 10:00pm', 'Requirement': '4'}}, {'source': '', 'values': {'Time': '10:00pm - 10:30pm', 'Requirement': '4'}}, {'source': '', 'values': {'Time': '10:30pm - 11:00pm', 'Requirement': '3'}}, {'source': '', 'values': {'Time': '11:00pm - 11:30pm', 'Requirement': '3'}}, {'source': '', 'values': {'Time': '11:30pm - 12:00am', 'Requirement': '3'}}, {'source': '', 'values': {'Time': '12:00am - 12:30am', 'Requirement': '3'}}, {'source': '', 'values': {'Time': '12:30am - 1:00am', 'Requirement': '4'}}, {'source': '', 'values': {'Time': '1:00am - 1:30am', 'Requirement': '4'}}, {'source': '', 'values': {'Time': '1:30am - 2:00am', 'Requirement': '4'}}]
+import gurobipy as gp
+from gurobipy import GRB
+requirements = []
+for rec in LEGACY_RECORDS:
+    val = rec['values']
+    if 'Requirement' not in val:
+        raise ValueError('Missing Requirement in LEGACY_RECORDS')
+    requirements.append(int(val['Requirement']))
+if len(requirements) != 48:
+    raise ValueError('Expected 48 time periods, got %d' % len(requirements))
+T = 48
+periods = list(range(T))
+m = gp.Model('Waitstaff_Scheduling')
+x = m.addVars(periods, lb=0, vtype=GRB.INTEGER, name='')
+m.setObjective(gp.quicksum((x[t] for t in periods)), GRB.MINIMIZE)
+for s in periods:
+    covering = [x[(s - k) % T] for k in range(8)]
+    m.addConstr(gp.quicksum(covering) >= requirements[s], name=f'cover_{s + 1}')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for t in periods:
+        print(f'x[{t + 1}]: {x[t].X}')
+else:
+    print(f'Solver status: {m.Status}')

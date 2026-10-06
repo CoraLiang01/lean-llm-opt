@@ -1,0 +1,135 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read customer demand
+    demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP5/customer_demand.csv"
+    supply_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP5/supply_capacity.csv"
+    cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP5/transportation_costs.csv"
+
+    # Try reading with different encodings
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            demand_df = pd.read_csv(demand_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Failed to read {demand_path} with tried encodings.")
+
+    for enc in encodings:
+        try:
+            supply_df = pd.read_csv(supply_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Failed to read {supply_path} with tried encodings.")
+
+    for enc in encodings:
+        try:
+            cost_df = pd.read_csv(cost_path, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Failed to read {cost_path} with tried encodings.")
+
+    # Extract customer and supplier identifiers
+    customers = demand_df['Customers'].astype(str).tolist()
+    suppliers = supply_df['Supplier'].astype(str).tolist()
+
+    # Build demand dictionary
+    demand = {}
+    for _, row in demand_df.iterrows():
+        cust = str(row['Customers'])
+        val = row['demand']
+        if cust in demand:
+            demand[cust] += val
+        else:
+            demand[cust] = val
+
+    # Build supply capacity dictionary
+    supply_capacity = {}
+    for _, row in supply_df.iterrows():
+        sup = str(row['Supplier'])
+        val = row['supply_capacity']
+        if sup in supply_capacity:
+            supply_capacity[sup] += val
+        else:
+            supply_capacity[sup] = val
+
+    # Build cost dictionary: cost[supplier][customer]
+    # cost_df rows: suppliers, columns: customers (first column is supplier id)
+    if cost_df.columns[0].casefold() in ['supplier', 'suppliers', 'unnamed: 0']:
+        cost_df = cost_df.rename(columns={cost_df.columns[0]: 'Supplier'})
+    cost = {}
+    for _, row in cost_df.iterrows():
+        sup = str(row['Supplier'])
+        cost[sup] = {}
+        for cust in customers:
+            if cust not in row:
+                raise ValueError(f"Cost data missing for supplier {sup}, customer {cust}")
+            cost[sup][cust] = row[cust]
+
+    # Validate dimensions
+    for cust in customers:
+        if cust not in demand:
+            raise ValueError(f"Demand data missing for customer {cust}")
+    for sup in suppliers:
+        if sup not in supply_capacity:
+            raise ValueError(f"Supply capacity data missing for supplier {sup}")
+        if sup not in cost:
+            raise ValueError(f"Cost data missing for supplier {sup}")
+        for cust in customers:
+            if cust not in cost[sup]:
+                raise ValueError(f"Cost data missing for supplier {sup}, customer {cust}")
+
+    # Build model
+    m = gp.Model('Amazon_Distribution_TP')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x[supplier, customer] >= 0, continuous
+    keys = [(sup, cust) for sup in suppliers for cust in customers]
+    x = m.addVars(keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: minimize total transportation cost
+    m.setObjective(
+        gp.quicksum(cost[sup][cust] * x[sup, cust] for sup in suppliers for cust in customers),
+        GRB.MINIMIZE
+    )
+
+    # Demand satisfaction: sum over suppliers >= demand for each customer
+    m.addConstrs(
+        (gp.quicksum(x[sup, cust] for sup in suppliers) >= demand[cust] for cust in customers),
+        name='demand'
+    )
+
+    # Supply capacity: sum over customers <= supply_capacity for each supplier
+    m.addConstrs(
+        (gp.quicksum(x[sup, cust] for cust in customers) <= supply_capacity[sup] for sup in suppliers),
+        name='supply'
+    )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v5/frozen_notebook.ipynb:cell29", line 140, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v5/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 88, in <module>
+  File "<string>", line 69, in solve_problem
+ValueError: Cost data missing for supplier supplier1

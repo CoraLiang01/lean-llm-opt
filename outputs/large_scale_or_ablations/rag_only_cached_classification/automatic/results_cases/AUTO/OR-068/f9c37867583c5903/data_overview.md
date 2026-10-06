@@ -1,0 +1,14 @@
+Here is the full cost matrix from "manager_project_costs.csv", including all manager names (rows) and project names (columns):
+
+|      |   P1  |   P2  |   P3  |   P4  |   P5  |   P6  |
+|------|-------|-------|-------|-------|-------|-------|
+| MA   | 2216  | 1911  | 1661  | 2122  | 1442  | 1442  |
+| MB   | 1100  | 1271  | 2764  | 2557  | 1036  | 1036  |
+| MC   | 2827  | 2784  | 2206  | 2216  | 2677  | 2677  |
+| MD   | 2627  | 1273  | 2610  | 1957  | 1594  | 1594  |
+| ME   | 3359  | 1003  | 2554  | 1706  | 2065  | 2065  |
+| MF   | 1579  | 2289  | 2368  | 1922  | 2740  | 2740  |
+
+- Rows: Managers (MA, MB, MC, MD, ME, MF)
+- Columns: Projects (P1, P2, P3, P4, P5, P6)
+- Each cell: Cost of assigning manager (row) to project (column)

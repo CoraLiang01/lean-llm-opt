@@ -1,0 +1,1 @@
+I do not have access to the contents of cost_12x12.csv. Please provide the file or paste its contents here so I can retrieve all necessary cost data and formulate the complete mathematical model, including all required parameters, vectors, and matrices.

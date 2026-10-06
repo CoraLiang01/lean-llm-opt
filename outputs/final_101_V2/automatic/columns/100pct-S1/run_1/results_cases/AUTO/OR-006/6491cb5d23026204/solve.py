@@ -1,0 +1,40 @@
+LEGACY_OBSERVATION = 'products.csv\nrecord_keeper_group,archived_attachment_count,ProductName,Value,archive_revision_number,Weight\nTeam B,2,Sedan,1752,4,15\nTeam A,6,SUV,1856,7,87\nTeam C,3,Truck,8372,6,36\nTeam C,2,Convertible,6168,8,30\nTeam C,6,Minivan,9681,2,33\nTeam A,4,Coupe,8062,6,72\nTeam A,3,Hatchback,3895,3,75\nTeam C,6,Station Wagon,3254,7,71\nTeam B,4,Electric Car,1701,9,51\nTeam C,2,Hybrid Car,6799,5,21\nTeam C,4,Luxury Sedan,2724,5,97\nTeam B,4,Sports Car,6304,5,52\nTeam A,6,Crossover,3255,8,25\nTeam A,6,Diesel Truck,1923,9,15\nTeam C,2,Compact SUV,4103,5,54\nTeam B,6,Luxury SUV,4429,5,57\nTeam A,4,Cargo Van,2663,2,18\nTeam C,4,Pickup Truck,1691,3,69\nTeam C,6,Roadster,5632,4,26\nTeam C,6,Muscle Car,4793,5,38\nTeam C,2,Off-road Vehicle,1343,6,31\nTeam B,6,Camper Van,9124,8,74\nTeam B,3,Compact Car,3652,7,82\nTeam C,6,Motorcycle,8842,8,49\nTeam C,2,Electric SUV,9176,7,64\n\ncapacity.csv\narchive_revision_number,Capacity\n4,1576'
+LEGACY_RECORDS = [{'source': 'products.csv', 'values': {'record_keeper_group': 'Team B', 'archived_attachment_count': '2', 'ProductName': 'Sedan', 'Value': '1752', 'archive_revision_number': '4', 'Weight': '15'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'archived_attachment_count': '6', 'ProductName': 'SUV', 'Value': '1856', 'archive_revision_number': '7', 'Weight': '87'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '3', 'ProductName': 'Truck', 'Value': '8372', 'archive_revision_number': '6', 'Weight': '36'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '2', 'ProductName': 'Convertible', 'Value': '6168', 'archive_revision_number': '8', 'Weight': '30'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '6', 'ProductName': 'Minivan', 'Value': '9681', 'archive_revision_number': '2', 'Weight': '33'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'archived_attachment_count': '4', 'ProductName': 'Coupe', 'Value': '8062', 'archive_revision_number': '6', 'Weight': '72'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'archived_attachment_count': '3', 'ProductName': 'Hatchback', 'Value': '3895', 'archive_revision_number': '3', 'Weight': '75'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '6', 'ProductName': 'Station Wagon', 'Value': '3254', 'archive_revision_number': '7', 'Weight': '71'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team B', 'archived_attachment_count': '4', 'ProductName': 'Electric Car', 'Value': '1701', 'archive_revision_number': '9', 'Weight': '51'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '2', 'ProductName': 'Hybrid Car', 'Value': '6799', 'archive_revision_number': '5', 'Weight': '21'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '4', 'ProductName': 'Luxury Sedan', 'Value': '2724', 'archive_revision_number': '5', 'Weight': '97'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team B', 'archived_attachment_count': '4', 'ProductName': 'Sports Car', 'Value': '6304', 'archive_revision_number': '5', 'Weight': '52'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'archived_attachment_count': '6', 'ProductName': 'Crossover', 'Value': '3255', 'archive_revision_number': '8', 'Weight': '25'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'archived_attachment_count': '6', 'ProductName': 'Diesel Truck', 'Value': '1923', 'archive_revision_number': '9', 'Weight': '15'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '2', 'ProductName': 'Compact SUV', 'Value': '4103', 'archive_revision_number': '5', 'Weight': '54'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team B', 'archived_attachment_count': '6', 'ProductName': 'Luxury SUV', 'Value': '4429', 'archive_revision_number': '5', 'Weight': '57'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team A', 'archived_attachment_count': '4', 'ProductName': 'Cargo Van', 'Value': '2663', 'archive_revision_number': '2', 'Weight': '18'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '4', 'ProductName': 'Pickup Truck', 'Value': '1691', 'archive_revision_number': '3', 'Weight': '69'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '6', 'ProductName': 'Roadster', 'Value': '5632', 'archive_revision_number': '4', 'Weight': '26'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '6', 'ProductName': 'Muscle Car', 'Value': '4793', 'archive_revision_number': '5', 'Weight': '38'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '2', 'ProductName': 'Off-road Vehicle', 'Value': '1343', 'archive_revision_number': '6', 'Weight': '31'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team B', 'archived_attachment_count': '6', 'ProductName': 'Camper Van', 'Value': '9124', 'archive_revision_number': '8', 'Weight': '74'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team B', 'archived_attachment_count': '3', 'ProductName': 'Compact Car', 'Value': '3652', 'archive_revision_number': '7', 'Weight': '82'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '6', 'ProductName': 'Motorcycle', 'Value': '8842', 'archive_revision_number': '8', 'Weight': '49'}}, {'source': 'products.csv', 'values': {'record_keeper_group': 'Team C', 'archived_attachment_count': '2', 'ProductName': 'Electric SUV', 'Value': '9176', 'archive_revision_number': '7', 'Weight': '64'}}, {'source': 'capacity.csv', 'values': {'archive_revision_number': '4', 'Capacity': '1576'}}]
+import gurobipy as gp
+from gurobipy import GRB
+products = []
+p = {}
+w = {}
+C = None
+for rec in LEGACY_RECORDS:
+    if rec['source'] == 'products.csv':
+        name = rec['values']['ProductName']
+        products.append(name)
+        try:
+            p[name] = int(rec['values']['Value'])
+            w[name] = int(rec['values']['Weight'])
+        except Exception as e:
+            raise ValueError(f'Missing or invalid Value/Weight for {name}: {e}')
+    elif rec['source'] == 'capacity.csv':
+        if C is not None:
+            raise ValueError('Multiple capacity records found.')
+        try:
+            C = int(rec['values']['Capacity'])
+        except Exception as e:
+            raise ValueError(f'Missing or invalid Capacity: {e}')
+if set(p.keys()) != set(products) or set(w.keys()) != set(products):
+    raise ValueError('Mismatch in product identifiers and coefficients.')
+if C is None:
+    raise ValueError('No capacity found in LEGACY_RECORDS.')
+m = gp.Model('Vehicle_Inventory_Optimization')
+x = m.addVars(products, lb=0, vtype=GRB.INTEGER, name='')
+m.setObjective(gp.quicksum((p[i] * x[i] for i in products)), GRB.MAXIMIZE)
+m.addConstr(gp.quicksum((w[i] * x[i] for i in products)) <= C, name='capacity')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')

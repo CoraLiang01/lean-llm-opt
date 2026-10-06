@@ -1,0 +1,882 @@
+--- LOTO_Examples_Only_GPT4.1_Large-scale.ipynb:before
++++ LOTO_Examples_Only_GPT4.1_Large-scale.ipynb:after
+@@ -1,12 +1,6 @@
+-# Leave-one-type-out: GPT4.1 — Remove same-type CSV examples; keep every workflow
+-
+-Based on `LEAN_LLM_OPT_4.1_Large-scale.ipynb` (SHA-256 `a68c6396a9a7a005267bd3d376abd55263794bb7bad611dc8c5984802ad89e80`). Evaluate all seven gold semantic types in separate folds: TP, NRM, RA, FLP (including UFLP), AP, Mixture, and Others. Each of the 101 cases is evaluated once per experiment. Gold labels organize folds and scoring; they are not passed to the classifier.
+-
+-Only matching semantic `Type` rows from `RAG_Examples_All.csv` are removed, in memory, before building any classification/modeling/code example index. Others removal keeps Mixture rows; Mixture removal keeps Others rows. Hand-written examples, class definitions and cross-label structurally similar examples remain as in this model's baseline. This is a CSV-reference/workflow-availability experiment, not a claim of eliminating all prior knowledge of a model family.
+-
+-Every original workflow remains available. A class can still be predicted when its CSV examples have been removed. Empty route-specific example pools produce no examples instead of an error; other-type examples are not inserted to fill the gap.
+-
+-Classification is recomputed using each fold's filtered reference library. Model settings, CSV data access, formulation/code prompts, solver behavior and objective tolerance follow this model's own baseline. The original CSV and notebooks are never edited. Inference is disabled by default; see the final run cell.
++# Large-scale OR: LOTO Examples Only
++
++Based on the same final full-model definitions. Remove the target semantic type from the effective classification reference (RAG_Examples_All), route modeling/code examples, and fixed classifier demonstrations. Generic class definitions and execution interfaces remain. Retain every route; a route with an empty reference pool uses generic instructions and current-case data. No gold label or reference objective is passed to generation.
+ 
+ 
+ ## 1. Imports and configuration
+@@ -48,12 +42,14 @@
+ from typing import Any
+ from urllib.parse import quote
+ 
++import httpx
++
+ 
+ # Start Jupyter in the repository root, or set LEAN_LLM_OPT_ROOT.
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/interface_v5_switches/full"
++RESULTS_DIR = PROJECT_ROOT / "outputs/minimal_revision_20261005/examples_only_v4"
+ # Edit this one value when the notebook file is renamed.
+ NOTEBOOK_FILENAME = "LOTO_Examples_Only_GPT4.1_Large-scale.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+@@ -67,32 +63,45 @@
+ load_dotenv(PROJECT_ROOT / ".env", override=False)
+ user_api_key = os.environ.get("OPENAI_API_KEY")
+ 
+-VERSION = "examples_only-interface-v4-switches-v5"
++VERSION = "single-pass-source-data-v4"
+ MODEL_SNAPSHOT = "gpt-4.1-2025-04-14"
+-NRM_RETRY_ON_TRUNCATION = True  # False: propagate truncation immediately; True: retry once.
+-CSVQA_REPAIR_PLAN_ON_FAILURE = False  # True: repair one invalid NRM/RA plan, then full-data fallback.
+-NORMALIZE_GUROBI_BULK_NAMES = False  # False: preserve generated names; True: clear bulk names.
++NRM_RETRY_ON_TRUNCATION = False  # Single attempt; truncation remains a failed case.
+ EMBEDDING_MODEL = "text-embedding-ada-002"
+ CLASS_LABELS = ["TP", "NRM", "RA", "FLP", "AP", "Mixture", "Others"]
+ WORKFLOW_ROUTES = ["TP", "NRM", "FLP", "AP", "RA", "Others"]
+ CSVQA_MODE_BY_ROUTE = {
+-    # NRM and RA use source-derived records; other routes retain their existing flow.
+-    "NRM": "planned", "RA": "planned", "TP": "legacy",
+-    "AP": "legacy", "FLP": "legacy", "Others": "legacy",
++    # Canonical CSV routes use source-derived records; Others retains its original flow.
++    "NRM": "planned", "RA": "planned", "TP": "planned",
++    "AP": "planned", "FLP": "planned", "Others": "legacy",
+ }
+ RAG_EXAMPLES_ALL_PATH = "Large_Scale_Or_Files/RAG_Examples_All.csv"
+-CACHE_SCHEMA_VERSION = "examples_only-interface-v4-switches-v5"
+-
+-RESULTS_DIR = PROJECT_ROOT / "outputs/interface_v5_switches/methods/examples_only"
++CACHE_SCHEMA_VERSION = VERSION
++
++API_MAX_RETRIES = 2  # Original SDK transport setting; no pipeline/model retry.
++
+ LOTO_VARIANT = "examples_only"
+ LOTO_REMOVE_ROUTE = False
+ LOTO_BASE_NOTEBOOK = "LEAN_LLM_OPT_4.1_Large-scale.ipynb"
+-LOTO_BASE_SHA256 = "ba31d0ccd2f1d0eb4b384241b0464a83642e98f3da9fd333454c25f2510e7d5a"
++LOTO_BASE_SHA256 = "27b17404536910dec6442e66cce5a76d0dc4c391b243142a3f5b75e5f9962a4d"
+ 
+ 
+ ## 2. Shared model clients
+ 
+-All workflows use the configured model snapshot and output guard. Clients are created when requested.
++Use the fixed GPT-4.1 snapshot and shared HTTP connection pool. Preserve the original SDK setting of at most two transport retries for connection/service errors, recording every actual retry. No failed formulation, generated program, solver result or truncated model response is regenerated.
++
++
++HTTP_RETRY_EVENTS = []
++
++
++def _record_http_request(request):
++    retry_index = int(request.headers.get("x-stainless-retry-count", "0"))
++    if retry_index:
++        HTTP_RETRY_EVENTS.append({"endpoint": request.url.path, "retry_index": retry_index})
++
++
++@lru_cache(maxsize=1)
++def _get_http_client():
++    return httpx.Client(timeout=180, event_hooks={"request": [_record_http_request]})
+ 
+ 
+ class ModelOutputTruncated(RuntimeError):
+@@ -130,13 +139,13 @@
+ def make_llm(*, timeout=180):
+     return ChatOpenAI(
+         model_name=MODEL_SNAPSHOT, openai_api_key=require_api_key(),
+-        temperature=0.0, top_p=1, n=1, max_retries=2, timeout=timeout,
++        temperature=0.0, top_p=1, n=1, max_retries=API_MAX_RETRIES, http_client=_get_http_client(), timeout=timeout,
+         callbacks=[RejectTruncatedOutput()],
+     )
+ 
+ 
+ def make_embeddings():
+-    return OpenAIEmbeddings(model=EMBEDDING_MODEL, openai_api_key=require_api_key(), max_retries=2)
++    return OpenAIEmbeddings(model=EMBEDDING_MODEL, openai_api_key=require_api_key(), max_retries=API_MAX_RETRIES, http_client=_get_http_client())
+ 
+ MODEL_INTERFACE_INSTRUCTIONS = """
+ Mandatory execution interface, independent of every retrieved example:
+@@ -158,29 +167,9 @@
+ """
+ 
+ 
+-def gurobi_naming_instructions():
+-    """Keep generation hints consistent with the optional local name normalization."""
+-    if NORMALIZE_GUROBI_BULK_NAMES:
+-        return """Keep business identifiers as Python dictionary keys, separate from Gurobi names.
+-Use name='' for addVars/addConstrs so business keys are not expanded into solver names;
+-use only short ASCII names for individually named variables and constraints.
+-Do not rely on named lookup of bulk variables/constraints; use Python dictionaries instead."""
+-    return """Keep business identifiers as Python dictionary keys, separate from Gurobi names.
+-Use short ASCII solver names. Generated names are preserved by the execution harness.
+-If long business keys would create oversized bulk solver names, create individually named
+-variables/constraints with short names while retaining the original Python dictionary keys.
+-Any getVarByName/getConstrByName lookup must match the names actually assigned."""
+-
+-
+ ## 3. CSV loading and route modes
+ 
+-NRM and RA use planned extraction. Other routes retain their existing data path.
+-Set CSVQA_REPAIR_PLAN_ON_FAILURE=True to repair one invalid plan using the original
+-query, CSV profile, previous output and validation error; another failure falls back
+-to full source data. The default is False. Few-shot Only uses direct data and never
+-invokes this planner or its repair path.
+-NORMALIZE_GUROBI_BULK_NAMES=False preserves generated variable/constraint names;
+-True restores bulk name clearing. Keep this setting fixed throughout an experiment.
++NRM, RA, TP, AP and FLP use the existing declarative planner and deterministic source-data extraction. Others keeps its CSV-schema workflow and its query-only formulation route. No repair or model rerun is available.
+ 
+ 
+ def normalize_route(value: Any) -> str:
+@@ -223,27 +212,13 @@
+ )
+ 
+ def invoke_react_with_required_csvqa(agent, query, route):
+-    """Require CSVQA while preserving the existing ReAct agent boundary."""
+-    def call_count(result):
+-        return sum(
+-            isinstance(step, tuple)
+-            and len(step) >= 2
+-            and getattr(step[0], "tool", None) == "CSVQA"
+-            for step in result.get("intermediate_steps", [])
+-        )
+-
++    """Validate tool use after one agent invocation; never correct or rerun it."""
+     result = agent.invoke(query)
+-    if call_count(result) == 0:
+-        result = agent.invoke(
+-            "Protocol correction: call CSVQA before the Final Answer. Begin with Action: CSVQA.\n\n"
+-            f"User Description: {query}"
+-        )
+-    calls = call_count(result)
+-    planned = CSVQA_MODE_BY_ROUTE[normalize_route(route)] == "planned"
+-    if (planned or normalize_route(route) == "RA") and calls != 1:
++    calls = sum(isinstance(step, tuple) and len(step) >= 2
++                and getattr(step[0], "tool", None) == "CSVQA"
++                for step in result.get("intermediate_steps", []))
++    if calls != 1:
+         raise RuntimeError(f"{route} ReAct must call CSVQA exactly once; observed {calls}")
+-    if not planned and calls < 1:
+-        raise RuntimeError(f"{route} legacy ReAct must call CSVQA at least once; observed {calls}")
+     return result
+ 
+ 
+@@ -354,12 +329,22 @@
+     return profile
+ 
+ 
++for _route in ("TP", "AP", "FLP"):
++    CSVQA_PLANNED_PROMPTS[_route] = (
++        "Select every source row and column required by the original query, including entity IDs, "
++        "matrix coefficients and axes, costs, capacities, demands and additional restrictions. "
++        "Use exact source column names and retain business keys. Exclude a column only when it "
++        "has no role in the query. Illustrative examples do not restrict the entity set."
++    )
++    CSVQA_TOOL_DESCRIPTIONS[_route] = "Return source-derived records, exact columns, filters and matrix axes."
++
++
+ ## 4. Planned CSV extraction
+ 
+ The model proposes columns and filters as JSON. Python applies the plan to the full CSV tables and preserves source identifiers and row order. These checks validate the data plan, not generated Python.
+ 
+ 
+-def _ask_extraction_plan(llm, route, query, tables, route_prompt, *, repair_context=None):
++def _ask_extraction_plan(llm, route, query, tables, route_prompt):
+     """Ask for one declarative plan and return the parsed plan plus raw response."""
+     profile = json.dumps(_build_profile(tables, query), ensure_ascii=False)
+     request = f"""You are a CSV extraction planner. Return one JSON object only.
+@@ -380,7 +365,11 @@
+ Python assigns each logical view a table_id of file_<file_index>_view_<zero-based occurrence for that
+ file>. A physical file may appear in multiple table specifications and roles may repeat. Every input
+ file must appear in tables or ignored_file_indices. Ignore a file only when the query does not need it.
+-Every explicit subset must have a filter and every filter must quote supporting query evidence.
++Filter only an explicit restriction; names introduced as examples (e.g., such as, for example)
++do not restrict the entity set. Every filter must quote the query restriction that requires it.
++Choose the filter operator from the requested matching semantics. A categorical code
++classifying identifier families refers to a prefix when no separate category column exists;
++arbitrary substring matching also admits unrelated identifiers and requires explicit query support.
+ Declare a matrix relationship only when the profile exposes its two axes unambiguously. When one label
+ column contains both decision entities and scalar parameter rows, retain every row that supplies a
+ query-required coefficient, price, cost, capacity, or bound; use separate logical views when helpful.
+@@ -394,16 +383,6 @@
+ CSV profile:
+ {profile}
+ """
+-    if repair_context is not None:
+-        request += (
+-            "\nRepair the previous extraction plan using the diagnostic data below. "
+-            "Keep the original query and CSV profile authoritative. Correct invalid JSON, "
+-            "columns, filters, and relationships without changing the task, inventing data, "
+-            "or adding unsupported subset conditions. Return only a complete plan in the "
+-            "same JSON schema. No solution code or objective feedback is supplied.\n"
+-            + "\nPrevious plan output:\n" + str(repair_context["previous_output"])
+-            + "\nValidation error:\n" + str(repair_context["validation_error"])
+-        )
+     text = str(llm.invoke([HumanMessage(content=request)]).content or "").strip()
+     cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.I) if text.startswith("```") else text
+     start, end = cleaned.find("{"), cleaned.rfind("}")
+@@ -522,6 +501,10 @@
+             value_supported = bool(raw_values) and all(key(value) in key(query) for value in raw_values)
+             if not evidence.strip() or (key(evidence) not in key(query) and not value_supported):
+                 raise ValueError(f"Filter lacks query evidence: {condition}")
++            illustrative = re.search(r"\bsuch as\b|\bfor example\b|\be\.g\.", evidence, re.I)
++            restrictive = re.search(r"\bonly\b|\bexclud\w*\b|\bexcept\b|\brestrict\w*\b|\blimited to\b", evidence, re.I)
++            if illustrative and not restrictive:
++                raise ValueError(f"Illustrative query examples cannot justify a source-row filter: {evidence}")
+             mask = _apply_condition(frame[column], condition)
+             combined = mask if combined is None else (combined & mask if logic == "and" else combined | mask)
+             used_conditions.append(condition)
+@@ -541,14 +524,6 @@
+         payload_by_id[table_id] = payload
+ 
+     profile = _build_profile(tables, query)
+-    required_values = {
+-        term for file_profile in profile for term, matches in file_profile["query_terms"].items()
+-        if matches["value_matches"] and not matches["column_matches"]
+-    }
+-    condition_text = json.dumps(used_conditions, ensure_ascii=False)
+-    missing_filters = sorted(term for term in required_values if key(term) not in key(condition_text))
+-    if missing_filters:
+-        raise ValueError(f"Plan omitted explicit query subset filters: {missing_filters}")
+     required_columns = {
+         column for file_profile in profile for matches in file_profile["query_terms"].values()
+         for column in matches["column_matches"]
+@@ -584,7 +559,7 @@
+                 raise ValueError(f"Matrix ID column {column!r} is not selected for {table['table_id']!r}")
+ 
+         def axis_keys(values, axis_name):
+-            normalized = [key(value) for value in values]
++            normalized = [str(value) for value in values]
+             if any(not value for value in normalized) or len(set(normalized)) != len(normalized):
+                 raise ValueError(f"Matrix {axis_name} IDs must be non-empty and unique: {values}")
+             return normalized
+@@ -593,12 +568,34 @@
+         column_ids = [record["values"][column_axis_column] for record in column_axis["records"]]
+         matrix_row_ids = [record["values"][row_id_column] for record in matrix_table["records"]]
+         matrix_columns = [column for column in matrix_table["columns"] if column != row_id_column]
++        def axis_mapping(actual, expected):
++            axis_keys(actual, "source")
++            axis_keys(expected, "reference")
++            if set(actual) == set(expected):
++                return dict(zip(actual, actual)), "exact"
++            def suffix_map(values):
++                matches = [re.fullmatch(r"\D*(\d+)", value) for value in values]
++                if not all(matches):
++                    return None
++                keys = [match.group(1) for match in matches]
++                return dict(zip(keys, values)) if len(set(keys)) == len(keys) else None
++            left, right = suffix_map(actual), suffix_map(expected)
++            if left is not None and right is not None and set(left) == set(right):
++                return {value: right[key] for key, value in left.items()}, "unique_complete_suffix"
++            return None, "unresolved"
++        row_map, row_basis = axis_mapping(matrix_row_ids, row_ids)
++        column_map, column_basis = axis_mapping(matrix_columns, column_ids)
++        relationship = dict(relationship)
++        if row_basis == "unique_complete_suffix":
++            relationship["row_id_mapping"] = row_map
++        if column_basis == "unique_complete_suffix":
++            relationship["column_id_mapping"] = column_map
+         checks = {
+             "matrix_table_id": matrix_id,
+             "shape": [len(matrix_table["records"]), len(matrix_columns)],
+             "expected_shape": [len(row_ids), len(column_ids)],
+-            "row_ids_aligned": axis_keys(matrix_row_ids, "matrix row") == axis_keys(row_ids, "row axis"),
+-            "column_ids_aligned": axis_keys(matrix_columns, "matrix column") == axis_keys(column_ids, "column axis"),
++            "row_ids_aligned": row_map is not None, "column_ids_aligned": column_map is not None,
++            "row_mapping_basis": row_basis, "column_mapping_basis": column_basis,
+         }
+         if checks["shape"] != checks["expected_shape"] or not checks["row_ids_aligned"] or not checks["column_ids_aligned"]:
+             raise ValueError(f"Matrix validation failed: {checks}")
+@@ -668,37 +665,21 @@
+             tables = _load_tables(dataset_address)
+             attempt_count = 1
+             raw_output = ""
+-            for attempt in range(2 if CSVQA_REPAIR_PLAN_ON_FAILURE else 1):
+-                attempt_count = attempt + 1
+-                raw_output = ""
+-                try:
+-                    if attempt:
+-                        plan, raw_output = _ask_extraction_plan(
+-                            llm, route, user_query, tables, system_prompt,
+-                            repair_context={"previous_output": planner_outputs[-1],
+-                                            "validation_error": errors[-1]},
+-                        )
+-                    else:
+-                        plan, raw_output = _ask_extraction_plan(
+-                            llm, route, user_query, tables, system_prompt
+-                        )
+-                    payload = _execute_plan(plan, tables, user_query, route)
+-                    planner_outputs.append(raw_output)
+-                    observation = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+-                    status = "PLANNED_REPAIRED" if attempt else "PLANNED"
+-                    break
+-                except Exception as exc:
+-                    # Only invalid first plans trigger repair. A failed repair request,
+-                    # including truncation after service retries, falls back to full data.
+-                    if not attempt and not isinstance(exc, (KeyError, TypeError, ValueError)):
+-                        raise
+-                    planner_outputs.append(getattr(exc, "planner_output", raw_output))
+-                    errors.append(str(exc))
+-                    if route not in {"NRM", "RA"}:
+-                        raise ValueError(
+-                            f"CSVQA extraction plan failed for {route}: {errors[-1]}"
+-                        ) from exc
+-            if status not in {"PLANNED", "PLANNED_REPAIRED"}:
++            try:
++                plan, raw_output = _ask_extraction_plan(
++                    llm, route, user_query, tables, system_prompt
++                )
++                payload = _execute_plan(plan, tables, user_query, route)
++                planner_outputs.append(raw_output)
++                observation = json.dumps(payload, ensure_ascii=False, sort_keys=True)
++                status = "PLANNED"
++            except (KeyError, TypeError, ValueError) as exc:
++                planner_outputs.append(getattr(exc, "planner_output", raw_output))
++                errors.append(str(exc))
++                if CSVQA_MODE_BY_ROUTE[route] != "planned":
++                    raise ValueError(
++                        f"CSVQA extraction plan failed for {route}: {errors[-1]}"
++                    ) from exc
+                 payload_tables = []
+                 for table in tables:
+                     frame, columns = table["frame"], list(table["frame"].columns)
+@@ -727,11 +708,10 @@
+         trace = {
+             "version": "GPT4.1-LO", "mode": "planned" if planned else "legacy",
+             "status": status, "plan": plan, "planner_attempt_count": attempt_count,
+-            "planner_repair_enabled": bool(planned and CSVQA_REPAIR_PLAN_ON_FAILURE),
+-            "planner_repair_attempted": attempt_count > 1,
+-            "planner_repair_succeeded": status == "PLANNED_REPAIRED",
+             "planner_outputs": planner_outputs, "planner_errors": errors,
+             "validation_errors": errors, "fallback_reason": fallback_reason,
++            "repair_count": 0, "retry_count": 0,
++            "fallback_count": int(status == "FALLBACK_FULL_DATA"),
+             "payload_hash": hashlib.sha256(observation.encode("utf-8")).hexdigest(),
+         }
+         state.clear()
+@@ -1077,7 +1057,7 @@
+     return initialize_agent(
+         tools=[tool], llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+         agent_kwargs={"prefix": prefix, "suffix": suffix}, verbose=True,
+-        handle_parsing_errors=True, max_iterations=4, return_intermediate_steps=True,
++        handle_parsing_errors=False, max_iterations=4, return_intermediate_steps=True,
+     )
+ 
+ 
+@@ -1169,25 +1149,43 @@
+     }
+ 
+ 
+-## 7. Route retrieval and NRM formulation
+-
+-Cache route-example retrievers and formulate network revenue management problems using planned CSV data.
++## 7. Data retrieval and formulation
++
++Python invokes the existing CSVQA Tool once before a single modeling request. Planned extraction and all route demonstrations remain. The modeling request receives the resulting Observation without an agent deciding whether to call the tool.
+ 
+ 
+ def formulate_with_csvqa(query, dataset_address, route, system_prompt, tool_description, prefix, suffix):
+-    """Run the shared CSVQA agent with the route's prompt and fixed data mode."""
++    """Call CSVQA once, then model its Observation once; no agent protocol repair."""
++    route = normalize_route(route)
++    if CSVQA_MODE_BY_ROUTE[route] == "planned":
++        system_prompt = CSVQA_PLANNED_PROMPTS[route]
++        tool_description = CSVQA_TOOL_DESCRIPTIONS[route]
++        prefix = prefix.replace("please output required parameters in a whole text, including all vectors and matrices.",
++                                "return symbolic parameters and an exact source Data Mapping; do not enumerate values.")
+     llm, qa_tool, csvqa_result = build_csvqa_components(
+         dataset_address, system_prompt, tool_description, route=route, user_query=query,
+     )
+-    prefix += ("\nPreserve the original objective sense, full expression, and constant terms. "
+-               "Do not replace it with an optimizer-equivalent objective with a different value.")
+-    agent = initialize_agent(
+-        tools=[qa_tool], llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+-        agent_kwargs={"prefix": prefix, "suffix": suffix}, verbose=True,
+-        handle_parsing_errors=True, return_intermediate_steps=True, early_stopping_method="generate",
+-    )
+-    result = invoke_react_with_required_csvqa(agent, query, route)
+-    return {"formulation": result["output"], **csvqa_result}
++    try:
++        qa_tool.invoke(query)
++    except Exception as exc:
++        exc.csvqa_result = dict(csvqa_result)
++        exc.pipeline_stage = "data_extraction"
++        raise
++    prompt = (prefix.replace("{{", "{").replace("}}", "}") +
++              "\nCSVQA has already been called exactly once by the program. Its complete current "
++              "Observation is supplied below. Return the final mathematical model directly; do not "
++              "request tools or copy example data. Use a concise symbolic model and an exact Data "
++              "Mapping with table_id and column names. Do not enumerate numerical tables. "
++              "Bind every parameter to source data or a query-defined expression; never invent a "
++              "missing limit. If total capacity refers to listed per-entity capacities, retain "
++              "their bounds and their sum. Preserve all variable domains, constraints, objective "
++              "sense and additive constants. Define each index set from ALL current returned entities "
++              "unless the original query explicitly restricts it. Demonstration names, counts and "
++              "profile samples must never determine the current entity set. Optional matrix alias "
++              "mappings apply only when present; otherwise preserve exact raw ID matching.\n" +
++              f"Original Query:\n{query}\nObservation:\n{csvqa_result['observation']}")
++    result = llm.invoke([HumanMessage(content=prompt)])
++    return {"formulation": result.content, **csvqa_result}
+ 
+ 
+ @lru_cache(maxsize=1)
+@@ -1309,20 +1307,9 @@
+     User Description: {input}
+     {agent_scratchpad}"""
+ 
+-    for attempt in range(2 if NRM_RETRY_ON_TRUNCATION else 1):
+-        try:
+-            result = formulate_with_csvqa(
+-                query, dataset_address, "NRM", csvqa_system_prompt, csvqa_tool_description, prefix, suffix,
+-            )
+-            if attempt:
+-                result.setdefault("trace", {})["truncation_retry"] = {"llm_usage": truncated_usage}
+-            return result
+-        except ModelOutputTruncated as exc:
+-            if attempt or not NRM_RETRY_ON_TRUNCATION:
+-                raise
+-            truncated_usage = getattr(exc, "llm_usage", {})
+-            prefix += "\nReturn a concise symbolic model and Data Mapping only; never enumerate data rows or repeat examples."
+-            print("NRM formulation truncated; retrying once.", truncated_usage)
++    return formulate_with_csvqa(
++        query, dataset_address, "NRM", csvqa_system_prompt, csvqa_tool_description, prefix, suffix,
++    )
+ 
+ 
+ ## 8. Resource allocation
+@@ -1707,7 +1694,9 @@
+ combined conditions rather than treating individual counts as intersection counts.
+ 
+ Reserve m and model for the Gurobi model; never reuse them as loop variables or other values.
+-{naming_instructions}
++Keep business identifiers as Python dictionary keys, separate from Gurobi names.
++Use name='' for addVars/addConstrs so business keys are not expanded into solver names;
++use only short ASCII names for individually named variables and constraints.
+ Never invent, truncate, or replace required coefficients with dummy or random data.
+ Before optimization, validate coefficient dimensions and identifier coverage against decision index sets;
+ raise an explicit error for missing data instead of guessing, padding, or silently dropping entries.
+@@ -1715,11 +1704,11 @@
+ [Your Gurobi Code]
+ """
+ 
+-        code_gen_template += "\n" + MODEL_INTERFACE_INSTRUCTIONS
++        code_gen_template += "\n" + CSV_SOLVER_INSTRUCTIONS + MODEL_INTERFACE_INSTRUCTIONS
+ 
+         code_gen_prompt = PromptTemplate(
+             template=code_gen_template,
+-            input_variables=["query", "schema", "abstract_plan", "dataset_address", "few_shot_examples", "naming_instructions"]
++            input_variables=["query", "schema", "abstract_plan", "dataset_address", "few_shot_examples"]
+         )
+         
+         code_gen_chain = LLMChain(llm=llm2, prompt=code_gen_prompt)
+@@ -1729,8 +1718,7 @@
+             schema=schema,
+             abstract_plan=abstract_model_plan,
+             dataset_address=dataset_address,
+-            few_shot_examples=few_shot_block_code,
+-            naming_instructions=gurobi_naming_instructions()
++            few_shot_examples=few_shot_block_code 
+         )
+         
+         if "```python" in final_code:
+@@ -1762,7 +1750,7 @@
+     llm = make_llm()
+ 
+     loader = CSVLoader(file_path=str(PROJECT_ROOT / "Large_Scale_Or_Files/RAG_Example_Others_Without_CSV.csv"), encoding="utf-8")
+-    documents = loader.load()
++    documents = filter_loto_query_only_documents(loader.load())
+ 
+     embeddings = make_embeddings()
+     vectors = FAISS.from_documents(documents, embeddings)
+@@ -1862,12 +1850,12 @@
+         llm=llm,
+         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+         agent_kwargs={
+-            "prefix": prefix,
++            "prefix": filter_loto_query_only_triggers(prefix),
+             "suffix": suffix,
+             "input_variables": ["input"]
+         },
+         verbose=True,
+-        handle_parsing_errors=True,  # Enable error handling
++        handle_parsing_errors=False,  # Enable error handling
+     )
+ 
+     openai.api_request_timeout = 60  
+@@ -2032,6 +2020,12 @@
+ identifiers, and matrix axes. Do not read CSVQA_DATA["plan"].
+ Without a continuous pre-horizon value, start change/ramp constraints at the second
+ period; an initial binary state does not supply a continuous period-zero value.
++Optional row_id_mapping/column_id_mapping in a declared matrix relationship are
++dictionaries from raw matrix label strings to entity ID strings. Apply them only when
++present; otherwise use exact raw IDs. Obtain a row label from record['values'][row_id_column],
++never from the record dictionary itself. Preserve every coefficient and both original IDs.
++Derive complete index sets from current records; an example or a copied formulation's
++literal entity list must not narrow them without an explicit original-query restriction.
+ Records are already structured dictionaries; do not reparse the payload as CSV text.
+ Only parse individual source fields when those fields themselves contain structured text.
+ """
+@@ -2044,6 +2038,9 @@
+ """
+ 
+ CSV_SOLVER_INSTRUCTIONS = """
++Keep business identifiers as Python dictionary keys, separate from Gurobi names.
++Use name='' for addVars/addConstrs so business keys are not expanded into solver names;
++use only short ASCII names for individually named variables and constraints.
+ Use setObjective for the original query's objective sense and full expression, including constants.
+ Do not substitute an optimizer-equivalent objective or restore omitted constants only in printed output.
+ Never invent, truncate, or replace required coefficients with dummy or random data.
+@@ -2051,6 +2048,17 @@
+ raise an explicit error for missing data instead of guessing, padding, or silently dropping entries.
+ For |linear expression| <= bound, use expression <= bound and expression >= -bound;
+ do not pass a non-variable expression to addGenConstrAbs.
++
++Gurobi addVars supports lb, ub, obj, vtype and name only; do not invent keyword arguments.
++Use a list of unique flat tuple keys with addVars(keys); do not pass a tuplelist and
++another Cartesian index unless that extra dimension is intended. Preserve every component
++of composite business keys in dictionaries and joins. Sum repeated component rows by the
++complete key instead of overwriting them. Ineligible decision pairs must be constrained to
++zero or excluded; their presence in source data is not a reason to reject the entire input.
++Never use chained comparisons, Python and/or, or bitwise |/& on Gurobi constraints.
++Represent logical conditions with explicit binary variables and indicator/linear constraints.
++Use pandas Series.str.casefold() for vectorized text and string.casefold() for one string.
++
+ Set MIPGap=1e-4 before optimize().
+ If Status == GRB.OPTIMAL, print ObjVal and every variable's VarName and X.
+ Otherwise print the solver status; do not report an incumbent as optimal.
+@@ -2104,7 +2112,7 @@
+             "identifiers, or data. The current formulation and current data are authoritative.",
+             examples,
+         ])
+-    parts.extend([CSV_SOLVER_INSTRUCTIONS, gurobi_naming_instructions(), MODEL_INTERFACE_INSTRUCTIONS])
++    parts.extend([CSV_SOLVER_INSTRUCTIONS, MODEL_INTERFACE_INSTRUCTIONS])
+     response = make_llm().invoke([HumanMessage(content="\n\n".join(parts))])
+     code = response.content
+     if bind_observation:
+@@ -2134,13 +2142,12 @@
+     match = re.fullmatch(r"```(?:python|py)?\s*\n(.*?)\n```", source, re.DOTALL)
+     source = match.group(1) if match else source
+     tree = ast.parse(source)
+-    # Optional compatibility mode; by default preserve generated names and named lookups.
+-    if NORMALIZE_GUROBI_BULK_NAMES:
+-        for node in ast.walk(tree):
+-            if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+-                    and node.func.attr in {"addVars", "addConstrs"}):
+-                node.keywords = [kw for kw in node.keywords if kw.arg != "name"]
+-                node.keywords.append(ast.keyword(arg="name", value=ast.Constant(value="")))
++    # Bulk names expand business keys; keep those keys out of Gurobi display names.
++    for node in ast.walk(tree):
++        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
++                and node.func.attr in {"addVars", "addConstrs"}):
++            node.keywords = [kw for kw in node.keywords if kw.arg != "name"]
++            node.keywords.append(ast.keyword(arg="name", value=ast.Constant(value="")))
+     return ast.unparse(tree)
+ 
+ 
+@@ -2218,16 +2225,22 @@
+     }
+ 
+ 
++def classification_for_case(case):
++    return invoke_classifier(case["Query"])
++
++
+ def execute_pipeline_case(case, *, forced_route=None):
+     """Classify, formulate, generate code, and solve; retain progress if a step fails."""
+     record = {**case_fields(case), "forced_route": forced_route,
+-              "experiment_mode": "forced" if forced_route else "automatic"}
++              "experiment_mode": "forced" if forced_route else "automatic",
++              "repair_count": 0, "retry_count": 0, "fallback_count": 0}
++    HTTP_RETRY_EVENTS.clear()
+     query, address = record["query"], record["dataset_address"]
+     try:
+         if forced_route is not None and not address:
+             raise ValueError("Forced routes require CSV inputs")
+         record["pipeline_stage"] = "classification" if forced_route is None else "formulation"
+-        classification = invoke_classifier(query) if forced_route is None else {}
++        classification = classification_for_case(case) if forced_route is None else {}
+         label = classification.get("normalized_label")
+         route = normalize_route(forced_route) if forced_route is not None else class_to_workflow_route(label)
+         record.update(predicted_label=label, assigned_route=route if address else "Others")
+@@ -2236,14 +2249,9 @@
+         mode = CSVQA_MODE_BY_ROUTE[route] if address else None
+         payload = formulation.get("observation", "") if mode == "planned" else ""
+         record.update(generated_model=formulation["formulation"], csvqa_observation=formulation.get("observation", ""), csvqa_mode=mode,
+-                      csvqa_status=formulation.get("trace", {}).get("status"))
+-        csvqa_trace = formulation.get("trace", {})
+-        record.update(
+-            csvqa_trace=json.dumps(csvqa_trace, ensure_ascii=False, indent=2),
+-            csvqa_planner_attempt_count=csvqa_trace.get("planner_attempt_count", 0),
+-            csvqa_plan_repair_attempted=csvqa_trace.get("planner_repair_attempted", False),
+-            csvqa_plan_repair_succeeded=csvqa_trace.get("planner_repair_succeeded", False),
+-        )
++                      csvqa_status=formulation.get("trace", {}).get("status"),
++                      csvqa_trace=json.dumps(formulation.get("trace", {}), ensure_ascii=False),
++                      fallback_count=formulation.get("trace", {}).get("fallback_count", 0))
+         model_text = formulation["formulation"]
+         if (not isinstance(model_text, str) or not model_text.strip()
+                 or "agent stopped due to" in model_text.lower()):
+@@ -2267,10 +2275,20 @@
+         record["solve_code"] = source
+         record["pipeline_stage"] = "solve"
+         objective, solution = execute_code(record["solve_code"])
++        record.update(api_retry_count=len(HTTP_RETRY_EVENTS), api_retry_events=json.dumps(HTTP_RETRY_EVENTS))
+         record.update(final_objective=objective, final_solution=solution, final_ok=True,
+                       record_status="completed", cache_source="computed", pipeline_stage="completed")
+         return record
+     except Exception as exc:
++        record.update(api_retry_count=len(HTTP_RETRY_EVENTS), api_retry_events=json.dumps(HTTP_RETRY_EVENTS))
++        evidence = getattr(exc, "csvqa_result", {})
++        if evidence:
++            record.update(csvqa_observation=evidence.get("observation", ""),
++                          csvqa_trace=json.dumps(evidence.get("trace", {}), ensure_ascii=False),
++                          csvqa_status=evidence.get("trace", {}).get("status"))
++        record["pipeline_stage"] = getattr(exc, "pipeline_stage", record["pipeline_stage"])
++        if isinstance(exc, ModelInterfaceError):
++            record["pipeline_stage"] = "result_extraction"
+         exc.pipeline_context = record
+         raise
+ 
+@@ -2397,8 +2415,7 @@
+ 
+ 
+ CSV_VALUE_READERS = {
+-    **dict.fromkeys(("final_ok", "classification_correct", "solution_correct", "csvqa_plan_repair_attempted", "csvqa_plan_repair_succeeded"), lambda value: value == "True"),
+-    "csvqa_planner_attempt_count": lambda value: int(float(value)),
++    **dict.fromkeys(("final_ok", "classification_correct", "solution_correct"), lambda value: value == "True"),
+     **dict.fromkeys(("final_objective", "label_objective"), float),
+ }
+ _RESULT_LOCK = RLock()
+@@ -2460,9 +2477,9 @@
+ 
+ 
+ def reusable_record(csv_path, record, fingerprint):
+-    """Reuse only successful, intact results from the same code and data."""
+-    if (not record or record.get("record_status") != "completed"
+-            or not record.get("final_ok") or record.get("cache_fingerprint") != fingerprint):
++    """Reuse every intact recorded attempt, including failures; never select successes."""
++    if (not record or record.get("record_status") not in {"completed", "error"}
++            or record.get("cache_fingerprint") != fingerprint):
+         return None
+     return materialize_record(csv_path, record)
+ 
+@@ -2521,8 +2538,6 @@
+               "model": MODEL_SNAPSHOT,
+               "embedding_model": EMBEDDING_MODEL, "modes": CSVQA_MODE_BY_ROUTE,
+               "nrm_retry_on_truncation": NRM_RETRY_ON_TRUNCATION,
+-              "csvqa_repair_plan_on_failure": CSVQA_REPAIR_PLAN_ON_FAILURE,
+-              "normalize_gurobi_bulk_names": NORMALIZE_GUROBI_BULK_NAMES,
+               "query": str(case["Query"]), "forced_route": route}
+     digest = hashlib.sha256(json.dumps(fields, sort_keys=True).encode())
+     for raw in normalize_data_address(case.get("dataset_address")).splitlines():
+@@ -2541,26 +2556,33 @@
+         "execution_error": f"{type(exc).__name__}: {exc}", "execution_error_type": type(exc).__name__,
+         "execution_error_code": getattr(exc, "code", None),
+         "record_status": "error", "cache_source": "computed",
++        "generated_model": getattr(exc, "pipeline_context", {}).get("generated_model", ""),
++        "solve_code": getattr(exc, "pipeline_context", {}).get("solve_code", ""),
++        "csvqa_observation": getattr(exc, "pipeline_context", {}).get("csvqa_observation", ""),
++        "csvqa_trace": getattr(exc, "pipeline_context", {}).get("csvqa_trace", "{}"),
++        "repair_count": 0, "retry_count": 0,
++        "fallback_count": getattr(exc, "pipeline_context", {}).get("fallback_count", 0),
+     }
+ 
+ 
+ ## 17. Shared test runner
+ 
+-run_test(test, output_csv=...) accepts a DataFrame or CSV path. It classifies automatic cases, detects CSV availability per row, and saves each result immediately. Pass routes=WORKFLOW_ROUTES to test every route. Every failure stays in the results; missing reference answers are not scored.
+-
+-Only successful results with matching fingerprints are reused. Failures are retried. Set reuse_completed=False to disable both local and AUTO reuse, and continue_on_error=False to stop at the first exception. Missing credentials stop the run before any case is saved.
++Run each code version and case once. Resume recorded successes and failures without regenerating them. Use a new directory for another round; historical results cannot be overwritten. Objective Match includes every requested case in the denominator. CSV-plan failures retain the existing deterministic full-source-data fallback, which is logged separately from repair and retries.
+ 
+ 
+ def run_test(test, *, output_csv=RESULTS_DIR / "results.csv", routes=None, reuse_auto_csv=None,
+              reuse_completed=True, continue_on_error=True, rel_tol=1e-4, abs_tol=1e-4):
+-    """Reuse matching successful results; retry failures. False disables all result reuse."""
++    """Evaluate once per case/version; resume recorded successes and failures."""
+     frame = load_benchmark(test) if isinstance(test, (str, Path)) else prepare_cases(test)
+     selected_routes = [None] if routes is None else [normalize_route(route) for route in routes]
+     if not selected_routes or len(selected_routes) != len(set(selected_routes)):
+         raise ValueError("Provide a non-empty list of distinct routes")
+     if routes is not None and frame["dataset_address"].eq("").any():
+         raise ValueError("Forced-route tests require case CSV inputs; use routes=None for query-only tests")
+-    cached = {record_key(row): row for row in load_records(output_csv)} if reuse_completed else {}
++    existing = load_records(output_csv)
++    if existing and not reuse_completed:
++        raise ValueError("Use a new round directory for a fresh run; historical attempts cannot be overwritten")
++    cached = {record_key(row): row for row in existing}
+     auto_cached = ({record_key(row): row for row in load_records(reuse_auto_csv)}
+                    if reuse_completed and reuse_auto_csv else {})
+     # Fingerprint every run before saving records so a first run is reusable later.
+@@ -2571,7 +2593,11 @@
+         for route in selected_routes:
+             key = (case["problem_id"], str(case["Query"]), case["dataset_address"], route or "AUTO")
+             fingerprint = case_fingerprint(case, route, source_fingerprint=source)
++            if key in cached and cached[key].get("cache_fingerprint") != fingerprint:
++                raise ValueError("Existing attempts use different code/data; choose a new version directory")
+             record = reusable_record(output_csv, cached.get(key), fingerprint)
++            if key in cached and record is None:
++                raise ValueError("Recorded attempt has missing/corrupt artifacts; do not rerun it")
+             if record is not None:
+                 record["cache_source"] = "csv"
+             elif route is not None and route == case.get("true_route"):
+@@ -2602,6 +2628,7 @@
+                         raise
+             record = finalize_record(record, rel_tol=rel_tol, abs_tol=abs_tol)
+             record["cache_fingerprint"] = fingerprint
++            record["base_notebook_sha256"] = globals().get("BASE_NOTEBOOK_SHA256", hashlib.sha256(NOTEBOOK_PATH.read_bytes()).hexdigest())
+             save_record(output_csv, record)
+             results.append(record)
+             print(f"[{len(results)}/{total}] {case['problem_id']} / {route or 'AUTO'}: "
+@@ -2686,9 +2713,9 @@
+     return tables
+ 
+ 
+-## 18. Fold controls and route enforcement
+-
+-The following definitions replace only the experimental interfaces above. Semantic filtering happens before route normalization. Switching folds clears all reference and classifier caches. A runtime dispatch check enforces route removal even if the classifier ignores its availability instructions. Original class definitions and hand-written examples remain.
++## Fold controls and route enforcement
++
++Filter target-type references before route normalization, remove its fixed classifier demonstrations, and clear reference caches at each fold. Generic definitions remain. Validate route availability before modeling.
+ 
+ 
+ # The original model-specific functions above stay intact; these controls scope each fold.
+@@ -2721,11 +2748,15 @@
+ 
+ def _loto_classifier_prefix():
+     state = require_loto_fold()
++    blocks = re.split(r"(?=Example \d+)", few_shot_example)
++    kept = [block for block in blocks if not re.search(
++        r"Final Answer:\s*" + re.escape(state["held_out_type"]) + r"\b", block)]
++    fold_prefix = _LOTO_BASE_CLASSIFIER_PREFIX.replace(few_shot_example, "".join(kept))
+     if not state["disabled_route"]:
+-        return _LOTO_BASE_CLASSIFIER_PREFIX
++        return fold_prefix
+     # Keep original semantic definitions and hand-written examples. Only availability changes.
+     tokens = ", ".join(state["allowed_labels"])
+-    return _LOTO_BASE_CLASSIFIER_PREFIX + f"""
++    return fold_prefix + f"""
+ 
+ WORKFLOW AVAILABILITY FOR THIS RUN (overrides the earlier output-label list):
+ The only available Final Answer labels are: {tokens}.
+@@ -2797,7 +2828,7 @@
+         "remaining_example_indices": state["remaining_example_indices"],
+         "remaining_counts": state["remaining_counts"],
+         "removal_scope": "Exact semantic Type in RAG_Examples_All; UFLP normalized to FLP",
+-        "fixed_prompt_examples": "Preserved from the model-specific baseline",
++        "fixed_prompt_examples": "Target-type classifier demonstrations removed; generic definitions retained",
+         "classification": "Recomputed using the current fold; no external classification cache",
+     }
+ 
+@@ -2849,9 +2880,7 @@
+ 
+ def finalize_record(record, *, rel_tol=1e-4, abs_tol=1e-4):
+     result = _LOTO_BASE_FINALIZE_RECORD(record, rel_tol=rel_tol, abs_tol=abs_tol)
+-    if LOTO_REMOVE_ROUTE:
+-        # The target label is deliberately unavailable: ordinary class accuracy is not meaningful.
+-        result["classification_correct"] = None
++    # Gold-label accuracy remains measurable; the forbidden label is expected to score zero.
+     return result
+ 
+ 
+@@ -2932,11 +2961,42 @@
+     return [json.loads(document.metadata["example_json"]) for document in documents]
+ 
+ 
+-## 20. Fold runner and reports
+-
+-`run_loto` is the supported entry point. Results are separated by model, condition, and held-out semantic type. Each folder contains the removed-example manifest, case artifacts, and results. Only complete successful records with an identical code/data/fold fingerprint are reused; failed or stale records are retried. The original `run_test` entry is blocked to prevent accidental evaluation without fold isolation.
+-
+-Reports include solved rate, objective match, macro accuracy across evaluated types, actual selected routes, and failures by stage. In the route-removal condition ordinary classification accuracy is marked not applicable because the gold type's workflow is deliberately unavailable. `ROWS` uses original zero-based benchmark positions; partial runs report only the selected cases and types.
++
++def filter_loto_query_only_documents(documents):
++    """Scope the separate query-only library by its original problem-type field."""
++    target = require_loto_fold()["held_out_type"]
++    def semantic_type(document):
++        match = re.search(r"^problem type:\s*(.*)$", document.page_content, re.MULTILINE | re.I)
++        text = match.group(1).casefold() if match else "others"
++        if "network revenue" in text:
++            return "NRM"
++        if "resource allocation" in text or "knapsack" in text:
++            return "RA"
++        if "assignment" in text:
++            return "AP"
++        if "facility location" in text:
++            return "FLP"
++        if "transport" in text or "transshipment" in text or "minimum-cost flow" in text:
++            return "TP"
++        return "Others"
++    return [document for document in documents if semantic_type(document) != target]
++
++
++def filter_loto_query_only_triggers(text):
++    """Remove target-type fixed demonstrations while retaining generic contracts."""
++    target = require_loto_fold()["held_out_type"]
++    # Explicit structural types of the three fixed baseline demonstrations.
++    trigger_types = {1: "RA", 2: "Mixture", 3: "Mixture"}
++    for number, label in trigger_types.items():
++        if label == target:
++            text = re.sub(r"\(" + str(number) + r"\).*?(?=\(\d\)|USER QUESTION:)",
++                          "", text, flags=re.DOTALL)
++    return text
++
++
++## Fold runner and reports
++
++run_loto executes the seven disjoint semantic folds once per case. Preserve failures during resume. Every fold has its own manifest and results. Gold-label classification accuracy, solve success and Objective Match are separate; gold-label accuracy in route-removal folds is expected to be zero because the target label is forbidden.
+ 
+ 
+ def loto_preflight():
+@@ -2989,10 +3049,8 @@
+         count = int(frame[field].eq(True).sum())
+         summary_rows.append({"metric": label, "correct": count, "total": len(frame),
+                              "accuracy": count / len(frame)})
+-    if not LOTO_REMOVE_ROUTE:
+-        scored = frame["classification_correct"].dropna()
+-        summary_rows.append({"metric": "Classification", "correct": int(scored.eq(True).sum()),
+-                             "total": len(scored), "accuracy": float(scored.eq(True).mean()) if len(scored) else None})
++    summary_rows.append({"metric": "Classification", "correct": int(frame["classification_correct"].eq(True).sum()),
++                         "total": len(frame), "accuracy": float(frame["classification_correct"].eq(True).mean())})
+     summary_rows.append({"metric": "Macro objective match across evaluated types", "correct": None,
+                          "total": len(per_type), "accuracy": float(per_type["objective_accuracy"].mean())})
+     summary = pd.DataFrame(summary_rows)
+@@ -3044,13 +3102,18 @@
+                         rel_tol=rel_tol, abs_tol=abs_tol)
+         _write_text_atomic(folder / "fold_manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2), "utf-8")
+         output_csv = folder / "results.csv"
+-        cached = {record_key(record): record for record in load_records(output_csv)} if reuse_completed else {}
++        existing = load_records(output_csv)
++        if existing and not reuse_completed:
++            raise ValueError("Use a fresh round directory; recorded LOTO attempts cannot be overwritten")
++        cached = {record_key(record): record for record in existing}
+         for case in fold_cases.to_dict("records"):
+             fingerprint = case_fingerprint(case, source_fingerprint=source)
+             key = (case["problem_id"], str(case["Query"]), case["dataset_address"], "AUTO")
+             previous = cached.get(key)
++            if previous and previous.get("cache_fingerprint") != fingerprint:
++                raise ValueError("LOTO code/data changed; use a fresh version directory")
+             record = None
+-            if (previous and previous.get("record_status") == "completed" and previous.get("final_ok")
++            if (previous and previous.get("record_status") in {"completed", "error"}
+                     and previous.get("cache_fingerprint") == fingerprint):
+                 record = materialize_record(output_csv, previous)
+                 if record is not None:
+@@ -3088,8 +3151,7 @@
+ Validate all 101 case IDs, gold-label folds, input-file paths, exact semantic reference exclusions, and available routes. This does not invoke OpenAI, Ollama, embeddings, or Gurobi solving.
+ 
+ 
+-PREFLIGHT_CASES, PREFLIGHT_FOLDS = loto_preflight()
+-display(PREFLIGHT_FOLDS)
++# Run loto_preflight() explicitly before enabling the experiment.
+ 
+ 
+ ## 22. Run the experiment

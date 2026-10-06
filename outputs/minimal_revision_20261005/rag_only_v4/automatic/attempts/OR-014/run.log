@@ -1,0 +1,193 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Required table_id file_0_view_0 not found in CSVQA_DATA.")
+
+    records = table["records"]
+    I = []
+    r = {}
+    d = {}
+    s = {}
+
+    for rec in records:
+        vals = rec["values"]
+        i = vals["Product Name"]
+        I.append(i)
+        try:
+            r[i] = float(vals["Revenue"])
+            d[i] = int(vals["Demand"])
+            s[i] = int(vals["Initial Inventory"])
+        except Exception as e:
+            raise ValueError(f"Invalid data for product {i}: {e}")
+
+    # Validate coverage
+    for i in I:
+        if i not in r or i not in d or i not in s:
+            raise ValueError(f"Missing data for product {i}")
+
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='', obj=0)
+
+    # Constraints: x_i <= d_i, x_i <= s_i
+    for i in I:
+        m.addConstr(x[i] <= d[i], name='')
+        m.addConstr(x[i] <= s[i], name='')
+
+    # Objective: maximize sum_i r_i * x_i
+    m.setObjective(gp.quicksum(r[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for i in I:
+            print(f"{x[i].VarName} {x[i].X}")
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 200 rows, 100 columns and 200 nonzeros
+Model fingerprint: 0xcf2b6855
+Variable types: 0 continuous, 100 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+01, 4e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [6e+01, 2e+04]
+Found heuristic solution: objective 1794269.0000
+Presolve removed 200 rows and 100 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.79427e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.794269000000e+06, best bound 1.794269000000e+06, gap 0.0000%
+1794269.0
+C0 1960.0
+C1 1884.0
+C2 963.0
+C3 3729.0
+C4 970.0
+C5 550.0
+C6 1116.0
+C7 198.0
+C8 1823.0
+C9 1858.0
+C10 992.0
+C11 375.0
+C12 1400.0
+C13 192.0
+C14 791.0
+C15 550.0
+C16 593.0
+C17 944.0
+C18 2340.0
+C19 1586.0
+C20 2769.0
+C21 2589.0
+C22 1163.0
+C23 189.0
+C24 602.0
+C25 1193.0
+C26 1815.0
+C27 956.0
+C28 2021.0
+C29 1447.0
+C30 803.0
+C31 602.0
+C32 1482.0
+C33 1861.0
+C34 390.0
+C35 380.0
+C36 969.0
+C37 607.0
+C38 734.0
+C39 546.0
+C40 577.0
+C41 1711.0
+C42 907.0
+C43 322.0
+C44 1123.0
+C45 853.0
+C46 939.0
+C47 765.0
+C48 788.0
+C49 1148.0
+C50 1440.0
+C51 1857.0
+C52 1490.0
+C53 1376.0
+C54 852.0
+C55 640.0
+C56 858.0
+C57 1183.0
+C58 844.0
+C59 1209.0
+C60 1135.0
+C61 1482.0
+C62 806.0
+C63 536.0
+C64 576.0
+C65 2009.0
+C66 1060.0
+C67 733.0
+C68 2198.0
+C69 808.0
+C70 807.0
+C71 563.0
+C72 563.0
+C73 801.0
+C74 882.0
+C75 1120.0
+C76 876.0
+C77 563.0
+C78 533.0
+C79 794.0
+C80 2776.0
+C81 955.0
+C82 956.0
+C83 510.0
+C84 560.0
+C85 604.0
+C86 1096.0
+C87 56.0
+C88 850.0
+C89 1265.0
+C90 921.0
+C91 733.0
+C92 2198.0
+C93 808.0
+C94 563.0
+C95 801.0
+C96 882.0
+C97 1120.0
+C98 794.0
+C99 2776.0
+Optimal objective: 1794269.0
+Optimal solution: [('C0', 1960.0), ('C1', 1884.0), ('C2', 963.0), ('C3', 3729.0), ('C4', 970.0), ('C5', 550.0), ('C6', 1116.0), ('C7', 198.0), ('C8', 1823.0), ('C9', 1858.0), ('C10', 992.0), ('C11', 375.0), ('C12', 1400.0), ('C13', 192.0), ('C14', 791.0), ('C15', 550.0), ('C16', 593.0), ('C17', 944.0), ('C18', 2340.0), ('C19', 1586.0), ('C20', 2769.0), ('C21', 2589.0), ('C22', 1163.0), ('C23', 189.0), ('C24', 602.0), ('C25', 1193.0), ('C26', 1815.0), ('C27', 956.0), ('C28', 2021.0), ('C29', 1447.0), ('C30', 803.0), ('C31', 602.0), ('C32', 1482.0), ('C33', 1861.0), ('C34', 390.0), ('C35', 380.0), ('C36', 969.0), ('C37', 607.0), ('C38', 734.0), ('C39', 546.0), ('C40', 577.0), ('C41', 1711.0), ('C42', 907.0), ('C43', 322.0), ('C44', 1123.0), ('C45', 853.0), ('C46', 939.0), ('C47', 765.0), ('C48', 788.0), ('C49', 1148.0), ('C50', 1440.0), ('C51', 1857.0), ('C52', 1490.0), ('C53', 1376.0), ('C54', 852.0), ('C55', 640.0), ('C56', 858.0), ('C57', 1183.0), ('C58', 844.0), ('C59', 1209.0), ('C60', 1135.0), ('C61', 1482.0), ('C62', 806.0), ('C63', 536.0), ('C64', 576.0), ('C65', 2009.0), ('C66', 1060.0), ('C67', 733.0), ('C68', 2198.0), ('C69', 808.0), ('C70', 807.0), ('C71', 563.0), ('C72', 563.0), ('C73', 801.0), ('C74', 882.0), ('C75', 1120.0), ('C76', 876.0), ('C77', 563.0), ('C78', 533.0), ('C79', 794.0), ('C80', 2776.0), ('C81', 955.0), ('C82', 956.0), ('C83', 510.0), ('C84', 560.0), ('C85', 604.0), ('C86', 1096.0), ('C87', 56.0), ('C88', 850.0), ('C89', 1265.0), ('C90', 921.0), ('C91', 733.0), ('C92', 2198.0), ('C93', 808.0), ('C94', 563.0), ('C95', 801.0), ('C96', 882.0), ('C97', 1120.0), ('C98', 794.0), ('C99', 2776.0)]

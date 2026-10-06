@@ -1,0 +1,113 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Try reading the CSV with multiple encodings as specified
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM21/BigMartSales.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not decode CSV with supported encodings.")
+
+    # Ensure required columns exist
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Filter for 'FDK57' car models in 'Product Name'
+    mask = df['Product Name'].astype(str).str.casefold().str.contains('fdk57')
+    df_fdk57 = df[mask].copy()
+
+    if df_fdk57.empty:
+        raise ValueError("No 'FDK57' car models found in the source data.")
+
+    # Group by 'Product Name' in case of duplicates, sum numeric columns
+    df_fdk57 = df_fdk57.groupby('Product Name', as_index=False).agg({
+        'Revenue': 'sum',
+        'Demand': 'sum',
+        'Initial Inventory': 'sum'
+    })
+
+    # Build index set and coefficient dictionaries
+    items = df_fdk57['Product Name'].tolist()
+    revenue = {}
+    inventory = {}
+    demand = {}
+
+    for _, row in df_fdk57.iterrows():
+        key = row['Product Name']
+        try:
+            revenue[key] = float(row['Revenue'])
+            inventory[key] = float(row['Initial Inventory'])
+            demand[key] = float(row['Demand'])
+        except Exception as e:
+            raise ValueError(f"Invalid data for product '{key}': {e}")
+
+    # Validate all items have coefficients
+    for key in items:
+        if key not in revenue or key not in inventory or key not in demand:
+            raise ValueError(f"Missing coefficients for product '{key}'.")
+
+    # Model
+    m = gp.Model('Car_Dealership_FDK57')
+    m.Params.MIPGap = 1e-4
+
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 2 rows, 1 columns and 2 nonzeros
+Model fingerprint: 0x3979db13
+Variable types: 0 continuous, 1 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+03, 1e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e+02, 1e+03]
+Found heuristic solution: objective 278995.08000
+Presolve removed 2 rows and 1 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 278995 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.789950800000e+05, best bound 2.789950800000e+05, gap 0.0000%
+ObjVal: 278995.08
+C0: 290.0
+Optimal objective: 278995.08
+Optimal solution: [('C0', 290.0)]

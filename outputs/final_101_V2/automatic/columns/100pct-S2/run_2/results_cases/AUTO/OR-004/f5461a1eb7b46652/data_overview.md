@@ -1,0 +1,1 @@
+There is no data from cost_12x12.csv in the provided context. Please provide the contents of cost_12x12.csv or upload the file so I can retrieve all data, preserving source order and exact identifiers and values as requested.

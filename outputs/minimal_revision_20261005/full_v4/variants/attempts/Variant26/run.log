@@ -1,0 +1,236 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure. The objective is to minimize total assignment cost. Decision variables are binary: whether a worker is assigned to a project. Each project must be assigned to exactly one worker, and each worker can take at most one project. Only feasible assignments are those in the offer list, and only workers not on leave and with sufficient skill can be assigned. This is a one-to-one assignment with eligibility constraints. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: one-to-one assignment of workers to projects minimizing total assignment cost, each project assigned to one worker, each worker to at most one project, only feasible assignments allowed by offer list and skill/availability constraints
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP
+
+[Retrieved example 2]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A factory needs to rent a warehouse to store materials for the next 4 months. The required warehouse area for each month is listed in 39-1.csv.The longer the rental contract period, the greater the discount on warehouse rental fees. The specific data is listed in 39-2.csv.
+
+The warehouse rental contract can be processed at the beginning of each month, and each contract specifies the rental area and period. Therefore, the factory can rent a contract on any month, and each time, they can sign one contract or multiple contracts with different rental areas and rental periods. The overall goal is to minimize the rental fees paid. Try to establish a linear programming mathematical model based on the above requirements.
+Type: Others[0m
+Thought:[32;1m[1;3mThought: The problem is a one-to-one assignment of workers to projects, minimizing total assignment cost. Each project must be assigned to exactly one worker, and each worker can take at most one project. Only feasible assignments are allowed, based on the offer list and eligibility (skill and availability). This matches the canonical assignment problem structure, as confirmed by the first retrieved example, which is labeled AP. There are no additional mechanisms such as subset selection, multi-stage decisions, or interacting constraint families that would make this Mixture.
+
+Final Answer: AP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_DATA):
+    # Skill order mapping
+    skill_order = {'junior': 0, 'intermediate': 1, 'senior': 2, 'expert': 3}
+
+    # --- Extract eligible workers ---
+    workers_table = None
+    for t in CSVQA_DATA['tables']:
+        if t['table_id'] == 'file_0_view_0':
+            workers_table = t
+            break
+    if workers_table is None:
+        raise RuntimeError('Missing workers table')
+    eligible_workers = []
+    worker_skill = {}
+    for rec in workers_table['records']:
+        wid = rec['values']['worker_id']
+        on_leave = rec['values']['on_leave']
+        skill = rec['values']['skill']
+        if on_leave == "0":
+            eligible_workers.append(wid)
+            worker_skill[wid] = skill
+
+    # --- Extract projects and required skills ---
+    projects_table = None
+    for t in CSVQA_DATA['tables']:
+        if t['table_id'] == 'file_1_view_0':
+            projects_table = t
+            break
+    if projects_table is None:
+        raise RuntimeError('Missing projects table')
+    projects = []
+    project_required_skill = {}
+    for rec in projects_table['records']:
+        pid = rec['values']['project_id']
+        req_skill = rec['values']['required_skill']
+        projects.append(pid)
+        project_required_skill[pid] = req_skill
+
+    # --- Extract offers (allowed assignments) ---
+    offers_table = None
+    for t in CSVQA_DATA['tables']:
+        if t['table_id'] == 'file_2_view_0':
+            offers_table = t
+            break
+    if offers_table is None:
+        raise RuntimeError('Missing offers table')
+    # Only offers for eligible workers
+    A = []
+    cost = {}
+    for rec in offers_table['records']:
+        wid = rec['values']['worker_id']
+        pid = rec['values']['project_id']
+        if wid not in eligible_workers:
+            continue
+        cents = int(rec['values']['cost_cents'])
+        # Skill requirement: only allow if worker's skill >= required
+        w_skill = worker_skill[wid].casefold()
+        p_skill = project_required_skill[pid].casefold()
+        if skill_order[w_skill] >= skill_order[p_skill]:
+            A.append((wid, pid))
+            cost[(wid, pid)] = cents
+        # else: do not include this assignment
+
+    # Validate that all projects have at least one eligible offer
+    for pid in projects:
+        found = False
+        for (wid, pid2) in A:
+            if pid2 == pid:
+                found = True
+                break
+        if not found:
+            raise RuntimeError(f'No eligible offer for project {pid}')
+
+    # Validate that all (wid, pid) in A have cost
+    for key in A:
+        if key not in cost:
+            raise RuntimeError(f'Missing cost for assignment {key}')
+
+    # --- Build model ---
+    m = gp.Model('AP')
+    x = m.addVars(A, vtype=GRB.BINARY, name='x')
+
+    # Objective: minimize total cost
+    m.setObjective(gp.quicksum(cost[key] * x[key] for key in A), GRB.MINIMIZE)
+
+    # Constraint 1: Each project assigned to exactly one worker
+    for pid in projects:
+        m.addConstr(gp.quicksum(x[wid, pid] for (wid, pid2) in A if pid2 == pid) == 1, name='project')
+
+    # Constraint 2: Each worker assigned to at most one project
+    for wid in eligible_workers:
+        m.addConstr(gp.quicksum(x[wid, pid] for (wid2, pid) in A if wid2 == wid) <= 1, name='worker')
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 17 rows, 50 columns and 100 nonzeros
+Model fingerprint: 0xe68aec3d
+Variable types: 0 continuous, 50 integer (50 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+02, 1e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 4221.0000000
+Presolve time: 0.00s
+Presolved: 17 rows, 50 columns, 100 nonzeros
+Variable types: 0 continuous, 50 integer (50 binary)
+
+Root relaxation: objective 1.720000e+03, 9 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    1720.0000000 1720.00000  0.00%     -    0s
+
+Explored 1 nodes (9 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 1720 4221 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.720000000000e+03, best bound 1.720000000000e+03, gap 0.0000%
+ObjVal: 1720.0
+C0: 0.0
+C1: 1.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: 1.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: 1.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: 1.0
+C25: -0.0
+C26: 1.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: -0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: 1.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: 1.0
+C43: -0.0
+C44: 1.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+Optimal objective: 1720.0
+Optimal solution: [('C0', 0.0), ('C1', 1.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', 1.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', 1.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', 1.0), ('C25', -0.0), ('C26', 1.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', 1.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', 1.0), ('C43', -0.0), ('C44', 1.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0)]

@@ -1,0 +1,27 @@
+Retrieved data from service_centers.csv:
+
+| Center | OpeningCost | CoveredDistricts   |
+|--------|-------------|-------------------|
+| SC1    | 12          | D1;D2;D4          |
+| SC2    | 15          | D2;D3;D5          |
+| SC3    | 18          | D4;D5;D6          |
+| SC4    | 10          | D6;D7             |
+| SC5    | 14          | D7;D8;D10         |
+| SC6    | 13          | D8;D9             |
+| SC7    | 16          | D1;D9;D10         |
+| SC8    | 11          | D3;D4;D8          |
+
+Retrieved data from districts.csv:
+
+| District |
+|----------|
+| D1       |
+| D2       |
+| D3       |
+| D4       |
+| D5       |
+| D6       |
+| D7       |
+| D8       |
+| D9       |
+| D10      |

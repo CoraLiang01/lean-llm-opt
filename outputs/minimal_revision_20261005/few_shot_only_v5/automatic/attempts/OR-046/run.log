@@ -1,0 +1,106 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read capacity
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/capacity.csv"
+    try:
+        cap_df = pd.read_csv(capacity_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            cap_df = pd.read_csv(capacity_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                cap_df = pd.read_csv(capacity_path, encoding='gbk')
+            except UnicodeDecodeError:
+                cap_df = pd.read_csv(capacity_path, encoding='latin-1')
+    if 'Capacity' not in cap_df.columns:
+        raise ValueError("Missing 'Capacity' column in capacity.csv")
+    if cap_df.shape[0] != 1:
+        raise ValueError("capacity.csv must have exactly one row for total capacity")
+    C = cap_df['Capacity'].iloc[0]
+
+    # Read products
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv"
+    try:
+        prod_df = pd.read_csv(products_path, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            prod_df = pd.read_csv(products_path, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                prod_df = pd.read_csv(products_path, encoding='gbk')
+            except UnicodeDecodeError:
+                prod_df = pd.read_csv(products_path, encoding='latin-1')
+    required_cols = {'ProductName', 'Weight', 'Value'}
+    if not required_cols.issubset(prod_df.columns):
+        raise ValueError(f"Missing columns in products.csv: {required_cols - set(prod_df.columns)}")
+    # Remove duplicates, sum by ProductName if needed
+    prod_df = prod_df.groupby('ProductName', as_index=False).agg({'Weight': 'sum', 'Value': 'sum'})
+    items = prod_df['ProductName'].tolist()
+    w = dict(zip(prod_df['ProductName'], prod_df['Weight']))
+    v = dict(zip(prod_df['ProductName'], prod_df['Value']))
+
+    # Validate all coefficients
+    for i in items:
+        if pd.isnull(w[i]) or pd.isnull(v[i]):
+            raise ValueError(f"Missing coefficient for product {i}")
+
+    m = gp.Model('Supermarket_Replenishment')
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+    m.setObjective(gp.quicksum(v[i] * x[i] for i in items), GRB.MAXIMIZE)
+    m.addConstr(gp.quicksum(w[i] * x[i] for i in items) <= C, name='capacity')
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 10 columns and 10 nonzeros
+Model fingerprint: 0x71b44288
+Variable types: 0 continuous, 10 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [8e+01, 8e+02]
+  Objective range  [1e+01, 9e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [9e+02, 9e+02]
+Found heuristic solution: objective 78.0000000
+Presolve removed 1 rows and 10 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 212 78 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.120000000000e+02, best bound 2.120000000000e+02, gap 0.0000%
+ObjVal: 212.0
+C0: -0.0
+C1: 0.0
+C2: -0.0
+C3: -0.0
+C4: 0.0
+C5: 2.0
+C6: -0.0
+C7: -0.0
+C8: 3.0
+C9: -0.0
+Optimal objective: 212.0
+Optimal solution: [('C0', -0.0), ('C1', 0.0), ('C2', -0.0), ('C3', -0.0), ('C4', 0.0), ('C5', 2.0), ('C6', -0.0), ('C7', -0.0), ('C8', 3.0), ('C9', -0.0)]

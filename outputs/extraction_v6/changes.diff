@@ -1,0 +1,366 @@
+--- baseline_v5
++++ extraction_v6
+@@ -37,9 +37,9 @@
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/interface_v5_switches/full"
++RESULTS_DIR = PROJECT_ROOT / "outputs/extraction_v6/notebook_runs"
+ # Edit this one value when the notebook file is renamed.
+-NOTEBOOK_FILENAME = "LEAN_LLM_OPT_4.1_Large-scale.ipynb"
++NOTEBOOK_FILENAME = "LEAN_LLM_OPT_4.1_Large-scale_Extraction_V6.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+ NOTEBOOK_PATH = (
+     _NOTEBOOK_CANDIDATE if _NOTEBOOK_CANDIDATE.is_absolute()
+@@ -51,7 +51,7 @@
+ load_dotenv(PROJECT_ROOT / ".env", override=False)
+ user_api_key = os.environ.get("OPENAI_API_KEY")
+ 
+-VERSION = "rag-101-ra-planned-interface-v4-switches-v5"
++VERSION = "rag-interface-v5-structured-extraction-v6"
+ MODEL_SNAPSHOT = "gpt-4.1-2025-04-14"
+ NRM_RETRY_ON_TRUNCATION = True  # False: propagate truncation immediately; True: retry once.
+ CSVQA_REPAIR_PLAN_ON_FAILURE = False  # True: repair one invalid NRM/RA plan, then full-data fallback.
+@@ -65,7 +65,7 @@
+     "AP": "legacy", "FLP": "legacy", "Others": "legacy",
+ }
+ RAG_EXAMPLES_ALL_PATH = "Large_Scale_Or_Files/RAG_Examples_All.csv"
+-CACHE_SCHEMA_VERSION = "rag-101-ra-planned-interface-v4-switches-v5"
++CACHE_SCHEMA_VERSION = "rag-interface-v5-structured-extraction-v6"
+ 
+ # Cell 5
+ class ModelOutputTruncated(RuntimeError):
+@@ -316,36 +316,109 @@
+     return profile
+ 
+ # Cell 9
++from typing import Literal
++from pydantic import BaseModel, ConfigDict
++
++
++class _PlanObject(BaseModel):
++    model_config = ConfigDict(extra="forbid", strict=True)
++
++
++class CSVFilterCondition(_PlanObject):
++    column: str
++    operator: Literal["exact", "prefix", "contains", "in", "not_in", "eq", "ne",
++                      "gt", "ge", "lt", "le", "between", "is_null", "not_null"]
++    dtype: Literal["string", "number", "date"]
++    value: str | int | float | list[str | int | float] | None
++    evidence: str
++    format: str | None
++    inclusive: Literal["both", "left", "right", "neither"]
++
++
++class CSVFilters(_PlanObject):
++    logic: Literal["and", "or"]
++    conditions: list[CSVFilterCondition]
++
++
++class CSVTableSelection(_PlanObject):
++    file_index: int
++    role: str
++    columns: list[str] | Literal["*"]
++    filters: CSVFilters
++
++
++class CSVMatrixAxis(_PlanObject):
++    table_id: str
++    id_column: str
++
++
++class CSVMatrixRelationship(_PlanObject):
++    type: Literal["matrix"]
++    matrix_table_id: str
++    row_id_column: str
++    row_axis: CSVMatrixAxis
++    column_axis: CSVMatrixAxis
++
++
++class CSVParameterBinding(_PlanObject):
++    parameter: str
++    table_id: str
++    value_column: str
++    index_columns: list[str]
++
++
++class CSVExtractionPlan(_PlanObject):
++    route: Literal["NRM", "RA"]
++    tables: list[CSVTableSelection]
++    ignored_file_indices: list[int]
++    relationships: list[CSVMatrixRelationship]
++    bindings: list[CSVParameterBinding]
++
++
+ def _ask_extraction_plan(llm, route, query, tables, route_prompt, *, repair_context=None):
+-    """Ask for one declarative plan and return the parsed plan plus raw response."""
++    """Generate a strict plan; retain the raw output for auditing and optional repair."""
+     profile = json.dumps(_build_profile(tables, query), ensure_ascii=False)
+-    request = f"""You are a CSV extraction planner. Return one JSON object only.
+-Choose tables, columns, and filters from the user query and the supplied CSV profile. Do not return
+-data, Python, formulas, prose, joins, aggregation, sorting, sampling, or invented fields.
+-
+-Shared plan schema:
+-{{"route":"{route}","tables":[{{"file_index":0,"role":"descriptive non-unique role",
+-"columns":["exact column"] or "*","filters":{{"logic":"and|or","conditions":[
+-{{"column":"exact column","operator":"exact|prefix|contains|in|not_in|eq|ne|gt|ge|lt|le|between|is_null|not_null",
+-"dtype":"string|number|date","value":"scalar or list","evidence":"exact query span",
+-"format":"optional date format","inclusive":"both|left|right|neither"}}]}}}}],
+-"ignored_file_indices":[],"relationships":[{{"type":"matrix",
+-"matrix_table_id":"file_2_view_0","row_id_column":"exact column",
+-"row_axis":{{"table_id":"file_0_view_0","id_column":"exact column"}},
+-"column_axis":{{"table_id":"file_1_view_0","id_column":"exact column"}}}}]}}
+-
+-Python assigns each logical view a table_id of file_<file_index>_view_<zero-based occurrence for that
+-file>. A physical file may appear in multiple table specifications and roles may repeat. Every input
+-file must appear in tables or ignored_file_indices. Ignore a file only when the query does not need it.
+-Every explicit subset must have a filter and every filter must quote supporting query evidence.
+-Declare a matrix relationship only when the profile exposes its two axes unambiguously. When one label
+-column contains both decision entities and scalar parameter rows, retain every row that supplies a
+-query-required coefficient, price, cost, capacity, or bound; use separate logical views when helpful.
++    request = f"""You are a CSV extraction planner. Return the extraction plan through the
++supplied strict JSON schema. Select tables, columns and query-supported filters from the CSV
++profile. Never output records, code, formulas, joins, aggregation, sorting or sampling.
++
++route must be {route}. Python assigns table_id file_<file_index>_view_<zero-based occurrence
++for each selected logical view of that file. Roles may repeat. Use every physical file or explicitly
++list it in ignored_file_indices. Ignore a file only if the query does not need it.
++Choose exact column names; never infer roles from position, numeric magnitude, or filename alone.
++Every filter evidence must be a literal span of the original query. Filter only an explicit subset.
++Use prefix only when the query describes a category/prefix and the profile supports this match;
++do not silently broaden exact names to prefix/contains. Preserve source rows, including parameter
++rows needed for prices, costs, capacities and bounds. All quantities and business IDs remain source values.
++
++No filter: filters={{"logic":"and","conditions":[]}}. Each condition includes column,
++operator, dtype, value, evidence, format and inclusive. Use format=null except for an explicit
++date format, inclusive="both" except for an explicit open range, value=null for null tests.
++prefix/contains require dtype=string; in/not_in/between require list values; between has two bounds;
++all other non-null operators require one scalar value. Do not invent a predicate from an example.
++
++bindings explicitly map query-needed source parameters to table_id, value_column and index_columns.
++For example: {{"parameter":"profit","table_id":"file_1_view_0","value_column":"Value",
++"index_columns":["ProductName"]}}. Bind every needed numeric coefficient, bound, fee and capacity.
++Use the actual business ID or a compound business key; repeated option names in different families
++need both family and option. Keep raw identifiers. No positional or invented row-number keys.
++Each key must uniquely identify a source record within its logical view. For component or ledger
++rows include the component/entry key so the modeling stage can perform the query-required sums.
++Use index_columns=[] only for a scalar view containing exactly one row. Multiple physical files
++may bind the same parameter when they partition its records. Bind source components, not invented
++derived values. Relationship and identity tables may be retained without numeric bindings.
++Do not filter away forbidden/unauthorized entities referenced by relationships when their rows are
++needed to impose zero decisions or evaluate prerequisites; the modeling stage enforces eligibility.
++
++relationships declares only unambiguous wide numeric matrices. Row IDs and column IDs must match
++their axis tables exactly, with the same order. Do not normalize punctuation, case or leading zeros.
++Wide matrix coefficients are covered by this relationship; do not emit one binding per matrix cell.
++Use relationships=[] when there is no such matrix.
+ 
+ Route guidance:
+ {route_prompt}
+ 
+-User query:
++Original user query:
+ {query}
+ 
+ CSV profile:
+@@ -353,35 +426,84 @@
+ """
+     if repair_context is not None:
+         request += (
+-            "\nRepair the previous extraction plan using the diagnostic data below. "
+-            "Keep the original query and CSV profile authoritative. Correct invalid JSON, "
+-            "columns, filters, and relationships without changing the task, inventing data, "
+-            "or adding unsupported subset conditions. Return only a complete plan in the "
+-            "same JSON schema. No solution code or objective feedback is supplied.\n"
+-            + "\nPrevious plan output:\n" + str(repair_context["previous_output"])
++            "\nRepair the previous plan using the validation error. The original query and profile "
++            "remain authoritative. Return a complete plan in the same strict schema. No solution "
++            "code or objective feedback is supplied.\nPrevious plan output:\n"
++            + str(repair_context["previous_output"])
+             + "\nValidation error:\n" + str(repair_context["validation_error"])
+         )
+-    text = str(llm.invoke([HumanMessage(content=request)]).content or "").strip()
+-    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.I) if text.startswith("```") else text
+-    start, end = cleaned.find("{"), cleaned.rfind("}")
+-    if start < 0 or end < start:
+-        error = ValueError(f"CSVQA planner did not return a JSON object: {text[:200]}")
++    result = llm.with_structured_output(
++        CSVExtractionPlan, method="json_schema", strict=True, include_raw=True
++    ).invoke([HumanMessage(content=request)])
++    raw = result.get("raw")
++    text = str(getattr(raw, "content", "") or "").strip()
++    parsed, parsing_error = result.get("parsed"), result.get("parsing_error")
++    if parsed is None or parsing_error is not None:
++        error = ValueError(f"CSVQA structured plan unavailable or invalid: {parsing_error or text[:200]}")
+         error.planner_output = text
+         raise error
+     try:
+-        plan = json.loads(cleaned[start:end + 1])
++        plan = (parsed if isinstance(parsed, CSVExtractionPlan)
++                else CSVExtractionPlan.model_validate(parsed)).model_dump(mode="json")
+     except ValueError as exc:
+-        error = ValueError(f"CSVQA planner returned invalid JSON: {exc}")
++        error = ValueError(f"CSVQA structured plan failed schema validation: {exc}")
+         error.planner_output = text
+         raise error from exc
+-    if not isinstance(plan, dict):
+-        raise ValueError("CSVQA extraction plan must be a JSON object")
+     return plan, text
++
++
++def _validate_bindings(bindings, payload_by_id):
++    """Check source addresses and raw compound keys; never aggregate or overwrite values."""
++    if not isinstance(bindings, list):
++        raise ValueError("bindings must be a list")
++    checks, seen = [], set()
++    for binding in bindings:
++        if not isinstance(binding, dict):
++            raise ValueError("Binding must be an object")
++        parameter, table_id = binding.get("parameter"), binding.get("table_id")
++        if not isinstance(parameter, str) or not parameter.strip() or table_id not in payload_by_id:
++            raise ValueError(f"Binding has an invalid parameter or table_id: {binding}")
++        signature = (parameter, table_id)
++        if signature in seen:
++            raise ValueError(f"Binding repeats parameter/table address: {signature}")
++        seen.add(signature)
++        table = payload_by_id[table_id]
++        value_column, indices = binding.get("value_column"), binding.get("index_columns")
++        if (not isinstance(indices, list) or any(not isinstance(c, str) for c in indices)
++                or len(indices) != len(set(indices))):
++            raise ValueError(f"Binding requires distinct index columns: {binding}")
++        if value_column not in table["columns"] or any(c not in table["columns"] for c in indices):
++            raise ValueError(f"Binding references an unselected column: {binding}")
++        rows = table["records"]
++        if not indices and len(rows) != 1:
++            raise ValueError(f"Binding scalar must select exactly one row: {binding}")
++        keys = [tuple(row["values"][c] for c in indices) for row in rows]
++        if any(any(not value.strip() for value in key) for key in keys):
++            raise ValueError(f"Binding has an empty business key: {binding}")
++        if len(keys) != len(set(keys)):
++            raise ValueError(f"Binding has duplicate business keys: {binding}")
++        checks.append({"parameter": parameter, "table_id": table_id,
++                       "value_column": value_column, "index_columns": indices,
++                       "key_count": len(keys), "status": "OK"})
++    return checks
+ 
+ 
+ def _apply_condition(series, condition):
+     """Apply one allowlisted string, number, date, range, set, or null predicate."""
+     operator, dtype = condition["operator"], condition.get("dtype", "string")
++    if operator not in FILTER_OPERATORS or dtype not in FILTER_DTYPES:
++        raise ValueError(f"Unsupported filter operator/dtype: {operator}/{dtype}")
++    if operator in {"prefix", "contains"} and dtype != "string":
++        raise ValueError(f"Operator {operator!r} requires string dtype")
++    value = condition.get("value")
++    if operator not in {"is_null", "not_null"}:
++        if operator in {"in", "not_in", "between"}:
++            if not isinstance(value, list) or not value:
++                raise ValueError(f"Operator {operator!r} requires a nonempty list value")
++            if operator == "between" and len(value) != 2:
++                raise ValueError("Operator 'between' requires exactly two bounds")
++        elif isinstance(value, list) or value is None:
++            raise ValueError(f"Operator {operator!r} requires a scalar value")
+     raw, missing = series.astype(str).str.strip(), series.astype(str).str.strip().eq("")
+     if operator in {"is_null", "not_null"}:
+         return missing if operator == "is_null" else ~missing
+@@ -474,10 +596,8 @@
+             dtype, evidence = condition.get("dtype", "string"), str(condition.get("evidence") or "")
+             if column not in frame.columns or operator not in FILTER_OPERATORS or dtype not in FILTER_DTYPES:
+                 raise ValueError(f"Invalid filter for table {table_id!r}: {condition}")
+-            raw_values = condition.get("value", [])
+-            raw_values = raw_values if isinstance(raw_values, list) else [raw_values]
+-            value_supported = bool(raw_values) and all(key(value) in key(query) for value in raw_values)
+-            if not evidence.strip() or (key(evidence) not in key(query) and not value_supported):
++            literal_span = lambda text: re.sub(r"\s+", " ", str(text)).strip().casefold()
++            if not evidence.strip() or literal_span(evidence) not in literal_span(query):
+                 raise ValueError(f"Filter lacks query evidence: {condition}")
+             mask = _apply_condition(frame[column], condition)
+             combined = mask if combined is None else (combined & mask if logic == "and" else combined | mask)
+@@ -541,8 +661,8 @@
+                 raise ValueError(f"Matrix ID column {column!r} is not selected for {table['table_id']!r}")
+ 
+         def axis_keys(values, axis_name):
+-            normalized = [key(value) for value in values]
+-            if any(not value for value in normalized) or len(set(normalized)) != len(normalized):
++            normalized = [str(value) for value in values]
++            if any(not value.strip() for value in normalized) or len(set(normalized)) != len(normalized):
+                 raise ValueError(f"Matrix {axis_name} IDs must be non-empty and unique: {values}")
+             return normalized
+ 
+@@ -563,10 +683,12 @@
+         matrix_checks.append(checks)
+ 
+     payload_tables.sort(key=lambda table: (table["file_index"], table["table_id"]))
+-    validation = {"status": "OK", "matrix_checks": matrix_checks}
++    bindings = plan.get("bindings", [])
++    binding_checks = _validate_bindings(bindings, payload_by_id)
++    validation = {"status": "OK", "matrix_checks": matrix_checks, "binding_checks": binding_checks}
+     return {
+         "route": route, "query": str(query or ""), "tables": payload_tables,
+-        "relationships": validated_relationships, "ignored_file_indices": sorted(ignored),
++        "relationships": validated_relationships, "bindings": bindings, "ignored_file_indices": sorted(ignored),
+         "validation": validation,
+     }
+ 
+@@ -667,7 +789,7 @@
+                 fallback_reason = errors[-1] if errors else "planner did not produce a valid plan"
+                 observation = json.dumps({
+                     "route": route, "query": str(user_query or ""), "tables": payload_tables,
+-                    "relationships": [], "ignored_file_indices": [],
++                    "relationships": [], "bindings": [], "ignored_file_indices": [],
+                     "validation": {
+                         "status": "FALLBACK_FULL_DATA", "planner_errors": errors,
+                         "fallback_reason": fallback_reason,
+@@ -677,7 +799,7 @@
+         else:
+             observation = rag_answer(tool_query)
+         trace = {
+-            "version": "GPT4.1-LO", "mode": "planned" if planned else "legacy",
++            "version": "GPT4.1-EXTRACTION-V6", "plan_format": "strict_json_schema" if planned else None, "mode": "planned" if planned else "legacy",
+             "status": status, "plan": plan, "planner_attempt_count": attempt_count,
+             "planner_repair_enabled": bool(planned and CSVQA_REPAIR_PLAN_ON_FAILURE),
+             "planner_repair_attempted": attempt_count > 1,
+@@ -1232,7 +1354,9 @@
+     route_instruction = """Call CSVQA exactly once and return an ABSTRACT model. Define
+ index sets, parameters, variables, objective, and constraints symbolically. Include a short Data
+ Mapping that identifies every source by exact table_id and exact column name. Do not copy record
+-values or literal record counts."""
++values or literal record counts. Use CSVQA_DATA bindings as validated source addresses for Data Mapping;
++keep compound business keys intact and distinguish source components from query-required sums.
++Bindings validate source structure; infer mathematical semantics from the original query."""
+     prefix = f"""You are an assistant that formulates mathematical optimization models.
+ 
+     The examples below illustrate model structure only; never copy their data.
+@@ -1294,7 +1418,9 @@
+ objective and constraints. Include a Data Mapping for every parameter using exact table_id and
+ column names from CSVQA_DATA. Keep every resource dimension and original business identifier.
+ Do not enumerate record values or hard-code entity counts; Python supplies the source records.
+-Ignore unrelated administrative columns; numeric columns are not automatically resources or costs.
++Ignore unrelated administrative columns; numeric columns are not automatically resources or costs. Use CSVQA_DATA bindings as validated source addresses for Data Mapping;
++keep compound business keys intact and distinguish source components from query-required sums.
++Bindings validate source structure; infer mathematical semantics from the original query.
+ """
+     prefix = f"""You are an assistant that formulates mathematical optimization models.
+ 
+@@ -1946,6 +2072,11 @@
+ period; an initial binary state does not supply a continuous period-zero value.
+ Records are already structured dictionaries; do not reparse the payload as CSV text.
+ Only parse individual source fields when those fields themselves contain structured text.
++CSVQA_DATA["bindings"] lists validated table/column addresses and complete compound business keys.
++Use these addresses for source parameters; do not collapse a compound key to a repeated display name.
++Bindings describe raw source fields, not computed totals. Perform sums/conversions only when the
++original query requires them; preserve component/ledger rows. If bindings is empty after a fallback,
++derive mappings from the complete source records and the original query.
+ """
+ 
+ LEGACY_CODE_INSTRUCTIONS = """
+@@ -2576,7 +2707,7 @@
+     return tables
+ 
+ # Cell 37
+-RUN_AUTOMATIC = True
++RUN_AUTOMATIC = False
+ if RUN_AUTOMATIC:
+     automatic_results = run_test(BENCHMARK_PATH, output_csv=RESULTS_DIR / "automatic/results.csv")
+     report_results(automatic_results, RESULTS_DIR / "automatic")

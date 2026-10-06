@@ -1,0 +1,25 @@
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+products_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/factory_products_100.csv', sep=',')
+resources_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/resources_capacities.csv', sep=',')
+products_df['product'] = products_df['product'].astype(str).str.strip()
+resources_df['resource'] = resources_df['resource'].astype(str).str.strip()
+products = products_df['product'].tolist()
+resources = resources_df['resource'].tolist()
+batch_size_units = int(products_df['batch_size_units'].iloc[0])
+profit_per_unit = products_df.set_index('product')['profit_per_unit'].to_dict()
+upper_demand_units = products_df.set_index('product')['upper_demand_units'].to_dict()
+r1_per_unit = products_df.set_index('product')['r1_per_unit'].to_dict()
+r2_per_unit = products_df.set_index('product')['r2_per_unit'].to_dict()
+r3_per_unit = products_df.set_index('product')['r3_per_unit'].to_dict()
+capacity = resources_df.set_index('resource')['capacity'].to_dict()
+m = gp.Model('BatchProductionPlanning')
+x = m.addVars(products, vtype=gp.GRB.INTEGER, lb=0, name='')
+m.setObjective(gp.quicksum((batch_size_units * profit_per_unit[i] * x[i] for i in products)), gp.GRB.MAXIMIZE)
+m.addConstr(gp.quicksum((r1_per_unit[i] * batch_size_units * x[i] for i in products)) <= capacity['R1'], name='R1_capacity')
+m.addConstr(gp.quicksum((r2_per_unit[i] * batch_size_units * x[i] for i in products)) <= capacity['R2'], name='R2_capacity')
+m.addConstr(gp.quicksum((r3_per_unit[i] * batch_size_units * x[i] for i in products)) <= capacity['R3'], name='R3_capacity')
+for i in products:
+    m.addConstr(batch_size_units * x[i] <= upper_demand_units[i], name=f'demand_{i}')
+m.optimize()

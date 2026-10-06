@@ -1,0 +1,164 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    def read_csv_try_encodings(path, **kwargs):
+        for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+            try:
+                return pd.read_csv(path, encoding=enc, **kwargs)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with tried encodings.")
+
+    # Paths from source schema
+    demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP9/demand.csv"
+    fixed_cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP9/fixed_cost.csv"
+    transportation_costs_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP9/transportation_costs.csv"
+
+    # Read demand
+    demand_df = read_csv_try_encodings(demand_path)
+    if 'customer' not in demand_df.columns or 'demand' not in demand_df.columns:
+        raise ValueError("demand.csv must have columns 'customer' and 'demand'")
+    customers = demand_df['customer'].astype(str).tolist()
+    demand = demand_df.groupby('customer')['demand'].sum().to_dict()
+
+    # Read fixed costs
+    fixed_cost_df = read_csv_try_encodings(fixed_cost_path)
+    # The warehouse/facility identifier is in 'Unnamed: 0'
+    if 'Unnamed: 0' not in fixed_cost_df.columns or 'fixed_costs' not in fixed_cost_df.columns:
+        raise ValueError("fixed_cost.csv must have columns 'Unnamed: 0' and 'fixed_costs'")
+    warehouses = fixed_cost_df['Unnamed: 0'].astype(str).tolist()
+    fixed_cost = fixed_cost_df.set_index('Unnamed: 0')['fixed_costs'].to_dict()
+
+    # Read transportation costs
+    trans_cost_df = read_csv_try_encodings(transportation_costs_path)
+    # The warehouse/facility identifier is in 'Unnamed: 0'
+    if 'Unnamed: 0' not in trans_cost_df.columns:
+        raise ValueError("transportation_costs.csv must have column 'Unnamed: 0'")
+    # All other columns are customer IDs
+    cost_customer_cols = [col for col in trans_cost_df.columns if col != 'Unnamed: 0']
+    # Validate that all customers are present in cost matrix
+    missing_customers = set(customers) - set(cost_customer_cols)
+    if missing_customers:
+        raise ValueError(f"Missing transportation cost columns for customers: {missing_customers}")
+    # Validate that all warehouses are present in cost matrix
+    missing_warehouses = set(warehouses) - set(trans_cost_df['Unnamed: 0'].astype(str))
+    if missing_warehouses:
+        raise ValueError(f"Missing transportation cost rows for warehouses: {missing_warehouses}")
+
+    # Build cost dictionary: cost[warehouse][customer]
+    cost = {}
+    for _, row in trans_cost_df.iterrows():
+        w = str(row['Unnamed: 0'])
+        cost[w] = {}
+        for c in customers:
+            cost[w][c] = row[c]
+
+    # Validate all required coefficients are present
+    for w in warehouses:
+        if w not in fixed_cost:
+            raise ValueError(f"Missing fixed cost for warehouse {w}")
+        if w not in cost:
+            raise ValueError(f"Missing cost row for warehouse {w}")
+        for c in customers:
+            if c not in cost[w]:
+                raise ValueError(f"Missing transportation cost for warehouse {w}, customer {c}")
+    for c in customers:
+        if c not in demand:
+            raise ValueError(f"Missing demand for customer {c}")
+
+    # Compute M: valid upper bound on total shipments from any warehouse
+    M = sum(demand.values())
+
+    # Build model
+    m = gp.Model('Bandcamp_FLP')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    x = m.addVars(warehouses, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    y = m.addVars(warehouses, vtype=GRB.BINARY, name='y')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(cost[w][c] * x[w, c] for w in warehouses for c in customers) +
+        gp.quicksum(fixed_cost[w] * y[w] for w in warehouses),
+        GRB.MINIMIZE
+    )
+
+    # Demand satisfaction constraints
+    m.addConstrs(
+        (gp.quicksum(x[w, c] for w in warehouses) == demand[c] for c in customers),
+        name='demand'
+    )
+
+    # Warehouse activation constraints
+    m.addConstrs(
+        (gp.quicksum(x[w, c] for c in customers) <= M * y[w] for w in warehouses),
+        name='activation'
+    )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 6 rows, 12 columns and 21 nonzeros
+Model fingerprint: 0xa1ab76e7
+Variable types: 9 continuous, 3 integer (3 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+04]
+  Objective range  [8e+00, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [8e+02, 2e+04]
+Presolve time: 0.00s
+Presolved: 6 rows, 12 columns, 21 nonzeros
+Variable types: 9 continuous, 3 integer (3 binary)
+Found heuristic solution: objective 317413.42000
+
+Root relaxation: objective 3.173185e+05, 0 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    317318.50000 317318.500  0.00%     -    0s
+
+Explored 1 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 317318 317413 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.173185000000e+05, best bound 3.173185000000e+05, gap 0.0000%
+ObjVal: 317318.5
+C0: 0.0
+C1: 776.0
+C2: 16214.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 1083.0
+C7: 0.0
+C8: 0.0
+C9: 1.0
+C10: -0.0
+C11: 1.0
+Optimal objective: 317318.5
+Optimal solution: [('C0', 0.0), ('C1', 776.0), ('C2', 16214.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 1083.0), ('C7', 0.0), ('C8', 0.0), ('C9', 1.0), ('C10', -0.0), ('C11', 1.0)]

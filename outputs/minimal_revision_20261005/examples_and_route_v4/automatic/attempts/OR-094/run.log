@@ -1,0 +1,272 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure of this problem. The objective is to minimize total idle production time across three workstations, with decision variables being the integer number of units of each radio model to produce per day. The main constraints are the effective daily capacities of each workstation (after accounting for maintenance), and the processing time per unit of each model at each workstation. There are no assignment, transportation, facility location, or network revenue management features. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: minimize total idle time across three workstations by choosing nonnegative integer production quantities for 101 products, subject to workstation-specific effective daily capacity constraints and per-product, per-workstation processing times
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 2]
+prompt: A supermarket needs to allocate various products, including high-demand items like the Sony Alpha Refrigerator, Sony Bravia XR, and Sony PlayStation 5, across different retail shelves. The product values and space requirements are provided in the "Products.csv" dataset. Additionally, the store has multiple shelves, each with a total space limit and specific space constraints for Sony and Apple products, as outlined in the "Capacity.csv" file. The goal is to determine the optimal number of units of each Sony product to place on each shelf to maximize total value while ensuring that the space used by Sony products on each shelf does not exceed the brand-specific limits. The decision variables x_ij represent the number of units of product i to be placed on shelf j. The variables x_ij must be nonnegative integers because the products are counted in whole units.
+Type: RA
+
+[Retrieved example 3]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others
+
+[Retrieved example 4]
+prompt: A factory needs to rent a warehouse to store materials for the next 4 months. The required warehouse area for each month is listed in 39-1.csv.The longer the rental contract period, the greater the discount on warehouse rental fees. The specific data is listed in 39-2.csv.
+
+The warehouse rental contract can be processed at the beginning of each month, and each contract specifies the rental area and period. Therefore, the factory can rent a contract on any month, and each time, they can sign one contract or multiple contracts with different rental areas and rental periods. The overall goal is to minimize the rental fees paid. Try to establish a linear programming mathematical model based on the above requirements.
+Type: Others
+
+[Retrieved example 5]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP[0m
+Thought:[32;1m[1;3mThought: The objective is to minimize total idle time across three workstations by choosing integer production quantities for 101 products, subject to workstation-specific effective daily capacity constraints and per-product, per-workstation processing times. The decision variables are the integer number of units of each product to produce. The main constraints are additive resource (workstation) capacity constraints, with no assignment, transportation, facility location, or network revenue management structure. The retrieved examples include a shelf allocation problem with brand-specific shelf capacities and integer product placement, labeled as RA, which is structurally similar: both involve allocating limited resources (workstation time or shelf space) among products to optimize an additive objective. There are no additional mechanisms such as assignment, selection, or multi-stage coupling. This is a clean resource allocation problem.
+
+Final Answer: RA[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Required table file_0_view_0 not found in CSVQA_DATA.")
+
+    records = table["records"]
+    if len(records) == 0:
+        raise RuntimeError("No records found in workstation_times.csv.")
+
+    # Index sets
+    # M: all columns matching HiFi{k}_Minutes
+    all_columns = table["columns"]
+    M = [col for col in all_columns if col.startswith("HiFi") and col.endswith("_Minutes")]
+    # Map to model names for reporting if needed
+    # m_name_map = {col: col.replace("_Minutes", "") for col in M}
+
+    # W: all Workstation values in order of records
+    W = [rec["values"]["Workstation"] for rec in records]
+
+    # Parameters
+    # t_{wm}: processing time (minutes) for model m at workstation w
+    t_wm = {}
+    for w_idx, rec in enumerate(records):
+        w = rec["values"]["Workstation"]
+        for m in M:
+            val = rec["values"][m]
+            try:
+                t_wm[w, m] = float(val)
+            except Exception:
+                raise RuntimeError(f"Invalid processing time for workstation {w}, model {m}: {val}")
+
+    # C_w: total available minutes per day at workstation w (constant 1440)
+    C_w = {w: 1440.0 for w in W}
+
+    # p_w: maintenance percent at workstation w
+    p_w = {}
+    for rec in records:
+        w = rec["values"]["Workstation"]
+        val = rec["values"]["Maintenance_Percent"]
+        try:
+            p_w[w] = float(val)
+        except Exception:
+            raise RuntimeError(f"Invalid maintenance percent for workstation {w}: {val}")
+
+    # E_w: effective daily capacity at workstation w
+    E_w = {w: C_w[w] * (1 - p_w[w]/100.0) for w in W}
+
+    # Model
+    m = gp.Model("radio_idle_time_min")
+    m.setParam("MIPGap", 1e-4)
+
+    # Decision variables: x_m >= 0, integer
+    x = m.addVars(M, lb=0, vtype=GRB.INTEGER, name="x")
+
+    # Auxiliary variables: I_w >= 0 (idle time at workstation w)
+    I = m.addVars(W, lb=0, vtype=GRB.CONTINUOUS, name="I")
+
+    # Objective: minimize total idle time
+    m.setObjective(gp.quicksum(I[w] for w in W), GRB.MINIMIZE)
+
+    # Constraints
+    # 1. Idle time definition for each workstation:
+    for w in W:
+        m.addConstr(
+            I[w] == E_w[w] - gp.quicksum(t_wm[w, m_] * x[m_] for m_ in M),
+            name=f"idle_def_{w}"
+        )
+
+    # 2. Nonnegativity of idle time: already enforced by lb=0
+
+    # 3. Nonnegativity and integrality of production: already enforced by lb=0, vtype=GRB.INTEGER
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 3 rows, 104 columns and 306 nonzeros
+Model fingerprint: 0x64f6fdbe
+Variable types: 3 continuous, 101 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 9e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 1e+03]
+Found heuristic solution: objective 3801.6000000
+Presolve removed 0 rows and 10 columns
+Presolve time: 0.00s
+Presolved: 3 rows, 94 columns, 276 nonzeros
+Variable types: 0 continuous, 94 integer (0 binary)
+
+Root relaxation: objective 6.000000e-01, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0    0.60000    0    3 3801.60000    0.60000   100%     -    0s
+H    0     0                       0.6000000    0.60000  0.00%     -    0s
+     0     0    0.60000    0    3    0.60000    0.60000  0.00%     -    0s
+
+Explored 1 nodes (3 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 0.6 3801.6 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.000000000000e-01, best bound 6.000000000000e-01, gap 0.0000%
+ObjVal: 0.6000000000000001
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: 58.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: -0.0
+C43: 0.0
+C44: -0.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: 1.0
+C52: 1.0
+C53: -0.0
+C54: -0.0
+C55: -0.0
+C56: -0.0
+C57: -0.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: -0.0
+C62: -0.0
+C63: -0.0
+C64: 0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: 7.0
+C72: -0.0
+C73: -0.0
+C74: -0.0
+C75: -0.0
+C76: -0.0
+C77: -0.0
+C78: -0.0
+C79: -0.0
+C80: -0.0
+C81: -0.0
+C82: -0.0
+C83: -0.0
+C84: -0.0
+C85: -0.0
+C86: -0.0
+C87: -0.0
+C88: -0.0
+C89: -0.0
+C90: -0.0
+C91: 0.0
+C92: -0.0
+C93: -0.0
+C94: -0.0
+C95: -0.0
+C96: -0.0
+C97: 2.0
+C98: 89.0
+C99: 21.0
+C100: 23.0
+C101: 0.0
+C102: 0.4
+C103: 0.2
+Optimal objective: 0.6000000000000001
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', 58.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', 0.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', 1.0), ('C52', 1.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', 0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', 7.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0), ('C80', -0.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', -0.0), ('C90', -0.0), ('C91', 0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', -0.0), ('C96', -0.0), ('C97', 2.0), ('C98', 89.0), ('C99', 21.0), ('C100', 23.0), ('C101', 0.0), ('C102', 0.4), ('C103', 0.2)]

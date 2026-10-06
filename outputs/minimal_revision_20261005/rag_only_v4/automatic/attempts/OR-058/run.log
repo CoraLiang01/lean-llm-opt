@@ -1,0 +1,166 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = CSVQA_DATA
+
+    # Suppliers (F)
+    suppliers = [rec['values']['Unnamed: 0'] for rec in next(t for t in data['tables'] if t['table_id'] == 'file_1_view_0')['records']]
+    # Stores (C)
+    stores = [rec['values']['customer'] for rec in next(t for t in data['tables'] if t['table_id'] == 'file_0_view_0')['records']]
+
+    # Fixed costs f_i
+    fixed_costs_table = next(t for t in data['tables'] if t['table_id'] == 'file_1_view_0')
+    fixed_costs = {}
+    for rec in fixed_costs_table['records']:
+        i = rec['values']['Unnamed: 0']
+        fixed_costs[i] = float(rec['values']['fixed_costs'])
+
+    # Demands d_j
+    demand_table = next(t for t in data['tables'] if t['table_id'] == 'file_0_view_0')
+    demands = {}
+    for rec in demand_table['records']:
+        j = rec['values']['customer']
+        demands[j] = float(rec['values']['demand'])
+
+    # Transportation costs t_{ij}
+    trans_cost_table = next(t for t in data['tables'] if t['table_id'] == 'file_2_view_0')
+    trans_costs = {}
+    for rec in trans_cost_table['records']:
+        i = rec['values']['Unnamed: 0']
+        for j in stores:
+            key = (i, j)
+            if j not in rec['values']:
+                raise ValueError(f"Missing transportation cost for supplier {i} to store {j}")
+            trans_costs[key] = float(rec['values'][j])
+
+    # Validate dimensions
+    for i in suppliers:
+        if i not in fixed_costs:
+            raise ValueError(f"Missing fixed cost for supplier {i}")
+        for j in stores:
+            if (i, j) not in trans_costs:
+                raise ValueError(f"Missing transportation cost for ({i},{j})")
+    for j in stores:
+        if j not in demands:
+            raise ValueError(f"Missing demand for store {j}")
+
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    y = m.addVars(suppliers, vtype=GRB.BINARY, name='y', lb=0, ub=1)
+    x = m.addVars([(i, j) for i in suppliers for j in stores], vtype=GRB.CONTINUOUS, name='x', lb=0)
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(fixed_costs[i] * y[i] for i in suppliers) +
+        gp.quicksum(trans_costs[(i, j)] * x[i, j] for i in suppliers for j in stores),
+        GRB.MINIMIZE
+    )
+
+    # Constraints
+
+    # 1. Demand satisfaction at each store
+    for j in stores:
+        m.addConstr(gp.quicksum(x[i, j] for i in suppliers) == demands[j], name='demand_%s' % j)
+
+    # 2. Supply only from open suppliers
+    for i in suppliers:
+        for j in stores:
+            m.addConstr(x[i, j] <= demands[j] * y[i], name='link_%s_%s' % (i, j))
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for v in m.getVars():
+            print(v.VarName, v.X)
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 42 rows, 42 columns and 108 nonzeros
+Model fingerprint: 0x9c440bdb
+Variable types: 36 continuous, 6 integer (6 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+02]
+  Objective range  [7e-02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+02, 2e+02]
+Presolve time: 0.00s
+Presolved: 42 rows, 42 columns, 108 nonzeros
+Variable types: 36 continuous, 6 integer (6 binary)
+Found heuristic solution: objective 36144.390000
+
+Root relaxation: objective 3.595065e+04, 4 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    35950.650000 35950.6500  0.00%     -    0s
+
+Explored 1 nodes (4 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 35950.7 36144.4 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.595065000000e+04, best bound 3.595065000000e+04, gap 0.0000%
+35950.65
+C0 1.0
+C1 -0.0
+C2 -0.0
+C3 1.0
+C4 1.0
+C5 1.0
+C6 216.0
+C7 0.0
+C8 216.0
+C9 0.0
+C10 144.0
+C11 0.0
+C12 0.0
+C13 0.0
+C14 0.0
+C15 0.0
+C16 0.0
+C17 0.0
+C18 0.0
+C19 0.0
+C20 0.0
+C21 0.0
+C22 0.0
+C23 0.0
+C24 0.0
+C25 0.0
+C26 0.0
+C27 0.0
+C28 0.0
+C29 144.0
+C30 0.0
+C31 0.0
+C32 0.0
+C33 144.0
+C34 0.0
+C35 0.0
+C36 0.0
+C37 216.0
+C38 0.0
+C39 0.0
+C40 0.0
+C41 0.0
+Optimal objective: 35950.65
+Optimal solution: [('C0', 1.0), ('C1', -0.0), ('C2', -0.0), ('C3', 1.0), ('C4', 1.0), ('C5', 1.0), ('C6', 216.0), ('C7', 0.0), ('C8', 216.0), ('C9', 0.0), ('C10', 144.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 144.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 144.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 216.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0)]

@@ -1,0 +1,229 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    csvs = [
+        ("/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP6/customer_demand.csv", ["customer", "demand"]),
+        ("/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP6/supply_capacity.csv", ["Unnamed: 0", "supply_capacity"]),
+        ("/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP6/transportation_costs.csv", ["Unnamed: 0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10"])
+    ]
+    def read_csv(path, **kwargs):
+        for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+            try:
+                return pd.read_csv(path, encoding=enc, **kwargs)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with supported encodings.")
+
+    # Read demand
+    df_demand = read_csv(csvs[0][0])
+    if not set(['customer', 'demand']).issubset(df_demand.columns):
+        raise ValueError("customer_demand.csv missing required columns.")
+    customers = df_demand['customer'].astype(str).tolist()
+    demand = dict(zip(df_demand['customer'].astype(str), df_demand['demand']))
+
+    # Read supply
+    df_supply = read_csv(csvs[1][0])
+    if not set(['Unnamed: 0', 'supply_capacity']).issubset(df_supply.columns):
+        raise ValueError("supply_capacity.csv missing required columns.")
+    suppliers = df_supply['Unnamed: 0'].astype(str).tolist()
+    supply_capacity = dict(zip(df_supply['Unnamed: 0'].astype(str), df_supply['supply_capacity']))
+
+    # Read transportation costs
+    df_cost = read_csv(csvs[2][0])
+    if 'Unnamed: 0' not in df_cost.columns:
+        raise ValueError("transportation_costs.csv missing 'Unnamed: 0' column.")
+    cost_suppliers = df_cost['Unnamed: 0'].astype(str).tolist()
+    cost_customers = [col for col in df_cost.columns if col != 'Unnamed: 0']
+    # Validate axes
+    if set(suppliers) != set(cost_suppliers):
+        raise ValueError("Mismatch between supply_capacity and transportation_costs warehouse indices.")
+    if set(customers) != set(cost_customers):
+        raise ValueError("Mismatch between customer_demand and transportation_costs customer indices.")
+    # Build cost dict
+    cost = {}
+    for i, row in df_cost.iterrows():
+        supplier = str(row['Unnamed: 0'])
+        cost[supplier] = {}
+        for customer in customers:
+            if customer not in row:
+                raise ValueError(f"Customer {customer} missing in transportation_costs.csv for supplier {supplier}.")
+            cost[supplier][customer] = float(row[customer])
+
+    # Validate all coefficients present
+    for i in suppliers:
+        if i not in cost:
+            raise ValueError(f"Missing cost row for supplier {i}.")
+        for j in customers:
+            if j not in cost[i]:
+                raise ValueError(f"Missing cost for ({i},{j}).")
+    for j in customers:
+        if j not in demand:
+            raise ValueError(f"Missing demand for customer {j}.")
+    for i in suppliers:
+        if i not in supply_capacity:
+            raise ValueError(f"Missing supply capacity for supplier {i}.")
+
+    # Model
+    m = gp.Model('TP6')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x[i,j] >= 0, continuous
+    keys = [(i, j) for i in suppliers for j in customers]
+    x = m.addVars(keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: minimize total transportation cost
+    m.setObjective(gp.quicksum(cost[i][j] * x[i, j] for i in suppliers for j in customers), GRB.MINIMIZE)
+
+    # Demand satisfaction: sum_i x[i,j] >= d_j for all j
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for i in suppliers) >= demand[j] for j in customers),
+        name='demand'
+    )
+
+    # Supply capacity: sum_j x[i,j] <= s_i for all i
+    m.addConstrs(
+        (gp.quicksum(x[i, j] for j in customers) <= supply_capacity[i] for i in suppliers),
+        name='supply'
+    )
+
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 20 rows, 100 columns and 200 nonzeros
+Model fingerprint: 0x6478fcad
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [3e+00, 2e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+01, 5e+02]
+Presolve time: 0.00s
+Presolved: 20 rows, 100 columns, 200 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   6.610000e+02   0.000000e+00      0s
+      18    6.3409723e+03   0.000000e+00   0.000000e+00      0s
+
+Solved in 18 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  6.340972287e+03
+ObjVal: 6340.972286592268
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 0.0
+C7: 50.0
+C8: 0.0
+C9: 77.0
+C10: 0.0
+C11: 23.0
+C12: 0.0
+C13: 114.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 99.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 94.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 0.0
+C68: 0.0
+C69: 0.0
+C70: 45.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 0.0
+C83: 0.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 57.0
+C95: 52.0
+C96: 23.0
+C97: 49.0
+C98: 0.0
+C99: 0.0
+Optimal objective: 6340.972286592268
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 50.0), ('C8', 0.0), ('C9', 77.0), ('C10', 0.0), ('C11', 23.0), ('C12', 0.0), ('C13', 114.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 99.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 94.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 45.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 57.0), ('C95', 52.0), ('C96', 23.0), ('C97', 49.0), ('C98', 0.0), ('C99', 0.0)]

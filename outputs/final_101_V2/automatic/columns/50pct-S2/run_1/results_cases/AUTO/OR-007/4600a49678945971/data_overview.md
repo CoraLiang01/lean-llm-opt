@@ -1,0 +1,29 @@
+annual_maintenance_visits,Capacity
+8,765
+
+warranty_months,ProductName,Value,showroom_display_zone,Weight
+48,Sedan,2524,South Wing,99
+60,SUV,4614,Central Hall,55
+48,Truck,8416,Central Hall,75
+36,Convertible,5917,Central Hall,94
+12,Minivan,9048,Central Hall,80
+24,Coupe,1140,North Wing,82
+36,Hatchback,8962,South Wing,71
+48,Station Wagon,1888,South Wing,100
+12,Electric Car,8487,North Wing,28
+12,Hybrid Car,4425,South Wing,93
+36,Luxury Sedan,4717,South Wing,84
+36,Sports Car,4210,Central Hall,83
+60,Crossover,1226,Central Hall,62
+12,Diesel Truck,7400,Central Hall,90
+48,Compact SUV,4639,South Wing,99
+36,Luxury SUV,7712,Central Hall,96
+36,Cargo Van,3299,Central Hall,21
+12,Pickup Truck,9895,South Wing,39
+48,Roadster,4496,South Wing,99
+36,Muscle Car,4526,South Wing,81
+48,Off-road Vehicle,5688,Central Hall,6
+12,Camper Van,3007,South Wing,58
+36,Compact Car,3623,South Wing,37
+48,Motorcycle,8474,Central Hall,15
+24,Electric SUV,8372,Central Hall,37

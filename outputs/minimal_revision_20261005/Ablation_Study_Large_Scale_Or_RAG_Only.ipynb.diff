@@ -1,0 +1,1301 @@
+--- Ablation_Study_Large_Scale_Or_RAG_Only.ipynb:before
++++ Ablation_Study_Large_Scale_Or_RAG_Only.ipynb:after
+@@ -1,6 +1,6 @@
+-# GPT-4.1 RAG-only — current-case data retrieval, no retrieved formulation/Code examples
+-
+-Uses the latest full implementation and its saved predictions. Public model-return and execution interfaces are preserved.
++# Large-scale OR: RAG Only
++
++Removed: retrieved model/Observation demonstrations from NRM, RA, TP, AP and FLP; Others Abstract Model Plan and code demonstrations; all retrieved code examples; query-only inserted demonstrations and its three fixed Question/Final Answer triggers. Retained: saved full-model classification, classification FileQA retrieval, CSVQA Tool, CSV loading/profiling, declarative extraction plans, Python extraction and validation, deterministic full-data fallback, Others CSV schema/statistics with runtime reading, and query-only ORLM_QA retrieval.
+ 
+ 
+ ## 1. Imports and configuration
+@@ -42,12 +42,14 @@
+ from typing import Any
+ from urllib.parse import quote
+ 
++import httpx
++
+ 
+ # Start Jupyter in the repository root, or set LEAN_LLM_OPT_ROOT.
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/interface_v5_switches/full"
++RESULTS_DIR = PROJECT_ROOT / "outputs/minimal_revision_20261005/rag_only_v4"
+ # Edit this one value when the notebook file is renamed.
+ NOTEBOOK_FILENAME = "Ablation_Study_Large_Scale_Or_RAG_Only.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+@@ -61,30 +63,44 @@
+ load_dotenv(PROJECT_ROOT / ".env", override=False)
+ user_api_key = os.environ.get("OPENAI_API_KEY")
+ 
+-VERSION = "rag_only-interface-v4-switches-v5"
++VERSION = "single-pass-source-data-v4"
+ MODEL_SNAPSHOT = "gpt-4.1-2025-04-14"
+-NRM_RETRY_ON_TRUNCATION = True  # False: propagate truncation immediately; True: retry once.
+-CSVQA_REPAIR_PLAN_ON_FAILURE = False  # True: repair one invalid NRM/RA plan, then full-data fallback.
+-NORMALIZE_GUROBI_BULK_NAMES = False  # False: preserve generated names; True: clear bulk names.
++NRM_RETRY_ON_TRUNCATION = False  # Single attempt; truncation remains a failed case.
+ EMBEDDING_MODEL = "text-embedding-ada-002"
+ CLASS_LABELS = ["TP", "NRM", "RA", "FLP", "AP", "Mixture", "Others"]
+ WORKFLOW_ROUTES = ["TP", "NRM", "FLP", "AP", "RA", "Others"]
+ CSVQA_MODE_BY_ROUTE = {
+-    # NRM and RA use source-derived records; other routes retain their existing flow.
+-    "NRM": "planned", "RA": "planned", "TP": "legacy",
+-    "AP": "legacy", "FLP": "legacy", "Others": "legacy",
++    # Canonical CSV routes use source-derived records; Others retains its original flow.
++    "NRM": "planned", "RA": "planned", "TP": "planned",
++    "AP": "planned", "FLP": "planned", "Others": "legacy",
+ }
+ RAG_EXAMPLES_ALL_PATH = "Large_Scale_Or_Files/RAG_Examples_All.csv"
+-CACHE_SCHEMA_VERSION = "rag_only-interface-v4-switches-v5"
+-
+-RESULTS_DIR = PROJECT_ROOT / "outputs/interface_v5_switches/methods/rag_only"
+-CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/interface_v4_full/automatic/results.csv"
++CACHE_SCHEMA_VERSION = VERSION
++
++API_MAX_RETRIES = 2  # Original SDK transport setting; no pipeline/model retry.
++
+ METHOD = "rag_only"
++CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/minimal_revision_20261005/full_v4/automatic/results.csv"
++BASE_NOTEBOOK_SHA256 = "27b17404536910dec6442e66cce5a76d0dc4c391b243142a3f5b75e5f9962a4d"
+ 
+ 
+ ## 2. Shared model clients
+ 
+-All workflows use the configured model snapshot and output guard. Clients are created when requested.
++Use the fixed GPT-4.1 snapshot and shared HTTP connection pool. Preserve the original SDK setting of at most two transport retries for connection/service errors, recording every actual retry. No failed formulation, generated program, solver result or truncated model response is regenerated.
++
++
++HTTP_RETRY_EVENTS = []
++
++
++def _record_http_request(request):
++    retry_index = int(request.headers.get("x-stainless-retry-count", "0"))
++    if retry_index:
++        HTTP_RETRY_EVENTS.append({"endpoint": request.url.path, "retry_index": retry_index})
++
++
++@lru_cache(maxsize=1)
++def _get_http_client():
++    return httpx.Client(timeout=180, event_hooks={"request": [_record_http_request]})
+ 
+ 
+ class ModelOutputTruncated(RuntimeError):
+@@ -122,13 +138,13 @@
+ def make_llm(*, timeout=180):
+     return ChatOpenAI(
+         model_name=MODEL_SNAPSHOT, openai_api_key=require_api_key(),
+-        temperature=0.0, top_p=1, n=1, max_retries=2, timeout=timeout,
++        temperature=0.0, top_p=1, n=1, max_retries=API_MAX_RETRIES, http_client=_get_http_client(), timeout=timeout,
+         callbacks=[RejectTruncatedOutput()],
+     )
+ 
+ 
+ def make_embeddings():
+-    return OpenAIEmbeddings(model=EMBEDDING_MODEL, openai_api_key=require_api_key(), max_retries=2)
++    return OpenAIEmbeddings(model=EMBEDDING_MODEL, openai_api_key=require_api_key(), max_retries=API_MAX_RETRIES, http_client=_get_http_client())
+ 
+ MODEL_INTERFACE_INSTRUCTIONS = """
+ Mandatory execution interface, independent of every retrieved example:
+@@ -150,29 +166,9 @@
+ """
+ 
+ 
+-def gurobi_naming_instructions():
+-    """Keep generation hints consistent with the optional local name normalization."""
+-    if NORMALIZE_GUROBI_BULK_NAMES:
+-        return """Keep business identifiers as Python dictionary keys, separate from Gurobi names.
+-Use name='' for addVars/addConstrs so business keys are not expanded into solver names;
+-use only short ASCII names for individually named variables and constraints.
+-Do not rely on named lookup of bulk variables/constraints; use Python dictionaries instead."""
+-    return """Keep business identifiers as Python dictionary keys, separate from Gurobi names.
+-Use short ASCII solver names. Generated names are preserved by the execution harness.
+-If long business keys would create oversized bulk solver names, create individually named
+-variables/constraints with short names while retaining the original Python dictionary keys.
+-Any getVarByName/getConstrByName lookup must match the names actually assigned."""
+-
+-
+ ## 3. CSV loading and route modes
+ 
+-NRM and RA use planned extraction. Other routes retain their existing data path.
+-Set CSVQA_REPAIR_PLAN_ON_FAILURE=True to repair one invalid plan using the original
+-query, CSV profile, previous output and validation error; another failure falls back
+-to full source data. The default is False. Few-shot Only uses direct data and never
+-invokes this planner or its repair path.
+-NORMALIZE_GUROBI_BULK_NAMES=False preserves generated variable/constraint names;
+-True restores bulk name clearing. Keep this setting fixed throughout an experiment.
++NRM, RA, TP, AP and FLP use the existing declarative planner and deterministic source-data extraction. Others keeps its CSV-schema workflow and its query-only formulation route. No repair or model rerun is available.
+ 
+ 
+ def normalize_route(value: Any) -> str:
+@@ -215,27 +211,13 @@
+ )
+ 
+ def invoke_react_with_required_csvqa(agent, query, route):
+-    """Require CSVQA while preserving the existing ReAct agent boundary."""
+-    def call_count(result):
+-        return sum(
+-            isinstance(step, tuple)
+-            and len(step) >= 2
+-            and getattr(step[0], "tool", None) == "CSVQA"
+-            for step in result.get("intermediate_steps", [])
+-        )
+-
++    """Validate tool use after one agent invocation; never correct or rerun it."""
+     result = agent.invoke(query)
+-    if call_count(result) == 0:
+-        result = agent.invoke(
+-            "Protocol correction: call CSVQA before the Final Answer. Begin with Action: CSVQA.\n\n"
+-            f"User Description: {query}"
+-        )
+-    calls = call_count(result)
+-    planned = CSVQA_MODE_BY_ROUTE[normalize_route(route)] == "planned"
+-    if (planned or normalize_route(route) == "RA") and calls != 1:
++    calls = sum(isinstance(step, tuple) and len(step) >= 2
++                and getattr(step[0], "tool", None) == "CSVQA"
++                for step in result.get("intermediate_steps", []))
++    if calls != 1:
+         raise RuntimeError(f"{route} ReAct must call CSVQA exactly once; observed {calls}")
+-    if not planned and calls < 1:
+-        raise RuntimeError(f"{route} legacy ReAct must call CSVQA at least once; observed {calls}")
+     return result
+ 
+ 
+@@ -346,12 +328,22 @@
+     return profile
+ 
+ 
++for _route in ("TP", "AP", "FLP"):
++    CSVQA_PLANNED_PROMPTS[_route] = (
++        "Select every source row and column required by the original query, including entity IDs, "
++        "matrix coefficients and axes, costs, capacities, demands and additional restrictions. "
++        "Use exact source column names and retain business keys. Exclude a column only when it "
++        "has no role in the query. Illustrative examples do not restrict the entity set."
++    )
++    CSVQA_TOOL_DESCRIPTIONS[_route] = "Return source-derived records, exact columns, filters and matrix axes."
++
++
+ ## 4. Planned CSV extraction
+ 
+ The model proposes columns and filters as JSON. Python applies the plan to the full CSV tables and preserves source identifiers and row order. These checks validate the data plan, not generated Python.
+ 
+ 
+-def _ask_extraction_plan(llm, route, query, tables, route_prompt, *, repair_context=None):
++def _ask_extraction_plan(llm, route, query, tables, route_prompt):
+     """Ask for one declarative plan and return the parsed plan plus raw response."""
+     profile = json.dumps(_build_profile(tables, query), ensure_ascii=False)
+     request = f"""You are a CSV extraction planner. Return one JSON object only.
+@@ -372,7 +364,11 @@
+ Python assigns each logical view a table_id of file_<file_index>_view_<zero-based occurrence for that
+ file>. A physical file may appear in multiple table specifications and roles may repeat. Every input
+ file must appear in tables or ignored_file_indices. Ignore a file only when the query does not need it.
+-Every explicit subset must have a filter and every filter must quote supporting query evidence.
++Filter only an explicit restriction; names introduced as examples (e.g., such as, for example)
++do not restrict the entity set. Every filter must quote the query restriction that requires it.
++Choose the filter operator from the requested matching semantics. A categorical code
++classifying identifier families refers to a prefix when no separate category column exists;
++arbitrary substring matching also admits unrelated identifiers and requires explicit query support.
+ Declare a matrix relationship only when the profile exposes its two axes unambiguously. When one label
+ column contains both decision entities and scalar parameter rows, retain every row that supplies a
+ query-required coefficient, price, cost, capacity, or bound; use separate logical views when helpful.
+@@ -386,16 +382,6 @@
+ CSV profile:
+ {profile}
+ """
+-    if repair_context is not None:
+-        request += (
+-            "\nRepair the previous extraction plan using the diagnostic data below. "
+-            "Keep the original query and CSV profile authoritative. Correct invalid JSON, "
+-            "columns, filters, and relationships without changing the task, inventing data, "
+-            "or adding unsupported subset conditions. Return only a complete plan in the "
+-            "same JSON schema. No solution code or objective feedback is supplied.\n"
+-            + "\nPrevious plan output:\n" + str(repair_context["previous_output"])
+-            + "\nValidation error:\n" + str(repair_context["validation_error"])
+-        )
+     text = str(llm.invoke([HumanMessage(content=request)]).content or "").strip()
+     cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.I) if text.startswith("```") else text
+     start, end = cleaned.find("{"), cleaned.rfind("}")
+@@ -514,6 +500,10 @@
+             value_supported = bool(raw_values) and all(key(value) in key(query) for value in raw_values)
+             if not evidence.strip() or (key(evidence) not in key(query) and not value_supported):
+                 raise ValueError(f"Filter lacks query evidence: {condition}")
++            illustrative = re.search(r"\bsuch as\b|\bfor example\b|\be\.g\.", evidence, re.I)
++            restrictive = re.search(r"\bonly\b|\bexclud\w*\b|\bexcept\b|\brestrict\w*\b|\blimited to\b", evidence, re.I)
++            if illustrative and not restrictive:
++                raise ValueError(f"Illustrative query examples cannot justify a source-row filter: {evidence}")
+             mask = _apply_condition(frame[column], condition)
+             combined = mask if combined is None else (combined & mask if logic == "and" else combined | mask)
+             used_conditions.append(condition)
+@@ -533,14 +523,6 @@
+         payload_by_id[table_id] = payload
+ 
+     profile = _build_profile(tables, query)
+-    required_values = {
+-        term for file_profile in profile for term, matches in file_profile["query_terms"].items()
+-        if matches["value_matches"] and not matches["column_matches"]
+-    }
+-    condition_text = json.dumps(used_conditions, ensure_ascii=False)
+-    missing_filters = sorted(term for term in required_values if key(term) not in key(condition_text))
+-    if missing_filters:
+-        raise ValueError(f"Plan omitted explicit query subset filters: {missing_filters}")
+     required_columns = {
+         column for file_profile in profile for matches in file_profile["query_terms"].values()
+         for column in matches["column_matches"]
+@@ -576,7 +558,7 @@
+                 raise ValueError(f"Matrix ID column {column!r} is not selected for {table['table_id']!r}")
+ 
+         def axis_keys(values, axis_name):
+-            normalized = [key(value) for value in values]
++            normalized = [str(value) for value in values]
+             if any(not value for value in normalized) or len(set(normalized)) != len(normalized):
+                 raise ValueError(f"Matrix {axis_name} IDs must be non-empty and unique: {values}")
+             return normalized
+@@ -585,12 +567,34 @@
+         column_ids = [record["values"][column_axis_column] for record in column_axis["records"]]
+         matrix_row_ids = [record["values"][row_id_column] for record in matrix_table["records"]]
+         matrix_columns = [column for column in matrix_table["columns"] if column != row_id_column]
++        def axis_mapping(actual, expected):
++            axis_keys(actual, "source")
++            axis_keys(expected, "reference")
++            if set(actual) == set(expected):
++                return dict(zip(actual, actual)), "exact"
++            def suffix_map(values):
++                matches = [re.fullmatch(r"\D*(\d+)", value) for value in values]
++                if not all(matches):
++                    return None
++                keys = [match.group(1) for match in matches]
++                return dict(zip(keys, values)) if len(set(keys)) == len(keys) else None
++            left, right = suffix_map(actual), suffix_map(expected)
++            if left is not None and right is not None and set(left) == set(right):
++                return {value: right[key] for key, value in left.items()}, "unique_complete_suffix"
++            return None, "unresolved"
++        row_map, row_basis = axis_mapping(matrix_row_ids, row_ids)
++        column_map, column_basis = axis_mapping(matrix_columns, column_ids)
++        relationship = dict(relationship)
++        if row_basis == "unique_complete_suffix":
++            relationship["row_id_mapping"] = row_map
++        if column_basis == "unique_complete_suffix":
++            relationship["column_id_mapping"] = column_map
+         checks = {
+             "matrix_table_id": matrix_id,
+             "shape": [len(matrix_table["records"]), len(matrix_columns)],
+             "expected_shape": [len(row_ids), len(column_ids)],
+-            "row_ids_aligned": axis_keys(matrix_row_ids, "matrix row") == axis_keys(row_ids, "row axis"),
+-            "column_ids_aligned": axis_keys(matrix_columns, "matrix column") == axis_keys(column_ids, "column axis"),
++            "row_ids_aligned": row_map is not None, "column_ids_aligned": column_map is not None,
++            "row_mapping_basis": row_basis, "column_mapping_basis": column_basis,
+         }
+         if checks["shape"] != checks["expected_shape"] or not checks["row_ids_aligned"] or not checks["column_ids_aligned"]:
+             raise ValueError(f"Matrix validation failed: {checks}")
+@@ -660,37 +664,21 @@
+             tables = _load_tables(dataset_address)
+             attempt_count = 1
+             raw_output = ""
+-            for attempt in range(2 if CSVQA_REPAIR_PLAN_ON_FAILURE else 1):
+-                attempt_count = attempt + 1
+-                raw_output = ""
+-                try:
+-                    if attempt:
+-                        plan, raw_output = _ask_extraction_plan(
+-                            llm, route, user_query, tables, system_prompt,
+-                            repair_context={"previous_output": planner_outputs[-1],
+-                                            "validation_error": errors[-1]},
+-                        )
+-                    else:
+-                        plan, raw_output = _ask_extraction_plan(
+-                            llm, route, user_query, tables, system_prompt
+-                        )
+-                    payload = _execute_plan(plan, tables, user_query, route)
+-                    planner_outputs.append(raw_output)
+-                    observation = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+-                    status = "PLANNED_REPAIRED" if attempt else "PLANNED"
+-                    break
+-                except Exception as exc:
+-                    # Only invalid first plans trigger repair. A failed repair request,
+-                    # including truncation after service retries, falls back to full data.
+-                    if not attempt and not isinstance(exc, (KeyError, TypeError, ValueError)):
+-                        raise
+-                    planner_outputs.append(getattr(exc, "planner_output", raw_output))
+-                    errors.append(str(exc))
+-                    if route not in {"NRM", "RA"}:
+-                        raise ValueError(
+-                            f"CSVQA extraction plan failed for {route}: {errors[-1]}"
+-                        ) from exc
+-            if status not in {"PLANNED", "PLANNED_REPAIRED"}:
++            try:
++                plan, raw_output = _ask_extraction_plan(
++                    llm, route, user_query, tables, system_prompt
++                )
++                payload = _execute_plan(plan, tables, user_query, route)
++                planner_outputs.append(raw_output)
++                observation = json.dumps(payload, ensure_ascii=False, sort_keys=True)
++                status = "PLANNED"
++            except (KeyError, TypeError, ValueError) as exc:
++                planner_outputs.append(getattr(exc, "planner_output", raw_output))
++                errors.append(str(exc))
++                if CSVQA_MODE_BY_ROUTE[route] != "planned":
++                    raise ValueError(
++                        f"CSVQA extraction plan failed for {route}: {errors[-1]}"
++                    ) from exc
+                 payload_tables = []
+                 for table in tables:
+                     frame, columns = table["frame"], list(table["frame"].columns)
+@@ -719,11 +707,10 @@
+         trace = {
+             "version": "GPT4.1-LO", "mode": "planned" if planned else "legacy",
+             "status": status, "plan": plan, "planner_attempt_count": attempt_count,
+-            "planner_repair_enabled": bool(planned and CSVQA_REPAIR_PLAN_ON_FAILURE),
+-            "planner_repair_attempted": attempt_count > 1,
+-            "planner_repair_succeeded": status == "PLANNED_REPAIRED",
+             "planner_outputs": planner_outputs, "planner_errors": errors,
+             "validation_errors": errors, "fallback_reason": fallback_reason,
++            "repair_count": 0, "retry_count": 0,
++            "fallback_count": int(status == "FALLBACK_FULL_DATA"),
+             "payload_hash": hashlib.sha256(observation.encode("utf-8")).hexdigest(),
+         }
+         state.clear()
+@@ -736,6 +723,341 @@
+ ## 6. Problem classification
+ 
+ Retrieve reference examples and classify the query. The classifier and its retriever are cached with lru_cache to avoid rebuilding indexes for each case.
++
++
++@lru_cache(maxsize=1)
++def _get_classifier_retriever():
++    documents = CSVLoader(
++        file_path=str(PROJECT_ROOT / "Large_Scale_Or_Files/RAG_Examples_All.csv"),
++        encoding="utf-8-sig",
++        content_columns=["prompt", "Type"],
++    ).load()
++    if len(documents) < 5:
++        raise ValueError("Classification reference requires at least five labeled examples")
++    return FAISS.from_documents(documents, make_embeddings()).as_retriever(
++        search_kwargs={"k": 5}
++    )
++
++
++def fileqa_retrieve(query):
++    """Retrieve five raw classification examples without an additional LLM call.
++    
++    Args:
++        query: Natural-language optimization problem or retrieval query.
++    
++    Returns:
++        A formatted string containing the ranked retrieved examples.
++    """
++    retrieved = _get_classifier_retriever().invoke(str(query))
++    if len(retrieved) != 5:
++        raise RuntimeError(f"FileQA expected five examples, retrieved {len(retrieved)}")
++
++    return "\n\n".join(
++        f"[Retrieved example {rank}]\n{document.page_content}"
++        for rank, document in enumerate(retrieved, start=1)
++    )
++
++
++few_shot_example = """
++Example 1 — Network Revenue Management
++
++Question:
++What is the problem type of the following optimization problem? Text: There
++are three products with corresponding revenues and independent demand
++streams. The company decides how many requests to fulfil over a finite sales
++horizon to maximize total revenue from fixed initial inventories.
++Replenishment is not allowed, and fulfilment decisions are non-negative
++integers.
++
++Thought: I need to identify the mathematical structure. I should call FileQA
++once to retrieve structurally similar labeled reference problems.
++
++Action: FileQA
++
++Action Input: finite-horizon revenue maximization with independent demand streams, fixed initial inventories, no replenishment, and integer demand-fulfilment decisions
++
++Observation: The retrieved RAG_Examples_All examples contain finite-inventory
++demand-fulfilment problems labeled Network Revenue Management.
++
++Thought: Fixed inventories are allocated to demand fulfilment over a sales
++horizon to maximize revenue. This is the defining NRM structure.
++
++Final Answer: NRM
++
++
++Example 2 — Mixture rather than Resource Allocation
++
++Question:
++What is the problem type of the following optimization problem? Text: A
++manufacturer determines integer production quantities and integer batch
++counts on several workstations. Each batch consumes machine capacity.
++Production creates a byproduct that must either be sold or disposed of, and
++the corresponding quantities must satisfy balance constraints.
++
++Thought: This problem contains resource capacities, but I must check whether
++it is a clean single-stage resource-allocation model or contains additional
++interacting mechanisms. I should call FileQA once.
++
++Action: FileQA
++
++Action Input: integer production and batch-count decisions across multiple workstations with capacity constraints and coupled byproduct sale-or-disposal balance
++
++Observation: The retrieved examples include resource-allocation and
++non-standard production-planning models. The latter contain batch decisions,
++multiple production components, and coupled balance constraints.
++
++Thought: Ordinary capacity constraints alone could indicate RA. However,
++integer batch counts, multiple workstations, and byproduct balance materially
++change the formulation. Therefore, the problem is Mixture rather than RA.
++
++Final Answer: Mixture
++
++
++Example 3 — Others rather than Mixture
++
++Question:
++What is the problem type of the following optimization problem? Text: A
++company selects a subset of independent projects. Each project has a profit
++and consumes part of one available budget. Each project is represented by a
++binary variable, and there are no precedence, dependency, assignment, batch,
++flow, or multi-stage constraints.
++
++Thought: I need to determine whether this is a hybrid model or a coherent
++standard optimization family outside the five canonical classes. I should
++call FileQA once.
++
++Action: FileQA
++
++Action Input: independent binary project selection maximizing profit under one budget constraint with no logical dependencies or additional coupling
++
++Observation: The retrieved examples contain standard binary knapsack and
++project-selection problems categorized as outside the five canonical
++classes.
++
++Thought: This is a clean knapsack-style model without interacting structures
++or non-standard coupling. It should be Others, not Mixture.
++
++Final Answer: Others
++"""
++
++
++prefix = f"""
++You are the classification agent in LEAN-LLM-OPT. Classify the current
++optimization problem into exactly one of the following seven semantic
++classes:
++
++- NRM: Network Revenue Management
++- RA: Resource Allocation
++- TP: Transportation Problem
++- FLP: Facility Location Problem
++- AP: Assignment Problem
++- Mixture
++- Others
++
++You must follow the ReAct workflow and call FileQA exactly once.
++
++FileQA retrieves structurally similar labeled optimization problems from
++RAG_Examples_All. For the Action Input, provide a concise but complete structural
++description that preserves the objective, decision variables, major
++constraints, and important coupling mechanisms.
++
++Retrieved examples are supporting evidence, not automatic votes. The current
++problem description and its mathematical structure are authoritative.
++
++Classify according to:
++
++- the objective;
++- the meanings and domains of the decision variables;
++- the principal constraint families;
++- coupling between decisions;
++- whether the formulation contains multiple stages or additional modeling
++  mechanisms.
++
++Do not classify according to company names, application narratives,
++filenames, CSV files, or isolated keywords.
++
++Class definitions:
++
++1. Network Revenue Management (NRM)
++
++A problem that allocates fixed inventories or capacities to known or
++stochastic demand streams in order to maximize revenue. Typical defining
++features include demand fulfilment, finite inventory, a sales horizon, and
++no replenishment.
++
++2. Resource Allocation (RA)
++
++A clean, primarily single-stage allocation of limited resources among
++activities or products, usually with ordinary capacity constraints and an
++additive objective.
++
++Capacity constraints or integer production quantities alone do not make a
++problem Mixture.
++
++Do not choose RA when additional mechanisms materially change the
++formulation, such as:
++
++- batch-size or lot-count decisions;
++- multiple interacting production stages, workstations, or devices;
++- byproduct sale, disposal, or material-balance decisions;
++- blending or proportion constraints interacting with production;
++- logical dependencies or conditional decisions;
++- selection followed by assignment;
++- equilibrium-style balance equations;
++- vehicle-count and shipment-quantity coupling.
++
++3. Transportation Problem (TP)
++
++A clean source-to-destination flow problem with source supplies, destination
++demands, route shipment quantities, and route transportation costs.
++
++Do not choose TP when the transportation structure is materially coupled
++with mechanisms such as integer truck dispatch, vehicle-capacity decisions,
++fixed-charge decisions, multi-stage transshipment, production decisions, or
++other non-standard constraint families. Such a problem may be Mixture.
++
++4. Facility Location Problem (FLP)
++
++A problem containing facility-opening or location decisions with fixed
++opening costs, together with assignment or shipment decisions that link
++clients or demand points to opened facilities.
++
++5. Assignment Problem (AP)
++
++A clean one-to-one or matching-style assignment of agents, workers,
++machines, products, or other entities to tasks.
++
++If the problem first selects a subset of entities and then assigns them, or
++combines assignment with multiple stages, logical dependencies, production,
++flow, or other interacting constraint families, choose Mixture instead.
++
++6. Mixture
++
++A hybrid or non-standard optimization model in which multiple structures or
++modeling mechanisms interact materially.
++
++Choose Mixture when either:
++
++(a) a canonical TP, NRM, RA, FLP, or AP structure is combined with an
++important additional mechanism; or
++
++(b) a non-core optimization model contains non-standard interacting
++constraint families that prevent it from being a clean textbook instance.
++
++Strong Mixture signals include:
++
++- batch-size, lot-size, or integer-trip decisions coupled with quantities;
++- logical implications, precedence, dependencies, or conditional decisions;
++- subset selection coupled with assignment;
++- blending or proportion requirements coupled with production or capacity;
++- byproduct production, sale, disposal, or balance;
++- multiple interacting workstations, devices, or production stages;
++- equilibrium or cross-variable balance equations;
++- truck-count or vehicle-capacity decisions coupled with transportation flow;
++- several distinct decision families whose interactions materially affect
++  the formulation.
++
++A problem does not need to belong to two named canonical classes to be
++Mixture. One recognizable base structure plus a material non-standard
++coupling mechanism is sufficient.
++
++7. Others
++
++A clean and coherent optimization family outside NRM, RA, TP, FLP, and AP,
++without the hybrid or non-standard interacting structure required for
++Mixture.
++
++Typical examples include:
++
++- a standard diet problem;
++- a pure knapsack or independent project-selection problem;
++- a standard traveling salesperson problem;
++- a standard workforce or shift-covering problem;
++- a standard parallel-machine scheduling problem;
++- another well-known outside family with one dominant mathematical
++  structure.
++
++A textbook blending model may be Others only when it is a standalone model
++with ordinary ingredient-balance and quality constraints. If blending or
++proportion decisions interact with production stages, capacities, equipment,
++batch decisions, or other constraint families, choose Mixture.
++
++Decision procedure:
++
++1. Identify the objective, decision variables, and main constraints.
++
++2. Determine whether the problem is a clean instance of NRM, RA, TP, FLP,
++   or AP.
++
++3. Even if a canonical base structure is present, check for a material
++   additional mechanism such as batching, logical dependencies,
++   selection-assignment coupling, byproducts, blending-production coupling,
++   multiple stages, equilibrium equations, or vehicle-count coupling.
++
++4. If such an additional mechanism materially changes the formulation,
++   choose Mixture.
++
++5. If the problem is a clean, well-known outside family with one dominant
++   structure and no material hybrid coupling, choose Others.
++
++6. When TP, NRM, RA, FLP, or AP cannot be confidently confirmed:
++   - choose Mixture if multiple structures or non-standard constraints
++     interact materially;
++   - otherwise choose Others.
++
++When deciding between Mixture and Others, choose Mixture if two different decision families or constraint mechanisms interact materially. Choose Others only when one standard textbook archetype explains all important variables and constraints.
++
++7. Retrieved labels are evidence, not rules. Do not use majority voting.
++   When retrieval conflicts with the current mathematical formulation,
++   prioritize the current formulation.
++
++Important boundary rules:
++
++- Multiple ordinary resource-capacity constraints alone are not sufficient
++  for Mixture; a clean allocation model remains RA.
++- Integer variables alone are not sufficient for Mixture.
++- A canonical structure plus a material additional decision mechanism is
++  sufficient for Mixture.
++- Mixture and Others are separate semantic labels even if they currently
++  share the same downstream workflow route.
++
++Return exactly one of the following label tokens in the Final Answer:
++
++NRM, RA, TP, FLP, AP, Mixture, Others
++
++Do not include explanations, punctuation, or multiple candidate labels in
++the Final Answer.
++
++Examples of the required ReAct process:
++
++{few_shot_example}
++"""
++
++
++suffix = """
++Begin!
++
++Question: {input}
++{agent_scratchpad}
++"""
++
++
++@lru_cache(maxsize=1)
++def _get_classification_agent():
++    llm = make_llm()
++    tool = Tool(
++        name="FileQA",
++        func=fileqa_retrieve,
++        description=(
++            "Return five structurally similar RAG examples and their labels. "
++            "Use the complete optimization problem text as input."
++        ),
++    )
++    return initialize_agent(
++        tools=[tool], llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
++        agent_kwargs={"prefix": prefix, "suffix": suffix}, verbose=True,
++        handle_parsing_errors=False, max_iterations=4, return_intermediate_steps=True,
++    )
+ 
+ 
+ def normalize_problem_class(value):
+@@ -783,6 +1105,7 @@
+         return matches[0]
+     raise ValueError(f"Cannot unambiguously normalize class: {value!r}")
+ 
++
+ def class_to_workflow_route(label):
+     """Map a semantic class to an executable workflow route.
+     
+@@ -796,72 +1119,72 @@
+     return "Others" if normalized in {"Mixture", "Others"} else normalized
+ 
+ 
+-def attach_cached_classifications(frame, classification_csv=CLASSIFICATION_RESULTS_PATH):
+-    """Validate saved predictions against each case; never reuse a model or solution."""
+-    path = Path(classification_csv).expanduser().resolve()
+-    required = {"problem_id", "query", "dataset_address", "predicted_label",
+-                "assigned_route", "experiment_mode", "forced_route"}
+-    cached = read_csv_compat(path, dtype=str, keep_default_na=False,
+-                             usecols=lambda name: name in required)
+-    missing = required.difference(cached.columns)
+-    if missing:
+-        raise ValueError(f"Classification CSV missing columns: {sorted(missing)}")
+-    if cached["problem_id"].eq("").any() or cached["problem_id"].duplicated().any():
+-        raise ValueError("Classification CSV must contain one row per nonempty problem_id")
+-    if (not cached["experiment_mode"].eq("automatic").all()
+-            or cached["forced_route"].ne("").any()):
+-        raise ValueError("Use automatic classification results, not forced-route results")
+-    lookup = cached.set_index("problem_id").to_dict("index")
+-    labels, routes = [], []
+-    for case in frame.to_dict("records"):
+-        problem_id = str(case["problem_id"])
+-        if problem_id not in lookup:
+-            raise ValueError(f"Missing cached classification for {problem_id}")
+-        row = lookup[problem_id]
+-        if (row["query"] != str(case["Query"])
+-                or resolve_dataset_address(row["dataset_address"])
+-                != resolve_dataset_address(case["dataset_address"])):
+-            raise ValueError(f"Cached question/CSV paths do not match {problem_id}")
+-        label = normalize_problem_class(row["predicted_label"])
+-        route = normalize_route(row["assigned_route"])
+-        if class_to_workflow_route(label) != route:
+-            raise ValueError(f"Cached label and route disagree for {problem_id}")
+-        labels.append(label)
+-        routes.append(route)
+-    result = frame.copy()
+-    result["cached_predicted_label"] = labels
+-    result["cached_assigned_route"] = routes
+-    result["classification_source"] = str(path)
+-    return result
+-
+-
+-def classification_for_case(case):
+-    """Return only the validated saved label; no classifier or API fallback."""
+-    label = normalize_problem_class(case["cached_predicted_label"])
+-    if class_to_workflow_route(label) != case["cached_assigned_route"]:
+-        raise ValueError(f"Invalid cached route for {case['problem_id']}")
+-    return {"normalized_label": label}
+-
+-
+-## 7. Route retrieval and NRM formulation
+-
+-Cache route-example retrievers and formulate network revenue management problems using planned CSV data.
++def invoke_classifier(query):
++    """Run the ReAct classification agent and validate its tool-use contract.
++    
++    Args:
++        query: Natural-language optimization problem or retrieval query.
++    
++    Returns:
++        A dictionary containing the raw output, normalized label, FileQA call count, and trace.
++    
++    Raises:
++        RuntimeError: If the classifier violates the one-FileQA-call contract or emits an invalid label.
++    """
++    response = _get_classification_agent().invoke(str(query))
++    steps = response.get("intermediate_steps", []) if isinstance(response, dict) else []
++    fileqa_calls = sum(
++        getattr(step[0], "tool", None) == "FileQA"
++        for step in steps if isinstance(step, tuple) and step
++    )
++    if fileqa_calls != 1:
++        raise RuntimeError(f"Classifier must call FileQA exactly once; observed {fileqa_calls}")
++    output = str(response.get("output", "") if isinstance(response, dict) else response).strip()
++    return {
++        "output": output,
++        "normalized_label": normalize_problem_class(output),
++        "fileqa_calls": fileqa_calls,
++        "intermediate_steps": steps,
++    }
++
++
++## 7. Data retrieval and formulation
++
++Python invokes the existing CSVQA Tool once before a single modeling request. Planned extraction and all route demonstrations remain. The modeling request receives the resulting Observation without an agent deciding whether to call the tool.
+ 
+ 
+ def formulate_with_csvqa(query, dataset_address, route, system_prompt, tool_description, prefix, suffix):
+-    """Run the shared CSVQA agent with the route's prompt and fixed data mode."""
++    """Call CSVQA once, then model its Observation once; no agent protocol repair."""
++    route = normalize_route(route)
++    if CSVQA_MODE_BY_ROUTE[route] == "planned":
++        system_prompt = CSVQA_PLANNED_PROMPTS[route]
++        tool_description = CSVQA_TOOL_DESCRIPTIONS[route]
++        prefix = prefix.replace("please output required parameters in a whole text, including all vectors and matrices.",
++                                "return symbolic parameters and an exact source Data Mapping; do not enumerate values.")
+     llm, qa_tool, csvqa_result = build_csvqa_components(
+         dataset_address, system_prompt, tool_description, route=route, user_query=query,
+     )
+-    prefix += ("\nPreserve the original objective sense, full expression, and constant terms. "
+-               "Do not replace it with an optimizer-equivalent objective with a different value.")
+-    agent = initialize_agent(
+-        tools=[qa_tool], llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+-        agent_kwargs={"prefix": prefix, "suffix": suffix}, verbose=True,
+-        handle_parsing_errors=True, return_intermediate_steps=True, early_stopping_method="generate",
+-    )
+-    result = invoke_react_with_required_csvqa(agent, query, route)
+-    return {"formulation": result["output"], **csvqa_result}
++    try:
++        qa_tool.invoke(query)
++    except Exception as exc:
++        exc.csvqa_result = dict(csvqa_result)
++        exc.pipeline_stage = "data_extraction"
++        raise
++    prompt = (prefix.replace("{{", "{").replace("}}", "}") +
++              "\nCSVQA has already been called exactly once by the program. Its complete current "
++              "Observation is supplied below. Return the final mathematical model directly; do not "
++              "request tools or copy example data. Use a concise symbolic model and an exact Data "
++              "Mapping with table_id and column names. Do not enumerate numerical tables. "
++              "Bind every parameter to source data or a query-defined expression; never invent a "
++              "missing limit. If total capacity refers to listed per-entity capacities, retain "
++              "their bounds and their sum. Preserve all variable domains, constraints, objective "
++              "sense and additive constants. Define each index set from ALL current returned entities "
++              "unless the original query explicitly restricts it. Demonstration names, counts and "
++              "profile samples must never determine the current entity set. Optional matrix alias "
++              "mappings apply only when present; otherwise preserve exact raw ID matching.\n" +
++              f"Original Query:\n{query}\nObservation:\n{csvqa_result['observation']}")
++    result = llm.invoke([HumanMessage(content=prompt)])
++    return {"formulation": result.content, **csvqa_result}
+ 
+ 
+ @lru_cache(maxsize=1)
+@@ -983,20 +1306,9 @@
+     User Description: {input}
+     {agent_scratchpad}"""
+ 
+-    for attempt in range(2 if NRM_RETRY_ON_TRUNCATION else 1):
+-        try:
+-            result = formulate_with_csvqa(
+-                query, dataset_address, "NRM", csvqa_system_prompt, csvqa_tool_description, prefix, suffix,
+-            )
+-            if attempt:
+-                result.setdefault("trace", {})["truncation_retry"] = {"llm_usage": truncated_usage}
+-            return result
+-        except ModelOutputTruncated as exc:
+-            if attempt or not NRM_RETRY_ON_TRUNCATION:
+-                raise
+-            truncated_usage = getattr(exc, "llm_usage", {})
+-            prefix += "\nReturn a concise symbolic model and Data Mapping only; never enumerate data rows or repeat examples."
+-            print("NRM formulation truncated; retrying once.", truncated_usage)
++    return formulate_with_csvqa(
++        query, dataset_address, "NRM", csvqa_system_prompt, csvqa_tool_description, prefix, suffix,
++    )
+ 
+ 
+ ## 8. Resource allocation
+@@ -1381,7 +1693,9 @@
+ combined conditions rather than treating individual counts as intersection counts.
+ 
+ Reserve m and model for the Gurobi model; never reuse them as loop variables or other values.
+-{naming_instructions}
++Keep business identifiers as Python dictionary keys, separate from Gurobi names.
++Use name='' for addVars/addConstrs so business keys are not expanded into solver names;
++use only short ASCII names for individually named variables and constraints.
+ Never invent, truncate, or replace required coefficients with dummy or random data.
+ Before optimization, validate coefficient dimensions and identifier coverage against decision index sets;
+ raise an explicit error for missing data instead of guessing, padding, or silently dropping entries.
+@@ -1389,11 +1703,11 @@
+ [Your Gurobi Code]
+ """
+ 
+-        code_gen_template += "\n" + MODEL_INTERFACE_INSTRUCTIONS
++        code_gen_template += "\n" + CSV_SOLVER_INSTRUCTIONS + MODEL_INTERFACE_INSTRUCTIONS
+ 
+         code_gen_prompt = PromptTemplate(
+             template=code_gen_template,
+-            input_variables=["query", "schema", "abstract_plan", "dataset_address", "few_shot_examples", "naming_instructions"]
++            input_variables=["query", "schema", "abstract_plan", "dataset_address", "few_shot_examples"]
+         )
+         
+         code_gen_chain = LLMChain(llm=llm2, prompt=code_gen_prompt)
+@@ -1403,8 +1717,7 @@
+             schema=schema,
+             abstract_plan=abstract_model_plan,
+             dataset_address=dataset_address,
+-            few_shot_examples=few_shot_block_code,
+-            naming_instructions=gurobi_naming_instructions()
++            few_shot_examples=few_shot_block_code 
+         )
+         
+         if "```python" in final_code:
+@@ -1483,32 +1796,6 @@
+ 
+     prefix = (
+     f"{few_shot_examples}\n\n"
+-    """ 
+-    Use the following triggers to identify problem structures and apply the corresponding mathematical formulations.
+-    (1) INTEGER trigger:
+-    Question: A factory can run two machine types. How many of each machine should be installed given budget and space limits? Maximize output.
+-    Final Answer: 
+-    $\\max\\; p_1 x_1 + p_2 x_2$
+-    $\\text{{s.t. }} a_1 x_1 + a_2 x_2 \\le B,\\; s_1 x_1 + s_2 x_2 \\le S$
+-    $x_1, x_2 \\in \\mathbb{{Z}}_+.$
+-    (2) MULTI-PERIOD FLOW trigger:
+-    Question: Multi-period production with inventory and backorders. Costs for production/holding/backorder. Initial and terminal conditions given.
+-    Final Answer:
+-    \textbf{{Indices: }} t\\in T=\\{{1,\\dots,n\\}}. \\
+-    \textbf{{Given: }} d_t,\\ I_0,\\ B_0,\\ \\dots \\
+-    \textbf{{Vars: }} x_t\\ge0,\\ I_t\\ge0,\\ B_t\\ge0. \\
+-    \\min \\sum_t (c x_t + h I_t + p B_t) \\
+-    \text{{s.t. }} I_t - B_t = I_{{t-1}} - B_{{t-1}} + x_t - d_t,\\ \forall t \\
+-    I_n \\ge I^{{\\min}},\\ B_n=0.
+-    (3) LOGIC+BINARY trigger:
+-    Question: Choose exactly one option from set P and at least K items from set V, with quantities and budget.
+-    Final Answer:
+-    \textbf{{Sets: }} i\\in P,\\ j\\in V. \\ \textbf{{Vars: }} q_i,q_j\\ge0;\\ y_i\\in\\{{0,1\\}}, z_j\\in\\{{0,1\\}}.\\
+-    \\max \\sum_j f_j q_j \\
+-    \text{{s.t. }} \\sum_i y_i = 1,\\ \\sum_j z_j \\ge K \\
+-    0\\le q_i \\le M_i y_i,\\ \forall i;\\ \\ 0\\le q_j \\le M_j z_j,\\ \forall j \\
+-    \text{{Budget: }} \\sum_i c_i q_i + \\sum_j c_j q_j \\le B.
+-    """
+     "USER QUESTION:\n{input}\n\n"
+     "TASK:\n"
+     "- Produce a complete LaTeX optimization model using ONLY information in the question.\n"
+@@ -1541,7 +1828,7 @@
+             "input_variables": ["input"]
+         },
+         verbose=True,
+-        handle_parsing_errors=True,  # Enable error handling
++        handle_parsing_errors=False,  # Enable error handling
+     )
+ 
+     openai.api_request_timeout = 60  
+@@ -1706,6 +1993,12 @@
+ identifiers, and matrix axes. Do not read CSVQA_DATA["plan"].
+ Without a continuous pre-horizon value, start change/ramp constraints at the second
+ period; an initial binary state does not supply a continuous period-zero value.
++Optional row_id_mapping/column_id_mapping in a declared matrix relationship are
++dictionaries from raw matrix label strings to entity ID strings. Apply them only when
++present; otherwise use exact raw IDs. Obtain a row label from record['values'][row_id_column],
++never from the record dictionary itself. Preserve every coefficient and both original IDs.
++Derive complete index sets from current records; an example or a copied formulation's
++literal entity list must not narrow them without an explicit original-query restriction.
+ Records are already structured dictionaries; do not reparse the payload as CSV text.
+ Only parse individual source fields when those fields themselves contain structured text.
+ """
+@@ -1718,6 +2011,9 @@
+ """
+ 
+ CSV_SOLVER_INSTRUCTIONS = """
++Keep business identifiers as Python dictionary keys, separate from Gurobi names.
++Use name='' for addVars/addConstrs so business keys are not expanded into solver names;
++use only short ASCII names for individually named variables and constraints.
+ Use setObjective for the original query's objective sense and full expression, including constants.
+ Do not substitute an optimizer-equivalent objective or restore omitted constants only in printed output.
+ Never invent, truncate, or replace required coefficients with dummy or random data.
+@@ -1725,6 +2021,17 @@
+ raise an explicit error for missing data instead of guessing, padding, or silently dropping entries.
+ For |linear expression| <= bound, use expression <= bound and expression >= -bound;
+ do not pass a non-variable expression to addGenConstrAbs.
++
++Gurobi addVars supports lb, ub, obj, vtype and name only; do not invent keyword arguments.
++Use a list of unique flat tuple keys with addVars(keys); do not pass a tuplelist and
++another Cartesian index unless that extra dimension is intended. Preserve every component
++of composite business keys in dictionaries and joins. Sum repeated component rows by the
++complete key instead of overwriting them. Ineligible decision pairs must be constrained to
++zero or excluded; their presence in source data is not a reason to reject the entire input.
++Never use chained comparisons, Python and/or, or bitwise |/& on Gurobi constraints.
++Represent logical conditions with explicit binary variables and indicator/linear constraints.
++Use pandas Series.str.casefold() for vectorized text and string.casefold() for one string.
++
+ Set MIPGap=1e-4 before optimize().
+ If Status == GRB.OPTIMAL, print ObjVal and every variable's VarName and X.
+ Otherwise print the solver status; do not report an incumbent as optimal.
+@@ -1778,7 +2085,7 @@
+             "identifiers, or data. The current formulation and current data are authoritative.",
+             examples,
+         ])
+-    parts.extend([CSV_SOLVER_INSTRUCTIONS, gurobi_naming_instructions(), MODEL_INTERFACE_INSTRUCTIONS])
++    parts.extend([CSV_SOLVER_INSTRUCTIONS, MODEL_INTERFACE_INSTRUCTIONS])
+     response = make_llm().invoke([HumanMessage(content="\n\n".join(parts))])
+     code = response.content
+     if bind_observation:
+@@ -1798,21 +2105,6 @@
+     return _generate_code(output, selected_problem, original_query=original_query)
+ 
+ 
+-def build_formulation_examples(*args, **kwargs):
+-    """RAG-only: no formulation demonstrations."""
+-    return ""
+-
+-
+-def retrieve_rag_examples(*args, **kwargs):
+-    """RAG-only: current-case data retrieval remains; example retrieval is disabled."""
+-    return []
+-
+-
+-def retrieve_csv_code_example(*args, **kwargs):
+-    """RAG-only: the generic model interface is preserved without Code demonstrations."""
+-    return ""
+-
+-
+ ## 14. Execute and assemble results
+ 
+ The pipeline classifies, formulates, generates code, and solves once. Query-only cases use the original Others modeling agent and the code example for the predicted class. execute_code returns the optimal objective and variable values from m or model; failures retain any model and code already generated.
+@@ -1823,13 +2115,12 @@
+     match = re.fullmatch(r"```(?:python|py)?\s*\n(.*?)\n```", source, re.DOTALL)
+     source = match.group(1) if match else source
+     tree = ast.parse(source)
+-    # Optional compatibility mode; by default preserve generated names and named lookups.
+-    if NORMALIZE_GUROBI_BULK_NAMES:
+-        for node in ast.walk(tree):
+-            if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+-                    and node.func.attr in {"addVars", "addConstrs"}):
+-                node.keywords = [kw for kw in node.keywords if kw.arg != "name"]
+-                node.keywords.append(ast.keyword(arg="name", value=ast.Constant(value="")))
++    # Bulk names expand business keys; keep those keys out of Gurobi display names.
++    for node in ast.walk(tree):
++        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
++                and node.func.attr in {"addVars", "addConstrs"}):
++            node.keywords = [kw for kw in node.keywords if kw.arg != "name"]
++            node.keywords.append(ast.keyword(arg="name", value=ast.Constant(value="")))
+     return ast.unparse(tree)
+ 
+ 
+@@ -1907,10 +2198,16 @@
+     }
+ 
+ 
++def classification_for_case(case):
++    return invoke_classifier(case["Query"])
++
++
+ def execute_pipeline_case(case, *, forced_route=None):
+     """Classify, formulate, generate code, and solve; retain progress if a step fails."""
+     record = {**case_fields(case), "forced_route": forced_route,
+-              "experiment_mode": "forced" if forced_route else "automatic"}
++              "experiment_mode": "forced" if forced_route else "automatic",
++              "repair_count": 0, "retry_count": 0, "fallback_count": 0}
++    HTTP_RETRY_EVENTS.clear()
+     query, address = record["query"], record["dataset_address"]
+     try:
+         if forced_route is not None and not address:
+@@ -1925,14 +2222,9 @@
+         mode = CSVQA_MODE_BY_ROUTE[route] if address else None
+         payload = formulation.get("observation", "") if mode == "planned" else ""
+         record.update(generated_model=formulation["formulation"], csvqa_observation=formulation.get("observation", ""), csvqa_mode=mode,
+-                      csvqa_status=formulation.get("trace", {}).get("status"))
+-        csvqa_trace = formulation.get("trace", {})
+-        record.update(
+-            csvqa_trace=json.dumps(csvqa_trace, ensure_ascii=False, indent=2),
+-            csvqa_planner_attempt_count=csvqa_trace.get("planner_attempt_count", 0),
+-            csvqa_plan_repair_attempted=csvqa_trace.get("planner_repair_attempted", False),
+-            csvqa_plan_repair_succeeded=csvqa_trace.get("planner_repair_succeeded", False),
+-        )
++                      csvqa_status=formulation.get("trace", {}).get("status"),
++                      csvqa_trace=json.dumps(formulation.get("trace", {}), ensure_ascii=False),
++                      fallback_count=formulation.get("trace", {}).get("fallback_count", 0))
+         model_text = formulation["formulation"]
+         if (not isinstance(model_text, str) or not model_text.strip()
+                 or "agent stopped due to" in model_text.lower()):
+@@ -1956,10 +2248,20 @@
+         record["solve_code"] = source
+         record["pipeline_stage"] = "solve"
+         objective, solution = execute_code(record["solve_code"])
++        record.update(api_retry_count=len(HTTP_RETRY_EVENTS), api_retry_events=json.dumps(HTTP_RETRY_EVENTS))
+         record.update(final_objective=objective, final_solution=solution, final_ok=True,
+                       record_status="completed", cache_source="computed", pipeline_stage="completed")
+         return record
+     except Exception as exc:
++        record.update(api_retry_count=len(HTTP_RETRY_EVENTS), api_retry_events=json.dumps(HTTP_RETRY_EVENTS))
++        evidence = getattr(exc, "csvqa_result", {})
++        if evidence:
++            record.update(csvqa_observation=evidence.get("observation", ""),
++                          csvqa_trace=json.dumps(evidence.get("trace", {}), ensure_ascii=False),
++                          csvqa_status=evidence.get("trace", {}).get("status"))
++        record["pipeline_stage"] = getattr(exc, "pipeline_stage", record["pipeline_stage"])
++        if isinstance(exc, ModelInterfaceError):
++            record["pipeline_stage"] = "result_extraction"
+         exc.pipeline_context = record
+         raise
+ 
+@@ -2086,8 +2388,7 @@
+ 
+ 
+ CSV_VALUE_READERS = {
+-    **dict.fromkeys(("final_ok", "classification_correct", "solution_correct", "csvqa_plan_repair_attempted", "csvqa_plan_repair_succeeded"), lambda value: value == "True"),
+-    "csvqa_planner_attempt_count": lambda value: int(float(value)),
++    **dict.fromkeys(("final_ok", "classification_correct", "solution_correct"), lambda value: value == "True"),
+     **dict.fromkeys(("final_objective", "label_objective"), float),
+ }
+ _RESULT_LOCK = RLock()
+@@ -2149,9 +2450,9 @@
+ 
+ 
+ def reusable_record(csv_path, record, fingerprint):
+-    """Reuse only successful, intact results from the same code and data."""
+-    if (not record or record.get("record_status") != "completed"
+-            or not record.get("final_ok") or record.get("cache_fingerprint") != fingerprint):
++    """Reuse every intact recorded attempt, including failures; never select successes."""
++    if (not record or record.get("record_status") not in {"completed", "error"}
++            or record.get("cache_fingerprint") != fingerprint):
+         return None
+     return materialize_record(csv_path, record)
+ 
+@@ -2210,8 +2511,6 @@
+               "model": MODEL_SNAPSHOT,
+               "embedding_model": EMBEDDING_MODEL, "modes": CSVQA_MODE_BY_ROUTE,
+               "nrm_retry_on_truncation": NRM_RETRY_ON_TRUNCATION,
+-              "csvqa_repair_plan_on_failure": CSVQA_REPAIR_PLAN_ON_FAILURE,
+-              "normalize_gurobi_bulk_names": NORMALIZE_GUROBI_BULK_NAMES,
+               "query": str(case["Query"]), "forced_route": route}
+     digest = hashlib.sha256(json.dumps(fields, sort_keys=True).encode())
+     for raw in normalize_data_address(case.get("dataset_address")).splitlines():
+@@ -2230,26 +2529,33 @@
+         "execution_error": f"{type(exc).__name__}: {exc}", "execution_error_type": type(exc).__name__,
+         "execution_error_code": getattr(exc, "code", None),
+         "record_status": "error", "cache_source": "computed",
++        "generated_model": getattr(exc, "pipeline_context", {}).get("generated_model", ""),
++        "solve_code": getattr(exc, "pipeline_context", {}).get("solve_code", ""),
++        "csvqa_observation": getattr(exc, "pipeline_context", {}).get("csvqa_observation", ""),
++        "csvqa_trace": getattr(exc, "pipeline_context", {}).get("csvqa_trace", "{}"),
++        "repair_count": 0, "retry_count": 0,
++        "fallback_count": getattr(exc, "pipeline_context", {}).get("fallback_count", 0),
+     }
+ 
+ 
+ ## 17. Shared test runner
+ 
+-run_test(test, output_csv=...) accepts a DataFrame or CSV path. It classifies automatic cases, detects CSV availability per row, and saves each result immediately. Pass routes=WORKFLOW_ROUTES to test every route. Every failure stays in the results; missing reference answers are not scored.
+-
+-Only successful results with matching fingerprints are reused. Failures are retried. Set reuse_completed=False to disable both local and AUTO reuse, and continue_on_error=False to stop at the first exception. Missing credentials stop the run before any case is saved.
+-
+-
+-def _run_test_with_attached_predictions(test, *, output_csv=RESULTS_DIR / "results.csv", routes=None, reuse_auto_csv=None,
++Run each code version and case once. Resume recorded successes and failures without regenerating them. Use a new directory for another round; historical results cannot be overwritten. Objective Match includes every requested case in the denominator. CSV-plan failures retain the existing deterministic full-source-data fallback, which is logged separately from repair and retries.
++
++
++def run_test(test, *, output_csv=RESULTS_DIR / "results.csv", routes=None, reuse_auto_csv=None,
+              reuse_completed=True, continue_on_error=True, rel_tol=1e-4, abs_tol=1e-4):
+-    """Reuse matching successful results; retry failures. False disables all result reuse."""
++    """Evaluate once per case/version; resume recorded successes and failures."""
+     frame = load_benchmark(test) if isinstance(test, (str, Path)) else prepare_cases(test)
+     selected_routes = [None] if routes is None else [normalize_route(route) for route in routes]
+     if not selected_routes or len(selected_routes) != len(set(selected_routes)):
+         raise ValueError("Provide a non-empty list of distinct routes")
+     if routes is not None and frame["dataset_address"].eq("").any():
+         raise ValueError("Forced-route tests require case CSV inputs; use routes=None for query-only tests")
+-    cached = {record_key(row): row for row in load_records(output_csv)} if reuse_completed else {}
++    existing = load_records(output_csv)
++    if existing and not reuse_completed:
++        raise ValueError("Use a new round directory for a fresh run; historical attempts cannot be overwritten")
++    cached = {record_key(row): row for row in existing}
+     auto_cached = ({record_key(row): row for row in load_records(reuse_auto_csv)}
+                    if reuse_completed and reuse_auto_csv else {})
+     # Fingerprint every run before saving records so a first run is reusable later.
+@@ -2260,7 +2566,11 @@
+         for route in selected_routes:
+             key = (case["problem_id"], str(case["Query"]), case["dataset_address"], route or "AUTO")
+             fingerprint = case_fingerprint(case, route, source_fingerprint=source)
++            if key in cached and cached[key].get("cache_fingerprint") != fingerprint:
++                raise ValueError("Existing attempts use different code/data; choose a new version directory")
+             record = reusable_record(output_csv, cached.get(key), fingerprint)
++            if key in cached and record is None:
++                raise ValueError("Recorded attempt has missing/corrupt artifacts; do not rerun it")
+             if record is not None:
+                 record["cache_source"] = "csv"
+             elif route is not None and route == case.get("true_route"):
+@@ -2291,6 +2601,7 @@
+                         raise
+             record = finalize_record(record, rel_tol=rel_tol, abs_tol=abs_tol)
+             record["cache_fingerprint"] = fingerprint
++            record["base_notebook_sha256"] = globals().get("BASE_NOTEBOOK_SHA256", hashlib.sha256(NOTEBOOK_PATH.read_bytes()).hexdigest())
+             save_record(output_csv, record)
+             results.append(record)
+             print(f"[{len(results)}/{total}] {case['problem_id']} / {route or 'AUTO'}: "
+@@ -2375,44 +2686,79 @@
+     return tables
+ 
+ 
+-def run_test(test, *, output_csv=RESULTS_DIR / "results.csv", reuse_completed=False, continue_on_error=True, rel_tol=1e-4, abs_tol=1e-4):
+-    frame = load_benchmark(test) if isinstance(test, (str, Path)) else prepare_cases(test)
+-    frame = attach_cached_classifications(frame)
+-    return _run_test_with_attached_predictions(frame, output_csv=output_csv, reuse_completed=reuse_completed,
+-        continue_on_error=continue_on_error, rel_tol=rel_tol, abs_tol=abs_tol)
+-
+-
+-## 18. Preflight (no API calls)
+-
+-Check all 101 classifications and every case CSV before enabling the run.
+-
+-
+-PREFLIGHT_CASES = attach_cached_classifications(load_benchmark())
+-if len(PREFLIGHT_CASES) != 101:
+-    raise ValueError(f"Expected 101 benchmark cases, found {len(PREFLIGHT_CASES)}")
+-for address in PREFLIGHT_CASES["dataset_address"]:
+-    for raw in normalize_data_address(address).splitlines():
+-        if not Path(raw).is_file():
+-            raise FileNotFoundError(raw)
+-print("Method:", METHOD, "Model:", MODEL_SNAPSHOT)
+-print("Validated cached classifications:", len(PREFLIGHT_CASES))
+-display(PREFLIGHT_CASES.groupby(["cached_predicted_label", "cached_assigned_route"]).size().rename("cases"))
+-
+-
+-## 19. Run the ablation
+-
+-Set `RUN_API = True` to run. `ROWS = None` selects all 101 cases; a list selects zero-based rows. Results are written only to this method's `RESULTS_DIR`. Rerunning reuses matching successful ablation results and retries failures, as in the full workflow.
++## Experimental component removal
++
++Reuse the final full-model classifications. No model output or solver result is reused. All common settings and execution definitions above match the full notebook.
++
++
++def attach_cached_classifications(frame, classification_csv=CLASSIFICATION_RESULTS_PATH):
++    """Validate saved predictions against each case; never reuse a model or solution."""
++    path = Path(classification_csv).expanduser().resolve()
++    required = {"problem_id", "query", "dataset_address", "predicted_label",
++                "assigned_route", "experiment_mode", "forced_route"}
++    cached = read_csv_compat(path, dtype=str, keep_default_na=False,
++                             usecols=lambda name: name in required)
++    missing = required.difference(cached.columns)
++    if missing:
++        raise ValueError(f"Classification CSV missing columns: {sorted(missing)}")
++    if cached["problem_id"].eq("").any() or cached["problem_id"].duplicated().any():
++        raise ValueError("Classification CSV must contain one row per nonempty problem_id")
++    if (not cached["experiment_mode"].eq("automatic").all()
++            or cached["forced_route"].ne("").any()):
++        raise ValueError("Use automatic classification results, not forced-route results")
++    lookup = cached.set_index("problem_id").to_dict("index")
++    labels, routes = [], []
++    provenance = load_records(path)
++    if any(row.get("base_notebook_sha256") != BASE_NOTEBOOK_SHA256 for row in provenance):
++        raise ValueError("Classification results are not from the final full notebook")
++    for case in frame.to_dict("records"):
++        problem_id = str(case["problem_id"])
++        if problem_id not in lookup:
++            raise ValueError(f"Missing cached classification for {problem_id}")
++        row = lookup[problem_id]
++        if (row["query"] != str(case["Query"])
++                or resolve_dataset_address(row["dataset_address"])
++                != resolve_dataset_address(case["dataset_address"])):
++            raise ValueError(f"Cached question/CSV paths do not match {problem_id}")
++        if not row["predicted_label"] and not row["assigned_route"]:
++            labels.append(None)
++            routes.append(None)
++            continue
++        label = normalize_problem_class(row["predicted_label"])
++        route = normalize_route(row["assigned_route"])
++        if class_to_workflow_route(label) != route:
++            raise ValueError(f"Cached label and route disagree for {problem_id}")
++        labels.append(label)
++        routes.append(route)
++    result = frame.copy()
++    result["cached_predicted_label"] = labels
++    result["cached_assigned_route"] = routes
++    result["classification_source"] = str(path)
++    return result
++
++
++def classification_for_case(case):
++    """Return only the validated saved label; no classifier or API fallback."""
++    if not case.get("cached_predicted_label"):
++        raise RuntimeError("Final full-model classification is unavailable; no classification rerun is allowed")
++    label = normalize_problem_class(case["cached_predicted_label"])
++    if class_to_workflow_route(label) != case["cached_assigned_route"]:
++        raise ValueError(f"Invalid cached route for {case['problem_id']}")
++    return {"normalized_label": label}
++
++
++def retrieve_rag_examples(route, query, k=1):
++    """Remove only formulation/code demonstrations; FileQA and CSVQA remain."""
++    return []
++
++
++def retrieve_similar_texts(query, retriever):
++    """Remove query-only few-shot insertion; retain its ORLM_QA retrieval tool."""
++    return []
+ 
+ 
+ RUN_API = False
+-ROWS = None
+ if RUN_API:
+-    selected_cases = load_benchmark()
+-    if ROWS is not None:
+-        if any(not isinstance(row, int) or isinstance(row, bool) or row < 0 or row >= len(selected_cases) for row in ROWS):
+-            raise ValueError("ROWS must contain zero-based row indices from 0 to 100")
+-        if len(ROWS) != len(set(ROWS)):
+-            raise ValueError("ROWS must not contain duplicates")
+-        selected_cases = selected_cases.iloc[ROWS]
+-    ablation_results = run_test(selected_cases, output_csv=RESULTS_DIR / "automatic/results.csv")
++    cases = attach_cached_classifications(load_benchmark())
++    ablation_results = run_test(cases, output_csv=RESULTS_DIR / "automatic/results.csv")
+     report_results(ablation_results, RESULTS_DIR / "automatic")

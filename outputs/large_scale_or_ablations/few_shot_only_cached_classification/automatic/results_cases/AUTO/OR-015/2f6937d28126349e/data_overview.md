@@ -1,0 +1,9 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM6/RestaurantSalesreport.csv
+   Product Name  Revenue  Demand  Initial Inventory
+       Aalopuri       20    1483            10440.0
+    Cold coffee       40    1918            13610.0
+        Frankie       50    1623            11500.0
+       Panipuri       20    1720            12260.0
+       Sandwich       60    1558            10970.0
+Sugarcane juice       25    1791            12780.0
+        Vadapav       20    1426            10060.0

@@ -1,0 +1,189 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to identify the mathematical structure of the problem. The objective is to minimize total assignment cost. The decision variables are binary: assign manager i to project j or not. The main constraints are that each manager is assigned to exactly one project and each project is assigned to exactly one manager. There are no additional mechanisms such as selection, batching, or multi-stage decisions. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: one-to-one assignment of managers to projects with assignment costs, binary assignment variables, each manager assigned to one project, each project assigned to one manager, minimize total cost
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP
+
+[Retrieved example 2]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP[0m
+Thought:[32;1m[1;3mThought: The retrieved examples include a nearly identical manager-to-project assignment problem labeled AP (Assignment Problem). The mathematical structure is a one-to-one assignment with binary variables, cost minimization, and exactly one manager per project and vice versa, with no additional mechanisms or interacting constraint families. This matches the canonical AP definition.
+
+Final Answer: AP[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = CSVQA_DATA
+    table = None
+    for t in data["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Cost table not found in CSVQA_DATA.")
+
+    # Get managers and projects from the table
+    managers = []
+    projects = []
+    # Identify manager and project columns
+    for col in table["columns"]:
+        if col == "Unnamed: 0":
+            continue
+        if col.startswith("P") and col[1:].isdigit():
+            projects.append(col)
+    # Get manager IDs in order
+    for rec in table["records"]:
+        managers.append(rec["values"]["Unnamed: 0"])
+
+    # Build cost dictionary
+    cost = {}
+    for rec in table["records"]:
+        i = rec["values"]["Unnamed: 0"]
+        cost[i] = {}
+        for j in projects:
+            cij = rec["values"][j]
+            try:
+                cij = float(cij)
+            except Exception:
+                raise ValueError(f"Invalid cost value for manager {i}, project {j}: {cij}")
+            cost[i][j] = cij
+
+    # Validate cost matrix coverage
+    for i in managers:
+        for j in projects:
+            if j not in cost[i]:
+                raise ValueError(f"Missing cost for manager {i}, project {j}")
+
+    m = gp.Model("ManagerProjectAssignment")
+    x = m.addVars(managers, projects, vtype=GRB.BINARY, name="x")
+
+    # Objective
+    m.setObjective(gp.quicksum(cost[i][j] * x[i, j] for i in managers for j in projects), GRB.MINIMIZE)
+
+    # Each manager assigned to exactly one project
+    m.addConstrs((gp.quicksum(x[i, j] for j in projects) == 1 for i in managers), name="mgr")
+
+    # Each project assigned to exactly one manager
+    m.addConstrs((gp.quicksum(x[i, j] for i in managers) == 1 for j in projects), name="prj")
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 12 rows, 36 columns and 72 nonzeros
+Model fingerprint: 0x1b11b8f3
+Variable types: 0 continuous, 36 integer (36 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+03, 3e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 11552.000000
+Presolve time: 0.00s
+Presolved: 12 rows, 36 columns, 72 nonzeros
+Variable types: 0 continuous, 36 integer (36 binary)
+
+Root relaxation: objective 9.089000e+03, 10 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    9089.0000000 9089.00000  0.00%     -    0s
+
+Explored 1 nodes (10 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 9089 11552 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 9.089000000000e+03, best bound 9.089000000000e+03, gap 0.0000%
+ObjVal: 9089.0
+C0: -0.0
+C1: -0.0
+C2: 1.0
+C3: -0.0
+C4: 0.0
+C5: 0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: 1.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: 0.0
+C15: 1.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: 0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: 1.0
+C24: -0.0
+C25: 1.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: 1.0
+C31: -0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+Optimal objective: 9089.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', 1.0), ('C3', -0.0), ('C4', 0.0), ('C5', 0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', 1.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', 0.0), ('C15', 1.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', 0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', 1.0), ('C24', -0.0), ('C25', 1.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', 1.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0)]

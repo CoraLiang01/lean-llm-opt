@@ -1,0 +1,28 @@
+reference_document_page_count,resource_id,archive_revision_number,resource_capacity,archive_audit_note_count,archived_attachment_count
+6,1,4,1336,5,4
+6,2,4,1754,5,3
+4,3,6,1617,4,4
+4,4,1,1119,4,6
+4,5,3,1410,5,2
+4,6,7,627,5,1
+6,7,5,748,3,1
+8,8,7,1540,2,1
+12,9,3,1292,3,3
+6,10,6,1138,5,2
+
+item_name,archive_revision_number,archive_storage_medium,record_index_style,reference_document_page_count,record_keeper_group,item_value,archived_attachment_count,resource_requirement
+Racing,4,Digital,Chronological,2,Team A,28,1,393
+Sports,6,Hybrid,Numeric,4,Team B,69,2,195
+Action,5,Paper,Numeric,4,Team A,20,2,192
+Adventure,8,Paper,Alphabetic,4,Team A,62,1,155
+RPG,9,Digital,Alphabetic,6,Team B,58,2,500
+Shooter,2,Hybrid,Alphabetic,4,Team A,11,3,156
+Strategy,5,Hybrid,Numeric,2,Team C,73,3,317
+Simulation,7,Hybrid,Alphabetic,12,Team C,43,4,694
+Puzzle,6,Paper,Chronological,2,Team A,28,2,751
+Fighting,3,Paper,Numeric,8,Team A,57,2,467
+Platformer,2,Hybrid,Numeric,4,Team A,92,3,796
+Survival,3,Paper,Chronological,6,Team B,66,6,146
+Horror,8,Hybrid,Numeric,12,Team C,14,4,269
+Sandbox,4,Paper,Alphabetic,8,Team A,49,6,246
+MMO,8,Hybrid,Chronological,4,Team A,12,3,652

@@ -1,0 +1,430 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mQuestion: A factory plans purchasing and production for 100 products (P1–P100) over a single planning horizon. Each product can only be purchased/produced in whole batches, where one batch equals 10 units. So, batch_size_units is fixed batch size in units =10. Producing one unit of any product consumes three limited resources (R1, R2, R3). Each product also faces an upper demand bound; producing beyond this bound is not allowed (unmet demand is permitted). The goal is to choose batch quantities to maximize total profit (=sum over products of (10 * x_i * profit_per_unit_i)) while respecting all resource and demand limits.
+
+    The referring data is listed in the csv file. factory_products_100.csv consists of profit earned per produced unit (positive, real). Among them r1_per_unit, r2_per_unit, r3_per_unit represent resource consumption per produced unit for R1, R2, R3 (real) respectively. upper_demand_units means maximum market demand (units) for the product (integers not equal to multiples of 10, so batch decisions meaningfully interact with demand).
+    resources_capacities.csv includes total available amount of each resource in the horizon (real)
+
+Thought: I need to identify the mathematical structure, focusing on the objective, decision variables, and main constraints. The decision variables are integer batch counts for each product (x_i), with each batch representing 10 units. The objective is to maximize total profit. Constraints include resource capacities (three resources) and upper demand bounds per product. The batch-size restriction (integer multiples of 10) interacts materially with the demand upper bounds (which are not multiples of 10), so the batch decision mechanism is not separable from the demand constraint. I should call FileQA to retrieve structurally similar labeled examples.
+
+Action: FileQA
+
+Action Input: single-stage profit maximization over multiple products, integer batch-size production decisions (fixed batch size), each unit consumes multiple limited resources, per-product upper demand bounds not aligned with batch size, batch decisions interact with demand constraints
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A supermarket needs to allocate various products, including high-demand items like the Sony Alpha Refrigerator, Sony Bravia XR, and Sony PlayStation 5, across different retail shelves. The product values and space requirements are provided in the "Products.csv" dataset. Additionally, the store has multiple shelves, each with a total space limit and specific space constraints for Sony and Apple products, as outlined in the "Capacity.csv" file. The goal is to determine the optimal number of units of each Sony product to place on each shelf to maximize total value while ensuring that the space used by Sony products on each shelf does not exceed the brand-specific limits. The decision variables x_ij represent the number of units of product i to be placed on shelf j. The variables x_ij must be nonnegative integers because the products are counted in whole units.
+Type: RA
+
+[Retrieved example 2]
+prompt: The data of the store offers several styles of Nike shoes is provided in "nike_Shoes_Sales.csv". Through the dataset, the revenue of each shoes is listed in the column "Revenue". Each style has its own demand limit. The store’s objective is to maximize the total revenue based on the fixed initial inventories of the Nike x Olivia Kim brand, which are detailed in column “Initial Inventory.” During the sales horizon, no replenishment is allowed, and there are no in-transit inventories. For this deterministic reference instance, the column “Demand” specifies the known total demand for each style over the entire sales horizon. The instance is eligible for trading when the sum of “Demand” over the four Nike x Olivia Kim styles is at least 100. Sales decisions are made for eligible instances. The decision variables x_i represent the number of customer requests the store intends to fulfill for Nike shoe style i, with each x_i being a positive integer.
+In addition, the four styles share a dispatch capacity of 100 units over the sales horizon: their total fulfilled quantity cannot exceed 100. This capacity is an explicit synthetic scenario assumption, not a measured field in the source CSV.
+Type: NRM
+
+[Retrieved example 3]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 4]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others
+
+[Retrieved example 5]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP[0m
+Thought:[32;1m[1;3mThought: The problem is a single-stage profit maximization over multiple products, with integer batch-size production decisions (fixed batch size of 10 units). Each unit produced consumes three limited resources, and each product has an upper demand bound that is not a multiple of the batch size, so the batch decision mechanism interacts materially with the demand constraint. The retrieved examples include clean resource allocation (RA) models with integer or continuous production decisions, but none involve batch-size decisions that interact with demand bounds. The batch-size mechanism here is not a standard feature of RA and creates a material coupling between batch decisions and demand satisfaction. This is a strong signal for Mixture, as the batch-size constraint interacts nontrivially with the demand upper bounds, preventing a clean RA classification.
+
+Final Answer: Mixture[0m
+
+[1m> Finished chain.[0m
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+**Objective Function:**
+$$
+\min Z = 200\,x_{1} + 250\,x_{2} + 380\,x_{3} + 350\,x_{4} + 50\,y_{3} + 50\,y_{4}
+$$
+
+**Constraints:**
+
+Flour demand constraint:
+$$
+30\,x_{1} + 20\,x_{2} + 40\,x_{3} + 10\,x_{4} = 100
+$$
+
+Rice demand constraint:
+$$
+20\,x_{1} + 30\,x_{2} + 10\,x_{3} + 40\,x_{4} = 80
+$$
+
+Supplier usage constraints for new suppliers:
+$$
+x_{3} \leq M\,y_{3}
+$$
+$$
+x_{4} \leq M\,y_{4}
+$$
+
+Existing-supplier order bounds (zero orders are allowed):
+$$
+x_{1} \geq 0
+$$
+$$
+x_{2} \geq 0
+$$
+
+Non-negativity for new suppliers:
+$$
+x_{3} \geq 0
+$$
+$$
+x_{4} \geq 0
+$$
+
+Binary variables for new supplier selection:
+$$
+y_{3} \in \{0,1\}
+$$
+$$
+y_{4} \in \{0,1\}
+$$
+
+Where $M$ is a sufficiently large constant (e.g., $M = 100$).
+
+**Decision Variables:**
+$$
+x_{i} \geq 0, \quad i = 1,2,3,4
+$$
+$$
+y_{j} \in \{0,1\}, \quad j = 3,4
+$$
+
+**Retrieved Information**
+
+- Supplier 1: Existing Supplier, Flour per batch = 30, Rice per batch = 20, Price per batch = 200, No new-supplier activation fee
+- Supplier 2: Existing Supplier, Flour per batch = 20, Rice per batch = 30, Price per batch = 250, No new-supplier activation fee
+- Supplier 3: New Supplier, Flour per batch = 40, Rice per batch = 10, Price per batch = 380, Administrative fee = 50
+- Supplier 4: New Supplier, Flour per batch = 10, Rice per batch = 40, Price per batch = 350, Administrative fee = 50
+
+- Demand: Flour = 100 kg, Rice = 80 kg
+
+- $x_{i}$: Continuous batch equivalents ordered from supplier $i$ ($i=1,2,3,4$)
+- $y_{j}$: Binary variable indicating if new supplier $j$ ($j=3,4$) is selected (1 if selected, 0 otherwise)
+
+Secondary objective, with strictly lower lexicographic priority than total cost: minimize y_3 + y_4. Existing suppliers are available with nonnegative continuous orders, including zero. Fractional batches are allowed for all suppliers. Supplier type and If new supplier consistently identify 1/2 as existing and 3/4 as new. The New supplier administrative fee field applies only where If new supplier is Yes; the stored values for suppliers 1/2 are inactive in this model.
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A factory needs to rent a warehouse to store materials for the next 4 months. The required warehouse area for each month is listed in 39-1.csv.The longer the rental contract period, the greater the discount on warehouse rental fees. The specific data is listed in 39-2.csv.
+
+The warehouse rental contract can be processed at the beginning of each month, and each contract specifies the rental area and period. Therefore, the factory can rent a contract on any month, and each time, they can sign one contract or multiple contracts with different rental areas and rental periods. The overall goal is to minimize the rental fees paid. Try to establish a linear programming mathematical model based on the above requirements.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+28\, (x_{1,1} + x_{2,1} + x_{3,1} + x_{4,1})
++ 45\, (x_{1,2} + x_{2,2} + x_{3,2})
++ 60\, (x_{1,3} + x_{2,3})
++ 73\, x_{1,4}
+$$
+
+**subject to**
+
+$$
+x_{1,1} + x_{1,2} + x_{1,3} + x_{1,4} \geq 1500 
+\quad (\text{month 1})
+$$
+
+$$
+x_{1,2} + x_{1,3} + x_{1,4} + x_{2,1} + x_{2,2} + x_{2,3} \geq 1000 
+\quad (\text{month 2})
+$$
+
+$$
+x_{1,3} + x_{1,4} + x_{2,2} + x_{2,3} + x_{3,1} + x_{3,2} \geq 2000 
+\quad (\text{month 3})
+$$
+
+$$
+x_{1,4} + x_{2,3} + x_{3,2} + x_{4,1} \geq 1200 
+\quad (\text{month 4})
+$$
+
+**where**
+
+$$
+x_{s,p} \geq 0 
+\quad \text{for } s \in \{1,2,3,4\},\ p \in \{1,2,3,4\}
+\quad \text{only if } s+p-1 \leq 4
+$$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal integer number of production/purchase batches for each of 100 products (P1–P100), where each batch is 10 units, to maximize total profit. The solution must not exceed available capacities of three resources (R1, R2, R3), and for each product, total produced units cannot exceed its upper demand bound (unmet demand is allowed).
+2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem (integer batch decisions, linear constraints/objective).
+3.  **Define Index Sets:** The primary index is Products (i ∈ {P1, ..., P100}), as listed in factory_products_100.csv.
+4.  **Define Decision Variables:**
+    -   `x[i]` = Number of batches of product i to produce/purchase. Type: GRB.INTEGER (must be integer, as only whole batches are allowed).
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'profit_per_unit' (profit per unit for each product), 'batch_size_units' (units per batch, always 10).
+    -   Constraint coefficients: 'r1_per_unit', 'r2_per_unit', 'r3_per_unit' (resource consumption per unit for each product).
+    -   Constraint RHS (limits): 'upper_demand_units' (maximum allowed units per product), and from resources_capacities.csv: 'capacity' for each resource (R1, R2, R3).
+6.  **Formulate Objective:** Maximize total profit, calculated as the sum over all products of (number of batches) × (units per batch) × (profit per unit), i.e., maximize sum over i of [x[i] * batch_size_units * profit_per_unit[i]].
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Resource Limits): For each resource (R1, R2, R3), the total resource consumed by all products cannot exceed its available capacity. For example, for R1: sum over i of [x[i] * batch_size_units * r1_per_unit[i]] ≤ R1_capacity (from resources_capacities.csv). Similarly for R2 and R3.
+    -   Constraint 2 (Demand Upper Bound): For each product i, the total produced units cannot exceed its upper demand, i.e., x[i] * batch_size_units ≤ upper_demand_units[i].
+    -   Constraint 3 (Non-negativity and Integrality): For each product i, x[i] ≥ 0 and integer (since only whole batches can be produced/purchased).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+
+# Read data
+products_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/factory_products_100.csv', sep=',')
+resources_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/resources_capacities.csv', sep=',')
+
+# Normalize product and resource identifiers
+products_df['product'] = products_df['product'].astype(str).str.strip()
+resources_df['resource'] = resources_df['resource'].astype(str).str.strip()
+
+# Index sets
+product_ids = list(products_df['product'].unique())
+resource_ids = list(resources_df['resource'].unique())
+
+# Validate batch_size_units is unique and 10 for all products
+batch_sizes = products_df['batch_size_units'].unique()
+if len(batch_sizes) != 1 or batch_sizes[0] != 10:
+    raise ValueError("batch_size_units must be 10 for all products.")
+batch_size_units = int(batch_sizes[0])
+
+# Build parameter dictionaries
+profit_per_unit = products_df.set_index('product')['profit_per_unit'].to_dict()
+upper_demand_units = products_df.set_index('product')['upper_demand_units'].to_dict()
+r1_per_unit = products_df.set_index('product')['r1_per_unit'].to_dict()
+r2_per_unit = products_df.set_index('product')['r2_per_unit'].to_dict()
+r3_per_unit = products_df.set_index('product')['r3_per_unit'].to_dict()
+
+resource_capacity = resources_df.set_index('resource')['capacity'].to_dict()
+
+# Validate all required resources are present
+for r in ['R1', 'R2', 'R3']:
+    if r not in resource_capacity:
+        raise ValueError(f"Resource {r} not found in resources_capacities.csv.")
+
+# Validate all required columns for all products
+for pid in product_ids:
+    for col in ['profit_per_unit', 'r1_per_unit', 'r2_per_unit', 'r3_per_unit', 'upper_demand_units']:
+        if pd.isnull(products_df.loc[products_df['product'] == pid, col]).any():
+            raise ValueError(f"Missing value for {col} in product {pid}.")
+
+# Build model
+def solve_problem():
+    m = gp.Model("FactoryBatchProduction")
+    # Decision variables: x[i] = number of batches of product i (integer, >=0)
+    x = m.addVars(product_ids, vtype=gp.GRB.INTEGER, lb=0, name='x')
+    
+    # Objective: maximize total profit = sum_i (x[i] * batch_size_units * profit_per_unit[i])
+    m.setObjective(
+        gp.quicksum(x[i] * batch_size_units * profit_per_unit[i] for i in product_ids),
+        gp.GRB.MAXIMIZE
+    )
+    
+    # Resource constraints
+    m.addConstr(
+        gp.quicksum(x[i] * batch_size_units * r1_per_unit[i] for i in product_ids) <= resource_capacity['R1'],
+        name='r1_cap'
+    )
+    m.addConstr(
+        gp.quicksum(x[i] * batch_size_units * r2_per_unit[i] for i in product_ids) <= resource_capacity['R2'],
+        name='r2_cap'
+    )
+    m.addConstr(
+        gp.quicksum(x[i] * batch_size_units * r3_per_unit[i] for i in product_ids) <= resource_capacity['R3'],
+        name='r3_cap'
+    )
+    
+    # Demand upper bound constraints
+    for i in product_ids:
+        m.addConstr(x[i] * batch_size_units <= upper_demand_units[i], name=f'demand_{i}')
+    
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+    
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+if m.status == gp.GRB.OPTIMAL:
+    print(f"ObjVal: {m.ObjVal}")
+    for v in m.getVars():
+        print(f"{v.VarName} {v.X}")
+else:
+    print(f"Solver status: {m.status}")
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 103 rows, 100 columns and 400 nonzeros
+Model fingerprint: 0x61267ef0
+Variable types: 0 continuous, 100 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [3e+00, 5e+01]
+  Objective range  [5e+01, 1e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+01, 3e+04]
+Found heuristic solution: objective 87591.500000
+Presolve removed 100 rows and 0 columns
+Presolve time: 0.00s
+Presolved: 3 rows, 100 columns, 300 nonzeros
+Variable types: 0 continuous, 100 integer (0 binary)
+
+Root relaxation: objective 1.086679e+05, 12 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 108667.881    0    3 87591.5000 108667.881  24.1%     -    0s
+H    0     0                    108550.40000 108667.881  0.11%     -    0s
+H    0     0                    108615.30000 108667.881  0.05%     -    0s
+H    0     0                    108624.60000 108667.881  0.04%     -    0s
+H    0     0                    108628.10000 108667.881  0.04%     -    0s
+H    0     0                    108640.50000 108667.881  0.03%     -    0s
+H    0     0                    108652.40000 108667.881  0.01%     -    0s
+     0     0 108667.291    0    4 108652.400 108667.291  0.01%     -    0s
+     0     0 108667.291    0    3 108652.400 108667.291  0.01%     -    0s
+     0     0 108667.291    0    4 108652.400 108667.291  0.01%     -    0s
+H    0     0                    108657.90000 108667.184  0.01%     -    0s
+
+Cutting planes:
+  Gomory: 1
+
+Explored 1 nodes (21 simplex iterations) in 0.08 seconds (0.01 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 8: 108658 108652 108641 ... 87591.5
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.086579000000e+05, best bound 1.086671840675e+05, gap 0.0085%
+ObjVal: 108657.90000000002
+C0 -0.0
+C1 -0.0
+C2 38.0
+C3 -0.0
+C4 -0.0
+C5 22.0
+C6 44.0
+C7 0.0
+C8 27.0
+C9 12.0
+C10 30.0
+C11 0.0
+C12 0.0
+C13 60.0
+C14 55.0
+C15 -0.0
+C16 -0.0
+C17 -0.0
+C18 0.0
+C19 0.0
+C20 0.0
+C21 -0.0
+C22 52.0
+C23 60.0
+C24 19.0
+C25 18.0
+C26 0.0
+C27 -0.0
+C28 15.0
+C29 -0.0
+C30 -0.0
+C31 44.0
+C32 11.0
+C33 0.0
+C34 0.0
+C35 0.0
+C36 27.0
+C37 5.0
+C38 -0.0
+C39 0.0
+C40 0.0
+C41 -0.0
+C42 -0.0
+C43 -0.0
+C44 21.0
+C45 21.0
+C46 43.0
+C47 0.0
+C48 -0.0
+C49 7.0
+C50 0.0
+C51 46.0
+C52 5.0
+C53 0.0
+C54 0.0
+C55 38.0
+C56 0.0
+C57 -0.0
+C58 37.0
+C59 18.0
+C60 -0.0
+C61 -0.0
+C62 -0.0
+C63 -0.0
+C64 45.0
+C65 0.0
+C66 22.0
+C67 21.0
+C68 13.0
+C69 0.0
+C70 0.0
+C71 -0.0
+C72 0.0
+C73 -0.0
+C74 0.0
+C75 -0.0
+C76 -0.0
+C77 -0.0
+C78 -0.0
+C79 4.0
+C80 0.0
+C81 39.0
+C82 -0.0
+C83 54.0
+C84 23.0
+C85 55.0
+C86 0.0
+C87 0.0
+C88 15.0
+C89 17.0
+C90 10.0
+C91 0.0
+C92 0.0
+C93 18.0
+C94 2.0
+C95 25.0
+C96 -0.0
+C97 -0.0
+C98 -0.0
+C99 57.0
+Optimal objective: 108657.90000000002
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', 38.0), ('C3', -0.0), ('C4', -0.0), ('C5', 22.0), ('C6', 44.0), ('C7', 0.0), ('C8', 27.0), ('C9', 12.0), ('C10', 30.0), ('C11', 0.0), ('C12', 0.0), ('C13', 60.0), ('C14', 55.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', -0.0), ('C22', 52.0), ('C23', 60.0), ('C24', 19.0), ('C25', 18.0), ('C26', 0.0), ('C27', -0.0), ('C28', 15.0), ('C29', -0.0), ('C30', -0.0), ('C31', 44.0), ('C32', 11.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 27.0), ('C37', 5.0), ('C38', -0.0), ('C39', 0.0), ('C40', 0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', 21.0), ('C45', 21.0), ('C46', 43.0), ('C47', 0.0), ('C48', -0.0), ('C49', 7.0), ('C50', 0.0), ('C51', 46.0), ('C52', 5.0), ('C53', 0.0), ('C54', 0.0), ('C55', 38.0), ('C56', 0.0), ('C57', -0.0), ('C58', 37.0), ('C59', 18.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', 45.0), ('C65', 0.0), ('C66', 22.0), ('C67', 21.0), ('C68', 13.0), ('C69', 0.0), ('C70', 0.0), ('C71', -0.0), ('C72', 0.0), ('C73', -0.0), ('C74', 0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', 4.0), ('C80', 0.0), ('C81', 39.0), ('C82', -0.0), ('C83', 54.0), ('C84', 23.0), ('C85', 55.0), ('C86', 0.0), ('C87', 0.0), ('C88', 15.0), ('C89', 17.0), ('C90', 10.0), ('C91', 0.0), ('C92', 0.0), ('C93', 18.0), ('C94', 2.0), ('C95', 25.0), ('C96', -0.0), ('C97', -0.0), ('C98', -0.0), ('C99', 57.0)]

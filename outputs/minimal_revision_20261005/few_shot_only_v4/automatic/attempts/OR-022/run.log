@@ -1,0 +1,116 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Try reading the CSV with multiple encodings as specified
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM13/Salesorders.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not read CSV with any of the specified encodings.")
+
+    # Filter for products with '27in' in 'Product Name' (case-insensitive)
+    mask = df['Product Name'].astype(str).str.casefold().str.contains('27in')
+    df_27in = df[mask].copy()
+
+    # Check required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df_27in.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Group by 'Product Name' in case of duplicates, sum numeric fields
+    group_cols = ['Product Name']
+    agg_dict = {
+        'Revenue': 'sum',
+        'Demand': 'sum',
+        'Initial Inventory': 'sum'
+    }
+    df_agg = df_27in.groupby(group_cols, as_index=False).agg(agg_dict)
+
+    # Build index set I and parameter dictionaries
+    items = df_agg['Product Name'].tolist()
+    if not items:
+        raise ValueError("No products with '27in' found in 'Product Name'.")
+
+    # Validate and build parameter dictionaries
+    try:
+        revenue = {row['Product Name']: float(row['Revenue']) for _, row in df_agg.iterrows()}
+        demand = {row['Product Name']: int(row['Demand']) for _, row in df_agg.iterrows()}
+        inventory = {row['Product Name']: int(row['Initial Inventory']) for _, row in df_agg.iterrows()}
+    except Exception as e:
+        raise ValueError(f"Error processing parameter values: {e}")
+
+    # Check for missing or invalid data
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f"Missing parameter for product: {i}")
+        if not (isinstance(revenue[i], (int, float)) and isinstance(demand[i], int) and isinstance(inventory[i], int)):
+            raise ValueError(f"Invalid parameter type for product: {i}")
+
+    # Build Gurobi model
+    m = gp.Model('NRM_27in')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    # Constraints
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 4 rows, 2 columns and 4 nonzeros
+Model fingerprint: 0x2c0518d3
+Variable types: 0 continuous, 2 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [5e+01, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+04, 8e+04]
+Found heuristic solution: objective 4049812.4247
+Presolve removed 4 rows and 2 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 4.04981e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.049812424700e+06, best bound 4.049812424700e+06, gap 0.0000%
+ObjVal: 4049812.4247
+C0: 12474.0
+C1: 15057.0
+Optimal objective: 4049812.4247
+Optimal solution: [('C0', 12474.0), ('C1', 15057.0)]

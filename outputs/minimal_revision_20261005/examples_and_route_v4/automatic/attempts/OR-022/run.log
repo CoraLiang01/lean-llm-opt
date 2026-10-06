@@ -1,0 +1,141 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I need to determine whether this problem is a clean instance of TP, RA, FLP, AP, Mixture, or Others. The objective is to maximize total revenue by allocating initial inventory of '27in' products to deterministic, known demand. The decision variables x_i represent the number of units of each product i to fulfill. The main constraints are likely inventory limits (cannot fulfill more than initial inventory) and possibly demand satisfaction (cannot fulfill more than demand). There is no mention of transportation, facility opening, assignment, or hybrid mechanisms. I should call FileQA to check for structurally similar examples.
+
+Action: FileQA
+
+Action Input: maximize total revenue by allocating initial inventory of products to deterministic known demand; decision variables are units of each product fulfilled; constraints include initial inventory limits and demand quantities; no transportation, facility location, assignment, or hybrid mechanisms
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A supermarket needs to allocate various products, including high-demand items like the Sony Alpha Refrigerator, Sony Bravia XR, and Sony PlayStation 5, across different retail shelves. The product values and space requirements are provided in the "Products.csv" dataset. Additionally, the store has multiple shelves, each with a total space limit and specific space constraints for Sony and Apple products, as outlined in the "Capacity.csv" file. The goal is to determine the optimal number of units of each Sony product to place on each shelf to maximize total value while ensuring that the space used by Sony products on each shelf does not exceed the brand-specific limits. The decision variables x_ij represent the number of units of product i to be placed on shelf j. The variables x_ij must be nonnegative integers because the products are counted in whole units.
+Type: RA
+
+[Retrieved example 2]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 5]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem structure is to maximize total revenue by allocating a fixed initial inventory of products to deterministic, known demand, with decision variables representing the number of units of each product fulfilled. The main constraints are inventory limits and demand limits. There are no transportation, facility location, assignment, or hybrid mechanisms. The retrieved examples include a resource allocation model (example 1) with similar structure—allocating products to shelves under capacity constraints to maximize value. The other examples involve additional mechanisms (batching, setup, multi-stage, or transportation), which are not present in the current problem. Therefore, this is a clean single-stage allocation of limited resources (inventory) to fulfill demand, matching the RA class.
+
+Final Answer: RA[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise ValueError("Required table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+    records = table["records"]
+    # Build index set I and parameter dictionaries
+    I = []
+    r = {}
+    d = {}
+    s = {}
+    for rec in records:
+        vals = rec["values"]
+        pname = vals["Product Name"]
+        # Only include products starting with "27in"
+        if not pname.casefold().startswith("27in"):
+            continue
+        I.append(pname)
+        try:
+            r[pname] = float(vals["Revenue"])
+            d[pname] = int(vals["Demand"])
+            s[pname] = int(vals["Initial Inventory"])
+        except Exception as e:
+            raise ValueError(f"Error parsing data for product '{pname}': {e}")
+
+    # Validate all required data present
+    for pname in I:
+        if pname not in r or pname not in d or pname not in s:
+            raise ValueError(f"Missing data for product '{pname}'.")
+
+    m = gp.Model('27in_Product_Fulfillment')
+    m.setParam('MIPGap', 1e-4)
+
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(r[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraints
+    # Inventory: x_i <= s_i
+    m.addConstrs((x[i] <= s[i] for i in I), name='inv')
+    # Demand: x_i <= d_i
+    m.addConstrs((x[i] <= d[i] for i in I), name='dem')
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 4 rows, 2 columns and 4 nonzeros
+Model fingerprint: 0x2c0518d3
+Variable types: 0 continuous, 2 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [5e+01, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+04, 8e+04]
+Found heuristic solution: objective 4049812.4247
+Presolve removed 4 rows and 2 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 4.04981e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.049812424700e+06, best bound 4.049812424700e+06, gap 0.0000%
+ObjVal: 4049812.4247
+C0: 12474.0
+C1: 15057.0
+Optimal objective: 4049812.4247
+Optimal solution: [('C0', 12474.0), ('C1', 15057.0)]

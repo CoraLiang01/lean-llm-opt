@@ -1,0 +1,18 @@
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine how to allocate various types of products to different display shelves in a way that maximizes the total value of products displayed, without exceeding the capacity of any shelf. The decision variable x_{ij} represents the number of units of product j placed on shelf i.
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem (specifically, a multi-knapsack allocation problem).
+3.  **Define Index Sets:** The primary indices are:
+    - Shelves (i): from the 'ShelfID' column in capacity.csv (10 shelves, IDs 1–10).
+    - Products (j): from the 'ProductName' column in products.csv (20 products, IDs 1–20).
+4.  **Define Decision Variables:**
+    -   `x[i,j]` = Number of units of product j placed on shelf i. Type: GRB.INTEGER (since you cannot place a fractional number of product units).
+5.  **Identify Parameters (from Schema):**
+    -   Value per unit of product: from 'Value' column in products.csv.
+    -   Weight per unit of product: from 'Weight' column in products.csv.
+    -   Shelf capacity: from 'Capacity' column in capacity.csv.
+6.  **Formulate Objective:** Maximize the total value of all products placed on all shelves, i.e., maximize sum over all shelves i and products j of (Value[j] * x[i,j]).
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Shelf Capacity): For each shelf i, the total weight of products placed on that shelf cannot exceed its capacity. That is, for each i: sum over j of (Weight[j] * x[i,j]) ≤ Capacity[i].
+    -   Constraint 2 (Non-negativity and Integrality): For all i, j: x[i,j] ≥ 0 and integer (cannot place negative or fractional units).
+    -   (If the problem requires that each product can only be placed on at most one shelf, or that there is a limited stock per product, additional constraints would be needed, but the query does not specify these.)
+[Abstract Model Plan END]

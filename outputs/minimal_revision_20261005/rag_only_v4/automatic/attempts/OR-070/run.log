@@ -1,0 +1,161 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    data = CSVQA_DATA
+    table = None
+    for t in data["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Required table file_0_view_0 not found in CSVQA_DATA.")
+
+    records = table["records"]
+    # Set of managers (M)
+    managers = [rec["values"]["Manager"] for rec in records]
+    # Set of projects (P): 1..7, corresponding to columns "Project 1 Cost" etc.
+    projects = [1,2,3,4,5,6,7]
+    project_cost_columns = ["Project 1 Cost", "Project 2 Cost", "Project 3 Cost", "Project 4 Cost", "Project 5 Cost", "Project 6 Cost", "Project 7 Cost"]
+
+    # Build cost matrix c_{m,p}
+    cost = {}
+    for rec in records:
+        m = rec["values"]["Manager"]
+        for idx, p in enumerate(projects):
+            col = project_cost_columns[idx]
+            val = rec["values"][col]
+            if val is None or val == "":
+                raise ValueError(f"Missing cost for manager {m}, project {p}")
+            cost[(m, p)] = float(val)
+
+    # Validate dimensions
+    if set(managers) != set([rec["values"]["Manager"] for rec in records]):
+        raise ValueError("Manager set mismatch in data.")
+    if len(projects) != 7 or any(col not in project_cost_columns for col in project_cost_columns):
+        raise ValueError("Project columns missing or misaligned.")
+    for m in managers:
+        for p in projects:
+            if (m, p) not in cost:
+                raise ValueError(f"Missing cost coefficient for ({m},{p})")
+
+    # Model
+    m = gp.Model("assignment")
+    # Decision variables: x_{m,p} ∈ {0,1}
+    x_keys = [(mgr, prj) for mgr in managers for prj in projects]
+    x = m.addVars(x_keys, vtype=GRB.BINARY, name='', lb=0, ub=1)
+
+    # Objective: minimize total assignment cost
+    m.setObjective(gp.quicksum(cost[(mgr, prj)] * x[(mgr, prj)] for mgr in managers for prj in projects), GRB.MINIMIZE)
+
+    # Constraint 1: Each project assigned to exactly one manager
+    for prj in projects:
+        m.addConstr(gp.quicksum(x[(mgr, prj)] for mgr in managers) == 1, name='')
+
+    # Constraint 2: Each manager assigned to exactly one project
+    for mgr in managers:
+        m.addConstr(gp.quicksum(x[(mgr, prj)] for prj in projects) == 1, name='')
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for key in x_keys:
+            var = x[key]
+            print(f"{var.VarName} {var.X}")
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 14 rows, 49 columns and 98 nonzeros
+Model fingerprint: 0x0cc2a7b2
+Variable types: 0 continuous, 49 integer (49 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+03, 3e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 14388.000000
+Presolve time: 0.00s
+Presolved: 14 rows, 49 columns, 98 nonzeros
+Variable types: 0 continuous, 49 integer (49 binary)
+
+Root relaxation: objective 8.809000e+03, 10 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    8809.0000000 8809.00000  0.00%     -    0s
+
+Explored 1 nodes (10 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 8809 14388 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 8.809000000000e+03, best bound 8.809000000000e+03, gap 0.0000%
+8809.0
+C0 -0.0
+C1 -0.0
+C2 -0.0
+C3 -0.0
+C4 -0.0
+C5 -0.0
+C6 1.0
+C7 1.0
+C8 -0.0
+C9 -0.0
+C10 -0.0
+C11 -0.0
+C12 -0.0
+C13 -0.0
+C14 -0.0
+C15 -0.0
+C16 -0.0
+C17 -0.0
+C18 1.0
+C19 -0.0
+C20 -0.0
+C21 -0.0
+C22 -0.0
+C23 -0.0
+C24 -0.0
+C25 -0.0
+C26 1.0
+C27 -0.0
+C28 -0.0
+C29 -0.0
+C30 1.0
+C31 -0.0
+C32 -0.0
+C33 -0.0
+C34 0.0
+C35 -0.0
+C36 1.0
+C37 -0.0
+C38 -0.0
+C39 -0.0
+C40 0.0
+C41 -0.0
+C42 -0.0
+C43 -0.0
+C44 0.0
+C45 1.0
+C46 -0.0
+C47 -0.0
+C48 -0.0
+Optimal objective: 8809.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', 1.0), ('C7', 1.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', 1.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', 1.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', 1.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', 0.0), ('C35', -0.0), ('C36', 1.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', 0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', 0.0), ('C45', 1.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0)]

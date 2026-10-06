@@ -1,0 +1,1 @@
+I am unable to generate the complete mathematical model with all required parameters because the contents of cost_12x12.csv (the 12x12 cost matrix) were not provided. Please upload or paste the full contents of cost_12x12.csv, and I will immediately retrieve all cost data and formulate the full assignment model as specified.

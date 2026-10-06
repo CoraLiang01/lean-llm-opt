@@ -1,0 +1,209 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise RuntimeError("Required table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+    records = table["records"]
+    I = []
+    r = {}
+    d = {}
+    s = {}
+
+    for rec in records:
+        v = rec["values"]
+        prod = v["Product Name"]
+        I.append(prod)
+        try:
+            r[prod] = float(v["Revenue"])
+            d[prod] = int(v["Demand"])
+            s[prod] = int(v["Initial Inventory"])
+        except Exception as e:
+            raise ValueError(f"Invalid data for product {prod}: {e}")
+
+    # Validate all index sets and parameter coverage
+    for prod in I:
+        if prod not in r or prod not in d or prod not in s:
+            raise ValueError(f"Missing parameter for product {prod}")
+
+    m = gp.Model()
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i (integer, 0 <= x_i <= min{d_i, s_i})
+    x = m.addVars(
+        I,
+        lb={i: 0 for i in I},
+        ub={i: min(d[i], s[i]) for i in I},
+        vtype=GRB.INTEGER,
+        name=''
+    )
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(r[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraints:
+    # 1. x_i <= d_i
+    m.addConstrs((x[i] <= d[i] for i in I), name='')
+
+    # 2. x_i <= s_i
+    m.addConstrs((x[i] <= s[i] for i in I), name='')
+
+    # 3. Non-negativity and integrality are handled by variable definition
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for i in I:
+            print(x[i].VarName, x[i].X)
+    else:
+        print(m.Status)
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 218 rows, 109 columns and 218 nonzeros
+Model fingerprint: 0x97d6155c
+Variable types: 0 continuous, 109 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [3e+01, 1e+02]
+  Bounds range     [1e+03, 2e+03]
+  RHS range        [1e+03, 2e+04]
+Found heuristic solution: objective 1.125813e+07
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.12581e+07 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.125812967000e+07, best bound 1.125812967000e+07, gap 0.0000%
+11258129.67
+C0 1280.0
+C1 1316.0
+C2 1242.0
+C3 1258.0
+C4 1292.0
+C5 1262.0
+C6 1132.0
+C7 1334.0
+C8 1323.0
+C9 1340.0
+C10 1232.0
+C11 1157.0
+C12 1237.0
+C13 1091.0
+C14 1386.0
+C15 1331.0
+C16 1364.0
+C17 1287.0
+C18 1378.0
+C19 1244.0
+C20 1278.0
+C21 1277.0
+C22 1063.0
+C23 1267.0
+C24 1233.0
+C25 1293.0
+C26 994.0
+C27 1363.0
+C28 1134.0
+C29 1362.0
+C30 1028.0
+C31 1200.0
+C32 1056.0
+C33 1139.0
+C34 1335.0
+C35 1267.0
+C36 1172.0
+C37 1175.0
+C38 1153.0
+C39 2457.0
+C40 1157.0
+C41 1139.0
+C42 1240.0
+C43 1206.0
+C44 1312.0
+C45 1224.0
+C46 1361.0
+C47 1241.0
+C48 1002.0
+C49 1246.0
+C50 1394.0
+C51 1327.0
+C52 1211.0
+C53 957.0
+C54 988.0
+C55 1347.0
+C56 1286.0
+C57 1193.0
+C58 1057.0
+C59 1165.0
+C60 1263.0
+C61 1288.0
+C62 1177.0
+C63 1358.0
+C64 1177.0
+C65 1191.0
+C66 1329.0
+C67 1135.0
+C68 1122.0
+C69 1223.0
+C70 1317.0
+C71 1086.0
+C72 1263.0
+C73 1183.0
+C74 1119.0
+C75 1182.0
+C76 1450.0
+C77 1357.0
+C78 1013.0
+C79 1145.0
+C80 1247.0
+C81 1205.0
+C82 1149.0
+C83 1185.0
+C84 1194.0
+C85 1160.0
+C86 1292.0
+C87 1253.0
+C88 1268.0
+C89 1193.0
+C90 1093.0
+C91 1351.0
+C92 1330.0
+C93 1278.0
+C94 1237.0
+C95 1254.0
+C96 1158.0
+C97 1144.0
+C98 1189.0
+C99 1274.0
+C100 1329.0
+C101 1342.0
+C102 1170.0
+C103 1247.0
+C104 1236.0
+C105 1175.0
+C106 1394.0
+C107 1252.0
+C108 1291.0
+Optimal objective: 11258129.67
+Optimal solution: [('C0', 1280.0), ('C1', 1316.0), ('C2', 1242.0), ('C3', 1258.0), ('C4', 1292.0), ('C5', 1262.0), ('C6', 1132.0), ('C7', 1334.0), ('C8', 1323.0), ('C9', 1340.0), ('C10', 1232.0), ('C11', 1157.0), ('C12', 1237.0), ('C13', 1091.0), ('C14', 1386.0), ('C15', 1331.0), ('C16', 1364.0), ('C17', 1287.0), ('C18', 1378.0), ('C19', 1244.0), ('C20', 1278.0), ('C21', 1277.0), ('C22', 1063.0), ('C23', 1267.0), ('C24', 1233.0), ('C25', 1293.0), ('C26', 994.0), ('C27', 1363.0), ('C28', 1134.0), ('C29', 1362.0), ('C30', 1028.0), ('C31', 1200.0), ('C32', 1056.0), ('C33', 1139.0), ('C34', 1335.0), ('C35', 1267.0), ('C36', 1172.0), ('C37', 1175.0), ('C38', 1153.0), ('C39', 2457.0), ('C40', 1157.0), ('C41', 1139.0), ('C42', 1240.0), ('C43', 1206.0), ('C44', 1312.0), ('C45', 1224.0), ('C46', 1361.0), ('C47', 1241.0), ('C48', 1002.0), ('C49', 1246.0), ('C50', 1394.0), ('C51', 1327.0), ('C52', 1211.0), ('C53', 957.0), ('C54', 988.0), ('C55', 1347.0), ('C56', 1286.0), ('C57', 1193.0), ('C58', 1057.0), ('C59', 1165.0), ('C60', 1263.0), ('C61', 1288.0), ('C62', 1177.0), ('C63', 1358.0), ('C64', 1177.0), ('C65', 1191.0), ('C66', 1329.0), ('C67', 1135.0), ('C68', 1122.0), ('C69', 1223.0), ('C70', 1317.0), ('C71', 1086.0), ('C72', 1263.0), ('C73', 1183.0), ('C74', 1119.0), ('C75', 1182.0), ('C76', 1450.0), ('C77', 1357.0), ('C78', 1013.0), ('C79', 1145.0), ('C80', 1247.0), ('C81', 1205.0), ('C82', 1149.0), ('C83', 1185.0), ('C84', 1194.0), ('C85', 1160.0), ('C86', 1292.0), ('C87', 1253.0), ('C88', 1268.0), ('C89', 1193.0), ('C90', 1093.0), ('C91', 1351.0), ('C92', 1330.0), ('C93', 1278.0), ('C94', 1237.0), ('C95', 1254.0), ('C96', 1158.0), ('C97', 1144.0), ('C98', 1189.0), ('C99', 1274.0), ('C100', 1329.0), ('C101', 1342.0), ('C102', 1170.0), ('C103', 1247.0), ('C104', 1236.0), ('C105', 1175.0), ('C106', 1394.0), ('C107', 1252.0), ('C108', 1291.0)]

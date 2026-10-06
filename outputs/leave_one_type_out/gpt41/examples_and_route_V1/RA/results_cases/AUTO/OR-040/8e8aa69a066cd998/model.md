@@ -1,0 +1,15 @@
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal daily scale of property development in each New York City area to maximize total benefit, subject to an overall development capacity constraint. The decision variables represent the integer number of development units per area per day.
+2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem (specifically, an integer knapsack-type allocation problem).
+3.  **Define Index Sets:** The primary index is the set of areas (from the 'ProductName' column in products.csv), e.g., Queens, Brooklyn, etc.
+4.  **Define Decision Variables:**
+    -   `x[i]` = Number of development units allocated daily to area i (where i is an area such as Queens, Brooklyn, etc.). Type: GRB.INTEGER.
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'Value' column in products.csv (the benefit per unit of development in each area).
+    -   Constraint coefficients: 'Weight' column in products.csv (the capacity consumed per unit of development in each area).
+    -   Constraint RHS (limit): 'Capacity' value from capacity.csv (the total available development capacity across all areas).
+6.  **Formulate Objective:** Maximize the total benefit, i.e., maximize the sum over all areas of (Value[i] * x[i]), where Value[i] is the benefit coefficient for area i.
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Overall Capacity Limit): The sum over all areas of (Weight[i] * x[i]) ≤ Capacity, where Weight[i] is the capacity consumed per unit in area i, and Capacity is the total available development capacity.
+    -   Constraint 2 (Non-negativity and Integrality): For all areas i, x[i] ≥ 0 and integer.
+[Abstract Model Plan END]

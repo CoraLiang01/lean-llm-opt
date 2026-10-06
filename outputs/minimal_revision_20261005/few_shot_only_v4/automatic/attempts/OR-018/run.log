@@ -1,0 +1,88 @@
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with robust encoding handling
+    csv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv'
+    tried_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in tried_encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError(f"Could not decode {csv_path} with tried encodings.")
+
+    # Check required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Filter for 'Baby' products (case-insensitive, exact match)
+    if 'Category' in df.columns:
+        baby_mask = df['Category'].str.casefold() == 'baby'
+    else:
+        # If no 'Category' column, cannot filter; raise error
+        raise ValueError("Source data must include a 'Category' column to identify 'Baby' products.")
+
+    baby_df = df[baby_mask].copy()
+    if baby_df.empty:
+        raise ValueError("No products classified as 'Baby' found in the source data.")
+
+    # Remove duplicate product names, sum repeated rows by product
+    group_cols = ['Product Name']
+    agg_dict = {
+        'Revenue': 'sum',
+        'Demand': 'sum',
+        'Initial Inventory': 'sum'
+    }
+    baby_df = baby_df.groupby(group_cols, as_index=False).agg(agg_dict)
+
+    # Build index set and parameter dictionaries
+    items = list(baby_df['Product Name'])
+    revenue = dict(zip(baby_df['Product Name'], baby_df['Revenue']))
+    demand = dict(zip(baby_df['Product Name'], baby_df['Demand']))
+    inventory = dict(zip(baby_df['Product Name'], baby_df['Initial Inventory']))
+
+    # Validate all coefficients are present and numeric
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f"Missing coefficients for product: {i}")
+        for d, name in zip([revenue[i], demand[i], inventory[i]], ['Revenue', 'Demand', 'Initial Inventory']):
+            if pd.isnull(d):
+                raise ValueError(f"Missing {name} for product: {i}")
+            if not isinstance(d, (int, float)):
+                raise ValueError(f"Non-numeric {name} for product: {i}")
+
+    m = gp.Model('Baby_Product_Revenue_Max')
+    x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+    m.addConstrs((x[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((x[i] <= demand[i] for i in items), name='dem')
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for v in m.getVars():
+            print(f'{v.VarName}: {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_minimal_revision_20261005.py", line 92, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 140, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/minimal_revision_20261005/few_shot_only_v4/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 56, in <module>
+  File "<string>", line 23, in solve_problem
+ValueError: Source data must include a 'Category' column to identify 'Baby' products.

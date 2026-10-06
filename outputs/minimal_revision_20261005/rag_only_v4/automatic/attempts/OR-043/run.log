@@ -1,0 +1,90 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Extract data from CSVQA_DATA
+    products_table = None
+    capacity_table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_1_view_0":
+            products_table = t
+        elif t["table_id"] == "file_0_view_0":
+            capacity_table = t
+    if products_table is None or capacity_table is None:
+        raise RuntimeError("Required tables not found in CSVQA_DATA.")
+
+    # Index set I: ProductName
+    I = []
+    v = {}
+    w = {}
+    for rec in products_table["records"]:
+        pname = rec["values"]["ProductName"]
+        I.append(pname)
+        try:
+            v[pname] = float(rec["values"]["Value"])
+            w[pname] = float(rec["values"]["Weight"])
+        except Exception as e:
+            raise ValueError(f"Invalid Value or Weight for product {pname}: {e}")
+
+    # Capacity parameter
+    if len(capacity_table["records"]) != 1:
+        raise ValueError("Expected exactly one row in capacity.csv")
+    try:
+        C = float(capacity_table["records"][0]["values"]["Capacity"])
+    except Exception as e:
+        raise ValueError(f"Invalid Capacity value: {e}")
+
+    # Validate all products have v and w
+    for pname in I:
+        if pname not in v or pname not in w:
+            raise ValueError(f"Missing value or weight for product {pname}")
+
+    # Build model
+    m = gp.Model()
+    # Decision variables: x_i >= 0, integer
+    x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize sum_i v_i x_i
+    m.setObjective(gp.quicksum(v[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraint: sum_i w_i x_i <= C
+    m.addConstr(gp.quicksum(w[i] * x[i] for i in I) <= C, name='capacity')
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 20 columns and 20 nonzeros
+Model fingerprint: 0x364cdb09
+Variable types: 0 continuous, 20 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [5e+01, 9e+02]
+  Objective range  [1e+02, 2e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [5e+02, 5e+02]
+Found heuristic solution: objective 1670.0000000
+Presolve removed 1 rows and 20 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 13570 1670 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.357000000000e+04, best bound 1.357000000000e+04, gap 0.0000%
+Optimal objective: 13570.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', -0.0), ('C3', 0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', 10.0), ('C10', -0.0), ('C11', 0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0)]
