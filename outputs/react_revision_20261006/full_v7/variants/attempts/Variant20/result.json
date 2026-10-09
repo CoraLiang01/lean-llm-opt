@@ -1,0 +1,79 @@
+{
+  "problem_id": "Variant20",
+  "query": "A water authority must install monitoring sensors so every monitoring zone is covered. Candidate sensor costs and covered zones are listed in sensor_sites.csv, and the complete set of monitoring zones is listed in monitoring_zones.csv.\n\nFormulate a minimum-cost set covering model. For each candidate sensor site i, define y_i as a binary variable equal to 1 if a sensor is installed at site i. The objective is to minimize total installation cost. The model should include one coverage constraint for each monitoring zone requiring at least one selected site that covers that zone, and binary restrictions for all sensor-site variables.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant20/inputs/sensor_sites.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant20/inputs/monitoring_zones.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 37.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to select a minimum-cost subset of sensor sites to install, such that every monitoring zone is covered by at least one installed sensor. Each candidate sensor site has a cost and covers a specific subset of zones.\n2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) set covering problem.\n3.  **Define Index Sets:** The primary indices are:\n    - Sensor Sites (from sensor_sites.csv, column 'Center')\n    - Monitoring Zones (from monitoring_zones.csv, column 'Zone')\n4.  **Define Decision Variables:**\n    -   `y[i]` = 1 if a sensor is installed at site i, 0 otherwise. Type: GRB.BINARY.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: Installation costs from 'OpeningCost' in sensor_sites.csv.\n    -   Coverage mapping: For each site i, the set of zones it covers from 'CoveredDistricts' in sensor_sites.csv (semicolon-separated list).\n    -   Complete set of zones to cover: All rows in monitoring_zones.csv ('Zone').\n6.  **Formulate Objective:** Minimize the total installation cost, i.e., sum over all sensor sites of (OpeningCost[i] * y[i]).\n7.  **Formulate Constraints:**\n    -   Coverage Constraint: For each monitoring zone j, the sum of y[i] over all sensor sites i that cover zone j must be at least 1. (This ensures every zone is covered by at least one installed sensor.)\n    -   Binary Restriction: For all sensor sites i, y[i] \u2208 {0,1}.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant20/inputs/sensor_sites.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 9\nColumns: ['Center', 'OpeningCost', 'CoveredDistricts']\nParsed column types: {'Center': 'object', 'OpeningCost': 'int64', 'CoveredDistricts': 'object'}\nPreview only (first 10 rows):\nCenter OpeningCost CoveredDistricts\n    S1           8         Q1;Q2;Q4\n    S2          12         Q2;Q3;Q5\n    S3          11         Q4;Q6;Q7\n    S4          10            Q5;Q8\n    S5          13         Q6;Q8;Q9\n    S6           9       Q7;Q10;Q11\n    S7          14        Q1;Q9;Q10\n    S8           7        Q3;Q5;Q11\n    S9          15        Q2;Q6;Q10\nFull-file column statistics: {\"Center\": {\"missing\": 0, \"unique_nonempty\": 9}, \"OpeningCost\": {\"missing\": 0, \"unique_nonempty\": 9, \"numeric_range\": [7.0, 15.0]}, \"CoveredDistricts\": {\"missing\": 0, \"unique_nonempty\": 9}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: []\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant20/inputs/monitoring_zones.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 11\nColumns: ['Zone']\nParsed column types: {'Zone': 'object'}\nPreview only (first 10 rows):\nZone\n  Q1\n  Q2\n  Q3\n  Q4\n  Q5\n  Q6\n  Q7\n  Q8\n  Q9\n Q10\nFull-file column statistics: {\"Zone\": {\"missing\": 0, \"unique_nonempty\": 11}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"zone\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"9ac66d283919f1f21d8d3b8218fb11c709fd0c10892f356812b28a7ed3f99668\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\nsensor_sites_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant20/inputs/sensor_sites.csv'\nsensor_sites_df = pd.read_csv(sensor_sites_path, sep=',', dtype=str, keep_default_na=False)\nmonitoring_zones_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant20/inputs/monitoring_zones.csv'\nmonitoring_zones_df = pd.read_csv(monitoring_zones_path, sep=',', dtype=str, keep_default_na=False)\nsensor_sites_df['Center'] = sensor_sites_df['Center'].str.strip()\nsensor_sites_df['OpeningCost'] = sensor_sites_df['OpeningCost'].astype(int)\nsensor_sites_df['CoveredDistricts'] = sensor_sites_df['CoveredDistricts'].str.strip()\nmonitoring_zones_df['Zone'] = monitoring_zones_df['Zone'].str.strip()\nsite_ids = list(sensor_sites_df['Center'])\nzone_ids = list(monitoring_zones_df['Zone'])\nsite_to_zones = {}\nfor (idx, row) in sensor_sites_df.iterrows():\n    site = row['Center']\n    covered = [z.strip() for z in row['CoveredDistricts'].split(';') if z.strip() != '']\n    site_to_zones[site] = set(covered)\nzone_to_sites = {zone: set() for zone in zone_ids}\nfor (site, covered_zones) in site_to_zones.items():\n    for zone in covered_zones:\n        if zone in zone_to_sites:\n            zone_to_sites[zone].add(site)\nuncovered_zones = [zone for (zone, sites) in zone_to_sites.items() if len(sites) == 0]\nif uncovered_zones:\n    raise ValueError(f'The following zones are not covered by any site: {uncovered_zones}')\nopening_cost = {row['Center']: row['OpeningCost'] for (idx, row) in sensor_sites_df.iterrows()}\nm = gp.Model('SensorSetCover')\ny_vars = m.addVars(site_ids, vtype=gp.GRB.BINARY, name='')\nm.setObjective(gp.quicksum((opening_cost[site] * y_vars[site] for site in site_ids)), gp.GRB.MINIMIZE)\nfor zone in zone_ids:\n    covering_sites = zone_to_sites[zone]\n    m.addConstr(gp.quicksum((y_vars[site] for site in covering_sites)) >= 1, name=f'cover_{zone}')\nm.setParam('MIPGap', 0.0001)\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'ObjVal: {m.objVal}')\n    for site in site_ids:\n        print(f'{y_vars[site].VarName} {y_vars[site].X}')\nelse:\n    print(f'Solver status: {m.status}')",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 37.0,
+  "final_solution": [
+    [
+      "C0",
+      1.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      0.0
+    ],
+    [
+      "C4",
+      1.0
+    ],
+    [
+      "C5",
+      1.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      1.0
+    ],
+    [
+      "C8",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 14.03,
+  "classification_source": "computed",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "cache_fingerprint": "6aee78a48f5faa1c01be165a811d630661487cda80b8662a82407c7380689efc",
+  "evaluated_utc": "2026-10-06T03:04:08.349959+00:00"
+}

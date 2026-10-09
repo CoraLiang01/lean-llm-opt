@@ -1,0 +1,185 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+##### Mathematical Model
+
+Let:
+- $I$ = set of vehicle types (indexed by $i$), from products.csv ProductName
+- $v_i$ = Value of vehicle type $i$ (products.csv Value)
+- $w_i$ = Weight of vehicle type $i$ (products.csv Weight)
+- $C$ = total inventory capacity (capacity.csv Capacity)
+- $x_i$ = number of units of vehicle type $i$ to order (integer, $\geq 0$)
+
+**Objective:**
+$$
+\max \sum_{i \in I} v_i x_i
+$$
+
+**Subject to:**
+$$
+\sum_{i \in I} w_i x_i \leq C
+$$
+
+$$
+x_i \in \mathbb{Z}_{\geq 0} \quad \forall i \in I
+$$
+
+---
+
+##### Data Mapping
+
+- $I$: All records in products.csv, column ProductName
+- $v_i$: products.csv, column Value, keyed by ProductName
+- $w_i$: products.csv, column Weight, keyed by ProductName
+- $C$: capacity.csv, column Capacity (single record)
+- $x_i$: Decision variable for each $i \in I$ (vehicle type)[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read products.csv
+    product_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/products.csv"
+    decode_errors = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for encoding in decode_errors:
+        try:
+            products_df = pd.read_csv(product_path, dtype=str, keep_default_na=False, encoding=encoding)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError(f"Could not decode {product_path} with tried encodings.")
+
+    # Read capacity.csv
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/capacity.csv"
+    for encoding in decode_errors:
+        try:
+            capacity_df = pd.read_csv(capacity_path, dtype=str, keep_default_na=False, encoding=encoding)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError(f"Could not decode {capacity_path} with tried encodings.")
+
+    # Validate required columns
+    required_product_cols = {'ProductName', 'Value', 'Weight'}
+    if not required_product_cols.issubset(products_df.columns):
+        missing = required_product_cols - set(products_df.columns)
+        raise ValueError(f"Missing columns in products.csv: {missing}")
+    if 'Capacity' not in capacity_df.columns:
+        raise ValueError("Missing 'Capacity' column in capacity.csv.")
+
+    # Prepare data
+    # Remove duplicate ProductName rows by summing Value and Weight per product
+    products_grouped = products_df.groupby('ProductName', as_index=False).agg({
+        'Value': lambda x: x.iloc[0],  # If duplicates, take the first (should not happen)
+        'Weight': lambda x: x.iloc[0]
+    })
+
+    # Index set I: all unique product names
+    I = list(products_grouped['ProductName'])
+
+    # Build value and weight dictionaries
+    try:
+        value = {row['ProductName']: float(row['Value']) for _, row in products_grouped.iterrows()}
+        weight = {row['ProductName']: float(row['Weight']) for _, row in products_grouped.iterrows()}
+    except Exception as e:
+        raise ValueError(f"Error converting Value/Weight to float: {e}")
+
+    # Capacity: take the first row's Capacity (assume single global capacity)
+    try:
+        C = float(capacity_df.iloc[0]['Capacity'])
+    except Exception as e:
+        raise ValueError(f"Error converting Capacity to float: {e}")
+
+    # Validate all products have value and weight
+    for i in I:
+        if i not in value or i not in weight:
+            raise ValueError(f"Missing value or weight for product {i}")
+
+    # Build model
+    m = gp.Model('CarSales_Inventory')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    quantity_vars = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize sum_i v_i x_i
+    m.setObjective(gp.quicksum(value[i] * quantity_vars[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraint: sum_i w_i x_i <= C
+    m.addConstr(gp.quicksum(weight[i] * quantity_vars[i] for i in I) <= C, name='capacity')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 25 columns and 25 nonzeros
+Model fingerprint: 0xff8da42d
+Variable types: 0 continuous, 25 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [2e+01, 1e+02]
+  Objective range  [1e+03, 1e+04]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+03, 2e+03]
+Found heuristic solution: objective 194267.00000
+Presolve removed 1 rows and 25 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 509925 194267 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.099250000000e+05, best bound 5.099250000000e+05, gap 0.0000%
+ObjVal: 509925.0
+C0: -0.0
+C1: 0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: 0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: 75.0
+C12: -0.0
+C13: -0.0
+C14: 0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+Optimal objective: 509925.0
+Optimal solution: [('C0', -0.0), ('C1', 0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', 0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', 75.0), ('C12', -0.0), ('C13', -0.0), ('C14', 0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0)]

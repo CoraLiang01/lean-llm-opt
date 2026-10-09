@@ -1,0 +1,43 @@
+{
+  "problem_id": "OR-011",
+  "query": "The supermarket offers a variety of top-selling products, with associated revenue data provided in the ‘Revenue’ column. Each product has its own demand level during the sales horizon. The company’s objective is to maximize total revenue by allocating the available inventory of products classified under ‘id999’. The initial inventory levels for the ‘id999’ products are detailed in the ‘Initial Inventory’ column. During the sales horizon, no restocking is allowed, and there are no in-transit inventories.\n\nDemand for each product during the sales period is assumed to be deterministic and known in advance, with demand quantities specified in the ‘Demand’ column. The decision variables x_i represent the number of units of each ‘id999’ product i that the company plans to fulfill, where each x_i is a non-negative integer. Because fulfilled orders cannot exceed either the available inventory or the realized demand, the fulfillment quantities must satisfy both inventory and demand constraints.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM2/OnlineRetailSalesDataset.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 3552260.54,
+  "forced_route": "AP",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "AP",
+  "generated_model": "##### Objective Function:\n\n$\\quad \\max \\sum_{i \\in \\mathcal{P}} r_i x_i$\n\nwhere:\n- $\\mathcal{P}$ is the set of products classified under ‘id999’ (here, a single product).\n- $r_i$ is the revenue per unit for product $i$.\n- $x_i$ is the number of units of product $i$ fulfilled.\n\n##### Constraints:\n\n1. Inventory and Demand Fulfillment Constraints:\n\n$\\quad 0 \\leq x_i \\leq \\min\\{\\text{Initial Inventory}_i, \\text{Demand}_i\\} \\quad \\forall i \\in \\mathcal{P}$\n\n2. Integer Constraints:\n\n$\\quad x_i \\in \\mathbb{Z}_{\\geq 0} \\quad \\forall i \\in \\mathcal{P}$\n\n##### Retrieved Information\n\n{\n  \"products\": [\n    {\n      \"id_number\": \"id999\",\n      \"Revenue\": 434.74,\n      \"Demand\": 8171,\n      \"Initial Inventory\": 56450\n    }\n  ]\n}\n\n##### Model with Parameters\n\nLet $x_{id999}$ be the number of units of product id999 to fulfill.\n\nObjective:\n$$\n\\max\\ 434.74\\, x_{id999}\n$$\n\nSubject to:\n$$\n0 \\leq x_{id999} \\leq 8171\n$$\n$$\nx_{id999} \\in \\mathbb{Z}_{\\geq 0}\n$$\n\nAll parameters (Revenue, Demand, Initial Inventory) are as retrieved above.",
+  "csvqa_observation": "[\n  {\n    \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM2/OnlineRetailSalesDataset.csv\",\n    \"values\": {\n      \"id_number\": \"id999\",\n      \"Revenue\": \"434.74\",\n      \"Demand\": \"8171\",\n      \"Initial Inventory\": \"56450\"\n    }\n  }\n]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_VALIDATED_SOURCE_ROWS",
+  "csvqa_trace": "{\"version\": \"GPT4.1-LO\", \"mode\": \"legacy\", \"status\": \"LEGACY_VALIDATED_SOURCE_ROWS\", \"plan\": null, \"planner_attempt_count\": 0, \"planner_outputs\": [], \"planner_errors\": [], \"validation_errors\": [], \"fallback_reason\": null, \"legacy_extraction_output\": \"[\\n  {\\n    \\\"source\\\": \\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM2/OnlineRetailSalesDataset.csv\\\",\\n    \\\"values\\\": {\\n      \\\"id_number\\\": \\\"id999\\\",\\n      \\\"Revenue\\\": \\\"434.74\\\",\\n      \\\"Demand\\\": \\\"8171\\\",\\n      \\\"Initial Inventory\\\": \\\"56450\\\"\\n    }\\n  }\\n]\", \"payload_hash\": \"2952e61bb1689cfb919b9a1f9dbeb298f97e3c77cba23a9705f64128413a6502\"}",
+  "solve_code": "import gurobipy as gp\nfrom gurobipy import GRB\nproducts = [{'id_number': 'id999', 'Revenue': 434.74, 'Demand': 8171, 'Initial Inventory': 56450}]\nproduct_ids = [p['id_number'] for p in products]\nrevenue = {p['id_number']: p['Revenue'] for p in products}\ndemand = {p['id_number']: p['Demand'] for p in products}\ninitial_inventory = {p['id_number']: p['Initial Inventory'] for p in products}\nfor pid in product_ids:\n    if pid not in revenue or pid not in demand or pid not in initial_inventory:\n        raise ValueError(f'Missing data for product {pid}')\nm = gp.Model('Supermarket_Revenue_Maximization')\nx_vars = m.addVars(product_ids, vtype=GRB.INTEGER, lb=0, name='')\nfor pid in product_ids:\n    upper_bound = min(initial_inventory[pid], demand[pid])\n    m.addConstr(x_vars[pid] <= upper_bound, name=f'ub_{pid}')\n    m.addConstr(x_vars[pid] >= 0, name=f'lb_{pid}')\nm.setObjective(gp.quicksum((revenue[pid] * x_vars[pid] for pid in product_ids)), GRB.MAXIMIZE)\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for v in m.getVars():\n        print(f'{v.VarName}: {v.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 3552260.54,
+  "final_solution": [
+    [
+      "C0",
+      8171.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 16.168,
+  "evaluated_utc": "2026-10-06T08:42:25.594095+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

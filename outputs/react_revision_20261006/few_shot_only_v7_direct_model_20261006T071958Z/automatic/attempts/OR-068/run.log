@@ -1,0 +1,183 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I have the required current data and can formulate the model.
+Final Answer:
+##### Objective Function:
+
+$\quad \min \sum_{i \in M} \sum_{j \in P} c_{ij} \, x_{ij}$
+
+##### Constraints:
+
+1. **Manager Assignment:**  
+$\sum_{j \in P} x_{ij} = 1 \quad \forall i \in M$
+
+2. **Project Assignment:**  
+$\sum_{i \in M} x_{ij} = 1 \quad \forall j \in P$
+
+3. **Variable Domains:**  
+$x_{ij} \in \{0,1\} \quad \forall i \in M, \; j \in P$
+
+##### Data Mapping
+
+- $M$ (Managers): All values in column "Unnamed: 0" of table_id "file_0_view_0"
+- $P$ (Projects): All columns except "Unnamed: 0" in table_id "file_0_view_0"
+- $c_{ij}$: Value at row with "Unnamed: 0" = $i$, column $j$ in table_id "file_0_view_0"
+- $x_{ij}$: Binary decision variable, 1 if manager $i$ is assigned to project $j$, 0 otherwise[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with fallback encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP3/manager_project_costs.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError(f"Could not decode {csv_path} with tried encodings.")
+
+    # Managers: all values in "Unnamed: 0"
+    if "Unnamed: 0" not in df.columns:
+        raise ValueError("Missing required column 'Unnamed: 0' in input CSV.")
+    managers = df["Unnamed: 0"].tolist()
+
+    # Projects: all columns except "Unnamed: 0"
+    projects = [col for col in df.columns if col != "Unnamed: 0"]
+
+    # Build cost dictionary c_{ij}
+    cost = {}
+    for idx, row in df.iterrows():
+        i = row["Unnamed: 0"]
+        cost[i] = {}
+        for j in projects:
+            val = row[j]
+            try:
+                cij = float(val)
+            except ValueError:
+                raise ValueError(f"Non-numeric cost at manager '{i}', project '{j}': '{val}'")
+            cost[i][j] = cij
+
+    # Validate dimensions
+    if set(cost.keys()) != set(managers):
+        raise ValueError("Mismatch between managers and cost keys.")
+    for i in managers:
+        if set(cost[i].keys()) != set(projects):
+            raise ValueError(f"Manager '{i}' missing cost entries for all projects.")
+
+    # Model
+    m = gp.Model("Manager_Project_Assignment")
+    x_vars = m.addVars([(i, j) for i in managers for j in projects], vtype=GRB.BINARY, name='x')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(cost[i][j] * x_vars[i, j] for i in managers for j in projects),
+        GRB.MINIMIZE
+    )
+
+    # Each manager assigned to exactly one project
+    m.addConstrs(
+        (gp.quicksum(x_vars[i, j] for j in projects) == 1 for i in managers),
+        name='mgr'
+    )
+
+    # Each project assigned to exactly one manager
+    m.addConstrs(
+        (gp.quicksum(x_vars[i, j] for i in managers) == 1 for j in projects),
+        name='prj'
+    )
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 12 rows, 36 columns and 72 nonzeros
+Model fingerprint: 0x1b11b8f3
+Variable types: 0 continuous, 36 integer (36 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+03, 3e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 11552.000000
+Presolve time: 0.00s
+Presolved: 12 rows, 36 columns, 72 nonzeros
+Variable types: 0 continuous, 36 integer (36 binary)
+
+Root relaxation: objective 9.089000e+03, 10 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    9089.0000000 9089.00000  0.00%     -    0s
+
+Explored 1 nodes (10 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 9089 11552 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 9.089000000000e+03, best bound 9.089000000000e+03, gap 0.0000%
+ObjVal: 9089.0
+C0: -0.0
+C1: -0.0
+C2: 1.0
+C3: -0.0
+C4: 0.0
+C5: 0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: 1.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: 0.0
+C15: 1.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: 0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: 1.0
+C24: -0.0
+C25: 1.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: 1.0
+C31: -0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+Optimal objective: 9089.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', 1.0), ('C3', -0.0), ('C4', 0.0), ('C5', 0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', 1.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', 0.0), ('C15', 1.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', 0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', 1.0), ('C24', -0.0), ('C25', 1.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', 1.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0)]

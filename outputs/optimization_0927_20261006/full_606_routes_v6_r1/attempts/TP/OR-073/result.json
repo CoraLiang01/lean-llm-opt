@@ -1,0 +1,115 @@
+{
+  "problem_id": "OR-073",
+  "query": "A factory produces three products, I, II, and III. Each product goes through two processing procedures, A and B. The factory has two types of equipment, A1 and A2, to complete procedure A, and three types of equipment, B1, B2, and B3, to complete procedure B. Product I can be processed on either type of A equipment or any type of B equipment. Product II can be processed on any type of A equipment, but when completing procedure B, it can only be processed on B1 equipment. Product III can only be processed on A2 and B2 equipment. Given the processing time, raw material cost, product selling price, available equipment operating time, and equipment cost at full load for each type of equipment, as shown in 43.csv, determine the optimal production plan to maximize profit. All production quantities should be continuous.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv",
+  "input_kind": "external_csv",
+  "true_label": "Mixture",
+  "true_route": "Others",
+  "label_objective": 1146.57,
+  "forced_route": "TP",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "TP",
+  "generated_model": "Let $x_{i}$ be the production quantity of product $i$ ($i=1,2,3$ for I, II, III).  \nLet $y_{k,i}$ be the quantity of product $i$ processed on equipment $k$ (for eligible $k,i$ pairs).\n\n#### Parameters (from 43.csv, preserving source order)\n\n- Equipment: $A1$, $A2$, $A3$, $B1$, $B2$, $B3$, $B4$\n- Products: I ($i=1$), II ($i=2$), III ($i=3$)\n- Processing time per unit (minutes/unit) for each equipment and product (blank means not eligible):\n\n| Equipment | I | II | III | Available Time | Equipment Cost at Full Load |\n|-----------|---|----|------|---------------|----------------------------|\n| A1        | 5 | 10 |      | 6000          | 300                        |\n| A2        | 7 | 9  | 12   | 10000         | 321                        |\n| A3        | 6 | 11 | 2    | 8000          | 203                        |\n| B1        | 6 | 8  |      | 4000          | 250                        |\n| B2        | 4 |    | 11   | 7000          | 783                        |\n| B3        | 7 |    |      | 4000          | 200                        |\n| B4        | 3 | 5  | 8    | 5000          | 300                        |\n\n- Raw material cost (yuan/unit): I: 0.25, II: 0.35, III: 0.5\n- Unit price (yuan/unit): I: 1.25, II: 2, III: 2.8\n\n#### Eligibility (from user description and table):\n\n- Procedure A: A1, A2, A3\n  - I: A1, A2, A3\n  - II: A1, A2, A3\n  - III: A2, A3\n- Procedure B: B1, B2, B3, B4\n  - I: B1, B2, B3, B4\n  - II: B1, B4\n  - III: B2, B4\n\n#### Decision Variables\n\n- $x_1, x_2, x_3 \\geq 0$: production quantity of product I, II, III\n- $y_{k,i} \\geq 0$: quantity of product $i$ processed on equipment $k$ (only for eligible $k,i$)\n\n#### Objective Function\n\nMaximize total profit:\n\\[\n\\max \\left[\n(1.25-0.25)x_1 + (2-0.35)x_2 + (2.8-0.5)x_3\n- \\sum_{k} \\text{Equipment Cost}_k \\cdot \\frac{\\sum_{i} t_{k,i} y_{k,i}}{\\text{Available Time}_k}\n\\right]\n\\]\nwhere $t_{k,i}$ is the processing time per unit for product $i$ on equipment $k$ (from table, blank means not eligible, so $y_{k,i}=0$).\n\n#### Constraints\n\n1. **Production-Procedure Assignment:**  \n   For each product, the sum of quantities processed on eligible equipment for each procedure equals the production quantity:\n   - Procedure A:\n     - $x_1 = y_{A1,1} + y_{A2,1} + y_{A3,1}$\n     - $x_2 = y_{A1,2} + y_{A2,2} + y_{A3,2}$\n     - $x_3 = y_{A2,3} + y_{A3,3}$\n   - Procedure B:\n     - $x_1 = y_{B1,1} + y_{B2,1} + y_{B3,1} + y_{B4,1}$\n     - $x_2 = y_{B1,2} + y_{B4,2}$\n     - $x_3 = y_{B2,3} + y_{B4,3}$\n\n2. **Equipment Capacity:**  \n   For each equipment $k$, total processing time cannot exceed available time:\n   \\[\n   \\sum_{i} t_{k,i} y_{k,i} \\leq \\text{Available Time}_k\n   \\]\n   (sum only over eligible $i$ for each $k$)\n\n3. **Non-negativity:**  \n   $x_i \\geq 0$, $y_{k,i} \\geq 0$ for all eligible $k,i$.\n\n#### Full Model (with all coefficients):\n\nLet $t_{k,i}$ be the processing time per unit for product $i$ on equipment $k$ (from table below).\n\n**Parameters:**\n\n- $t_{A1,1}=5$, $t_{A1,2}=10$\n- $t_{A2,1}=7$, $t_{A2,2}=9$, $t_{A2,3}=12$\n- $t_{A3,1}=6$, $t_{A3,2}=11$, $t_{A3,3}=2$\n- $t_{B1,1}=6$, $t_{B1,2}=8$\n- $t_{B2,1}=4$, $t_{B2,3}=11$\n- $t_{B3,1}=7$\n- $t_{B4,1}=3$, $t_{B4,2}=5$, $t_{B4,3}=8$\n\n- Equipment costs at full load: $c_{A1}=300$, $c_{A2}=321$, $c_{A3}=203$, $c_{B1}=250$, $c_{B2}=783$, $c_{B3}=200$, $c_{B4}=300$\n- Available times: $T_{A1}=6000$, $T_{A2}=10000$, $T_{A3}=8000$, $T_{B1}=4000$, $T_{B2}=7000$, $T_{B3}=4000$, $T_{B4}=5000$\n\n**Variables:**\n\n- $x_1, x_2, x_3 \\geq 0$\n- $y_{A1,1}, y_{A1,2} \\geq 0$\n- $y_{A2,1}, y_{A2,2}, y_{A2,3} \\geq 0$\n- $y_{A3,1}, y_{A3,2}, y_{A3,3} \\geq 0$\n- $y_{B1,1}, y_{B1,2} \\geq 0$\n- $y_{B2,1}, y_{B2,3} \\geq 0$\n- $y_{B3,1} \\geq 0$\n- $y_{B4,1}, y_{B4,2}, y_{B4,3} \\geq 0$\n\n**Objective:**\n\\[\n\\max \\Bigg[\n(1.25-0.25)x_1 + (2-0.35)x_2 + (2.8-0.5)x_3\n- 300 \\cdot \\frac{5y_{A1,1} + 10y_{A1,2}}{6000}\n- 321 \\cdot \\frac{7y_{A2,1} + 9y_{A2,2} + 12y_{A2,3}}{10000}\n- 203 \\cdot \\frac{6y_{A3,1} + 11y_{A3,2} + 2y_{A3,3}}{8000}\n- 250 \\cdot \\frac{6y_{B1,1} + 8y_{B1,2}}{4000}\n- 783 \\cdot \\frac{4y_{B2,1} + 11y_{B2,3}}{7000}\n- 200 \\cdot \\frac{7y_{B3,1}}{4000}\n- 300 \\cdot \\frac{3y_{B4,1} + 5y_{B4,2} + 8y_{B4,3}}{5000}\n\\Bigg]\n\\]\n\n**Subject to:**\n\n- $x_1 = y_{A1,1} + y_{A2,1} + y_{A3,1}$\n- $x_2 = y_{A1,2} + y_{A2,2} + y_{A3,2}$\n- $x_3 = y_{A2,3} + y_{A3,3}$\n\n- $x_1 = y_{B1,1} + y_{B2,1} + y_{B3,1} + y_{B4,1}$\n- $x_2 = y_{B1,2} + y_{B4,2}$\n- $x_3 = y_{B2,3} + y_{B4,3}$\n\n- $5y_{A1,1} + 10y_{A1,2} \\leq 6000$\n- $7y_{A2,1} + 9y_{A2,2} + 12y_{A2,3} \\leq 10000$\n- $6y_{A3,1} + 11y_{A3,2} + 2y_{A3,3} \\leq 8000$\n- $6y_{B1,1} + 8y_{B1,2} \\leq 4000$\n- $4y_{B2,1} + 11y_{B2,3} \\leq 7000$\n- $7y_{B3,1} \\leq 4000$\n- $3y_{B4,1} + 5y_{B4,2} + 8y_{B4,3} \\leq 5000$\n\n- All variables $\\geq 0$\n\nAll coefficients and eligibility are preserved from the source data and user description.",
+  "csvqa_observation": "[{\"source\":\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\",\"values\":{\"Equipment / Cost\":\"A1\",\"Product I\":\"5\",\"Product II\":\"10\",\"Product III\":\"\",\"Available Equipment Operating Time\":\"6000\",\"Equipment Cost at Full Load (yuan)\":\"300\"}},{\"source\":\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\",\"values\":{\"Equipment / Cost\":\"A2\",\"Product I\":\"7\",\"Product II\":\"9\",\"Product III\":\"12\",\"Available Equipment Operating Time\":\"10000\",\"Equipment Cost at Full Load (yuan)\":\"321\"}},{\"source\":\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\",\"values\":{\"Equipment / Cost\":\"A3\",\"Product I\":\"6\",\"Product II\":\"11\",\"Product III\":\"2\",\"Available Equipment Operating Time\":\"8000\",\"Equipment Cost at Full Load (yuan)\":\"203\"}},{\"source\":\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\",\"values\":{\"Equipment / Cost\":\"B1\",\"Product I\":\"6\",\"Product II\":\"8\",\"Product III\":\"\",\"Available Equipment Operating Time\":\"4000\",\"Equipment Cost at Full Load (yuan)\":\"250\"}},{\"source\":\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\",\"values\":{\"Equipment / Cost\":\"B2\",\"Product I\":\"4\",\"Product II\":\"\",\"Product III\":\"11\",\"Available Equipment Operating Time\":\"7000\",\"Equipment Cost at Full Load (yuan)\":\"783\"}},{\"source\":\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\",\"values\":{\"Equipment / Cost\":\"B3\",\"Product I\":\"7\",\"Product II\":\"\",\"Product III\":\"\",\"Available Equipment Operating Time\":\"4000\",\"Equipment Cost at Full Load (yuan)\":\"200\"}},{\"source\":\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\",\"values\":{\"Equipment / Cost\":\"B4\",\"Product I\":\"3\",\"Product II\":\"5\",\"Product III\":\"8\",\"Available Equipment Operating Time\":\"5000\",\"Equipment Cost at Full Load (yuan)\":\"300\"}},{\"source\":\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\",\"values\":{\"Equipment / Cost\":\"Raw Material Cost (yuan/unit)\",\"Product I\":\"0.25\",\"Product II\":\"0.35\",\"Product III\":\"0.5\",\"Available Equipment Operating Time\":\"\",\"Equipment Cost at Full Load (yuan)\":\"\"}},{\"source\":\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\",\"values\":{\"Equipment / Cost\":\"Unit Price (yuan/unit)\",\"Product I\":\"1.25\",\"Product II\":\"2\",\"Product III\":\"2.8\",\"Available Equipment Operating Time\":\"\",\"Equipment Cost at Full Load (yuan)\":\"\"}}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_VALIDATED_SOURCE_ROWS",
+  "csvqa_trace": "{\"version\": \"GPT4.1-LO\", \"mode\": \"legacy\", \"status\": \"LEGACY_VALIDATED_SOURCE_ROWS\", \"plan\": null, \"planner_attempt_count\": 0, \"planner_outputs\": [], \"planner_errors\": [], \"validation_errors\": [], \"fallback_reason\": null, \"legacy_extraction_output\": \"[{\\\"source\\\":\\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\\\",\\\"values\\\":{\\\"Equipment / Cost\\\":\\\"A1\\\",\\\"Product I\\\":\\\"5\\\",\\\"Product II\\\":\\\"10\\\",\\\"Product III\\\":\\\"\\\",\\\"Available Equipment Operating Time\\\":\\\"6000\\\",\\\"Equipment Cost at Full Load (yuan)\\\":\\\"300\\\"}},{\\\"source\\\":\\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\\\",\\\"values\\\":{\\\"Equipment / Cost\\\":\\\"A2\\\",\\\"Product I\\\":\\\"7\\\",\\\"Product II\\\":\\\"9\\\",\\\"Product III\\\":\\\"12\\\",\\\"Available Equipment Operating Time\\\":\\\"10000\\\",\\\"Equipment Cost at Full Load (yuan)\\\":\\\"321\\\"}},{\\\"source\\\":\\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\\\",\\\"values\\\":{\\\"Equipment / Cost\\\":\\\"A3\\\",\\\"Product I\\\":\\\"6\\\",\\\"Product II\\\":\\\"11\\\",\\\"Product III\\\":\\\"2\\\",\\\"Available Equipment Operating Time\\\":\\\"8000\\\",\\\"Equipment Cost at Full Load (yuan)\\\":\\\"203\\\"}},{\\\"source\\\":\\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\\\",\\\"values\\\":{\\\"Equipment / Cost\\\":\\\"B1\\\",\\\"Product I\\\":\\\"6\\\",\\\"Product II\\\":\\\"8\\\",\\\"Product III\\\":\\\"\\\",\\\"Available Equipment Operating Time\\\":\\\"4000\\\",\\\"Equipment Cost at Full Load (yuan)\\\":\\\"250\\\"}},{\\\"source\\\":\\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\\\",\\\"values\\\":{\\\"Equipment / Cost\\\":\\\"B2\\\",\\\"Product I\\\":\\\"4\\\",\\\"Product II\\\":\\\"\\\",\\\"Product III\\\":\\\"11\\\",\\\"Available Equipment Operating Time\\\":\\\"7000\\\",\\\"Equipment Cost at Full Load (yuan)\\\":\\\"783\\\"}},{\\\"source\\\":\\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\\\",\\\"values\\\":{\\\"Equipment / Cost\\\":\\\"B3\\\",\\\"Product I\\\":\\\"7\\\",\\\"Product II\\\":\\\"\\\",\\\"Product III\\\":\\\"\\\",\\\"Available Equipment Operating Time\\\":\\\"4000\\\",\\\"Equipment Cost at Full Load (yuan)\\\":\\\"200\\\"}},{\\\"source\\\":\\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\\\",\\\"values\\\":{\\\"Equipment / Cost\\\":\\\"B4\\\",\\\"Product I\\\":\\\"3\\\",\\\"Product II\\\":\\\"5\\\",\\\"Product III\\\":\\\"8\\\",\\\"Available Equipment Operating Time\\\":\\\"5000\\\",\\\"Equipment Cost at Full Load (yuan)\\\":\\\"300\\\"}},{\\\"source\\\":\\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\\\",\\\"values\\\":{\\\"Equipment / Cost\\\":\\\"Raw Material Cost (yuan/unit)\\\",\\\"Product I\\\":\\\"0.25\\\",\\\"Product II\\\":\\\"0.35\\\",\\\"Product III\\\":\\\"0.5\\\",\\\"Available Equipment Operating Time\\\":\\\"\\\",\\\"Equipment Cost at Full Load (yuan)\\\":\\\"\\\"}},{\\\"source\\\":\\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv\\\",\\\"values\\\":{\\\"Equipment / Cost\\\":\\\"Unit Price (yuan/unit)\\\",\\\"Product I\\\":\\\"1.25\\\",\\\"Product II\\\":\\\"2\\\",\\\"Product III\\\":\\\"2.8\\\",\\\"Available Equipment Operating Time\\\":\\\"\\\",\\\"Equipment Cost at Full Load (yuan)\\\":\\\"\\\"}}]\", \"payload_hash\": \"53b4dacc06f6f79a02c423f479a651a5b1c15654424b898b0b63be3c3f79465b\"}",
+  "solve_code": "import gurobipy as gp\nfrom gurobipy import GRB\nequipments = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'B4']\nproducts = ['I', 'II', 'III']\nproduct_idx = {'I': 1, 'II': 2, 'III': 3}\nprocessing_time = {('A1', 'I'): 5, ('A1', 'II'): 10, ('A2', 'I'): 7, ('A2', 'II'): 9, ('A2', 'III'): 12, ('A3', 'I'): 6, ('A3', 'II'): 11, ('A3', 'III'): 2, ('B1', 'I'): 6, ('B1', 'II'): 8, ('B2', 'I'): 4, ('B2', 'III'): 11, ('B3', 'I'): 7, ('B4', 'I'): 3, ('B4', 'II'): 5, ('B4', 'III'): 8}\navailable_time = {'A1': 6000, 'A2': 10000, 'A3': 8000, 'B1': 4000, 'B2': 7000, 'B3': 4000, 'B4': 5000}\nequipment_cost = {'A1': 300, 'A2': 321, 'A3': 203, 'B1': 250, 'B2': 783, 'B3': 200, 'B4': 300}\nraw_material_cost = {'I': 0.25, 'II': 0.35, 'III': 0.5}\nunit_price = {'I': 1.25, 'II': 2, 'III': 2.8}\neligible_pairs = list(processing_time.keys())\nm = gp.Model('Factory_Production_Optimization')\nx_vars = m.addVars(products, lb=0, vtype=GRB.CONTINUOUS, name='')\ny_vars = m.addVars(eligible_pairs, lb=0, vtype=GRB.CONTINUOUS, name='')\nprofit_expr = (unit_price['I'] - raw_material_cost['I']) * x_vars['I'] + (unit_price['II'] - raw_material_cost['II']) * x_vars['II'] + (unit_price['III'] - raw_material_cost['III']) * x_vars['III']\nequipment_cost_expr = gp.LinExpr()\nfor k in equipments:\n    eligible_products = [i for (kk, i) in eligible_pairs if kk == k]\n    if eligible_products:\n        total_time = gp.quicksum((processing_time[k, i] * y_vars[k, i] for i in eligible_products))\n        equipment_cost_expr += equipment_cost[k] * total_time / available_time[k]\nm.setObjective(profit_expr - equipment_cost_expr, GRB.MAXIMIZE)\nm.addConstr(x_vars['I'] == y_vars['A1', 'I'] + y_vars['A2', 'I'] + y_vars['A3', 'I'], name='A_I_assign')\nm.addConstr(x_vars['II'] == y_vars['A1', 'II'] + y_vars['A2', 'II'] + y_vars['A3', 'II'], name='A_II_assign')\nm.addConstr(x_vars['III'] == y_vars['A2', 'III'] + y_vars['A3', 'III'], name='A_III_assign')\nm.addConstr(x_vars['I'] == y_vars['B1', 'I'] + y_vars['B2', 'I'] + y_vars['B3', 'I'] + y_vars['B4', 'I'], name='B_I_assign')\nm.addConstr(x_vars['II'] == y_vars['B1', 'II'] + y_vars['B4', 'II'], name='B_II_assign')\nm.addConstr(x_vars['III'] == y_vars['B2', 'III'] + y_vars['B4', 'III'], name='B_III_assign')\nfor k in equipments:\n    eligible_products = [i for (kk, i) in eligible_pairs if kk == k]\n    if eligible_products:\n        m.addConstr(gp.quicksum((processing_time[k, i] * y_vars[k, i] for i in eligible_products)) <= available_time[k], name=f'{k}_capacity')\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for v in m.getVars():\n        print(f'{v.VarName}: {v.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 2480.6953201970446,
+  "final_solution": [
+    [
+      "C0",
+      959.9753694581281
+    ],
+    [
+      "C1",
+      500.0
+    ],
+    [
+      "C2",
+      1120.073891625616
+    ],
+    [
+      "C3",
+      0.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      0.0
+    ],
+    [
+      "C6",
+      500.0
+    ],
+    [
+      "C7",
+      0.0
+    ],
+    [
+      "C8",
+      959.9753694581281
+    ],
+    [
+      "C9",
+      0.0
+    ],
+    [
+      "C10",
+      1120.073891625616
+    ],
+    [
+      "C11",
+      0.0
+    ],
+    [
+      "C12",
+      500.0
+    ],
+    [
+      "C13",
+      388.5467980295566
+    ],
+    [
+      "C14",
+      495.0738916256158
+    ],
+    [
+      "C15",
+      571.4285714285714
+    ],
+    [
+      "C16",
+      0.0
+    ],
+    [
+      "C17",
+      0.0
+    ],
+    [
+      "C18",
+      625.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": false,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 25.501,
+  "evaluated_utc": "2026-10-06T09:02:21.403801+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

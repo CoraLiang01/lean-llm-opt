@@ -1,0 +1,76 @@
+{
+  "problem_id": "Variant18",
+  "query": "A roll-cutting line has a fixed menu of feasible cutting patterns. Item demands are listed in item_demand.csv, and the number of each item produced by every pattern is listed in cutting_patterns.csv. A pattern may be used any nonnegative integer number of times, and producing extra pieces is allowed.\n\nFormulate a minimum-roll cutting-stock model. For each cutting pattern p, define y_p as the nonnegative integer number of stock rolls cut with pattern p. The objective is to minimize the total number of rolls used. The model should include demand satisfaction constraints for every item, nonnegativity constraints, and integer restrictions for all pattern-use variables.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant18/inputs/item_demand.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant18/inputs/cutting_patterns.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 21.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the minimum number of stock rolls to cut in order to meet or exceed the demand for each item, using only a fixed set of feasible cutting patterns. Overproduction is allowed, and the number of times each pattern is used must be a nonnegative integer.\n2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem, specifically a cutting-stock (set covering) model with integer variables.\n3.  **Define Index Sets:** The primary indices are:\n    - Items (from item_demand.csv): set I\n    - Cutting patterns (from cutting_patterns.csv): set P\n4.  **Define Decision Variables:**\n    -   `y_p` = Number of times cutting pattern p ∈ P is used (i.e., number of rolls cut with pattern p). Type: GRB.INTEGER (nonnegative).\n5.  **Identify Parameters (from Schema):**\n    -   Demand for each item i: from item_demand.csv, column 'Demand'.\n    -   Number of pieces of item i produced by pattern p: from cutting_patterns.csv, columns 'A', 'B', 'C', 'D', 'E' (one column per item).\n6.  **Formulate Objective:** Minimize the total number of rolls used, i.e., minimize the sum over all patterns p of y_p.\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand Satisfaction): For each item i ∈ I, the total number of pieces produced across all patterns must be at least the demand for item i. That is, for each i, sum over p of (number of pieces of item i in pattern p) × y_p ≥ demand for item i.\n    -   Constraint 2 (Nonnegativity and Integrality): For each pattern p ∈ P, y_p ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant18/inputs/item_demand.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 5\nColumns: ['Item', 'Demand']\nParsed column types: {'Item': 'object', 'Demand': 'int64'}\nPreview only (first 10 rows):\nItem Demand\n   A     18\n   B     14\n   C     12\n   D     10\n   E      8\nFull-file column statistics: {\"Item\": {\"missing\": 0, \"unique_nonempty\": 5}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 5, \"numeric_range\": [8.0, 18.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"a\", \"matching_columns\": [{\"column\": \"Item\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"A\"]}], \"exact_matching_columns\": 1}, {\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"item\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant18/inputs/cutting_patterns.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 10\nColumns: ['Pattern', 'A', 'B', 'C', 'D', 'E']\nParsed column types: {'Pattern': 'object', 'A': 'int64', 'B': 'int64', 'C': 'int64', 'D': 'int64', 'E': 'int64'}\nPreview only (first 10 rows):\nPattern A B C D E\n     P1 3 0 0 0 0\n     P2 0 2 1 0 0\n     P3 0 0 2 1 0\n     P4 0 0 0 2 1\n     P5 1 1 0 1 0\n     P6 2 0 1 0 0\n     P7 0 1 1 0 1\n     P8 1 0 0 1 1\n     P9 1 2 0 0 0\n    P10 0 0 1 1 1\nFull-file column statistics: {\"Pattern\": {\"missing\": 0, \"unique_nonempty\": 10}, \"A\": {\"missing\": 0, \"unique_nonempty\": 4, \"numeric_range\": [0.0, 3.0]}, \"B\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [0.0, 2.0]}, \"C\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [0.0, 2.0]}, \"D\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [0.0, 2.0]}, \"E\": {\"missing\": 0, \"unique_nonempty\": 2, \"numeric_range\": [0.0, 1.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"a\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"pattern\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nitem_demand_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant18/inputs/item_demand.csv'\ncutting_patterns_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant18/inputs/cutting_patterns.csv'\nitem_demand_df = pd.read_csv(item_demand_path, sep=',', dtype=str, keep_default_na=False)\ncutting_patterns_df = pd.read_csv(cutting_patterns_path, sep=',', dtype=str, keep_default_na=False)\nitems = item_demand_df['Item'].astype(str).str.strip().tolist()\npatterns = cutting_patterns_df['Pattern'].astype(str).str.strip().tolist()\ndemand = {}\nfor (idx, row) in item_demand_df.iterrows():\n    item = str(row['Item']).strip()\n    try:\n        demand[item] = int(row['Demand'])\n    except Exception:\n        raise ValueError(f\"Invalid demand value for item '{item}': {row['Demand']}\")\nfor item in items:\n    if item not in cutting_patterns_df.columns:\n        raise KeyError(f\"Item '{item}' from item_demand.csv not found as a column in cutting_patterns.csv\")\npattern_item_pieces = {}\nfor (idx, row) in cutting_patterns_df.iterrows():\n    pattern = str(row['Pattern']).strip()\n    for item in items:\n        try:\n            pattern_item_pieces[pattern, item] = int(row[item])\n        except Exception:\n            raise ValueError(f\"Invalid piece count for pattern '{pattern}', item '{item}': {row[item]}\")\nm = gp.Model('CuttingStock_MinRolls')\ny_vars = m.addVars(patterns, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((y_vars[p] for p in patterns)), gp.GRB.MINIMIZE)\nfor item in items:\n    m.addConstr(gp.quicksum((pattern_item_pieces[p, item] * y_vars[p] for p in patterns)) >= demand[item], name=f'demand_{item}')\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 21.0,
+  "final_solution": [
+    [
+      "C0",
+      2.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      2.0
+    ],
+    [
+      "C3",
+      0.0
+    ],
+    [
+      "C4",
+      7.0
+    ],
+    [
+      "C5",
+      2.0
+    ],
+    [
+      "C6",
+      7.0
+    ],
+    [
+      "C7",
+      1.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "variants",
+  "seconds": 12.963,
+  "evaluated_utc": "2026-10-06T03:26:52.667362+00:00",
+  "notebook_source_sha256": "d2f4f72fc2d67baab041f2440fa4fd866be06a4defd180fc5edce65637dce7d9",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

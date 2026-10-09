@@ -1,0 +1,66 @@
+{
+  "problem_id": "Variant14",
+  "query": "A utility company must place emergency repair depots so that every service zone is covered by at least one selected depot. Candidate depot opening costs and covered service zones are listed in facility_sites.csv, and the full set of service zones is listed in service_zones.csv.\n\nFormulate a minimum-cost set covering model. For each candidate depot i, define y_i as a binary variable equal to 1 if depot i is opened. The objective is to minimize total opening cost. The model should include one coverage constraint for each service zone requiring at least one opened depot that covers that zone, and binary restrictions for all depot-opening variables.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant14/inputs/facility_sites.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant14/inputs/service_zones.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 46.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to select a minimum-cost set of emergency repair depots so that every service zone is covered by at least one opened depot. Each depot has an opening cost and covers a specific subset of service zones. The goal is to minimize the total opening cost while ensuring every service zone is covered.\n2.  **Identify Model Type:** Based on the query, this is a Set Covering Problem, formulated as a Mixed-Integer Programming (MIP) model with binary variables.\n3.  **Define Index Sets:** The primary indices are:\n    - Depots (from 'Center' in facility_sites.csv)\n    - Service Zones (from 'Zone' in service_zones.csv)\n4.  **Define Decision Variables:**\n    -   `y[i]` = 1 if depot i is opened, 0 otherwise. Type: GRB.BINARY.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: Depot opening costs from 'OpeningCost' column in facility_sites.csv.\n    -   Coverage mapping: For each depot, the set of service zones it covers from 'CoveredDistricts' in facility_sites.csv (semicolon-separated list).\n    -   Constraint RHS: Each service zone must be covered at least once (RHS = 1 for each zone).\n6.  **Formulate Objective:** Minimize the total opening cost, i.e., sum over all depots of (OpeningCost[i] * y[i]).\n7.  **Formulate Constraints:**\n    -   Coverage Constraint: For each service zone j, the sum of y[i] over all depots i that cover zone j must be at least 1. (That is, every zone must be covered by at least one opened depot.)\n    -   Binary Restriction: For each depot i, y[i] ∈ {0, 1}.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant14/inputs/facility_sites.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 8\nColumns: ['Center', 'OpeningCost', 'CoveredDistricts']\nParsed column types: {'Center': 'object', 'OpeningCost': 'int64', 'CoveredDistricts': 'object'}\nPreview only (first 10 rows):\nCenter OpeningCost CoveredDistricts\n    B1          11         Z1;Z2;Z5\n    B2          14         Z2;Z3;Z6\n    B3          10         Z4;Z5;Z8\n    B4          13         Z1;Z6;Z7\n    B5          16         Z3;Z7;Z9\n    B6           9        Z8;Z9;Z10\n    B7          12           Z4;Z10\n    B8          15         Z5;Z6;Z9\nFull-file column statistics: {\"Center\": {\"missing\": 0, \"unique_nonempty\": 8}, \"OpeningCost\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [9.0, 16.0]}, \"CoveredDistricts\": {\"missing\": 0, \"unique_nonempty\": 8}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: []\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant14/inputs/service_zones.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 10\nColumns: ['Zone']\nParsed column types: {'Zone': 'object'}\nPreview only (first 10 rows):\nZone\n  Z1\n  Z2\n  Z3\n  Z4\n  Z5\n  Z6\n  Z7\n  Z8\n  Z9\n Z10\nFull-file column statistics: {\"Zone\": {\"missing\": 0, \"unique_nonempty\": 10}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"zone\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\nfacilities_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant14/inputs/facility_sites.csv', sep=',')\nzones_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant14/inputs/service_zones.csv', sep=',')\n\ndef norm_id(x):\n    return str(x).strip()\ndepots = [norm_id(c) for c in facilities_df['Center']]\nzones = [norm_id(z) for z in zones_df['Zone']]\nopening_cost = {}\nfor (idx, row) in facilities_df.iterrows():\n    depot = norm_id(row['Center'])\n    cost = row['OpeningCost']\n    opening_cost[depot] = float(cost)\ndepot_covers = {}\nzone_covered_by = {z: set() for z in zones}\nfor (idx, row) in facilities_df.iterrows():\n    depot = norm_id(row['Center'])\n    covered_str = str(row['CoveredDistricts'])\n    covered_zones = [norm_id(z) for z in covered_str.split(';') if z.strip()]\n    depot_covers[depot] = set(covered_zones)\n    for z in covered_zones:\n        if z in zone_covered_by:\n            zone_covered_by[z].add(depot)\n        else:\n            raise ValueError(f\"Depot {depot} covers unknown zone '{z}' not in service_zones.csv.\")\nfor z in zones:\n    if len(zone_covered_by[z]) == 0:\n        raise ValueError(f\"Service zone '{z}' is not covered by any depot.\")\nm = gp.Model('SetCoveringDepots')\ny = m.addVars(depots, vtype=gp.GRB.BINARY, name='')\nm.setObjective(gp.quicksum((opening_cost[d] * y[d] for d in depots)), gp.GRB.MINIMIZE)\nfor z in zones:\n    covering_depots = zone_covered_by[z]\n    m.addConstr(gp.quicksum((y[d] for d in covering_depots)) >= 1, name=f'cover_{z}')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total opening cost: {m.objVal:.2f}')\n    print('Opened depots:')\n    for d in depots:\n        if y[d].X > 0.5:\n            print(f'  Depot {d} (Opening cost: {opening_cost[d]:.2f})')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "final_objective": 46.0,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      1.0
+    ],
+    [
+      "C2",
+      1.0
+    ],
+    [
+      "C3",
+      1.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      1.0
+    ],
+    [
+      "C6",
+      0.0
+    ],
+    [
+      "C7",
+      0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "variants",
+  "seconds": 16.41,
+  "evaluated_utc": "2026-10-06T03:14:01.922433+00:00",
+  "notebook_source_sha256": "2ce95970ba71e1d984d77bab606aff77f06eda58d49e9551187f73b26c2f6b35",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

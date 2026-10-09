@@ -1,0 +1,133 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=18mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,booktabs,array,xcolor}
+\usepackage[round,authoryear]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\definecolor{replyblue}{RGB}{0,65,165}
+\begin{document}
+\textbf{Response to AE: within-category heterogeneity}
+
+\textit{Author draft, 3 October 2026. The structural analysis below is complete.
+Before submission, insert its manuscript/appendix location here: [LOCATION].
+Controlled performance under modified test formulations is not established by
+this analysis; no such experiment is claimed below.}
+
+\textbf{Comment.} \textit{The second question concerns the heterogeneity of problems even within each category. In my opinion, the reason that the proposed method performed quite well may be attributed to the close resemblance between the reference problem and the actual problem. However, in reality, even when two problems belong to the same category, they can be still drastically different. For example, there could be many additional constraints, varying objectives, or other business requirements one may consider in one type of problem. Would the current approach be robust facing such conditions? How well can it perform? I didn't see clear evidence from the current paper. I hope that the authors can also perform some tests to analyze such scenarios.}
+
+\begingroup\color{replyblue}
+\textbf{Response.} We agree that sharing a problem category does not imply sharing
+a formulation, and that semantic comparisons alone do not address this concern.
+We distinguish two questions: how closely benchmark formulations resemble the
+available references, and whether the method performs reliably when modeling
+requirements change. To investigate the first question, we computed a structural
+diagnostic for all 101 benchmark LP files and the 15 formulations corresponding
+to the current reference CSV. We report the evidence and its limitations below;
+it does not by itself answer the second question.
+
+\textbf{Method.} We apply the Weisfeiler--Lehman (WL) subtree feature construction
+of \citet{Shervashidze2011} to variable--constraint bipartite graphs. This type of
+MILP graph representation also appears in \citet{Gasse2019}, although we do not
+use their learned branching model. Each variable and each explicit linear
+constraint becomes a node, with an edge whenever the corresponding constraint
+coefficient is nonzero. Initial labels distinguish binary, integer, and
+continuous variables, and equality versus inequality rows. We retain the
+supplied formulations without presolving. Objective coefficients, coefficient
+values and signs, right-hand sides, bounds, and names are not encoded.
+
+At each WL iteration, a node's label is replaced by an injective encoding of its
+previous label and the multiset of its neighbors' labels. All graphs share the
+encoding dictionary. Let $c_t(G)$ count the labels after iteration $t$. We use
+the cumulative vector $\phi_h(G)=[c_0(G),\ldots,c_h(G)]$ and its cosine similarity:
+\[
+ S_h(P,R)=\frac{\phi_h(G_P)^\top\phi_h(G_R)}
+ {\|\phi_h(G_P)\|_2\|\phi_h(G_R)\|_2},\qquad
+ S_{\mathrm{same}}(P)=\max_{R\in\mathcal R_{g(P)}}S_2(P,R).
+\]
+Here $\mathcal R_{g(P)}$ is the available same-category reference pool. We also
+compute $S_{\mathrm{all}}$ by maximizing over all 15 references. The primary
+setting retains the existing implementation's $h=2$; $h=1$ and $h=3$ are
+sensitivity checks. Larger scores indicate closer normalized label-count
+representations. These are not percentages of shared business requirements,
+and there is no calibrated high/low-similarity threshold. This is an application
+of the WL construction, not a replication of the original paper's classification
+experiments.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Category & Tests & Same-type refs. & Median $S_{\mathrm{same}}$ & Mean $S_{\mathrm{same}}$ & Median $S_{\mathrm{all}}$\\
+\midrule
+NRM     &25 &1 &0.6097&0.6097&0.6097\\
+RA      &22 &1 &0.6562&0.6391&0.6562\\
+TP      &9  &1 &0.6240&0.6314&0.6343\\
+AP      &5  &1 &0.0508&0.0551&0.4424\\
+UFLP    &14 &1 &0.5503&0.5557&0.5503\\
+Mixture &18 &8 &0.4387&0.4699&0.5376\\
+Others  &8  &2 &0.2584&0.3025&0.3811\\
+\midrule
+All instances &101&15 (total)&0.6097&0.5339&0.6097\\
+\bottomrule
+\end{tabular}
+\par\vspace{3pt}
+\parbox{\linewidth}{\footnotesize
+Table 1. Nearest-reference WL similarities, using cumulative $h=2$ features.
+The pooled row summarizes individual test scores. Others is a heterogeneous
+pool. Reference counts differ by category, and these maxima concern available
+references, not necessarily those retrieved during a particular online run.}
+\end{center}
+
+\textbf{Results and interpretation.} The pooled same-category median is 0.6097
+(interquartile range 0.5077--0.6558); 100 of 101 scores are below 1.
+However, UFLP10 has score 1 against its reference, and its typed support graph
+is isomorphic to that reference graph. Allowing cross-category matches increases
+29 individual scores. Thus, the results describe variation in resemblance to
+the current pool; they do not exclude shared templates or all structural overlap.
+
+Three checks qualify this interpretation. First, the pooled same-category median
+is 0.9007, 0.6097, and 0.4608 for $h=1,2,3$, respectively. Substantial shallow
+pattern overlap therefore remains, and absolute magnitudes depend on depth.
+Second, all AP test exports use continuous variables whereas the AP reference
+uses binary variables. Removing only variable-domain labels increases the AP
+median from 0.0508 to 0.5842; AP2 then has score 1 and an isomorphic support graph.
+Its low typed score should not be interpreted as evidence of novel business rules.
+
+Third, the current NRM reference was revised after examining benchmark
+resemblance, by adding an explicitly synthetic shared-dispatch constraint,
+$\sum_i x_i\leq100$. All 25 test NRM graphs consist of repeated identical
+variable--constraint components, and their normalized pairwise similarities are
+1. Removing only the added reference constraint in an in-memory diagnostic
+restores all test-to-reference scores from 0.6097 to 1. The current NRM result
+therefore describes a revised reference pool, not an untouched original pool,
+and is not independent evidence of within-category benchmark diversity or
+robustness to new test-side requirements.
+
+\textbf{Scope of the evidence.} We consequently interpret WL as a formulation
+diagnostic, not a performance test. In particular, because objectives are not
+encoded, this analysis cannot quantify robustness to objective changes.
+Addressing that part of the comment requires paired evaluations of original
+and independently verified variants with additional constraints, changed
+objectives, and combined changes, while holding the reference pool and pipeline
+fixed. Such evaluations should report modeling correctness, feasibility, and
+objective-value accuracy for each condition. The present structural results
+partially address the resemblance question; they do not establish quantitative
+performance under those changes or generalization to unseen modeling archetypes.
+\endgroup
+
+\begin{thebibliography}{2}
+\bibitem[Shervashidze et~al.(2011)]{Shervashidze2011}
+Shervashidze, N., Schweitzer, P., van Leeuwen, E.~J., Mehlhorn, K., and Borgwardt,
+K.~M. (2011). Weisfeiler--Lehman graph kernels.
+\emph{Journal of Machine Learning Research}, 12(77), 2539--2561.
+\url{https://jmlr.org/papers/v12/shervashidze11a.html}.
+
+\bibitem[Gasse et~al.(2019)]{Gasse2019}
+Gasse, M., Ch\'{e}telat, D., Ferroni, N., Charlin, L., and Lodi, A. (2019).
+Exact combinatorial optimization with graph convolutional neural networks.
+\emph{Advances in Neural Information Processing Systems}, 32.
+\url{https://arxiv.org/abs/1906.01629}.
+\end{thebibliography}
+\end{document}

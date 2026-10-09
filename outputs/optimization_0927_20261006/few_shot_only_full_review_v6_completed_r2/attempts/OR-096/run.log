@@ -1,0 +1,458 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+**Objective Function:**
+$$
+\min Z = 200\,x_{1} + 250\,x_{2} + 380\,x_{3} + 350\,x_{4} + 50\,y_{3} + 50\,y_{4}
+$$
+
+**Constraints:**
+
+Flour demand constraint:
+$$
+30\,x_{1} + 20\,x_{2} + 40\,x_{3} + 10\,x_{4} = 100
+$$
+
+Rice demand constraint:
+$$
+20\,x_{1} + 30\,x_{2} + 10\,x_{3} + 40\,x_{4} = 80
+$$
+
+Supplier usage constraints for new suppliers:
+$$
+x_{3} \leq M\,y_{3}
+$$
+$$
+x_{4} \leq M\,y_{4}
+$$
+
+Existing-supplier order bounds (zero orders are allowed):
+$$
+x_{1} \geq 0
+$$
+$$
+x_{2} \geq 0
+$$
+
+Non-negativity for new suppliers:
+$$
+x_{3} \geq 0
+$$
+$$
+x_{4} \geq 0
+$$
+
+Binary variables for new supplier selection:
+$$
+y_{3} \in \{0,1\}
+$$
+$$
+y_{4} \in \{0,1\}
+$$
+
+Where $M$ is a sufficiently large constant (e.g., $M = 100$).
+
+**Decision Variables:**
+$$
+x_{i} \geq 0, \quad i = 1,2,3,4
+$$
+$$
+y_{j} \in \{0,1\}, \quad j = 3,4
+$$
+
+**Retrieved Information**
+
+- Supplier 1: Existing Supplier, Flour per batch = 30, Rice per batch = 20, Price per batch = 200, No new-supplier activation fee
+- Supplier 2: Existing Supplier, Flour per batch = 20, Rice per batch = 30, Price per batch = 250, No new-supplier activation fee
+- Supplier 3: New Supplier, Flour per batch = 40, Rice per batch = 10, Price per batch = 380, Administrative fee = 50
+- Supplier 4: New Supplier, Flour per batch = 10, Rice per batch = 40, Price per batch = 350, Administrative fee = 50
+
+- Demand: Flour = 100 kg, Rice = 80 kg
+
+- $x_{i}$: Continuous batch equivalents ordered from supplier $i$ ($i=1,2,3,4$)
+- $y_{j}$: Binary variable indicating if new supplier $j$ ($j=3,4$) is selected (1 if selected, 0 otherwise)
+
+Secondary objective, with strictly lower lexicographic priority than total cost: minimize y_3 + y_4. Existing suppliers are available with nonnegative continuous orders, including zero. Fractional batches are allowed for all suppliers. Supplier type and If new supplier consistently identify 1/2 as existing and 3/4 as new. The New supplier administrative fee field applies only where If new supplier is Yes; the stored values for suppliers 1/2 are inactive in this model.
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A specialty chemical factory produces three premium products (A, B, C) by blending three raw materials (1, 2, 3). The factory supplies custom formulations to high-end manufacturers:
+
+Product A is a precision industrial lubricant requiring ≥50% Material 1 and ≤25% Material 2
+Product B is an aerospace-grade adhesive requiring ≥25% Material 1 and ≤50% Material 2
+Product C is a general-purpose compound with no material restrictions
+Raw material costs and availability are in raw_materials.csv, while product specifications and selling prices are in products.csv. Determine the optimal blending plan to maximize daily profit.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+#### Decision Variables
+- $x_{ij}$: kg of material $j$ used in product $i$ 
+$i \in \{\text{A}, \text{B}, \text{C}\}, j \in \{1,2,3\}$
+
+#### Objective Function
+Maximize profit: 
+$\quad \quad \max \ 60(x_{A1} + x_{A2} + x_{A3}) + 70(x_{B1} + x_{B2} + x_{B3}) + 60(x_{C1} + x_{C2} + x_{C3})$
+$\quad \quad - 65(x_{A1} + x_{B1} + x_{C1}) - 25(x_{A2} + x_{B2} + x_{C2}) - 35(x_{A3} + x_{B3} + x_{C3})$
+
+#### Constraints
+**1. Material Availability** 
+$\quad \quad x_{A1} + x_{B1} + x_{C1} \leq 100$ 
+$\quad \quad x_{A2} + x_{B2} + x_{C2} \leq 100$ 
+$\quad \quad x_{A3} + x_{B3} + x_{C3} \leq 60$ 
+
+**2. Product A Specifications** 
+$\quad \quad x_{A1} \geq 0.5(x_{A1} + x_{A2} + x_{A3})$ 
+$\quad \quad x_{A2} \leq 0.25(x_{A1} + x_{A2} + x_{A3})$ 
+
+**3. Product B Specifications** 
+$\quad \quad x_{B1} \geq 0.25(x_{B1} + x_{B2} + x_{B3})$ 
+$\quad \quad x_{B2} \leq 0.5(x_{B1} + x_{B2} + x_{B3})$ 
+
+**4. Non-negativity** 
+$\quad \quad x_{ij} \geq 0 \quad \forall i,j$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to assign white and nonwhite elementary students from each of 31 neighborhoods to two schools, minimizing total travel distance, while ensuring each school's enrollment does not exceed its capacity and each school's white-student percentage is within 10 percentage points of the district's 60% white ratio.
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) transportation/assignment problem with side constraints (capacity and racial balance).
+3.  **Define Index Sets:** The primary indices are:
+    - Schools (from `school_capacity.csv`): \( S \)
+    - Neighborhoods (from `neighborhoods_population.csv`): \( N \)
+    - Student groups: {White, NonWhite} (\( G \))
+4.  **Define Decision Variables:**
+    - \( x_{s,n,g} \) = Number of students of group \( g \) (White or NonWhite) from neighborhood \( n \) assigned to school \( s \). Type: GRB.CONTINUOUS (nonnegative, can be fractional if partial assignments are allowed; otherwise, GRB.INTEGER if only whole students are allowed).
+5.  **Identify Parameters (from Schema):**
+    - School capacities: `Capacity` from `school_capacity.csv` (indexed by school \( s \))
+    - Neighborhood populations: `Population_White`, `Population_NonWhite` from `neighborhoods_population.csv` (indexed by neighborhood \( n \))
+    - Distances: `distance.csv` provides distance in miles from each school \( s \) to each neighborhood \( n \)
+    - District-wide white and nonwhite totals: sum over all neighborhoods of `Population_White` and `Population_NonWhite`
+6.  **Formulate Objective:** Minimize the total student-miles traveled: sum over all schools \( s \), neighborhoods \( n \), and groups \( g \) of \( x_{s,n,g} \times \text{distance}_{s,n} \).
+7.  **Formulate Constraints:**
+    - **Neighborhood assignment:** For each neighborhood \( n \) and group \( g \), the sum over schools \( s \) of \( x_{s,n,g} \) equals the total population of group \( g \) in neighborhood \( n \) (i.e., all students must be assigned to a school).
+    - **School capacity:** For each school \( s \), the sum over all neighborhoods \( n \) and groups \( g \) of \( x_{s,n,g} \) does not exceed the school's capacity.
+    - **Racial balance:** For each school \( s \), the percentage of white students assigned must be within 10 percentage points of the district's white percentage (i.e., between 50% and 70% white). This is: \( 0.5 \leq \frac{\text{total white at } s}{\text{total students at } s} \leq 0.7 \), where totals are sums over all neighborhoods.
+    - **Nonnegativity:** All \( x_{s,n,g} \geq 0 \).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+
+# 1. Read all required CSVs with dtype=str and keep_default_na=False
+school_capacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture15/school_capacity.csv'
+neighborhoods_population_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture15/neighborhoods_population.csv'
+distance_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture15/distance.csv'
+
+school_capacity_df = pd.read_csv(school_capacity_path, dtype=str, keep_default_na=False)
+neighborhoods_population_df = pd.read_csv(neighborhoods_population_path, dtype=str, keep_default_na=False)
+distance_df = pd.read_csv(distance_path, dtype=str, keep_default_na=False)
+
+# 2. Normalize and extract entity sets
+
+# Schools
+if 'School' not in school_capacity_df.columns:
+    raise KeyError("Missing 'School' column in school_capacity.csv")
+schools = school_capacity_df['School'].astype(str).tolist()
+
+# Neighborhoods
+if 'Neighborhood' not in neighborhoods_population_df.columns:
+    raise KeyError("Missing 'Neighborhood' column in neighborhoods_population.csv")
+neighborhoods = neighborhoods_population_df['Neighborhood'].astype(str).tolist()
+
+# Groups
+groups = ['White', 'NonWhite']
+
+# 3. Build parameter dictionaries
+
+# School capacities
+if 'Capacity' not in school_capacity_df.columns:
+    raise KeyError("Missing 'Capacity' column in school_capacity.csv")
+school_capacity_dict = {}
+for idx, row in school_capacity_df.iterrows():
+    school = str(row['School'])
+    try:
+        cap = int(row['Capacity'])
+    except Exception:
+        raise ValueError(f"Invalid capacity for school {school}: {row['Capacity']}")
+    school_capacity_dict[school] = cap
+
+# Neighborhood populations by group
+if 'Population_White' not in neighborhoods_population_df.columns or 'Population_NonWhite' not in neighborhoods_population_df.columns:
+    raise KeyError("Missing population columns in neighborhoods_population.csv")
+pop_white_dict = {}
+pop_nonwhite_dict = {}
+for idx, row in neighborhoods_population_df.iterrows():
+    n = str(row['Neighborhood'])
+    try:
+        pop_white = int(row['Population_White'])
+        pop_nonwhite = int(row['Population_NonWhite'])
+    except Exception:
+        raise ValueError(f"Invalid population for neighborhood {n}: {row['Population_White']}, {row['Population_NonWhite']}")
+    pop_white_dict[n] = pop_white
+    pop_nonwhite_dict[n] = pop_nonwhite
+
+# Distance: distance[s][n] = miles
+distance_dict = {}
+distance_df = distance_df.set_index('School')
+for s in schools:
+    if s not in distance_df.index:
+        raise KeyError(f"School {s} not found in distance.csv")
+    row = distance_df.loc[s]
+    distance_dict[s] = {}
+    for n in neighborhoods:
+        if n not in row.index:
+            raise KeyError(f"Neighborhood {n} not found in distance.csv columns")
+        try:
+            dist = float(row[n])
+        except Exception:
+            raise ValueError(f"Invalid distance for school {s}, neighborhood {n}: {row[n]}")
+        distance_dict[s][n] = dist
+
+# 4. Compute district-wide white and nonwhite totals
+total_white = sum(pop_white_dict[n] for n in neighborhoods)
+total_nonwhite = sum(pop_nonwhite_dict[n] for n in neighborhoods)
+total_students = total_white + total_nonwhite
+
+if total_students == 0:
+    raise ValueError("Total number of students in the district is zero.")
+
+district_white_ratio = total_white / total_students  # Should be 0.6 per query, but compute from data
+# Racial balance: each school's white % must be in [0.5, 0.7]
+min_white_ratio = 0.5
+max_white_ratio = 0.7
+
+# 5. Build Gurobi model
+m = gp.Model("SchoolAssignment")
+
+# 6. Decision variables: x_vars[s, n, g] = number of students of group g from neighborhood n assigned to school s
+x_vars = m.addVars(
+    schools, neighborhoods, groups,
+    lb=0.0,
+    vtype=gp.GRB.CONTINUOUS,
+    name='x'
+)
+
+# 7. Objective: Minimize total student-miles traveled
+m.setObjective(
+    gp.quicksum(
+        x_vars[s, n, g] * distance_dict[s][n]
+        for s in schools for n in neighborhoods for g in groups
+    ),
+    gp.GRB.MINIMIZE
+)
+
+# 8. Constraints
+
+# (a) All students from each neighborhood and group must be assigned
+for n in neighborhoods:
+    # White
+    m.addConstr(
+        gp.quicksum(x_vars[s, n, 'White'] for s in schools) == pop_white_dict[n],
+        name=f"AssignWhite_{n}"
+    )
+    # NonWhite
+    m.addConstr(
+        gp.quicksum(x_vars[s, n, 'NonWhite'] for s in schools) == pop_nonwhite_dict[n],
+        name=f"AssignNonWhite_{n}"
+    )
+
+# (b) School capacity
+for s in schools:
+    m.addConstr(
+        gp.quicksum(x_vars[s, n, g] for n in neighborhoods for g in groups) <= school_capacity_dict[s],
+        name=f"Capacity_{s}"
+    )
+
+# (c) Racial balance at each school: 0.5 <= (white at s)/(total at s) <= 0.7, unless school has zero students assigned
+for s in schools:
+    total_white_at_s = gp.quicksum(x_vars[s, n, 'White'] for n in neighborhoods)
+    total_nonwhite_at_s = gp.quicksum(x_vars[s, n, 'NonWhite'] for n in neighborhoods)
+    total_at_s = total_white_at_s + total_nonwhite_at_s
+    # To avoid division by zero, only enforce if total_at_s > 0
+    # Gurobi does not allow division by variables, so rewrite:
+    # total_white_at_s >= min_white_ratio * total_at_s
+    # total_white_at_s <= max_white_ratio * total_at_s
+    # If total_at_s == 0, both sides are zero, so constraints are satisfied
+    m.addConstr(
+        total_white_at_s >= min_white_ratio * (total_white_at_s + total_nonwhite_at_s),
+        name=f"MinWhiteRatio_{s}"
+    )
+    m.addConstr(
+        total_white_at_s <= max_white_ratio * (total_white_at_s + total_nonwhite_at_s),
+        name=f"MaxWhiteRatio_{s}"
+    )
+
+# 9. Solve
+m.optimize()
+
+# 10. Print results
+if m.status == gp.GRB.OPTIMAL:
+    print(f"Optimal total student-miles: {m.objVal:.2f}")
+    print("\n--- Assignment Plan (students assigned from each neighborhood to each school) ---")
+    for n in neighborhoods:
+        for g in groups:
+            for s in schools:
+                val = x_vars[s, n, g].X
+                if val > 1e-5:
+                    print(f"Neighborhood {n}, Group {g}, School {s}: {val:.2f} students")
+    print("\n--- School Summaries ---")
+    for s in schools:
+        white = sum(x_vars[s, n, 'White'].X for n in neighborhoods)
+        nonwhite = sum(x_vars[s, n, 'NonWhite'].X for n in neighborhoods)
+        total = white + nonwhite
+        if total > 1e-5:
+            pct_white = 100 * white / total
+            print(f"School {s}: {total:.2f} students (White: {white:.2f}, NonWhite: {nonwhite:.2f}, %White: {pct_white:.2f}%)")
+        else:
+            print(f"School {s}: 0 students assigned")
+else:
+    print(f"No optimal solution found. Status: {m.status}")
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 68 rows, 124 columns and 496 nonzeros
+Model fingerprint: 0x0746994f
+Coefficient statistics:
+  Matrix range     [3e-01, 1e+00]
+  Objective range  [1e+00, 4e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+01, 2e+03]
+Presolve removed 68 rows and 124 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    5.0440000e+03   0.000000e+00   0.000000e+00      0s
+
+Solved in 0 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  5.044000000e+03
+Optimal total student-miles: 5044.00
+
+--- Assignment Plan (students assigned from each neighborhood to each school) ---
+Neighborhood N01, Group White, School I: 78.00 students
+Neighborhood N01, Group NonWhite, School I: 22.00 students
+Neighborhood N02, Group White, School I: 57.00 students
+Neighborhood N02, Group NonWhite, School I: 33.00 students
+Neighborhood N03, Group White, School I: 47.00 students
+Neighborhood N03, Group NonWhite, School I: 63.00 students
+Neighborhood N04, Group White, School I: 78.00 students
+Neighborhood N04, Group NonWhite, School I: 22.00 students
+Neighborhood N05, Group White, School I: 57.00 students
+Neighborhood N05, Group NonWhite, School I: 33.00 students
+Neighborhood N06, Group White, School I: 47.00 students
+Neighborhood N06, Group NonWhite, School I: 63.00 students
+Neighborhood N07, Group White, School I: 78.00 students
+Neighborhood N07, Group NonWhite, School I: 22.00 students
+Neighborhood N08, Group White, School I: 57.00 students
+Neighborhood N08, Group NonWhite, School I: 33.00 students
+Neighborhood N09, Group White, School I: 46.00 students
+Neighborhood N09, Group NonWhite, School I: 64.00 students
+Neighborhood N10, Group White, School I: 77.00 students
+Neighborhood N10, Group NonWhite, School I: 23.00 students
+Neighborhood N11, Group White, School I: 56.00 students
+Neighborhood N11, Group NonWhite, School I: 34.00 students
+Neighborhood N12, Group White, School I: 46.00 students
+Neighborhood N12, Group NonWhite, School I: 64.00 students
+Neighborhood N13, Group White, School I: 77.00 students
+Neighborhood N13, Group NonWhite, School I: 23.00 students
+Neighborhood N14, Group White, School I: 56.00 students
+Neighborhood N14, Group NonWhite, School I: 34.00 students
+Neighborhood N15, Group White, School I: 46.00 students
+Neighborhood N15, Group NonWhite, School I: 64.00 students
+Neighborhood N16, Group White, School I: 77.00 students
+Neighborhood N16, Group NonWhite, School I: 23.00 students
+Neighborhood N17, Group White, School II: 56.00 students
+Neighborhood N17, Group NonWhite, School II: 34.00 students
+Neighborhood N18, Group White, School II: 46.00 students
+Neighborhood N18, Group NonWhite, School II: 64.00 students
+Neighborhood N19, Group White, School II: 77.00 students
+Neighborhood N19, Group NonWhite, School II: 23.00 students
+Neighborhood N20, Group White, School II: 56.00 students
+Neighborhood N20, Group NonWhite, School II: 34.00 students
+Neighborhood N21, Group White, School II: 46.00 students
+Neighborhood N21, Group NonWhite, School II: 64.00 students
+Neighborhood N22, Group White, School II: 77.00 students
+Neighborhood N22, Group NonWhite, School II: 23.00 students
+Neighborhood N23, Group White, School II: 56.00 students
+Neighborhood N23, Group NonWhite, School II: 34.00 students
+Neighborhood N24, Group White, School II: 46.00 students
+Neighborhood N24, Group NonWhite, School II: 64.00 students
+Neighborhood N25, Group White, School II: 77.00 students
+Neighborhood N25, Group NonWhite, School II: 23.00 students
+Neighborhood N26, Group White, School II: 56.00 students
+Neighborhood N26, Group NonWhite, School II: 34.00 students
+Neighborhood N27, Group White, School II: 46.00 students
+Neighborhood N27, Group NonWhite, School II: 64.00 students
+Neighborhood N28, Group White, School II: 77.00 students
+Neighborhood N28, Group NonWhite, School II: 23.00 students
+Neighborhood N29, Group White, School II: 56.00 students
+Neighborhood N29, Group NonWhite, School II: 34.00 students
+Neighborhood N30, Group White, School II: 46.00 students
+Neighborhood N30, Group NonWhite, School II: 64.00 students
+Neighborhood N31, Group White, School II: 74.00 students
+Neighborhood N31, Group NonWhite, School II: 46.00 students
+
+--- School Summaries ---
+School I: 1600.00 students (White: 980.00, NonWhite: 620.00, %White: 61.25%)
+School II: 1520.00 students (White: 892.00, NonWhite: 628.00, %White: 58.68%)
+Optimal objective: 5044.0
+Optimal solution: [('C0', 78.0), ('C1', 22.0), ('C2', 57.0), ('C3', 33.0), ('C4', 47.0), ('C5', 63.0), ('C6', 78.0), ('C7', 22.0), ('C8', 57.0), ('C9', 33.0), ('C10', 47.0), ('C11', 63.0), ('C12', 78.0), ('C13', 22.0), ('C14', 57.0), ('C15', 33.0), ('C16', 46.0), ('C17', 64.0), ('C18', 77.0), ('C19', 23.0), ('C20', 56.0), ('C21', 34.0), ('C22', 46.0), ('C23', 64.0), ('C24', 77.0), ('C25', 23.0), ('C26', 56.0), ('C27', 34.0), ('C28', 46.0), ('C29', 64.0), ('C30', 77.0), ('C31', 23.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 56.0), ('C95', 34.0), ('C96', 46.0), ('C97', 64.0), ('C98', 77.0), ('C99', 23.0), ('C100', 56.0), ('C101', 34.0), ('C102', 46.0), ('C103', 64.0), ('C104', 77.0), ('C105', 23.0), ('C106', 56.0), ('C107', 34.0), ('C108', 46.0), ('C109', 64.0), ('C110', 77.0), ('C111', 23.0), ('C112', 56.0), ('C113', 34.0), ('C114', 46.0), ('C115', 64.0), ('C116', 77.0), ('C117', 23.0), ('C118', 56.0), ('C119', 34.0), ('C120', 46.0), ('C121', 64.0), ('C122', 74.0), ('C123', 46.0)]

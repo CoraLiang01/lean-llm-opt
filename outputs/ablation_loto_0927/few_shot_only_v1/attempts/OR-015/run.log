@@ -1,0 +1,78 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Extract table records for file_0_view_0
+table_id = "file_0_view_0"
+found = False
+for t in CSVQA_DATA["tables"]:
+    if t["table_id"] == table_id:
+        records = t["records"]
+        columns = t["columns"]
+        found = True
+        break
+if not found:
+    raise ValueError(f"Table {table_id} not found in CSVQA_DATA.")
+
+# Identify column indices
+try:
+    idx_product = columns.index("Product Name")
+    idx_revenue = columns.index("Revenue")
+    idx_demand = columns.index("Demand")
+    idx_inventory = columns.index("Initial Inventory")
+except ValueError as e:
+    raise ValueError(f"Required column missing: {e}")
+
+# Select products classified under 'Aalop'
+aalop_items = []
+revenue = {}
+demand = {}
+inventory = {}
+
+for rec in records:
+    pname = rec["values"]["Product Name"]
+    # Use regex to match 'Aalop' in product name (case-insensitive, whole word)
+    if re.search(r'\bAalop\b', pname, re.IGNORECASE):
+        aalop_items.append(pname)
+        # Parse revenue, demand, inventory as numbers
+        try:
+            rev = float(rec["values"]["Revenue"])
+            dem = int(float(rec["values"]["Demand"]))
+            inv = int(float(rec["values"]["Initial Inventory"]))
+        except Exception as e:
+            raise ValueError(f"Failed to parse numeric fields for product '{pname}': {e}")
+        revenue[pname] = rev
+        demand[pname] = dem
+        inventory[pname] = inv
+
+if not aalop_items:
+    raise ValueError("No products classified under 'Aalop' found in the data.")
+
+# Validate all coefficients are present for each Aalop product
+for i in aalop_items:
+    if i not in revenue or i not in demand or i not in inventory:
+        raise ValueError(f"Missing data for product '{i}'.")
+
+# Build and solve the Gurobi model
+m = gp.Model('Aalop_Revenue_Max')
+x = m.addVars(aalop_items, lb=0, vtype=GRB.INTEGER, name='x')
+m.setObjective(gp.quicksum(revenue[i] * x[i] for i in aalop_items), GRB.MAXIMIZE)
+m.addConstrs((x[i] <= inventory[i] for i in aalop_items), name='')
+m.addConstrs((x[i] <= demand[i] for i in aalop_items), name='')
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for variable in m.getVars():
+        print(f'{variable.VarName}: {variable.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_0927_experiments.py", line 62, in worker
+    record=ns['execute_pipeline_case'](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/ablation_loto_0927/few_shot_only_v1/frozen_notebook.ipynb:cell29", line 93, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/ablation_loto_0927/few_shot_only_v1/frozen_notebook.ipynb:cell29", line 17, in execute_code
+  File "<string>", line 40, in <module>
+ValueError: No products classified under 'Aalop' found in the data.

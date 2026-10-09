@@ -1,0 +1,171 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+#### Symbolic Model
+
+**Index Set:**  
+Let $\mathcal{I}$ be the set of all products where Product_Name contains 'Books'.
+
+**Parameters:**  
+For each $i \in \mathcal{I}$:
+- $A_i$: Revenue per unit of product $i$ (from column 'Revenue')
+- $d_i$: Demand for product $i$ (from column 'Demand')
+- $I_i$: Initial inventory for product $i$ (from column 'Initial Inventory')
+
+**Decision Variables:**  
+For each $i \in \mathcal{I}$:
+- $x_i \in \mathbb{Z}_+, \quad 0 \leq x_i \leq \min\{d_i, I_i\}$: Number of units of product $i$ to fulfill
+
+**Objective:**  
+$\max \sum_{i \in \mathcal{I}} A_i x_i$
+
+**Constraints:**  
+For all $i \in \mathcal{I}$:
+- $x_i \leq d_i$  (Demand constraint)
+- $x_i \leq I_i$  (Inventory constraint)
+- $x_i \geq 0$  (Non-negativity and integrality)
+
+#### Data Mapping
+
+- Table: `/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM23/DifferentStoreSales.csv`
+    - Index set $\mathcal{I}$: rows where `Product_Name` contains 'Books'
+    - Parameter $A_i$: column `Revenue`
+    - Parameter $d_i$: column `Demand`
+    - Parameter $I_i$: column `Initial Inventory`[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Try reading the CSV with multiple encodings as specified
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM23/DifferentStoreSales.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not read CSV with any of the specified encodings.")
+
+    # Ensure required columns exist
+    required_cols = ['Product_Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Filter for 'Books' products (case-insensitive, substring match)
+    # If there is a product type/category column, it is not specified; so we filter by Product_Name
+    books_mask = df['Product_Name'].str.casefold().str.contains('books')
+    books_df = df[books_mask].copy()
+
+    # If no 'Books' products found, raise error
+    if books_df.empty:
+        raise ValueError("No products classified under 'Books' found in the data.")
+
+    # Prepare index set and coefficients
+    items = []
+    revenue = {}
+    demand = {}
+    inventory = {}
+
+    for idx, row in books_df.iterrows():
+        prod = row['Product_Name']
+        try:
+            rev = float(row['Revenue'])
+        except Exception:
+            raise ValueError(f"Non-numeric Revenue for product '{prod}'")
+        try:
+            dem = float(row['Demand'])
+        except Exception:
+            raise ValueError(f"Non-numeric Demand for product '{prod}'")
+        try:
+            inv = float(row['Initial Inventory'])
+        except Exception:
+            raise ValueError(f"Non-numeric Initial Inventory for product '{prod}'")
+        # Only include products with all numeric coefficients
+        items.append(prod)
+        revenue[prod] = rev
+        demand[prod] = dem
+        inventory[prod] = inv
+
+    # Validate that all items have coefficients
+    if not (set(items) == set(revenue) == set(demand) == set(inventory)):
+        raise ValueError("Mismatch in coefficient coverage for items.")
+
+    # Build the model
+    m = gp.Model('Books_Revenue_Maximization')
+
+    # Decision variables: x_i ∈ ℤ₊, 0 ≤ x_i ≤ min{d_i, I_i}
+    quantity_vars = m.addVars(
+        items,
+        lb=0,
+        ub={i: min(demand[i], inventory[i]) for i in items},
+        vtype=GRB.INTEGER,
+        name='x'
+    )
+
+    # Objective: maximize total revenue
+    m.setObjective(
+        gp.quicksum(revenue[i] * quantity_vars[i] for i in items),
+        GRB.MAXIMIZE
+    )
+
+    # Constraints: x_i ≤ d_i (demand), x_i ≤ I_i (inventory), x_i ≥ 0 (already set by lb)
+    m.addConstrs((quantity_vars[i] <= demand[i] for i in items), name='d')
+    m.addConstrs((quantity_vars[i] <= inventory[i] for i in items), name='I')
+
+    # Set MIPGap as required
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 10 rows, 5 columns and 10 nonzeros
+Model fingerprint: 0x43a08891
+Variable types: 0 continuous, 5 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+01, 8e+01]
+  Bounds range     [2e+03, 8e+03]
+  RHS range        [2e+03, 5e+04]
+Found heuristic solution: objective 1240406.2500
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.24041e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.240406250000e+06, best bound 1.240406250000e+06, gap 0.0000%
+ObjVal: 1240406.25
+C0: 1980.0
+C1: 3024.0
+C2: 4536.0
+C3: 5601.0
+C4: 7567.0
+Optimal objective: 1240406.25
+Optimal solution: [('C0', 1980.0), ('C1', 3024.0), ('C2', 4536.0), ('C3', 5601.0), ('C4', 7567.0)]

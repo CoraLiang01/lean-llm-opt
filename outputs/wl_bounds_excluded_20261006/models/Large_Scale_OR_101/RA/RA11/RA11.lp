@@ -1,0 +1,19 @@
+\ Canonical native-bound formulation; bounds excluded from WL graph.
+Maximize
+  obj: + 49 x_0_0 + 30 x_1_0 + 30 x_2_0 + 18 x_3_0 + 54 x_4_0 + 27 x_5_0 + 91 x_6_0 + 88 x_7_0 + 78 x_8_0 + 22 x_9_0
+Subject To
+  R0: + 282 x_0_0 + 83 x_1_0 + 251 x_2_0 + 257 x_3_0 + 88 x_4_0 + 52 x_5_0 + 198 x_6_0 + 203 x_7_0 + 87 x_8_0 + 265 x_9_0 <= 1035
+Bounds
+  0 <= x_0_0 <= +inf
+  0 <= x_1_0 <= +inf
+  0 <= x_2_0 <= +inf
+  0 <= x_3_0 <= +inf
+  0 <= x_4_0 <= +inf
+  0 <= x_5_0 <= +inf
+  0 <= x_6_0 <= +inf
+  0 <= x_7_0 <= +inf
+  0 <= x_8_0 <= +inf
+  0 <= x_9_0 <= +inf
+Generals
+  x_0_0 x_1_0 x_2_0 x_3_0 x_4_0 x_5_0 x_6_0 x_7_0 x_8_0 x_9_0
+End

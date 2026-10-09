@@ -1,0 +1,245 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'A supermarket manager needs to select a variety of products to stock in different sections of the store. '
+          'Particularly, the store has several sections, each with a display space limit provided in "capacity.csv." '
+          'The predefined price and shelf space requirement of each product are detailed in "products.csv." The '
+          'objective is to determine the optimal number of units of each product to stock in each section to maximize '
+          'the total revenue, while ensuring that the total space used by the products in each section does not exceed '
+          'the available capacity. The decision variables x_ij denote the number of units of product j to be placed in '
+          'section i.The decision variables must be integers.',
+ 'relationships': [],
+ 'route': 'RA',
+ 'tables': [{'columns': ['reference_document_page_count',
+                         'archive_audit_note_count',
+                         'SectionID',
+                         'archived_attachment_count',
+                         'archive_revision_number',
+                         'Capacity'],
+             'file_index': 0,
+             'file_name': 'capacity.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 8,
+             'records': [{'source_row': 0,
+                          'values': {'Capacity': '100',
+                                     'SectionID': '1',
+                                     'archive_audit_note_count': '5',
+                                     'archive_revision_number': '3',
+                                     'archived_attachment_count': '1',
+                                     'reference_document_page_count': '6'}},
+                         {'source_row': 1,
+                          'values': {'Capacity': '150',
+                                     'SectionID': '2',
+                                     'archive_audit_note_count': '3',
+                                     'archive_revision_number': '7',
+                                     'archived_attachment_count': '1',
+                                     'reference_document_page_count': '8'}},
+                         {'source_row': 2,
+                          'values': {'Capacity': '120',
+                                     'SectionID': '3',
+                                     'archive_audit_note_count': '1',
+                                     'archive_revision_number': '3',
+                                     'archived_attachment_count': '3',
+                                     'reference_document_page_count': '2'}},
+                         {'source_row': 3,
+                          'values': {'Capacity': '130',
+                                     'SectionID': '4',
+                                     'archive_audit_note_count': '4',
+                                     'archive_revision_number': '4',
+                                     'archived_attachment_count': '2',
+                                     'reference_document_page_count': '12'}},
+                         {'source_row': 4,
+                          'values': {'Capacity': '90',
+                                     'SectionID': '5',
+                                     'archive_audit_note_count': '4',
+                                     'archive_revision_number': '6',
+                                     'archived_attachment_count': '3',
+                                     'reference_document_page_count': '2'}},
+                         {'source_row': 5,
+                          'values': {'Capacity': '110',
+                                     'SectionID': '6',
+                                     'archive_audit_note_count': '2',
+                                     'archive_revision_number': '4',
+                                     'archived_attachment_count': '3',
+                                     'reference_document_page_count': '6'}},
+                         {'source_row': 6,
+                          'values': {'Capacity': '160',
+                                     'SectionID': '7',
+                                     'archive_audit_note_count': '3',
+                                     'archive_revision_number': '3',
+                                     'archived_attachment_count': '1',
+                                     'reference_document_page_count': '12'}},
+                         {'source_row': 7,
+                          'values': {'Capacity': '140',
+                                     'SectionID': '8',
+                                     'archive_audit_note_count': '1',
+                                     'archive_revision_number': '8',
+                                     'archived_attachment_count': '3',
+                                     'reference_document_page_count': '4'}}],
+             'returned_rows': 8,
+             'role': 'file_0',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['record_keeper_group',
+                         'reference_document_page_count',
+                         'archive_storage_medium',
+                         'ProductName',
+                         'Value',
+                         'archive_revision_number',
+                         'record_index_style',
+                         'Weight',
+                         'archived_attachment_count'],
+             'file_index': 1,
+             'file_name': 'products.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 10,
+             'records': [{'source_row': 0,
+                          'values': {'ProductName': '1',
+                                     'Value': '10',
+                                     'Weight': '2',
+                                     'archive_revision_number': '1',
+                                     'archive_storage_medium': 'Digital',
+                                     'archived_attachment_count': '4',
+                                     'record_index_style': 'Numeric',
+                                     'record_keeper_group': 'Team B',
+                                     'reference_document_page_count': '2'}},
+                         {'source_row': 1,
+                          'values': {'ProductName': '2',
+                                     'Value': '15',
+                                     'Weight': '3',
+                                     'archive_revision_number': '4',
+                                     'archive_storage_medium': 'Hybrid',
+                                     'archived_attachment_count': '3',
+                                     'record_index_style': 'Numeric',
+                                     'record_keeper_group': 'Team A',
+                                     'reference_document_page_count': '4'}},
+                         {'source_row': 2,
+                          'values': {'ProductName': '3',
+                                     'Value': '8',
+                                     'Weight': '1',
+                                     'archive_revision_number': '2',
+                                     'archive_storage_medium': 'Digital',
+                                     'archived_attachment_count': '2',
+                                     'record_index_style': 'Alphabetic',
+                                     'record_keeper_group': 'Team C',
+                                     'reference_document_page_count': '8'}},
+                         {'source_row': 3,
+                          'values': {'ProductName': '4',
+                                     'Value': '12',
+                                     'Weight': '2',
+                                     'archive_revision_number': '9',
+                                     'archive_storage_medium': 'Paper',
+                                     'archived_attachment_count': '2',
+                                     'record_index_style': 'Numeric',
+                                     'record_keeper_group': 'Team A',
+                                     'reference_document_page_count': '8'}},
+                         {'source_row': 4,
+                          'values': {'ProductName': '5',
+                                     'Value': '20',
+                                     'Weight': '4',
+                                     'archive_revision_number': '3',
+                                     'archive_storage_medium': 'Paper',
+                                     'archived_attachment_count': '2',
+                                     'record_index_style': 'Numeric',
+                                     'record_keeper_group': 'Team A',
+                                     'reference_document_page_count': '12'}},
+                         {'source_row': 5,
+                          'values': {'ProductName': '6',
+                                     'Value': '25',
+                                     'Weight': '5',
+                                     'archive_revision_number': '7',
+                                     'archive_storage_medium': 'Paper',
+                                     'archived_attachment_count': '2',
+                                     'record_index_style': 'Chronological',
+                                     'record_keeper_group': 'Team C',
+                                     'reference_document_page_count': '6'}},
+                         {'source_row': 6,
+                          'values': {'ProductName': '7',
+                                     'Value': '5',
+                                     'Weight': '1',
+                                     'archive_revision_number': '2',
+                                     'archive_storage_medium': 'Paper',
+                                     'archived_attachment_count': '3',
+                                     'record_index_style': 'Alphabetic',
+                                     'record_keeper_group': 'Team A',
+                                     'reference_document_page_count': '12'}},
+                         {'source_row': 7,
+                          'values': {'ProductName': '8',
+                                     'Value': '30',
+                                     'Weight': '6',
+                                     'archive_revision_number': '3',
+                                     'archive_storage_medium': 'Hybrid',
+                                     'archived_attachment_count': '3',
+                                     'record_index_style': 'Numeric',
+                                     'record_keeper_group': 'Team C',
+                                     'reference_document_page_count': '2'}},
+                         {'source_row': 8,
+                          'values': {'ProductName': '9',
+                                     'Value': '18',
+                                     'Weight': '3',
+                                     'archive_revision_number': '7',
+                                     'archive_storage_medium': 'Digital',
+                                     'archived_attachment_count': '1',
+                                     'record_index_style': 'Chronological',
+                                     'record_keeper_group': 'Team C',
+                                     'reference_document_page_count': '8'}},
+                         {'source_row': 9,
+                          'values': {'ProductName': '10',
+                                     'Value': '22',
+                                     'Weight': '4',
+                                     'archive_revision_number': '5',
+                                     'archive_storage_medium': 'Hybrid',
+                                     'archived_attachment_count': '2',
+                                     'record_index_style': 'Alphabetic',
+                                     'record_keeper_group': 'Team A',
+                                     'reference_document_page_count': '8'}}],
+             'returned_rows': 10,
+             'role': 'file_1',
+             'table_id': 'file_1_view_0'}],
+ 'validation': {'fallback_reason': "Relationship references an unknown table_id: {'type': 'matrix', 'matrix_table_id': "
+                                   "'file_2_view_0', 'row_id_column': 'SectionID', 'row_axis': {'table_id': "
+                                   "'file_0_view_0', 'id_column': 'SectionID'}, 'column_axis': {'table_id': "
+                                   "'file_1_view_0', 'id_column': 'ProductName'}}",
+                'planner_errors': ["Relationship references an unknown table_id: {'type': 'matrix', 'matrix_table_id': "
+                                   "'file_2_view_0', 'row_id_column': 'SectionID', 'row_axis': {'table_id': "
+                                   "'file_0_view_0', 'id_column': 'SectionID'}, 'column_axis': {'table_id': "
+                                   "'file_1_view_0', 'id_column': 'ProductName'}}"],
+                'status': 'FALLBACK_FULL_DATA'}}
+import pandas as pd
+CSVQA_FRAMES = {t["table_id"]: pd.DataFrame([r["values"] for r in t["records"]], columns=t["columns"], index=[r["source_row"] for r in t["records"]]) for t in CSVQA_DATA["tables"]}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    capacity_df = CSVQA_FRAMES['file_0_view_0']
+    products_df = CSVQA_FRAMES['file_1_view_0']
+    I = list(capacity_df['SectionID'])
+    J = list(products_df['ProductName'])
+    c_i = {}
+    for (idx, row) in capacity_df.iterrows():
+        section_id = row['SectionID']
+        try:
+            c_i[section_id] = float(row['Capacity'])
+        except Exception:
+            raise ValueError(f"Invalid Capacity for SectionID {section_id}: {row['Capacity']}")
+    v_j = {}
+    w_j = {}
+    for (idx, row) in products_df.iterrows():
+        product_name = row['ProductName']
+        try:
+            v_j[product_name] = float(row['Value'])
+        except Exception:
+            raise ValueError(f"Invalid Value for ProductName {product_name}: {row['Value']}")
+        try:
+            w_j[product_name] = float(row['Weight'])
+        except Exception:
+            raise ValueError(f"Invalid Weight for ProductName {product_name}: {row['Weight']}")
+    if set(I) != set(c_i.keys()):
+        raise ValueError('SectionID mismatch between index set and capacity data')
+    if set(J) != set(v_j.keys()) or set(J) != set(w_j.keys()):
+        raise ValueError('ProductName mismatch between index set and product data')
+    m = gp.Model('Supermarket_Section_Stocking')
+    quantity_vars = m.addVars(I, J, lb=0, vtype=GRB.INTEGER, name='')
+    m.setObjective(gp.quicksum((v_j[j] * quantity_vars[i, j] for i in I for j in J)), GRB.MAXIMIZE)
+    m.addConstrs((gp.quicksum((w_j[j] * quantity_vars[i, j] for j in J)) <= c_i[i] for i in I), name='')
+    m.Params.MIPGap = 0.0001
+    m.optimize()
+    return m
+m = solve_problem()

@@ -1,0 +1,147 @@
+{
+  "problem_id": "OR-025",
+  "query": "A smartphone retail outlet offers several models with revenue data provided in the ‘Revenue’ column. The retailer aims to maximize total revenue using the initial inventory of products classified under ‘TABLET’. Inventory levels are provided in the ‘Initial Inventory’ column. Demand quantities for these products are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. Decision variables x_i represent the number of units of each ‘TABLET’ smartphone model i that will be fulfilled.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM16/SmartphoneRetailOutletSalesData.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 5486959.83,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to maximize total revenue by deciding how many units of each ‘TABLET’ smartphone model to fulfill, given known demand and initial inventory for each model.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem.\n3.  **Define Index Sets:** The primary index is the set of all products where ‘Product Name’ starts with ‘TABLET’ (i.e., all TABLET smartphone models).\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of TABLET model i to fulfill. Type: GRB.INTEGER.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: ‘Revenue’ column (revenue per unit for each TABLET model).\n    -   Constraint coefficients: ‘Demand’ column (maximum units that can be fulfilled per model), ‘Initial Inventory’ column (maximum available units per model).\n    -   Constraint RHS: For each model, the minimum of ‘Demand’ and ‘Initial Inventory’ (since cannot fulfill more than available or demanded).\n6.  **Formulate Objective:** Maximize the sum over all TABLET models of (Revenue[i] * x[i]), i.e., maximize total revenue from fulfilled TABLET sales.\n7.  **Formulate Constraints:**\n    -   For each TABLET model i:\n        -   Fulfillment cannot exceed demand: x[i] ≤ Demand[i].\n        -   Fulfillment cannot exceed initial inventory: x[i] ≤ Initial Inventory[i].\n        -   Non-negativity and integrality: x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM16/SmartphoneRetailOutletSalesData.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 481\nColumns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product Name': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'int64'}\nPreview only (first 10 rows):\n      Product Name  Revenue Demand Initial Inventory\n ACCESSORY_1024.58  1024.58      8                40\n ACCESSORY_1025.42  1025.42     16                80\nACCESSORY_102550.0 102550.0      4                20\nACCESSORY_10347.46 10347.46      4                20\n ACCESSORY_10432.2  10432.2      6                30\nACCESSORY_10508.48 10508.48     12                60\n ACCESSORY_10932.2  10932.2      4                20\n ACCESSORY_1288.14  1288.14      4                20\n ACCESSORY_1322.04  1322.04      4                20\n ACCESSORY_1363.56  1363.56      6                30\nFull-file column statistics: {\"Product Name\": {\"missing\": 0, \"unique_nonempty\": 481}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 458, \"numeric_range\": [410.71, 104767.86]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 78, \"numeric_range\": [2.0, 326.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 70, \"numeric_range\": [10.0, 2000.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"tablet\", \"matching_columns\": [{\"column\": \"Product Name\", \"exact\": 0, \"prefix\": 27, \"contains\": 27, \"examples\": [\"TABLET_10084.74\", \"TABLET_12211.86\", \"TABLET_14669.5\"]}], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"59e70f7670636bd8817b2dff3b44866762596b492bf88263963c6fe711524870\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM16/SmartphoneRetailOutletSalesData.csv'\ndf = pd.read_csv(csv_path, dtype=str, keep_default_na=False)\n\ndef is_tablet(name):\n    return name.strip().casefold().startswith('tablet')\ntablet_mask = df['Product Name'].apply(is_tablet)\ntablet_df = df[tablet_mask].copy()\nrequired_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nfor col in required_cols:\n    if col not in tablet_df.columns:\n        raise KeyError(f\"Required column '{col}' not found in the data.\")\ntablet_df['Product Name'] = tablet_df['Product Name'].apply(lambda x: x.strip())\ntablet_df.set_index('Product Name', inplace=True)\nfor col in ['Revenue', 'Demand', 'Initial Inventory']:\n    tablet_df[col] = pd.to_numeric(tablet_df[col], errors='raise')\ntablet_models = list(tablet_df.index)\nrevenue = tablet_df['Revenue'].to_dict()\ndemand = tablet_df['Demand'].to_dict()\ninitial_inventory = tablet_df['Initial Inventory'].to_dict()\nfulfillment_ub = {i: min(demand[i], initial_inventory[i]) for i in tablet_models}\nm = gp.Model('TabletRevenueMaximization')\nx_vars = m.addVars(tablet_models, vtype=gp.GRB.INTEGER, lb=0, ub=[fulfillment_ub[i] for i in tablet_models], name='')\nm.setObjective(gp.quicksum((revenue[i] * x_vars[i] for i in tablet_models)), gp.GRB.MAXIMIZE)\nfor i in tablet_models:\n    m.addConstr(x_vars[i] <= demand[i], name=f'demand_{i}')\n    m.addConstr(x_vars[i] <= initial_inventory[i], name=f'inventory_{i}')\n    m.addConstr(x_vars[i] >= 0, name=f'nonneg_{i}')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total value/cost: {m.objVal:.2f}')\n    print('--- Fulfillment Plan for TABLET Models ---')\n    for i in tablet_models:\n        fulfilled = int(round(x_vars[i].X))\n        print(f'Model: {i}, Fulfilled: {fulfilled}, Demand: {demand[i]}, Inventory: {initial_inventory[i]}, Revenue/unit: {revenue[i]:.2f}')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 5486959.829999999,
+  "final_solution": [
+    [
+      "C0",
+      2.0
+    ],
+    [
+      "C1",
+      43.0
+    ],
+    [
+      "C2",
+      6.0
+    ],
+    [
+      "C3",
+      6.0
+    ],
+    [
+      "C4",
+      20.0
+    ],
+    [
+      "C5",
+      22.0
+    ],
+    [
+      "C6",
+      3.0
+    ],
+    [
+      "C7",
+      16.0
+    ],
+    [
+      "C8",
+      2.0
+    ],
+    [
+      "C9",
+      2.0
+    ],
+    [
+      "C10",
+      32.0
+    ],
+    [
+      "C11",
+      14.0
+    ],
+    [
+      "C12",
+      2.0
+    ],
+    [
+      "C13",
+      2.0
+    ],
+    [
+      "C14",
+      6.0
+    ],
+    [
+      "C15",
+      2.0
+    ],
+    [
+      "C16",
+      6.0
+    ],
+    [
+      "C17",
+      2.0
+    ],
+    [
+      "C18",
+      6.0
+    ],
+    [
+      "C19",
+      6.0
+    ],
+    [
+      "C20",
+      6.0
+    ],
+    [
+      "C21",
+      12.0
+    ],
+    [
+      "C22",
+      60.0
+    ],
+    [
+      "C23",
+      8.0
+    ],
+    [
+      "C24",
+      8.0
+    ],
+    [
+      "C25",
+      38.0
+    ],
+    [
+      "C26",
+      4.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 10.615,
+  "evaluated_utc": "2026-10-06T08:48:54.137562+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

@@ -1,0 +1,59 @@
+{
+  "problem_id": "OR-032",
+  "query": "The supermarket offers various products with revenue data in the ‘Revenue’ column. The company aims to maximize total revenue by focusing on products classified under ‘Books’. Inventory levels are detailed in the ‘Initial Inventory’ column. Demand quantities are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. Decision variables x_i represent the number of units of each ‘Books’ product i that will be fulfilled.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM23/DifferentStoreSales.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 1240406.25,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to maximize total revenue by selecting how many units to fulfill for each product classified as ‘Books’, subject to inventory and demand constraints. Only products with 'Books' in the 'Product_Name' are considered. The decision variable for each such product is the number of units fulfilled, which cannot exceed either the initial inventory or the demand for that product.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem.\n3.  **Define Index Sets:** The primary index is the set of products i where 'Product_Name' starts with 'Books' (i.e., all rows in the CSV where 'Product_Name' matches this prefix).\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of 'Books' product i to fulfill. Type: GRB.CONTINUOUS (or GRB.INTEGER if only whole units are allowed; the schema uses int64 for demand, but the variable type is not explicitly specified in the query).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Revenue' column (per-unit revenue for each product i).\n    -   Constraint coefficients: Each variable is directly bounded by 'Demand' and 'Initial Inventory' columns for product i.\n    -   Constraint RHS: 'Demand' and 'Initial Inventory' columns (upper bounds for each x[i]).\n6.  **Formulate Objective:** Maximize the sum over all selected 'Books' products of (schema['Revenue'][i] * x[i]); that is, maximize total revenue from fulfilled units of 'Books' products.\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand Limit): For each 'Books' product i, x[i] ≤ schema['Demand'][i] (cannot fulfill more than demand).\n    -   Constraint 2 (Inventory Limit): For each 'Books' product i, x[i] ≤ schema['Initial Inventory'][i] (cannot fulfill more than available inventory).\n    -   Constraint 3 (Non-negativity): For each 'Books' product i, x[i] ≥ 0.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM23/DifferentStoreSales.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 40\nColumns: ['Product_Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product_Name': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'float64'}\nPreview only (first 10 rows):\n    Product_Name Revenue Demand Initial Inventory\n     Books_15.15   15.15   1980            9920.0\n      Books_30.3    30.3   3024           20160.0\n     Books_45.45   45.45   4536           30000.0\n      Books_60.6    60.6   5601           38360.0\n     Books_75.75   75.75   7567           51450.0\nClothing_1200.32 1200.32  39904          273960.0\n Clothing_1500.4  1500.4  50929          347000.0\n Clothing_300.08  300.08  13719           68690.0\n Clothing_600.16  600.16  20857          139050.0\n Clothing_900.24  900.24  31483          207280.0\nFull-file column statistics: {\"Product_Name\": {\"missing\": 0, \"unique_nonempty\": 40}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 40, \"numeric_range\": [5.23, 5250.0]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 40, \"numeric_range\": [1970.0, 50929.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 39, \"numeric_range\": [9850.0, 347000.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"books\", \"matching_columns\": [{\"column\": \"Product_Name\", \"exact\": 0, \"prefix\": 5, \"contains\": 5, \"examples\": [\"Books_15.15\", \"Books_30.3\", \"Books_45.45\"]}], \"exact_matching_columns\": 0}, {\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"8a8c780408eb891b98048cf7b89bc33a7fe94920986983b1c150fc6d1a4b7fdc\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM23/DifferentStoreSales.csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\n\ndef is_books(row):\n    return row['Product_Name'].strip().casefold().startswith('books')\nbooks_df = df[df.apply(is_books, axis=1)].copy()\nrequired_columns = ['Product_Name', 'Revenue', 'Demand', 'Initial Inventory']\nfor col in required_columns:\n    if col not in books_df.columns:\n        raise KeyError(f\"Required column '{col}' not found in CSV.\")\nbooks_df['Product_Name'] = books_df['Product_Name'].astype(str)\nbooks_df.set_index('Product_Name', inplace=True)\nfor col in ['Revenue', 'Demand', 'Initial Inventory']:\n    if col == 'Revenue':\n        books_df[col] = books_df[col].astype(float)\n    else:\n        books_df[col] = books_df[col].astype(float)\nbooks_products = list(books_df.index)\nrevenue = books_df['Revenue'].to_dict()\ndemand = books_df['Demand'].to_dict()\ninventory = books_df['Initial Inventory'].to_dict()\nfor i in books_products:\n    if i not in revenue or i not in demand or i not in inventory:\n        raise ValueError(f\"Missing parameter for product '{i}'.\")\nm = gp.Model('BooksRevenueMaximization')\nx_vars = m.addVars(books_products, lb=0.0, ub={i: min(demand[i], inventory[i]) for i in books_products}, vtype=gp.GRB.CONTINUOUS, name='')\nm.addConstrs((x_vars[i] <= demand[i] for i in books_products), name='')\nm.addConstrs((x_vars[i] <= inventory[i] for i in books_products), name='')\nm.setObjective(gp.quicksum((revenue[i] * x_vars[i] for i in books_products)), gp.GRB.MAXIMIZE)\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total value/cost: {m.objVal:.2f}')\n    print(\"--- Fulfillment Plan for 'Books' Products ---\")\n    for i in books_products:\n        print(f'Product: {i}')\n        print(f'  Units fulfilled: {x_vars[i].X:.2f} (Demand: {demand[i]:.0f}, Inventory: {inventory[i]:.0f}, Revenue/unit: {revenue[i]:.2f})')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 1240406.25,
+  "final_solution": [
+    [
+      "C0",
+      1980.0
+    ],
+    [
+      "C1",
+      3024.0
+    ],
+    [
+      "C2",
+      4536.0
+    ],
+    [
+      "C3",
+      5601.0
+    ],
+    [
+      "C4",
+      7567.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 11.433,
+  "evaluated_utc": "2026-10-06T08:51:52.961528+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

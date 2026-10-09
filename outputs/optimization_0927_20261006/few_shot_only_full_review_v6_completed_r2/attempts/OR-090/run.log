@@ -1,0 +1,287 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+Maximize
+39.62 x_1 - 178539 y_1 + 35.98 x_2 - 157708 y_2 + 37.96 x_3 - 85192 y_3
+
+Subject to
+x_1 <= 5732 (demand)
+x_1 <= 12892 (22-day individual production quota)
+x_1 >= 18 y_1 (minimum batch)
+x_1 <= 5732 y_1 (activation)
+x_2 <= 5607 (demand)
+x_2 <= 7238 (22-day individual production quota)
+x_2 >= 25 y_2 (minimum batch)
+x_2 <= 5607 y_2 (activation)
+x_3 <= 4653 (demand)
+x_3 <= 11902 (22-day individual production quota)
+x_3 >= 23 y_3 (minimum batch)
+x_3 <= 4653 y_3 (activation)
+x_1/586 + x_2/329 + x_3/541 <= 22 (shared production days)
+x_1, x_2, x_3 >= 0 integer; y_1, y_2, y_3 binary.
+
+###### Retrieved Information
+
+{
+  "daily_quota": {
+    "1": 586,
+    "2": 329,
+    "3": 541
+  },
+  "demand": {
+    "1": 5732,
+    "2": 5607,
+    "3": 4653
+  },
+  "fixed_cost": {
+    "1": 178539,
+    "2": 157708,
+    "3": 85192
+  },
+  "min_batch": {
+    "1": 18,
+    "2": 25,
+    "3": 23
+  },
+  "products": [
+    "A1",
+    "A2",
+    "A3"
+  ],
+  "profit": {
+    "1": 39.62,
+    "2": 35.98,
+    "3": 37.96
+  },
+  "quota": {
+    "1": 12892,
+    "2": 7238,
+    "3": 11902
+  }
+}
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+#### Decision Variables
+- $x_1$: Quantity of Product A to produce
+- $x_2$: Quantity of Product B to produce
+
+#### Objective Function
+Maximize total profit: 
+$\quad \quad \max \ 80x_1 + 125x_2$
+
+#### Constraints
+**1. Steel Constraint** 
+$\quad \quad 8x_1 + 5x_2 \leq 3500$ 
+
+**2. Iron Constraint** 
+$\quad \quad 6x_1 + 4x_2 \leq 1800$ 
+
+**3. Machine Hours Constraint** 
+$\quad \quad 4x_1 + 5x_2 \leq 2800$ 
+
+**4. Non-negativity** 
+$\quad \quad x_1 \geq 0, x_2 \geq 0$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal integer number of batches to produce/purchase for each of 100 products, where each batch is 10 units, in order to maximize total profit. The plan must respect per-product upper demand limits (in units, not always divisible by 10) and aggregate resource constraints for three resources (R1, R2, R3). Unmet demand is allowed (no penalty), but overproduction beyond the upper demand is not allowed.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with resource constraints and batch-size integer variables.
+3.  **Define Index Sets:** The primary indices are Products (i ∈ {P1, ..., P100}) and Resources (r ∈ {R1, R2, R3}).
+4.  **Define Decision Variables:**
+    -   `x[i]` = Number of batches of product i to produce/purchase. Type: GRB.INTEGER, x[i] ≥ 0.
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'profit_per_unit' (from factory_products_100.csv), batch size 'batch_size_units' (fixed at 10).
+    -   Constraint coefficients: 'r1_per_unit', 'r2_per_unit', 'r3_per_unit' (resource consumption per unit, from factory_products_100.csv).
+    -   Constraint RHS: 'upper_demand_units' (per product, from factory_products_100.csv), 'capacity' (per resource, from resources_capacities.csv).
+6.  **Formulate Objective:** Maximize total profit, calculated as the sum over all products of (batch_size_units * x[i] * profit_per_unit[i]), i.e., maximize sum_i (10 * x[i] * profit_per_unit[i]).
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Resource Limits): For each resource r ∈ {R1, R2, R3}, the total resource consumption across all products cannot exceed the available capacity. For each r, sum_i (batch_size_units * x[i] * r_per_unit[i][r]) ≤ capacity[r].
+    -   Constraint 2 (Demand Upper Bound): For each product i, the total units produced cannot exceed its upper demand, i.e., batch_size_units * x[i] ≤ upper_demand_units[i].
+    -   Constraint 3 (Non-negativity and Integrality): For each product i, x[i] ∈ {0, 1, 2, ...}.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+
+# Read data
+products_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/factory_products_100.csv',
+    sep=',', dtype=str, keep_default_na=False
+)
+resources_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/resources_capacities.csv',
+    sep=',', dtype=str, keep_default_na=False
+)
+
+# Normalize and extract product IDs
+if 'product' not in products_df.columns:
+    raise KeyError("Missing 'product' column in factory_products_100.csv")
+product_ids = products_df['product'].tolist()
+if len(product_ids) != 100:
+    raise ValueError(f"Expected 100 products, got {len(product_ids)}")
+
+# Extract and convert numeric parameters for products
+def to_float_col(df, col):
+    if col not in df.columns:
+        raise KeyError(f"Missing '{col}' column in factory_products_100.csv")
+    try:
+        return df[col].astype(float).to_dict()
+    except Exception as e:
+        raise ValueError(f"Failed to convert column '{col}' to float: {e}")
+
+def to_int_col(df, col):
+    if col not in df.columns:
+        raise KeyError(f"Missing '{col}' column in factory_products_100.csv")
+    try:
+        return df[col].astype(int).to_dict()
+    except Exception as e:
+        raise ValueError(f"Failed to convert column '{col}' to int: {e}")
+
+profit_per_unit = to_float_col(products_df, 'profit_per_unit')
+r1_per_unit = to_float_col(products_df, 'r1_per_unit')
+r2_per_unit = to_float_col(products_df, 'r2_per_unit')
+r3_per_unit = to_float_col(products_df, 'r3_per_unit')
+upper_demand_units = to_int_col(products_df, 'upper_demand_units')
+
+# batch_size_units: fixed at 10 for all products (per query and schema)
+if 'batch_size_units' not in products_df.columns:
+    raise KeyError("Missing 'batch_size_units' column in factory_products_100.csv")
+batch_size_units_set = set(products_df['batch_size_units'].astype(int).tolist())
+if len(batch_size_units_set) != 1 or 10 not in batch_size_units_set:
+    raise ValueError(f"batch_size_units must be fixed at 10 for all products, got {batch_size_units_set}")
+batch_size_units = 10
+
+# Resource IDs and capacities
+if 'resource' not in resources_df.columns or 'capacity' not in resources_df.columns:
+    raise KeyError("Missing 'resource' or 'capacity' column in resources_capacities.csv")
+resource_ids = resources_df['resource'].tolist()
+if set(resource_ids) != {'R1', 'R2', 'R3'}:
+    raise ValueError(f"Expected resources R1, R2, R3, got {resource_ids}")
+capacity = {}
+for idx, row in resources_df.iterrows():
+    rid = row['resource']
+    try:
+        capacity[rid] = float(row['capacity'])
+    except Exception as e:
+        raise ValueError(f"Failed to convert capacity for resource '{rid}': {e}")
+
+# Build model
+m = gp.Model("BatchProductionPlanning")
+
+# Decision variables: x[i] = number of batches of product i (integer, >=0)
+x_vars = m.addVars(product_ids, vtype=gp.GRB.INTEGER, lb=0, name='x')
+
+# Objective: maximize total profit = sum_i (batch_size_units * x[i] * profit_per_unit[i])
+m.setObjective(
+    gp.quicksum(batch_size_units * x_vars[i] * profit_per_unit[i] for i in product_ids),
+    gp.GRB.MAXIMIZE
+)
+
+# Resource constraints
+for r in ['R1', 'R2', 'R3']:
+    if r == 'R1':
+        r_per_unit = r1_per_unit
+    elif r == 'R2':
+        r_per_unit = r2_per_unit
+    elif r == 'R3':
+        r_per_unit = r3_per_unit
+    else:
+        raise ValueError(f"Unexpected resource: {r}")
+    m.addConstr(
+        gp.quicksum(batch_size_units * x_vars[i] * r_per_unit[i] for i in product_ids) <= capacity[r],
+        name=f"resource_{r}"
+    )
+
+# Demand upper bound constraints
+for i in product_ids:
+    m.addConstr(
+        batch_size_units * x_vars[i] <= upper_demand_units[i],
+        name=f"demand_{i}"
+    )
+
+m.optimize()
+```
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_0927_optimization.py", line 102, in worker
+    record = ns['execute_pipeline_case'](item['case'])
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/optimization_0927_20261006/few_shot_only_full_review_v6_completed_r2/frozen_notebook.ipynb:cell29", line 96, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/optimization_0927_20261006/few_shot_only_full_review_v6_completed_r2/frozen_notebook.ipynb:cell29", line 17, in execute_code
+  File "<string>", line 53, in <module>
+  File "src/gurobipy/_helpers.pyx", line 41, in gurobipy._helpers.quicksum
+  File "<string>", line 53, in <genexpr>
+KeyError: 'P1'

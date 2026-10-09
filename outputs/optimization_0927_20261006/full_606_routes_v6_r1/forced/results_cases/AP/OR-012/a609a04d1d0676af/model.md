@@ -1,0 +1,752 @@
+##### Decision Variables
+
+Let $x_i$ denote the number of units of product $i$ to fulfill for customer purchases, for each product $i$ in the set of products.
+
+##### Objective Function
+
+$\max \sum_{i=1}^{N} r_i x_i$
+
+where $r_i$ is the revenue per unit for product $i$.
+
+##### Constraints
+
+For each product $i$:
+
+$0 \leq x_i \leq \min\{\text{Initial Inventory}_i, \text{Demand}_i\}$
+
+That is, the number of units fulfilled for each product cannot exceed either the available initial inventory or the deterministic demand.
+
+##### Variable Constraints
+
+$x_i$ are integer variables, for all $i$.
+
+##### Retrieved Information
+
+{
+  "products": [
+    {
+      "Product Name": "1984 by George Orwell",
+      "Revenue": 19.99,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Adidas 3-Stripes Shorts",
+      "Revenue": 29.99,
+      "Demand": 7,
+      "Initial Inventory": 30
+    },
+    {
+      "Product Name": "Adidas Essential Track Pants",
+      "Revenue": 44.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Adidas FIFA World Cup Football",
+      "Revenue": 29.99,
+      "Demand": 4,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Adidas Originals Superstar Sneakers",
+      "Revenue": 79.99,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Adidas Originals Trefoil Hoodie",
+      "Revenue": 64.99,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Adidas Ultraboost Running Shoes",
+      "Revenue": 179.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Adidas Ultraboost Shoes",
+      "Revenue": 179.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Amazon Echo Dot (4th Gen)",
+      "Revenue": 49.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Amazon Echo Show 10",
+      "Revenue": 249.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Amazon Fire TV Stick 4K",
+      "Revenue": 49.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Anastasia Beverly Hills Brow Wiz",
+      "Revenue": 23,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Anker PowerCore Portable Charger",
+      "Revenue": 59.99,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Anova Precision Cooker",
+      "Revenue": 199,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Anova Precision Oven",
+      "Revenue": 599,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Apple AirPods Max",
+      "Revenue": 549,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Apple AirPods Pro",
+      "Revenue": 249.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Apple MacBook Air",
+      "Revenue": 1199.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Apple MacBook Pro 16-inch",
+      "Revenue": 2399,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Apple TV 4K",
+      "Revenue": 179,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Apple Watch Series 8",
+      "Revenue": 399.99,
+      "Demand": 4,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Apple iPad Air",
+      "Revenue": 599.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Atomic Habits by James Clear",
+      "Revenue": 16.99,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Babolat Pure Drive Tennis Racket",
+      "Revenue": 199.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Becoming by Michelle Obama",
+      "Revenue": 32.5,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Biore UV Aqua Rich Watery Essence Sunscreen",
+      "Revenue": 15,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Blueair Classic 480i",
+      "Revenue": 599.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Bose QuietComfort 35 Headphones",
+      "Revenue": 299.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Bose QuietComfort 35 II Wireless Headphones",
+      "Revenue": 299,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Bose SoundLink Color Bluetooth Speaker II",
+      "Revenue": 129,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Bose SoundLink Revolve+ Speaker",
+      "Revenue": 299.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Bose SoundSport Wireless Earbuds",
+      "Revenue": 149.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Bowflex SelectTech 1090 Adjustable Dumbbells",
+      "Revenue": 699.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Bowflex SelectTech 552 Dumbbells",
+      "Revenue": 399.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Breville Nespresso Creatista Plus",
+      "Revenue": 499.95,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Breville Smart Coffee Grinder Pro",
+      "Revenue": 199.95,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Breville Smart Grill",
+      "Revenue": 299.95,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Breville Smart Oven",
+      "Revenue": 299.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Calvin Klein Boxer Briefs",
+      "Revenue": 29.99,
+      "Demand": 7,
+      "Initial Inventory": 30
+    },
+    {
+      "Product Name": "Canon EOS R5 Camera",
+      "Revenue": 3899.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Canon EOS Rebel T7i DSLR Camera",
+      "Revenue": 749.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Caudalie Vinoperfect Radiance Serum",
+      "Revenue": 79,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "CeraVe Hydrating Facial Cleanser",
+      "Revenue": 14.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Champion Reverse Weave Hoodie",
+      "Revenue": 49.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Chanel No. 5 Perfume",
+      "Revenue": 129.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Charlotte Tilbury Magic Cream",
+      "Revenue": 100,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Clinique Dramatically Different Moisturizing Lotion",
+      "Revenue": 29.5,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Clinique Moisture Surge",
+      "Revenue": 52,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Columbia Fleece Jacket",
+      "Revenue": 59.99,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Crock-Pot 6-Quart Slow Cooker",
+      "Revenue": 49.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Cuisinart Coffee Center",
+      "Revenue": 199.95,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Cuisinart Custom 14-Cup Food Processor",
+      "Revenue": 199.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Cuisinart Griddler Deluxe",
+      "Revenue": 159.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "De'Longhi Magnifica Espresso Machine",
+      "Revenue": 899.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Dr. Jart+ Cicapair Tiger Grass Color Correcting Treatment",
+      "Revenue": 52,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Drunk Elephant C-Firma Day Serum",
+      "Revenue": 78,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Dune by Frank Herbert",
+      "Revenue": 25.99,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Dyson Pure Cool Link",
+      "Revenue": 499.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Dyson Supersonic Hair Dryer",
+      "Revenue": 399.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Dyson V11 Vacuum",
+      "Revenue": 499.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Dyson V8 Absolute",
+      "Revenue": 399.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Educated by Tara Westover",
+      "Revenue": 28,
+      "Demand": 4,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Estee Lauder Advanced Night Repair",
+      "Revenue": 105,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Eufy RoboVac 11S",
+      "Revenue": 219.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Fenty Beauty Killawatt Highlighter",
+      "Revenue": 36,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "First Aid Beauty Ultra Repair Cream",
+      "Revenue": 34,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Fitbit Charge 5",
+      "Revenue": 129.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Fitbit Inspire 2",
+      "Revenue": 99.95,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Fitbit Luxe",
+      "Revenue": 149.95,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Fitbit Versa 3",
+      "Revenue": 229.95,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Forever 21 Graphic Tee",
+      "Revenue": 12.99,
+      "Demand": 7,
+      "Initial Inventory": 30
+    },
+    {
+      "Product Name": "Fresh Sugar Lip Treatment",
+      "Revenue": 24,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Gap 1969 Original Fit Jeans",
+      "Revenue": 59.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Gap Crewneck Sweatshirt",
+      "Revenue": 34.99,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Gap Essential Crewneck T-Shirt",
+      "Revenue": 19.99,
+      "Demand": 8,
+      "Initial Inventory": 30
+    },
+    {
+      "Product Name": "Gap High Rise Skinny Jeans",
+      "Revenue": 49.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Garmin Edge 530",
+      "Revenue": 299.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Garmin Fenix 6X Pro",
+      "Revenue": 999.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Garmin Forerunner 245",
+      "Revenue": 299.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Garmin Forerunner 945",
+      "Revenue": 499.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "GlamGlow Supermud Clearing Treatment",
+      "Revenue": 59,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Glossier Boy Brow",
+      "Revenue": 16,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Glossier Cloud Paint",
+      "Revenue": 18,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "GoPro HERO10 Black",
+      "Revenue": 399.99,
+      "Demand": 4,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "GoPro HERO9 Black",
+      "Revenue": 449.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Gone Girl by Gillian Flynn",
+      "Revenue": 22.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Google Nest Hub Max",
+      "Revenue": 229.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Google Nest Wifi Router",
+      "Revenue": 169,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Google Pixel 6 Pro",
+      "Revenue": 899.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Google Pixelbook Go",
+      "Revenue": 649.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "H&M Slim Fit Jeans",
+      "Revenue": 39.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "HP Spectre x360 Laptop",
+      "Revenue": 1599.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Hamilton Beach FlexBrew Coffee Maker",
+      "Revenue": 89.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Hanes ComfortSoft T-Shirt",
+      "Revenue": 9.99,
+      "Demand": 15,
+      "Initial Inventory": 50
+    },
+    {
+      "Product Name": "Harry Potter and the Sorcerer's Stone",
+      "Revenue": 24.99,
+      "Demand": 4,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Hydro Flask Standard Mouth Water Bottle",
+      "Revenue": 32.95,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Hydro Flask Wide Mouth Water Bottle",
+      "Revenue": 39.95,
+      "Demand": 6,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Hyperice Hypervolt Massager",
+      "Revenue": 349,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Instant Pot Duo",
+      "Revenue": 89.99,
+      "Demand": 4,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Instant Pot Duo Crisp",
+      "Revenue": 179.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Instant Pot Duo Evo Plus",
+      "Revenue": 139.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Instant Pot Duo Nova",
+      "Revenue": 99.95,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Instant Pot Ultra",
+      "Revenue": 139.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Keurig K-Elite Coffee Maker",
+      "Revenue": 189.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Keurig K-Mini Coffee Maker",
+      "Revenue": 79.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Kiehl's Midnight Recovery Concentrate",
+      "Revenue": 82,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Kindle Paperwhite",
+      "Revenue": 129.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "KitchenAid Artisan Stand Mixer",
+      "Revenue": 499.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "KitchenAid Stand Mixer",
+      "Revenue": 379.99,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "L'Occitane Shea Butter Hand Cream",
+      "Revenue": 29,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "L'Oreal Revitalift Serum",
+      "Revenue": 39.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "LG OLED TV",
+      "Revenue": 1299.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "La Mer Cr_¨me de la Mer Moisturizer",
+      "Revenue": 190,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Lancome La Vie Est Belle",
+      "Revenue": 102,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Laneige Water Sleeping Mask",
+      "Revenue": 25,
+      "Demand": 2,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Levi's 501 Jeans",
+      "Revenue": 69.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Levi's 511 Slim Fit Jeans",
+      "Revenue": 59.99,
+      "Demand": 5,
+      "Initial Inventory": 20
+    },
+    {
+      "Product Name": "Levi's Sherpa Trucker Jacket",
+      "Revenue": 98,
+      "Demand": 3,
+      "Initial Inventory": 10
+    },
+    {
+      "Product Name": "Levi's Trucker Jacket",
+      "Revenue": 89.99,
+      "Demand": 3,
+      "Initial Inventory": 10
+    }
+  ]
+}
+
+##### Model Summary
+
+For each product $i$ (with product name, revenue $r_i$, demand $d_i$, and initial inventory $s_i$ as above):
+
+$\max \sum_{i} r_i x_i$
+
+subject to
+
+$0 \leq x_i \leq \min\{d_i, s_i\}$, $x_i \in \mathbb{Z}$ for all $i$

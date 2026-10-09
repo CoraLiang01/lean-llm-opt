@@ -1,0 +1,11 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM24/EuropeSalesRecords.csv",
+    "values": {
+      "Product Name": "Baby Food_255.28",
+      "Revenue": "255.28",
+      "Demand": "765850",
+      "Initial Inventory": "5627060"
+    }
+  }
+]

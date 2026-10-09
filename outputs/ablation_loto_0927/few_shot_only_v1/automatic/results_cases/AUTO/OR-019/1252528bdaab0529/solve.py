@@ -1,0 +1,162 @@
+CSVQA_DATA = {'route': 'NRM',
+ 'tables': [{'table_id': 'file_0_view_0',
+             'file_index': 0,
+             'file_name': 'SalesDataAnalysis.csv',
+             'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM10/SalesDataAnalysis.csv',
+             'role': 'file_0',
+             'columns': ['Product Name', 'Revenue', 'Demand', 'Initial Inventory'],
+             'original_rows': 19,
+             'returned_rows': 19,
+             'filters': {'logic': 'and', 'conditions': []},
+             'records': [{'source_row': 0,
+                          'values': {'Product Name': '20in Monitor',
+                                     'Revenue': '109.99',
+                                     'Demand': '8230',
+                                     'Initial Inventory': '41290'}},
+                         {'source_row': 1,
+                          'values': {'Product Name': '27in 4K Gaming Monitor',
+                                     'Revenue': '389.99',
+                                     'Demand': '12474',
+                                     'Initial Inventory': '62440'}},
+                         {'source_row': 2,
+                          'values': {'Product Name': '27in FHD Monitor',
+                                     'Revenue': '149.99',
+                                     'Demand': '15057',
+                                     'Initial Inventory': '75500'}},
+                         {'source_row': 3,
+                          'values': {'Product Name': '34in Ultrawide Monitor',
+                                     'Revenue': '379.99',
+                                     'Demand': '12380',
+                                     'Initial Inventory': '61990'}},
+                         {'source_row': 4,
+                          'values': {'Product Name': 'AA Batteries (4-pack)',
+                                     'Revenue': '3.84',
+                                     'Demand': '49129',
+                                     'Initial Inventory': '276350'}},
+                         {'source_row': 5,
+                          'values': {'Product Name': 'AAA Batteries (4-pack)',
+                                     'Revenue': '2.99',
+                                     'Demand': '53317',
+                                     'Initial Inventory': '310170'}},
+                         {'source_row': 6,
+                          'values': {'Product Name': 'Apple Airpods Headphones',
+                                     'Revenue': '150.0',
+                                     'Demand': '31210',
+                                     'Initial Inventory': '156610'}},
+                         {'source_row': 7,
+                          'values': {'Product Name': 'Bose SoundSport Headphones',
+                                     'Revenue': '99.99',
+                                     'Demand': '26784',
+                                     'Initial Inventory': '134570'}},
+                         {'source_row': 8,
+                          'values': {'Product Name': 'Flatscreen TV',
+                                     'Revenue': '300.0',
+                                     'Demand': '9619',
+                                     'Initial Inventory': '48190'}},
+                         {'source_row': 9,
+                          'values': {'Product Name': 'Google Phone',
+                                     'Revenue': '600.0',
+                                     'Demand': '11057',
+                                     'Initial Inventory': '55320'}},
+                         {'source_row': 10,
+                          'values': {'Product Name': 'LG Dryer',
+                                     'Revenue': '600.0',
+                                     'Demand': '1292',
+                                     'Initial Inventory': '6460'}},
+                         {'source_row': 11,
+                          'values': {'Product Name': 'LG Washing Machine',
+                                     'Revenue': '600.0',
+                                     'Demand': '1332',
+                                     'Initial Inventory': '6660'}},
+                         {'source_row': 12,
+                          'values': {'Product Name': 'Lightning Charging Cable',
+                                     'Revenue': '14.95',
+                                     'Demand': '44936',
+                                     'Initial Inventory': '232170'}},
+                         {'source_row': 13,
+                          'values': {'Product Name': 'Macbook Pro Laptop',
+                                     'Revenue': '1700.0',
+                                     'Demand': '9452',
+                                     'Initial Inventory': '47280'}},
+                         {'source_row': 14,
+                          'values': {'Product Name': 'ThinkPad Laptop',
+                                     'Revenue': '999.99',
+                                     'Demand': '8258',
+                                     'Initial Inventory': '41300'}},
+                         {'source_row': 15,
+                          'values': {'Product Name': 'USB-C Charging Cable',
+                                     'Revenue': '11.95',
+                                     'Demand': '45977',
+                                     'Initial Inventory': '239750'}},
+                         {'source_row': 16,
+                          'values': {'Product Name': 'Vareebadd Phone',
+                                     'Revenue': '400.0',
+                                     'Demand': '4133',
+                                     'Initial Inventory': '20680'}},
+                         {'source_row': 17,
+                          'values': {'Product Name': 'Wired Headphones',
+                                     'Revenue': '11.99',
+                                     'Demand': '39520',
+                                     'Initial Inventory': '205570'}},
+                         {'source_row': 18,
+                          'values': {'Product Name': 'iPhone',
+                                     'Revenue': '700.0',
+                                     'Demand': '13691',
+                                     'Initial Inventory': '68490'}}]}],
+ 'relationships': [],
+ 'ignored_file_indices': [],
+ 'validation': {'status': 'PYTHON_FULL_CSV'}}
+import gurobipy as gp
+from gurobipy import GRB
+import re
+table_id = 'file_0_view_0'
+tables = CSVQA_DATA['tables']
+table = None
+for t in tables:
+    if t['table_id'] == table_id:
+        table = t
+        break
+if table is None:
+    raise ValueError(f'Table {table_id} not found in CSVQA_DATA.')
+records = table['records']
+if records is None or len(records) == 0:
+    raise ValueError('No records found in the specified table.')
+pattern = re.compile('27in', re.IGNORECASE)
+items = []
+revenue = {}
+demand = {}
+inventory = {}
+for rec in records:
+    pname = rec['values']['Product Name']
+    if pattern.search(str(pname)):
+        items.append(pname)
+        try:
+            rev = rec['values']['Revenue']
+            dem = rec['values']['Demand']
+            inv = rec['values']['Initial Inventory']
+        except KeyError as e:
+            raise ValueError(f'Missing required column in record: {e}')
+        try:
+            revenue[pname] = float(rev)
+            demand[pname] = int(float(dem))
+            inventory[pname] = int(float(inv))
+        except Exception as e:
+            raise ValueError(f"Non-numeric value in record for '{pname}': {e}")
+if not items:
+    raise ValueError("No products found with '27in' in the Product Name.")
+for i in items:
+    if i not in revenue or i not in demand or i not in inventory:
+        raise ValueError(f"Missing data for product '{i}'.")
+m = gp.Model('27in_Product_Revenue_Max')
+x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='')
+m.setObjective(gp.quicksum((revenue[i] * x[i] for i in items)), GRB.MAXIMIZE)
+m.addConstrs((x[i] <= demand[i] for i in items), name='')
+m.addConstrs((x[i] <= inventory[i] for i in items), name='')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for variable in m.getVars():
+        print(f'{variable.VarName}: {variable.X}')
+else:
+    print(f'Solver status: {m.Status}')

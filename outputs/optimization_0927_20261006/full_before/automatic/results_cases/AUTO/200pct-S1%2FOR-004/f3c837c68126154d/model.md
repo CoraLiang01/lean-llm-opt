@@ -1,0 +1,1 @@
+I do not have access to the contents of cost_12x12.csv in the current context. Please provide the contents of cost_12x12.csv (the 12x12 cost matrix) or upload the file, and I will retrieve all necessary data and formulate the complete mathematical model as requested. If you prefer a generic model template without the specific cost data, let me know!

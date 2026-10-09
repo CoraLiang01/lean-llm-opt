@@ -1,0 +1,177 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+# Data
+warehouses = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7']
+musicians = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']
+
+demand = {
+    'C1': 1083,
+    'C2': 776,
+    'C3': 16214,
+    'C4': 553,
+    'C5': 17106,
+    'C6': 594,
+    'C7': 732
+}
+
+fixed_cost = {
+    'S1': 102.33,
+    'S2': 94.92,
+    'S3': 91.83,
+    'S4': 98.71,
+    'S5': 95.73,
+    'S6': 99.96,
+    'S7': 98.16
+}
+
+cost = {
+    'S1': {'C1': 1506.22, 'C2': 70.90,   'C3': 8.44,    'C4': 260.27,  'C5': 197.47,  'C6': 71.71,   'C7': 61.19},
+    'S2': {'C1': 1732.65, 'C2': 1780.72, 'C3': 567.44,  'C4': 448.68,  'C5': 29.00,   'C6': 1484.91, 'C7': 963.92},
+    'S3': {'C1': 115.66,  'C2': 100.76,  'C3': 64.68,   'C4': 1324.53, 'C5': 64.99,   'C6': 134.88,  'C7': 2102.83},
+    'S4': {'C1': 1254.78, 'C2': 1115.63, 'C3': 52.31,   'C4': 1036.16, 'C5': 892.63,  'C6': 1464.04, 'C7': 1383.41},
+    'S5': {'C1': 42.90,   'C2': 891.01,  'C3': 1013.94, 'C4': 1128.72, 'C5': 58.91,   'C6': 42.89,   'C7': 1570.31},
+    'S6': {'C1': 0.70,    'C2': 139.46,  'C3': 70.03,   'C4': 79.15,   'C5': 1482.00, 'C6': 0.91,    'C7': 110.46},
+    'S7': {'C1': 1732.30, 'C2': 1780.44, 'C3': 486.50,  'C4': 523.74,  'C5': 522.08,  'C6': 82.48,   'C7': 826.41}
+}
+
+M = sum(demand.values())
+
+# Validate data coverage
+for i in warehouses:
+    if i not in fixed_cost:
+        raise ValueError(f'Missing fixed cost for warehouse {i}')
+    if i not in cost:
+        raise ValueError(f'Missing cost row for warehouse {i}')
+    for j in musicians:
+        if j not in cost[i]:
+            raise ValueError(f'Missing cost for warehouse {i}, musician {j}')
+for j in musicians:
+    if j not in demand:
+        raise ValueError(f'Missing demand for musician {j}')
+
+# Model
+m = gp.Model('Bandcamp_FLP')
+
+x = m.addVars(warehouses, musicians, lb=0, vtype=GRB.CONTINUOUS, name='x')
+y = m.addVars(warehouses, vtype=GRB.BINARY, name='y')
+
+m.setObjective(
+    gp.quicksum(cost[i][j] * x[i, j] for i in warehouses for j in musicians) +
+    gp.quicksum(fixed_cost[i] * y[i] for i in warehouses),
+    GRB.MINIMIZE
+)
+
+m.addConstrs(
+    (gp.quicksum(x[i, j] for i in warehouses) == demand[j] for j in musicians),
+    name='demand'
+)
+
+m.addConstrs(
+    (gp.quicksum(x[i, j] for j in musicians) <= M * y[i] for i in warehouses),
+    name='activation'
+)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 14 rows, 56 columns and 105 nonzeros
+Model fingerprint: 0xd197f524
+Variable types: 49 continuous, 7 integer (7 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 4e+04]
+  Objective range  [7e-01, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [6e+02, 2e+04]
+Presolve time: 0.00s
+Presolved: 14 rows, 56 columns, 105 nonzeros
+Variable types: 49 continuous, 7 integer (7 binary)
+Found heuristic solution: objective 778479.87000
+
+Root relaxation: objective 7.778970e+05, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 777896.997    0    3 778479.870 777896.997  0.07%     -    0s
+*    0     0               0    778095.44000 778095.440  0.00%     -    0s
+
+Explored 1 nodes (6 simplex iterations) in 0.03 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 2: 778095 778480 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.780954400000e+05, best bound 7.780954400000e+05, gap 0.0000%
+ObjVal: 778095.44
+C0: 0.0
+C1: 776.0
+C2: 16214.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 732.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 17106.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 1083.0
+C36: 0.0
+C37: 0.0
+C38: 553.0
+C39: 0.0
+C40: 594.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 1.0
+C50: 1.0
+C51: -0.0
+C52: -0.0
+C53: -0.0
+C54: 1.0
+C55: -0.0
+Optimal objective: 778095.44
+Optimal solution: [('C0', 0.0), ('C1', 776.0), ('C2', 16214.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 732.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 17106.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 1083.0), ('C36', 0.0), ('C37', 0.0), ('C38', 553.0), ('C39', 0.0), ('C40', 594.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 1.0), ('C50', 1.0), ('C51', -0.0), ('C52', -0.0), ('C53', -0.0), ('C54', 1.0), ('C55', -0.0)]

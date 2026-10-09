@@ -1,0 +1,434 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "four_periods_ago_demand": "10",
+      "customer_id": "demand1",
+      "demand_previous_period": "10",
+      "two_periods_ago_demand": "11",
+      "three_periods_ago_demand": "8",
+      "demand": "9"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "four_periods_ago_demand": "65",
+      "customer_id": "demand2",
+      "demand_previous_period": "64",
+      "two_periods_ago_demand": "72",
+      "three_periods_ago_demand": "58",
+      "demand": "66"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "four_periods_ago_demand": "59",
+      "customer_id": "demand3",
+      "demand_previous_period": "57",
+      "two_periods_ago_demand": "49",
+      "three_periods_ago_demand": "65",
+      "demand": "56"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "four_periods_ago_demand": "19",
+      "customer_id": "demand4",
+      "demand_previous_period": "18",
+      "two_periods_ago_demand": "15",
+      "three_periods_ago_demand": "20",
+      "demand": "17"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "four_periods_ago_demand": "50",
+      "customer_id": "demand5",
+      "demand_previous_period": "41",
+      "two_periods_ago_demand": "47",
+      "three_periods_ago_demand": "42",
+      "demand": "43"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "four_periods_ago_demand": "65",
+      "customer_id": "demand6",
+      "demand_previous_period": "51",
+      "two_periods_ago_demand": "56",
+      "three_periods_ago_demand": "65",
+      "demand": "62"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "four_periods_ago_demand": "9",
+      "customer_id": "demand7",
+      "demand_previous_period": "9",
+      "two_periods_ago_demand": "9",
+      "three_periods_ago_demand": "11",
+      "demand": "10"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "four_periods_ago_demand": "31",
+      "customer_id": "demand8",
+      "demand_previous_period": "34",
+      "two_periods_ago_demand": "35",
+      "three_periods_ago_demand": "38",
+      "demand": "37"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "four_periods_ago_supply_capacity": "62",
+      "three_periods_ago_supply_capacity": "59",
+      "supply_capacity_previous_period": "58",
+      "supplier_id": "supplier1",
+      "two_periods_ago_supply_capacity": "59",
+      "supply_capacity": "60"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "four_periods_ago_supply_capacity": "25",
+      "three_periods_ago_supply_capacity": "20",
+      "supply_capacity_previous_period": "25",
+      "supplier_id": "supplier2",
+      "two_periods_ago_supply_capacity": "23",
+      "supply_capacity": "22"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "four_periods_ago_supply_capacity": "14",
+      "three_periods_ago_supply_capacity": "17",
+      "supply_capacity_previous_period": "14",
+      "supplier_id": "supplier3",
+      "two_periods_ago_supply_capacity": "14",
+      "supply_capacity": "16"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "four_periods_ago_supply_capacity": "13",
+      "three_periods_ago_supply_capacity": "15",
+      "supply_capacity_previous_period": "16",
+      "supplier_id": "supplier4",
+      "two_periods_ago_supply_capacity": "17",
+      "supply_capacity": "14"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "four_periods_ago_supply_capacity": "18",
+      "three_periods_ago_supply_capacity": "16",
+      "supply_capacity_previous_period": "22",
+      "supplier_id": "supplier5",
+      "two_periods_ago_supply_capacity": "20",
+      "supply_capacity": "19"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "four_periods_ago_supply_capacity": "81",
+      "three_periods_ago_supply_capacity": "75",
+      "supply_capacity_previous_period": "62",
+      "supplier_id": "supplier6",
+      "two_periods_ago_supply_capacity": "75",
+      "supply_capacity": "70"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "four_periods_ago_supply_capacity": "69",
+      "three_periods_ago_supply_capacity": "63",
+      "supply_capacity_previous_period": "63",
+      "supplier_id": "supplier7",
+      "two_periods_ago_supply_capacity": "67",
+      "supply_capacity": "60"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "four_periods_ago_supply_capacity": "44",
+      "three_periods_ago_supply_capacity": "46",
+      "supply_capacity_previous_period": "37",
+      "supplier_id": "supplier8",
+      "two_periods_ago_supply_capacity": "40",
+      "supply_capacity": "39"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "two_periods_ago_transportation_cost_to_demand2": "266.136589760",
+      "two_periods_ago_transportation_cost_to_demand5": "213.382756653",
+      "previous_period_transportation_cost_to_demand5": "174.077074169",
+      "three_periods_ago_service_status": "Regular",
+      "supplier_id": "supply1",
+      "previous_period_transportation_cost_to_demand2": "217.274499418",
+      "transportation_cost_to_demand1": "0.03020736643461065",
+      "four_periods_ago_service_status": "Seasonal",
+      "previous_period_transportation_cost_to_demand3": "175.702406114",
+      "two_periods_ago_transportation_cost_to_demand1": "0.0263106161645",
+      "previous_period_transportation_cost_to_demand6": "110.411425035",
+      "two_periods_ago_transportation_cost_to_demand6": "123.784405017",
+      "transportation_cost_to_demand2": "229.50723504640203",
+      "two_periods_ago_service_status": "Trial",
+      "transportation_cost_to_demand3": "198.62356558205792",
+      "previous_period_transportation_cost_to_demand8": "13.2889126387",
+      "previous_period_transportation_cost_to_demand7": "11.6088657428",
+      "previous_period_service_status": "Regular",
+      "transportation_cost_to_demand4": "12.995050640153751",
+      "previous_period_transportation_cost_to_demand4": "14.3296423409",
+      "transportation_cost_to_demand5": "211.20732124396406",
+      "previous_period_transportation_cost_to_demand1": "0.0332975800209",
+      "transportation_cost_to_demand6": "134.9442985029274",
+      "two_periods_ago_transportation_cost_to_demand4": "10.6507435047",
+      "transportation_cost_to_demand7": "9.822206398831067",
+      "two_periods_ago_transportation_cost_to_demand3": "218.525646853",
+      "transportation_cost_to_demand8": "11.394077543225675"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "two_periods_ago_transportation_cost_to_demand2": "3.86336730204",
+      "two_periods_ago_transportation_cost_to_demand5": "3.33855075461",
+      "previous_period_transportation_cost_to_demand5": "3.33147455547",
+      "three_periods_ago_service_status": "Suspended",
+      "supplier_id": "supply2",
+      "previous_period_transportation_cost_to_demand2": "3.73609917224",
+      "transportation_cost_to_demand1": "232.34691308087835",
+      "four_periods_ago_service_status": "Regular",
+      "previous_period_transportation_cost_to_demand3": "0.334111470865",
+      "two_periods_ago_transportation_cost_to_demand1": "226.445301489",
+      "previous_period_transportation_cost_to_demand6": "114.007033612",
+      "two_periods_ago_transportation_cost_to_demand6": "110.623972046",
+      "transportation_cost_to_demand2": "3.6258726438627473",
+      "two_periods_ago_service_status": "Regular",
+      "transportation_cost_to_demand3": "0.28605434149404785",
+      "previous_period_transportation_cost_to_demand8": "28.0665786004",
+      "previous_period_transportation_cost_to_demand7": "275.606168988",
+      "previous_period_service_status": "Trial",
+      "transportation_cost_to_demand4": "45.73127693242935",
+      "previous_period_transportation_cost_to_demand4": "47.0071795588",
+      "transportation_cost_to_demand5": "2.8304796563034573",
+      "previous_period_transportation_cost_to_demand1": "243.894554661",
+      "transportation_cost_to_demand6": "107.05891033185472",
+      "two_periods_ago_transportation_cost_to_demand4": "53.5604715433",
+      "transportation_cost_to_demand7": "299.96317913389305",
+      "two_periods_ago_transportation_cost_to_demand3": "0.309453586628",
+      "transportation_cost_to_demand8": "23.79935436307657"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "two_periods_ago_transportation_cost_to_demand2": "0.216798643823",
+      "two_periods_ago_transportation_cost_to_demand5": "50.4320105462",
+      "previous_period_transportation_cost_to_demand5": "65.9206939127",
+      "three_periods_ago_service_status": "Regular",
+      "supplier_id": "supply3",
+      "previous_period_transportation_cost_to_demand2": "0.214736228543",
+      "transportation_cost_to_demand1": "11.061938334356302",
+      "four_periods_ago_service_status": "Regular",
+      "previous_period_transportation_cost_to_demand3": "0.331804753722",
+      "two_periods_ago_transportation_cost_to_demand1": "9.51769174288",
+      "previous_period_transportation_cost_to_demand6": "5.05216866260",
+      "two_periods_ago_transportation_cost_to_demand6": "5.99827148147",
+      "transportation_cost_to_demand2": "0.2041995326579051",
+      "two_periods_ago_service_status": "Seasonal",
+      "transportation_cost_to_demand3": "0.2789447278030927",
+      "previous_period_transportation_cost_to_demand8": "28.4132300687",
+      "previous_period_transportation_cost_to_demand7": "283.441118786",
+      "previous_period_service_status": "Regular",
+      "transportation_cost_to_demand4": "45.721912724349636",
+      "previous_period_transportation_cost_to_demand4": "48.4377943402",
+      "transportation_cost_to_demand5": "59.54895565737313",
+      "previous_period_transportation_cost_to_demand1": "10.6957881755",
+      "transportation_cost_to_demand6": "5.097536739581239",
+      "two_periods_ago_transportation_cost_to_demand4": "36.9113001424",
+      "transportation_cost_to_demand7": "300.00118415135785",
+      "two_periods_ago_transportation_cost_to_demand3": "0.282515220319",
+      "transportation_cost_to_demand8": "23.711282707746893"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "two_periods_ago_transportation_cost_to_demand2": "45.6953575960",
+      "two_periods_ago_transportation_cost_to_demand5": "4.31909256454",
+      "previous_period_transportation_cost_to_demand5": "5.07340818119",
+      "three_periods_ago_service_status": "Trial",
+      "supplier_id": "supply4",
+      "previous_period_transportation_cost_to_demand2": "42.1567483438",
+      "transportation_cost_to_demand1": "235.1794835706472",
+      "four_periods_ago_service_status": "Suspended",
+      "previous_period_transportation_cost_to_demand3": "39.9689275715",
+      "two_periods_ago_transportation_cost_to_demand1": "229.182406740",
+      "previous_period_transportation_cost_to_demand6": "133.856014404",
+      "two_periods_ago_transportation_cost_to_demand6": "145.920573018",
+      "transportation_cost_to_demand2": "43.794668963036194",
+      "two_periods_ago_service_status": "Regular",
+      "transportation_cost_to_demand3": "40.709846782945924",
+      "previous_period_transportation_cost_to_demand8": "26.5078878636",
+      "previous_period_transportation_cost_to_demand7": "298.542800044",
+      "previous_period_service_status": "Regular",
+      "transportation_cost_to_demand4": "0.07774496620087613",
+      "previous_period_transportation_cost_to_demand4": "0.0886836829453",
+      "transportation_cost_to_demand5": "4.237728183419554",
+      "previous_period_transportation_cost_to_demand1": "274.572047069",
+      "transportation_cost_to_demand6": "131.70915517494691",
+      "two_periods_ago_transportation_cost_to_demand4": "0.0645360964433",
+      "transportation_cost_to_demand7": "296.55587567706743",
+      "two_periods_ago_transportation_cost_to_demand3": "48.8273902315",
+      "transportation_cost_to_demand8": "29.810940017561297"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "two_periods_ago_transportation_cost_to_demand2": "42.4703337804",
+      "two_periods_ago_transportation_cost_to_demand5": "0.0623942383292",
+      "previous_period_transportation_cost_to_demand5": "0.0700734338482",
+      "three_periods_ago_service_status": "Seasonal",
+      "supplier_id": "supply5",
+      "previous_period_transportation_cost_to_demand2": "39.8189130322",
+      "transportation_cost_to_demand1": "211.85808746383796",
+      "four_periods_ago_service_status": "Trial",
+      "previous_period_transportation_cost_to_demand3": "43.0544823901",
+      "two_periods_ago_transportation_cost_to_demand1": "183.829262492",
+      "previous_period_transportation_cost_to_demand6": "5.70636977124",
+      "two_periods_ago_transportation_cost_to_demand6": "5.85787103468",
+      "transportation_cost_to_demand2": "47.60180876530328",
+      "two_periods_ago_service_status": "Suspended",
+      "transportation_cost_to_demand3": "50.04007716193931",
+      "previous_period_transportation_cost_to_demand8": "4.38577590646",
+      "previous_period_transportation_cost_to_demand7": "245.595205114",
+      "previous_period_service_status": "Suspended",
+      "transportation_cost_to_demand4": "86.14548807358399",
+      "previous_period_transportation_cost_to_demand4": "98.6624274907",
+      "transportation_cost_to_demand5": "0.06197897916874956",
+      "previous_period_transportation_cost_to_demand1": "239.251338173",
+      "transportation_cost_to_demand6": "5.3345515296262205",
+      "two_periods_ago_transportation_cost_to_demand4": "96.7586122042",
+      "transportation_cost_to_demand7": "270.06290423798396",
+      "two_periods_ago_transportation_cost_to_demand3": "41.3531197666",
+      "transportation_cost_to_demand8": "3.853933133973331"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "two_periods_ago_transportation_cost_to_demand2": "92.1658471585",
+      "two_periods_ago_transportation_cost_to_demand5": "5.81771987310",
+      "previous_period_transportation_cost_to_demand5": "5.45424465004",
+      "three_periods_ago_service_status": "Regular",
+      "supplier_id": "supply6",
+      "previous_period_transportation_cost_to_demand2": "87.3697671074",
+      "transportation_cost_to_demand1": "6.45506633554524",
+      "four_periods_ago_service_status": "Suspended",
+      "previous_period_transportation_cost_to_demand3": "4.25116531502",
+      "two_periods_ago_transportation_cost_to_demand1": "7.04764142515",
+      "previous_period_transportation_cost_to_demand6": "0.0482725317680",
+      "two_periods_ago_transportation_cost_to_demand6": "0.0548766964249",
+      "transportation_cost_to_demand2": "88.16323623354015",
+      "two_periods_ago_service_status": "Seasonal",
+      "transportation_cost_to_demand3": "5.047091671641611",
+      "previous_period_transportation_cost_to_demand8": "90.6296517428",
+      "previous_period_transportation_cost_to_demand7": "10.9840354776",
+      "previous_period_service_status": "Suspended",
+      "transportation_cost_to_demand4": "151.46120287365497",
+      "previous_period_transportation_cost_to_demand4": "132.634575356",
+      "transportation_cost_to_demand5": "5.290760161059401",
+      "previous_period_transportation_cost_to_demand1": "5.94898913484",
+      "transportation_cost_to_demand6": "0.04602205335871525",
+      "two_periods_ago_transportation_cost_to_demand4": "148.007887448",
+      "transportation_cost_to_demand7": "9.93670660180487",
+      "two_periods_ago_transportation_cost_to_demand3": "4.10227611071",
+      "transportation_cost_to_demand8": "103.75460989446313"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "two_periods_ago_transportation_cost_to_demand2": "227.754193653",
+      "two_periods_ago_transportation_cost_to_demand5": "12.3548769110",
+      "previous_period_transportation_cost_to_demand5": "11.4685927610",
+      "three_periods_ago_service_status": "Regular",
+      "supplier_id": "supply7",
+      "previous_period_transportation_cost_to_demand2": "277.269243346",
+      "transportation_cost_to_demand1": "174.27229047340035",
+      "four_periods_ago_service_status": "Trial",
+      "previous_period_transportation_cost_to_demand3": "242.427663724",
+      "two_periods_ago_transportation_cost_to_demand1": "171.867332865",
+      "previous_period_transportation_cost_to_demand6": "181.212144023",
+      "two_periods_ago_transportation_cost_to_demand6": "194.692324769",
+      "transportation_cost_to_demand2": "250.58223528739327",
+      "two_periods_ago_service_status": "Seasonal",
+      "transportation_cost_to_demand3": "253.90413041857263",
+      "previous_period_transportation_cost_to_demand8": "295.663596828",
+      "previous_period_transportation_cost_to_demand7": "2.52880408244",
+      "previous_period_service_status": "Seasonal",
+      "transportation_cost_to_demand4": "16.235467318386764",
+      "previous_period_transportation_cost_to_demand4": "17.0586055114",
+      "transportation_cost_to_demand5": "12.643140514778086",
+      "previous_period_transportation_cost_to_demand1": "144.715710009",
+      "transportation_cost_to_demand6": "175.0672824108511",
+      "two_periods_ago_transportation_cost_to_demand4": "15.2158799708",
+      "transportation_cost_to_demand7": "2.983839625303656",
+      "two_periods_ago_transportation_cost_to_demand3": "280.233988743",
+      "transportation_cost_to_demand8": "317.0655193866389"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "two_periods_ago_transportation_cost_to_demand2": "1.62913550472",
+      "two_periods_ago_transportation_cost_to_demand5": "87.3868672607",
+      "previous_period_transportation_cost_to_demand5": "77.0281157173",
+      "three_periods_ago_service_status": "Trial",
+      "supplier_id": "supply8",
+      "previous_period_transportation_cost_to_demand2": "1.42022140619",
+      "transportation_cost_to_demand1": "207.87006253790491",
+      "four_periods_ago_service_status": "Trial",
+      "previous_period_transportation_cost_to_demand3": "20.9950016900",
+      "two_periods_ago_transportation_cost_to_demand1": "232.939192080",
+      "previous_period_transportation_cost_to_demand6": "102.657813089",
+      "two_periods_ago_transportation_cost_to_demand6": "120.813095648",
+      "transportation_cost_to_demand2": "1.517168471518212",
+      "two_periods_ago_service_status": "Seasonal",
+      "transportation_cost_to_demand3": "24.027239288137153",
+      "previous_period_transportation_cost_to_demand8": "0.219354734154",
+      "previous_period_transportation_cost_to_demand7": "17.3264071935",
+      "previous_period_service_status": "Seasonal",
+      "transportation_cost_to_demand4": "27.133999276450346",
+      "previous_period_transportation_cost_to_demand4": "28.5395404390",
+      "transportation_cost_to_demand5": "73.20672468851855",
+      "previous_period_transportation_cost_to_demand1": "219.635508078",
+      "transportation_cost_to_demand6": "125.72910359893308",
+      "two_periods_ago_transportation_cost_to_demand4": "24.0434367589",
+      "transportation_cost_to_demand7": "15.463103251642147",
+      "two_periods_ago_transportation_cost_to_demand3": "24.1858190674",
+      "transportation_cost_to_demand8": "0.20164987511903337"
+    }
+  }
+]

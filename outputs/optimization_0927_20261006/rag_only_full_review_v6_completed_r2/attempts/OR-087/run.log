@@ -1,0 +1,148 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine an optimal monthly production plan for 80 products over 22 days, maximizing total profit. The plan must account for product-specific maximum demand, selling prices, production costs, daily production quotas, fixed activation costs per product, and minimum batch sizes. All production and activation decisions must be integer (quantities in 100 kg units, activation as binary).
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with fixed-charge (activation cost) and batch-size constraints.
+3.  **Define Index Sets:** The primary index is the set of Products (i ∈ {A1, A2, ..., A80}).
+4.  **Define Decision Variables:**
+    -   `x[i]` = Total quantity of product i to produce in the month (in integer multiples of 100 kg). Type: GRB.INTEGER.
+    -   `y[i]` = 1 if product i is produced (i.e., its production line is activated), 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   Maximum demand per product: from 36-1.csv, row 'Maximum Demand (100 kg units)', columns A1–A80.
+    -   Selling price per product: from 36-1.csv, row 'Selling Price ($/100 kg)', columns A1–A80.
+    -   Production cost per product: from 36-1.csv, row 'Production Cost ($/100 kg)', columns A1–A80.
+    -   Daily production quota per product: from 36-1.csv, row 'Production Quota (max per day)', columns A1–A80.
+    -   Fixed activation cost per product: from 36-2.csv, row 'Activation Cost ($)', columns A1–A80.
+    -   Minimum batch size per product: from 36-3.csv, row 'Minimum Batch Size (100 kg units)', columns A1–A80.
+    -   Number of production days: 22 (given in query).
+6.  **Formulate Objective:** Maximize total profit, defined as the sum over all products of [(selling price - production cost) × produced quantity] minus the sum of fixed activation costs for each product produced:
+    -   Maximize:  
+        sum over i [ (SellingPrice[i] - ProductionCost[i]) × x[i] - ActivationCost[i] × y[i] ]
+7.  **Formulate Constraints:**
+    -   Demand constraint: For each product i, x[i] ≤ MaximumDemand[i].
+    -   Production quota constraint: For each product i, x[i] ≤ DailyQuota[i] × 22.
+    -   Minimum batch size constraint: For each product i, x[i] = 0 or x[i] ≥ MinBatchSize[i]. (Enforced as: x[i] ≥ MinBatchSize[i] × y[i])
+    -   Linking constraint: For each product i, x[i] ≤ (MaximumDemand[i] or DailyQuota[i] × 22) × y[i] (ensures y[i] = 1 iff x[i] > 0).
+    -   Integrality constraints: x[i] ∈ {0, 1, 2, ...} (integer), y[i] ∈ {0, 1} (binary).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+from gurobipy import Model, GRB, quicksum
+
+# File paths
+file_36_1 = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture9/36-1.csv'
+file_36_2 = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture9/36-2.csv'
+file_36_3 = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture9/36-3.csv'
+
+# Read all CSVs as string, no NA conversion
+df_36_1 = pd.read_csv(file_36_1, dtype=str, keep_default_na=False)
+df_36_2 = pd.read_csv(file_36_2, dtype=str, keep_default_na=False)
+df_36_3 = pd.read_csv(file_36_3, dtype=str, keep_default_na=False)
+
+# Products: A1 ... A80 (from columns, not from data)
+product_ids = [f'A{i}' for i in range(1, 81)]
+
+# --- Extract parameters from 36-1.csv ---
+# Normalize 'Product' column for matching
+df_36_1['Product_norm'] = df_36_1['Product'].str.strip().str.casefold()
+
+def get_row_by_norm(df, col, value):
+    idx = (df[col].str.strip().str.casefold() == value.strip().casefold())
+    if not idx.any():
+        raise ValueError(f"Row '{value}' not found in {col}")
+    return df[idx].iloc[0]
+
+# Maximum Demand
+row_max_demand = get_row_by_norm(df_36_1, 'Product', 'Maximum Demand (100 kg units)')
+max_demand = {pid: int(float(row_max_demand[pid])) for pid in product_ids}
+
+# Selling Price
+row_selling_price = get_row_by_norm(df_36_1, 'Product', 'Selling Price ($/100 kg)')
+selling_price = {pid: float(row_selling_price[pid]) for pid in product_ids}
+
+# Production Cost
+row_prod_cost = get_row_by_norm(df_36_1, 'Product', 'Production Cost ($/100 kg)')
+prod_cost = {pid: float(row_prod_cost[pid]) for pid in product_ids}
+
+# Daily Production Quota
+row_daily_quota = get_row_by_norm(df_36_1, 'Product', 'Production Quota (max per day)')
+daily_quota = {pid: int(float(row_daily_quota[pid])) for pid in product_ids}
+
+# --- Extract parameters from 36-2.csv ---
+# Only one row, with 'Product' column as header
+row_activation_cost = df_36_2.iloc[0]
+activation_cost = {pid: float(row_activation_cost[pid]) for pid in product_ids}
+
+# --- Extract parameters from 36-3.csv ---
+# Only one row, with 'Product' column as header
+row_min_batch = df_36_3.iloc[0]
+min_batch_size = {pid: int(float(row_min_batch[pid])) for pid in product_ids}
+
+# --- Model parameters ---
+num_days = 22
+
+# --- Build Model ---
+m = Model()
+
+# Decision variables
+x_vars = m.addVars(product_ids, vtype=GRB.INTEGER, lb=0, name='x')  # production quantity (100kg units)
+y_vars = m.addVars(product_ids, vtype=GRB.BINARY, name='y')         # activation (0/1)
+
+# --- Constraints ---
+for pid in product_ids:
+    # Demand constraint
+    m.addConstr(x_vars[pid] <= max_demand[pid])
+    # Production quota constraint
+    m.addConstr(x_vars[pid] <= daily_quota[pid] * num_days)
+    # Minimum batch size constraint (if produced)
+    m.addConstr(x_vars[pid] >= min_batch_size[pid] * y_vars[pid])
+    # Linking constraint: x[i] <= max_possible * y[i]
+    max_possible = min(max_demand[pid], daily_quota[pid] * num_days)
+    m.addConstr(x_vars[pid] <= max_possible * y_vars[pid])
+
+# --- Objective ---
+profit_terms = []
+for pid in product_ids:
+    unit_profit = selling_price[pid] - prod_cost[pid]
+    profit_terms.append(unit_profit * x_vars[pid] - activation_cost[pid] * y_vars[pid])
+
+m.setObjective(quicksum(profit_terms), GRB.MAXIMIZE)
+
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 320 rows, 160 columns and 480 nonzeros
+Model fingerprint: 0x1623af45
+Variable types: 0 continuous, 160 integer (80 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 7e+03]
+  Objective range  [2e+01, 2e+05]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [3e+03, 2e+04]
+Found heuristic solution: objective -0.0000000
+Presolve removed 320 rows and 160 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 6.24306e+06 -0 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.243055960000e+06, best bound 6.243055960000e+06, gap 0.0000%
+Optimal objective: 6243055.959999999
+Optimal solution: [('C0', 5732.0), ('C1', 5607.0), ('C2', 4653.0), ('C3', 6264.0), ('C4', 3835.0), ('C5', 0.0), ('C6', 4731.0), ('C7', 6431.0), ('C8', 4033.0), ('C9', 6795.0), ('C10', 3277.0), ('C11', 0.0), ('C12', 4828.0), ('C13', 5647.0), ('C14', 6142.0), ('C15', 6544.0), ('C16', 5648.0), ('C17', 6468.0), ('C18', 5362.0), ('C19', 3705.0), ('C20', 6558.0), ('C21', 5599.0), ('C22', 5135.0), ('C23', 5222.0), ('C24', 6672.0), ('C25', 5897.0), ('C26', 4701.0), ('C27', 0.0), ('C28', 5893.0), ('C29', 5120.0), ('C30', 5825.0), ('C31', 4940.0), ('C32', 5163.0), ('C33', 3976.0), ('C34', 3755.0), ('C35', 6781.0), ('C36', 5046.0), ('C37', 0.0), ('C38', 6503.0), ('C39', 5496.0), ('C40', 0.0), ('C41', 3099.0), ('C42', 0.0), ('C43', 6249.0), ('C44', 3755.0), ('C45', 0.0), ('C46', 3659.0), ('C47', 6219.0), ('C48', 5958.0), ('C49', 3423.0), ('C50', 6360.0), ('C51', 6337.0), ('C52', 5745.0), ('C53', 0.0), ('C54', 3544.0), ('C55', 5591.0), ('C56', 0.0), ('C57', 5292.0), ('C58', 0.0), ('C59', 5723.0), ('C60', 5558.0), ('C61', 6531.0), ('C62', 5930.0), ('C63', 0.0), ('C64', 5076.0), ('C65', 0.0), ('C66', 5176.0), ('C67', 5176.0), ('C68', 4956.0), ('C69', 6125.0), ('C70', 4925.0), ('C71', 6622.0), ('C72', 6560.0), ('C73', 3756.0), ('C74', 0.0), ('C75', 5383.0), ('C76', 0.0), ('C77', 4641.0), ('C78', 6114.0), ('C79', 4466.0), ('C80', 1.0), ('C81', 1.0), ('C82', 1.0), ('C83', 1.0), ('C84', 1.0), ('C85', 0.0), ('C86', 1.0), ('C87', 1.0), ('C88', 1.0), ('C89', 1.0), ('C90', 1.0), ('C91', 0.0), ('C92', 1.0), ('C93', 1.0), ('C94', 1.0), ('C95', 1.0), ('C96', 1.0), ('C97', 1.0), ('C98', 1.0), ('C99', 1.0), ('C100', 1.0), ('C101', 1.0), ('C102', 1.0), ('C103', 1.0), ('C104', 1.0), ('C105', 1.0), ('C106', 1.0), ('C107', 0.0), ('C108', 1.0), ('C109', 1.0), ('C110', 1.0), ('C111', 1.0), ('C112', 1.0), ('C113', 1.0), ('C114', 1.0), ('C115', 1.0), ('C116', 1.0), ('C117', 0.0), ('C118', 1.0), ('C119', 1.0), ('C120', 0.0), ('C121', 1.0), ('C122', 0.0), ('C123', 1.0), ('C124', 1.0), ('C125', 0.0), ('C126', 1.0), ('C127', 1.0), ('C128', 1.0), ('C129', 1.0), ('C130', 1.0), ('C131', 1.0), ('C132', 1.0), ('C133', 0.0), ('C134', 1.0), ('C135', 1.0), ('C136', 0.0), ('C137', 1.0), ('C138', 0.0), ('C139', 1.0), ('C140', 1.0), ('C141', 1.0), ('C142', 1.0), ('C143', 0.0), ('C144', 1.0), ('C145', 0.0), ('C146', 1.0), ('C147', 1.0), ('C148', 1.0), ('C149', 1.0), ('C150', 1.0), ('C151', 1.0), ('C152', 1.0), ('C153', 1.0), ('C154', 0.0), ('C155', 1.0), ('C156', 0.0), ('C157', 1.0), ('C158', 1.0), ('C159', 1.0)]

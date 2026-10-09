@@ -1,0 +1,143 @@
+{
+  "problem_id": "OR-037",
+  "query": "A car sales company is planning an inventory replenishment strategy. For each model (e.g., cars, SUVs, trucks, etc.), the company has a \u2018products.csv\u2019 file which records the profit that can be brought by selling each type of vehicle.The company has an overall inventory capacity limit, which is detailed in the \u2018capacity.csv\u2019 file. The company's objective is to decide which types of vehicles to order each day and in what quantities, in order to maximise the overall benefit while adhering to the overall stock capacity. The decision variable x_i represents the number of vehicles of type i to be ordered per day. The company needs to strike a balance between maximising benefits and adhering to stock limits in order to develop an optimal ordering plan.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA3/CarSales2/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 722376.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "RA",
+  "assigned_route": "RA",
+  "generated_model": "ABSTRACT MATHEMATICAL MODEL\n\nSets:\n- $I$: set of vehicle types (indexed by $i$), from file_1_view_0 ProductName.\n\nParameters:\n- $p_i$: profit per unit of vehicle $i$ (file_1_view_0, Value, for ProductName $i$)\n- $w_i$: weight (space requirement) per unit of vehicle $i$ (file_1_view_0, Weight, for ProductName $i$)\n- $C$: total inventory capacity (file_0_view_0, Capacity)\n\nDecision Variables:\n- $x_i \\in \\mathbb{Z}_{\\geq 0}$: number of vehicles of type $i$ to order per day\n\nObjective:\n$$\n\\max \\sum_{i \\in I} p_i x_i\n$$\n\nSubject to:\n$$\n\\sum_{i \\in I} w_i x_i \\leq C\n$$\n\n$$\nx_i \\in \\mathbb{Z}_{\\geq 0} \\quad \\forall i \\in I\n$$\n\nDATA MAPPING\n\n- $I$: All ProductName values in file_1_view_0\n- $p_i$: file_1_view_0, column Value, for ProductName $i$\n- $w_i$: file_1_view_0, column Weight, for ProductName $i$\n- $C$: file_0_view_0, column Capacity\n- $x_i$: decision variable for ProductName $i$",
+  "csvqa_observation": "{\"tables\": [{\"table_id\": \"file_0_view_0\", \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA3/CarSales2/capacity.csv\", \"columns\": [\"Capacity\"], \"records\": [{\"Capacity\": \"765\"}]}, {\"table_id\": \"file_1_view_0\", \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA3/CarSales2/products.csv\", \"columns\": [\"ProductName\", \"Value\", \"Weight\"], \"records\": [{\"ProductName\": \"Sedan\", \"Value\": \"2524\", \"Weight\": \"99\"}, {\"ProductName\": \"SUV\", \"Value\": \"4614\", \"Weight\": \"55\"}, {\"ProductName\": \"Truck\", \"Value\": \"8416\", \"Weight\": \"75\"}, {\"ProductName\": \"Convertible\", \"Value\": \"5917\", \"Weight\": \"94\"}, {\"ProductName\": \"Minivan\", \"Value\": \"9048\", \"Weight\": \"80\"}, {\"ProductName\": \"Coupe\", \"Value\": \"1140\", \"Weight\": \"82\"}, {\"ProductName\": \"Hatchback\", \"Value\": \"8962\", \"Weight\": \"71\"}, {\"ProductName\": \"Station Wagon\", \"Value\": \"1888\", \"Weight\": \"100\"}, {\"ProductName\": \"Electric Car\", \"Value\": \"8487\", \"Weight\": \"28\"}, {\"ProductName\": \"Hybrid Car\", \"Value\": \"4425\", \"Weight\": \"93\"}, {\"ProductName\": \"Luxury Sedan\", \"Value\": \"4717\", \"Weight\": \"84\"}, {\"ProductName\": \"Sports Car\", \"Value\": \"4210\", \"Weight\": \"83\"}, {\"ProductName\": \"Crossover\", \"Value\": \"1226\", \"Weight\": \"62\"}, {\"ProductName\": \"Diesel Truck\", \"Value\": \"7400\", \"Weight\": \"90\"}, {\"ProductName\": \"Compact SUV\", \"Value\": \"4639\", \"Weight\": \"99\"}, {\"ProductName\": \"Luxury SUV\", \"Value\": \"7712\", \"Weight\": \"96\"}, {\"ProductName\": \"Cargo Van\", \"Value\": \"3299\", \"Weight\": \"21\"}, {\"ProductName\": \"Pickup Truck\", \"Value\": \"9895\", \"Weight\": \"39\"}, {\"ProductName\": \"Roadster\", \"Value\": \"4496\", \"Weight\": \"99\"}, {\"ProductName\": \"Muscle Car\", \"Value\": \"4526\", \"Weight\": \"81\"}, {\"ProductName\": \"Off-road Vehicle\", \"Value\": \"5688\", \"Weight\": \"6\"}, {\"ProductName\": \"Camper Van\", \"Value\": \"3007\", \"Weight\": \"58\"}, {\"ProductName\": \"Compact Car\", \"Value\": \"3623\", \"Weight\": \"37\"}, {\"ProductName\": \"Motorcycle\", \"Value\": \"8474\", \"Weight\": \"15\"}, {\"ProductName\": \"Electric SUV\", \"Value\": \"8372\", \"Weight\": \"37\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "DIRECT_FULL_SOURCE",
+  "csvqa_trace": "{\"status\": \"DIRECT_FULL_SOURCE\", \"formulation_protocol\": \"ReAct\", \"csvqa_call_count\": 0, \"planner_attempt_count\": 0, \"repair_count\": 0, \"fallback_count\": 0, \"retry_count\": 0, \"protocol_retry_count\": 0, \"protocol_retry_events\": \"[]\"}",
+  "solve_code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_problem():\n    csv_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']\n\n    def read_csv_with_encodings(path):\n        last_err = None\n        for enc in csv_encodings:\n            try:\n                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)\n            except Exception as e:\n                last_err = e\n        raise last_err\n    products_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA3/CarSales2/products.csv'\n    capacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA3/CarSales2/capacity.csv'\n    products_df = read_csv_with_encodings(products_path)\n    capacity_df = read_csv_with_encodings(capacity_path)\n    for col in ['ProductName', 'Value', 'Weight']:\n        if col not in products_df.columns:\n            raise ValueError(f\"Missing column '{col}' in products.csv\")\n    if 'Capacity' not in capacity_df.columns:\n        raise ValueError(\"Missing column 'Capacity' in capacity.csv\")\n    I = products_df['ProductName'].tolist()\n    products_grouped = products_df.groupby('ProductName', sort=False, dropna=False).agg({'Value': lambda x: list(x), 'Weight': lambda x: list(x)}).reset_index()\n    p_i = {}\n    w_i = {}\n    for (idx, row) in products_grouped.iterrows():\n        pname = row['ProductName']\n        values = row['Value']\n        weights = row['Weight']\n        if len(values) != 1 or len(weights) != 1:\n            raise ValueError(f\"Multiple Value or Weight entries for ProductName '{pname}'\")\n        try:\n            p_i[pname] = float(values[0])\n        except Exception:\n            raise ValueError(f\"Non-numeric Value for ProductName '{pname}': {values[0]}\")\n        try:\n            w_i[pname] = float(weights[0])\n        except Exception:\n            raise ValueError(f\"Non-numeric Weight for ProductName '{pname}': {weights[0]}\")\n    I = list(p_i.keys())\n    if len(capacity_df) != 1:\n        raise ValueError('capacity.csv must have exactly one row for total inventory capacity')\n    try:\n        C = float(capacity_df.iloc[0]['Capacity'])\n    except Exception:\n        raise ValueError(f\"Non-numeric Capacity: {capacity_df.iloc[0]['Capacity']}\")\n    m = gp.Model('CarSales_Inventory')\n    m.Params.MIPGap = 0.0001\n    quantity_vars = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='')\n    m.setObjective(gp.quicksum((p_i[i] * quantity_vars[i] for i in I)), GRB.MAXIMIZE)\n    m.addConstr(gp.quicksum((w_i[i] * quantity_vars[i] for i in I)) <= C, name='capacity')\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal: {m.ObjVal}')\n        for v in m.getVars():\n            print(f'{v.VarName}: {v.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_problem()",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 722376.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ],
+    [
+      "C20",
+      127.0
+    ],
+    [
+      "C21",
+      -0.0
+    ],
+    [
+      "C22",
+      -0.0
+    ],
+    [
+      "C23",
+      0.0
+    ],
+    [
+      "C24",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 14.95,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "5ddad9b79a56ba8572d74f743afee427e23d6237567f19eb1ea2dfbd1fc32a81",
+  "cache_fingerprint": "55ce1b4ebfde9acc58d95ed022c00f927f9567e96c0f3a25dc636cec63b46bbf",
+  "evaluated_utc": "2026-10-06T07:54:14.607080+00:00"
+}

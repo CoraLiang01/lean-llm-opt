@@ -1,0 +1,33 @@
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+cost_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP1/cost_12x12.csv'
+cost_df = pd.read_csv(cost_path, sep=',')
+machines = cost_df['Machine'].astype(str).tolist()
+tasks = [col for col in cost_df.columns if col != 'Machine']
+c = {}
+for (_, row) in cost_df.iterrows():
+    machine = str(row['Machine'])
+    for task in tasks:
+        c[machine, task] = float(row[task])
+if len(machines) != 12 or len(tasks) != 12:
+    raise ValueError(f'Expected 12 machines and 12 tasks, got {len(machines)} machines and {len(tasks)} tasks.')
+for i in machines:
+    for j in tasks:
+        if (i, j) not in c:
+            raise KeyError(f'Missing cost coefficient for machine {i}, task {j}.')
+m = gp.Model('AssignmentProblem')
+x = m.addVars(machines, tasks, vtype=gp.GRB.BINARY, name='')
+m.setObjective(gp.quicksum((c[i, j] * x[i, j] for i in machines for j in tasks)), gp.GRB.MINIMIZE)
+m.addConstrs((gp.quicksum((x[i, j] for j in tasks)) == 1 for i in machines), name='')
+m.addConstrs((gp.quicksum((x[i, j] for i in machines)) == 1 for j in tasks), name='')
+m.optimize()
+if m.status == gp.GRB.OPTIMAL:
+    print(f'Optimal total value/cost: {m.objVal:.2f}')
+    print('--- Assignment ---')
+    for i in machines:
+        for j in tasks:
+            if x[i, j].X > 0.5:
+                print(f'Machine {i} assigned to Task {j} with cost {c[i, j]:.2f}')
+else:
+    print(f'No optimal solution found. Status: {m.status}')

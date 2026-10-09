@@ -1,0 +1,105 @@
+##### Sets
+
+- $I = \{S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12\}$ (suppliers)
+- $J = \{C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12\}$ (supermarkets)
+
+##### Parameters
+
+- Demands $d_j$ for each supermarket $j \in J$:
+  - $d_{C1} = 1097$
+  - $d_{C2} = 61$
+  - $d_{C3} = 11$
+  - $d_{C4} = 7$
+  - $d_{C5} = 82$
+  - $d_{C6} = 37$
+  - $d_{C7} = 483$
+  - $d_{C8} = 582$
+  - $d_{C9} = 223$
+  - $d_{C10} = 89$
+  - $d_{C11} = 60$
+  - $d_{C12} = 55$
+
+- Fixed costs $f_i$ for each supplier $i \in I$:
+  - $f_{S1} = 98.88$
+  - $f_{S2} = 99.73$
+  - $f_{S3} = 94.01$
+  - $f_{S4} = 93.77$
+  - $f_{S5} = 107.59$
+  - $f_{S6} = 112.65$
+  - $f_{S7} = 97.05$
+  - $f_{S8} = 103$
+  - $f_{S9} = 90.45$
+  - $f_{S10} = 96.73$
+  - $f_{S11} = 96.43$
+  - $f_{S12} = 112.19$
+
+- Transportation costs $c_{ij}$ for each supplier $i \in I$ and supermarket $j \in J$:
+
+|        |  C1    |   C2   |   C3   |   C4   |   C5   |   C6   |   C7   |   C8   |   C9   |  C10   |  C11   |  C12   |
+|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+| S1     | 284.11 | 53.78  | 10.62  | 111.27 | 158.5  | 8.79   | 53.79  | 8.84   |1911.43 | 8.87   |1129.47 |185.53  |
+| S2     | 7.19   |1031.96 | 90.94  | 276.97 | 0.45   | 0.2    | 49.14  | 1.05   |2079.54 | 1.45   | 49.14  | 0.05   |
+| S3     |151.10  | 884.48 | 4.33   | 277.04 | 0.33   | 0.19   | 49.14  | 0.99   | 99.03  | 1.63   | 884.47 | 0.96   |
+| S4     |144.16  | 868.75 | 94.20  | 285.48 | 16.93  | 0.94   | 868.78 |16.60   | 98.69  |19.74   | 868.74 |19.85   |
+| S5     |151.34  |1030.88 | 91.43  | 13.24  | 0.72   | 0.87   | 49.09  | 0.01   | 99.05  | 0.84   | 883.60 | 0.58   |
+| S6     | 7.18   | 49.13  | 90.72  | 277.57 | 0.37   | 0.58   |1031.74 | 0.76   |1782.98 | 1.06   | 884.31 | 0.34   |
+| S7     |104.38  |1324.35 |1829.39 |1857.57 |1782.69 |2079.47 |1324.31 |2080.29 | 0      |2080.99 |1545.08 |99.07   |
+| S8     |129.51  |1031.96 | 4.33   | 276.97 | 0.02   | 0.23   | 884.56 | 1.22   |2079.54 | 1.69   | 49.14  | 0.05   |
+| S9     | 50.93  | 5.75   |1057.85 | 58.62  | 47.63  |1000.41 |103.48  | 47.60  |1642.85 |47.59   | 5.75   |999.94  |
+| S10    |129.62  | 884.35 | 91.10  | 277.12 | 0.27   | 0.07   |1031.78 | 0.91   | 99.03  | 0.08   | 49.13  | 0.04   |
+| S11    | 53.30  | 0      | 941.91 | 58.92  |1031.61 | 49.13  | 0.03   |1030.99 |1324.29 |49.10   | 0.08   |49.12   |
+| S12    |959.55  | 0.11   | 941.98 |1237.42 | 49.13  |1031.86 | 0.09   |1031.07 | 73.57  |49.10   | 0.12   |1031.53 |
+
+- Let $M = \sum_{j \in J} d_j = 2797$ (an upper bound on total demand, used for linking constraints).
+
+##### Decision Variables
+
+- $x_{ij} \geq 0$: quantity shipped from supplier $i$ to supermarket $j$ (continuous)
+- $y_i \in \{0,1\}$: 1 if supplier $i$ is open, 0 otherwise (binary)
+
+##### Objective Function
+
+\[
+\min \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij} + \sum_{i \in I} f_i y_i
+\]
+
+##### Constraints
+
+1. **Demand satisfaction:** For each supermarket $j \in J$,
+   \[
+   \sum_{i \in I} x_{ij} = d_j
+   \]
+2. **Supplier activation:** For each supplier $i \in I$,
+   \[
+   \sum_{j \in J} x_{ij} \leq M y_i
+   \]
+   (If $y_i = 0$, then $x_{ij} = 0$ for all $j$; if $y_i = 1$, supplier $i$ can supply up to total demand $M$.)
+
+3. **Variable domains:**
+   \[
+   x_{ij} \geq 0 \quad \forall i \in I, j \in J
+   \]
+   \[
+   y_i \in \{0,1\} \quad \forall i \in I
+   \]
+
+##### Complete Mathematical Model
+
+\[
+\begin{align*}
+\min \quad & \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij} + \sum_{i \in I} f_i y_i \\
+\text{s.t.} \quad & \sum_{i \in I} x_{ij} = d_j \quad \forall j \in J \\
+& \sum_{j \in J} x_{ij} \leq M y_i \quad \forall i \in I \\
+& x_{ij} \geq 0 \quad \forall i \in I, j \in J \\
+& y_i \in \{0,1\} \quad \forall i \in I
+\end{align*}
+\]
+
+Where:
+
+- $I = \{S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12\}$
+- $J = \{C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12\}$
+- $d_j$ as listed above
+- $f_i$ as listed above
+- $c_{ij}$ as in the table above
+- $M = 2797$

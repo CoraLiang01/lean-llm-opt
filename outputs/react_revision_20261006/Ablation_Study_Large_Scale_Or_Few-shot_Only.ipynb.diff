@@ -1,0 +1,105 @@
+--- Ablation_Study_Large_Scale_Or_Few-shot_Only.ipynb:direct_call_before
++++ Ablation_Study_Large_Scale_Or_Few-shot_Only.ipynb:ReAct_v3
+@@ -51,7 +51,7 @@
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/minimal_revision_20261005/few_shot_only_v5"
++RESULTS_DIR = PROJECT_ROOT / "outputs/react_revision_20261006/few_shot_only_v3"
+ # Edit this one value when the notebook file is renamed.
+ NOTEBOOK_FILENAME = "Ablation_Study_Large_Scale_Or_Few-shot_Only.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+@@ -65,7 +65,7 @@
+ load_dotenv(PROJECT_ROOT / ".env", override=False)
+ user_api_key = os.environ.get("OPENAI_API_KEY")
+ 
+-VERSION = "single-pass-source-data-v4"
++VERSION = "react-source-data-v3"
+ MODEL_SNAPSHOT = "gpt-4.1-2025-04-14"
+ NRM_RETRY_ON_TRUNCATION = False  # Single attempt; truncation remains a failed case.
+ EMBEDDING_MODEL = "text-embedding-ada-002"
+@@ -82,8 +82,8 @@
+ API_MAX_RETRIES = 2  # Original SDK transport setting; no pipeline/model retry.
+ 
+ METHOD = "few_shot_only"
+-CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/minimal_revision_20261005/full_v4/automatic/results.csv"
+-BASE_NOTEBOOK_SHA256 = "27b17404536910dec6442e66cce5a76d0dc4c391b243142a3f5b75e5f9962a4d"
++CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/react_revision_20261006/full_v3/automatic/results.csv"
++BASE_NOTEBOOK_SHA256 = "e7fabb996ca33f9c9b994768f549a5d41554801e38fe2d9392af649fc4010ad7"
+ 
+ CSVQA_MODE_BY_ROUTE = {route: "direct" for route in WORKFLOW_ROUTES}
+ 
+@@ -821,23 +821,50 @@
+     }
+ 
+ 
+-## 7. Data retrieval and formulation
+-
+-Python invokes the existing CSVQA Tool once before a single modeling request. Planned extraction and all route demonstrations remain. The modeling request receives the resulting Observation without an agent deciding whether to call the tool.
++## 7. ReAct formulation
++
++The original ReAct agent receives a complete Python Observation and has no data tools. CSVQA/planning remain removed; full source data is never sent to code generation.
+ 
+ 
+ def formulate_with_csvqa(query, dataset_address, route, system_prompt, tool_description, prefix, suffix):
+-    """Direct Python Observation; one modeling call without tools or an extraction plan."""
++    """ReAct with a complete Python Observation; no CSVQA tool or extraction planner."""
+     observation = direct_source_observation(dataset_address)
+-    prompt = (prefix.replace("{{", "{").replace("}}", "}") +
+-              "\nThe CSVQA actions in demonstrations describe historical examples. No tools are available. "
+-              "Use the complete current Python Observation below directly; never screen, rewrite or invent data. "
+-              "Return a concise symbolic model and source-column Data Mapping; do not copy data rows. "
+-              "Preserve the original objective sense, all constants, and all constraints.\n" +
+-              f"Original Query:\n{query}\nObservation:\n{observation}")
+-    result = make_llm().invoke([HumanMessage(content=prompt)])
+-    return {"formulation": result.content, "observation": observation,
+-            "trace": {"status": "DIRECT_FULL_SOURCE", "planner_attempt_count": 0,
++    prefix = prefix.replace("{{", "{").replace("}}", "}")
++    prefix = escape_braces(prefix)
++    prefix += ("\nThe CSVQA actions in demonstrations describe historical examples. "
++               "No tools are available in this experiment. Complete current source data is already "
++               "provided by Python in the Observation. Use it directly without screening, rewriting "
++               "or inventing values. Return a concise symbolic model and source-column Data Mapping; "
++               "do not copy numerical tables. Preserve the original objective and all constraints.")
++    prefix += "\nCurrent Python Observation:\n" + escape_braces(observation)
++    suffix = """Begin!
++
++Original user description: {input}
++The complete CURRENT Observation has already been provided. No tools are available.
++Your response MUST have exactly this envelope:
++Thought: I can formulate from the supplied current data.
++Final Answer:
++<the complete symbolic model and Data Mapping>
++The literal label "Final Answer:" is mandatory before any model heading.
++Never output a bare model or markdown heading before these labels.
++Do not emit Action or Action Input for a historical demonstration.
++{agent_scratchpad}"""
++    # initialize_agent rejects an empty tool list; construct the same ReAct agent directly.
++    from langchain_classic.agents import AgentExecutor, ZeroShotAgent
++    model_prompt = ZeroShotAgent.create_prompt(tools=[], prefix=prefix, suffix=suffix)
++    reasoning_agent = ZeroShotAgent(
++        llm_chain=LLMChain(llm=make_llm(), prompt=model_prompt), allowed_tools=[],
++    )
++    agent = AgentExecutor(
++        agent=reasoning_agent, tools=[], verbose=True, handle_parsing_errors=False,
++        return_intermediate_steps=True, early_stopping_method="force",
++    )
++    result = agent.invoke(query)
++    if result.get("intermediate_steps"):
++        raise RuntimeError("Few-shot Only requested an unavailable tool; no repair or rerun")
++    return {"formulation": result["output"], "observation": observation,
++            "trace": {"status": "DIRECT_FULL_SOURCE", "formulation_protocol": "ReAct",
++                      "csvqa_call_count": 0, "planner_attempt_count": 0,
+                       "repair_count": 0, "retry_count": 0, "fallback_count": 0}}
+ 
+ 
+@@ -1895,7 +1922,8 @@
+         if evidence:
+             record.update(csvqa_observation=evidence.get("observation", ""),
+                           csvqa_trace=json.dumps(evidence.get("trace", {}), ensure_ascii=False),
+-                          csvqa_status=evidence.get("trace", {}).get("status"))
++                          csvqa_status=evidence.get("trace", {}).get("status"),
++                          fallback_count=evidence.get("trace", {}).get("fallback_count", 0))
+         record["pipeline_stage"] = getattr(exc, "pipeline_stage", record["pipeline_stage"])
+         if isinstance(exc, ModelInterfaceError):
+             record["pipeline_stage"] = "result_extraction"

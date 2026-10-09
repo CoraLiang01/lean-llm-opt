@@ -1,0 +1,2 @@
+{"values": {"Product Name": "27in 4K Gaming Monitor", "Revenue": "389.99", "Demand": "12474", "Initial Inventory": "62440"}}
+{"values": {"Product Name": "27in FHD Monitor", "Revenue": "149.99", "Demand": "15057", "Initial Inventory": "75500"}}

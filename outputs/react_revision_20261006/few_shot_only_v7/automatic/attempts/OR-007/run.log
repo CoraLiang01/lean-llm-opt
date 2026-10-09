@@ -1,0 +1,255 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+##### Decision Variables
+
+Let $x_{ij} \geq 0$ be the quantity shipped from warehouse $i$ to store $j$, for all $i \in I$, $j \in J$.
+
+Where:
+- $I = \{\text{S1}, \text{S2}, \text{S3}, \text{S4}, \text{S5}\}$ (warehouses)
+- $J = \{\text{D1}, \text{D2}, \text{D3}, \text{D4}, \text{D5}\}$ (stores)
+
+##### Parameters
+
+- $d_j$: demand of store $j$ (from customer_demand.csv)
+- $s_i$: supply capacity of warehouse $i$ (from supply_capacity.csv)
+- $c_{ij}$: transportation cost per unit from warehouse $i$ to store $j$ (from transportation_costs.csv)
+
+##### Objective Function
+
+Minimize total transportation cost:
+$$
+\min \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij}
+$$
+
+##### Constraints
+
+1. **Demand satisfaction (for each store):**
+   $$
+   \sum_{i \in I} x_{ij} \geq d_j \quad \forall j \in J
+   $$
+
+2. **Supply capacity (for each warehouse):**
+   $$
+   \sum_{j \in J} x_{ij} \leq s_i \quad \forall i \in I
+   $$
+
+3. **Non-negativity:**
+   $$
+   x_{ij} \geq 0 \quad \forall i \in I,\, j \in J
+   $$
+
+---
+
+#### Data Mapping
+
+- **customer_demand.csv**  
+  - $J = \{\text{D1}, \text{D2}, \text{D3}, \text{D4}, \text{D5}\}$
+  - $d_{\text{D1}} = 428$
+  - $d_{\text{D2}} = 217$
+  - $d_{\text{D3}} = 214$
+  - $d_{\text{D4}} = 380$
+  - $d_{\text{D5}} = 254$
+
+- **supply_capacity.csv**  
+  - $I = \{\text{S1}, \text{S2}, \text{S3}, \text{S4}, \text{S5}\}$
+  - $s_{\text{S1}} = 428$
+  - $s_{\text{S2}} = 217$
+  - $s_{\text{S3}} = 214$
+  - $s_{\text{S4}} = 380$
+  - $s_{\text{S5}} = 254$
+
+- **transportation_costs.csv**  
+  - $c_{ij}$: For $i$ in $I$, $j$ in $J$, $c_{ij}$ is the value in row $i$, column $j$.
+
+  |        | D1              | D2              | D3              | D4              | D5              |
+  |--------|-----------------|-----------------|-----------------|-----------------|-----------------|
+  | S1     | 269.39105880208 | 1.45373353909   | 99.60345345757  | 26.64078166310  | 9.53768895688   |
+  | S2     | 9.29184687679   | 10.87477843707  | 144.52609291615 | 11.42013307790  | 153.17568199278 |
+  | S3     | 9.67458430167   | 2.61916509597   | 100.82422491687 | 3.21219108879   | 133.84933961242 |
+  | S4     | 270.57498480010 | 32.50253586     | 4.68420980965   | 1.56822696865   | 9.58927599      |
+  | S5     | 226.03319106758 | 8.66916198083   | 65.47681316968  | 9.06876525846   | 202.65015316426 |
+
+- $x_{ij}$ are continuous, nonnegative variables for all $i \in I$, $j \in J$.[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # File paths from Source Schema
+    demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP7/customer_demand.csv"
+    supply_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP7/supply_capacity.csv"
+    cost_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP7/transportation_costs.csv"
+
+    # Try reading CSVs with fallback encodings
+    def read_csv_with_encodings(path):
+        encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+        for enc in encodings:
+            try:
+                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with tried encodings.")
+
+    # Read demand
+    demand_df = read_csv_with_encodings(demand_path)
+    if 'customer' not in demand_df.columns or 'demand' not in demand_df.columns:
+        raise ValueError("customer_demand.csv must have columns: customer, demand")
+    customers = demand_df['customer'].tolist()
+    demand = {}
+    for _, row in demand_df.iterrows():
+        cust = row['customer']
+        try:
+            val = float(row['demand'])
+        except Exception:
+            raise ValueError(f"Non-numeric demand for customer {cust}: {row['demand']}")
+        if cust in demand:
+            demand[cust] += val
+        else:
+            demand[cust] = val
+
+    # Read supply
+    supply_df = read_csv_with_encodings(supply_path)
+    if 'region' not in supply_df.columns or 'supply_capacity' not in supply_df.columns:
+        raise ValueError("supply_capacity.csv must have columns: region, supply_capacity")
+    warehouses = supply_df['region'].tolist()
+    supply_capacity = {}
+    for _, row in supply_df.iterrows():
+        wh = row['region']
+        try:
+            val = float(row['supply_capacity'])
+        except Exception:
+            raise ValueError(f"Non-numeric supply_capacity for warehouse {wh}: {row['supply_capacity']}")
+        if wh in supply_capacity:
+            supply_capacity[wh] += val
+        else:
+            supply_capacity[wh] = val
+
+    # Read cost matrix
+    cost_df = read_csv_with_encodings(cost_path)
+    # The first column is warehouse identifier, rest are store columns
+    if cost_df.columns[0] not in ['Unnamed: 0', 'region', 'warehouse']:
+        raise ValueError("First column of transportation_costs.csv must be warehouse identifier")
+    cost_warehouses = cost_df[cost_df.columns[0]].tolist()
+    cost_stores = [col for col in cost_df.columns[1:]]
+    # Validate that all warehouses and customers are present in cost matrix
+    missing_wh = set(warehouses) - set(cost_warehouses)
+    missing_cust = set(customers) - set(cost_stores)
+    if missing_wh:
+        raise ValueError(f"Warehouses missing in transportation_costs.csv: {missing_wh}")
+    if missing_cust:
+        raise ValueError(f"Customers missing in transportation_costs.csv: {missing_cust}")
+    # Build cost dictionary
+    cost = {}
+    for idx, row in cost_df.iterrows():
+        wh = row[cost_df.columns[0]]
+        cost[wh] = {}
+        for cust in customers:
+            try:
+                val = float(row[cust])
+            except Exception:
+                raise ValueError(f"Non-numeric cost for warehouse {wh}, customer {cust}: {row[cust]}")
+            cost[wh][cust] = val
+
+    # Decision variable keys: all (warehouse, customer) pairs
+    quantity_keys = [(wh, cust) for wh in warehouses for cust in customers]
+
+    # Validate cost coverage
+    for wh, cust in quantity_keys:
+        if wh not in cost or cust not in cost[wh]:
+            raise ValueError(f"Missing cost coefficient for warehouse {wh}, customer {cust}")
+
+    # Build model
+    m = gp.Model('GreenMart_Transportation')
+    quantity_vars = m.addVars(quantity_keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: Minimize total transportation cost
+    m.setObjective(
+        gp.quicksum(cost[wh][cust] * quantity_vars[wh, cust] for wh, cust in quantity_keys),
+        GRB.MINIMIZE
+    )
+
+    # Demand satisfaction: sum over warehouses for each customer >= demand
+    m.addConstrs(
+        (gp.quicksum(quantity_vars[wh, cust] for wh in warehouses) >= demand[cust]
+         for cust in customers),
+        name='demand'
+    )
+
+    # Supply capacity: sum over customers for each warehouse <= supply_capacity
+    m.addConstrs(
+        (gp.quicksum(quantity_vars[wh, cust] for cust in customers) <= supply_capacity[wh]
+         for wh in warehouses),
+        name='supply'
+    )
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 10 rows, 25 columns and 50 nonzeros
+Model fingerprint: 0xf8fd285a
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+02, 4e+02]
+Presolve time: 0.00s
+Presolved: 10 rows, 25 columns, 50 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   1.493000e+03   0.000000e+00      0s
+      10    1.0291277e+04   0.000000e+00   0.000000e+00      0s
+
+Solved in 10 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  1.029127701e+04
+ObjVal: 10291.2770066575
+C0: 0.0
+C1: 174.0
+C2: 0.0
+C3: 0.0
+C4: 254.0
+C5: 217.0
+C6: 0.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 211.0
+C11: 3.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 214.0
+C18: 166.0
+C19: 0.0
+C20: 0.0
+C21: 40.0
+C22: 0.0
+C23: 214.0
+C24: 0.0
+Optimal objective: 10291.2770066575
+Optimal solution: [('C0', 0.0), ('C1', 174.0), ('C2', 0.0), ('C3', 0.0), ('C4', 254.0), ('C5', 217.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 211.0), ('C11', 3.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 214.0), ('C18', 166.0), ('C19', 0.0), ('C20', 0.0), ('C21', 40.0), ('C22', 0.0), ('C23', 214.0), ('C24', 0.0)]

@@ -1,0 +1,248 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'In the context of BigMart Sales, the store needs to allocate various types of products into different '
+          'display shelves. Specifically, the store has several shelves, each with a capacity limit provided in '
+          '‚Äúcapacity.csv.‚Äù The predefined value and weight of each product can be found in ‚Äúproducts.csv.‚Äù The '
+          'objective is to determine the optimal number of units of each product to place on each shelf to maximize '
+          'the total value of the products across all shelves, while ensuring that the total weight of the products on '
+          'each shelf does not exceed its capacity. The decision variables x_ij represent the number of units of '
+          'product j to be placed on shelf i.The decision variables must be integers.',
+ 'relationships': [],
+ 'route': 'RA',
+ 'tables': [{'columns': ['store_weekly_visitor_count', 'resource_id', 'resource_capacity'],
+             'file_index': 0,
+             'file_name': 'capacity.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 10,
+             'records': [{'source_row': 0,
+                          'values': {'resource_capacity': '500',
+                                     'resource_id': '1',
+                                     'store_weekly_visitor_count': '1460'}},
+                         {'source_row': 1,
+                          'values': {'resource_capacity': '700',
+                                     'resource_id': '2',
+                                     'store_weekly_visitor_count': '1170'}},
+                         {'source_row': 2,
+                          'values': {'resource_capacity': '600',
+                                     'resource_id': '3',
+                                     'store_weekly_visitor_count': '1820'}},
+                         {'source_row': 3,
+                          'values': {'resource_capacity': '800',
+                                     'resource_id': '4',
+                                     'store_weekly_visitor_count': '620'}},
+                         {'source_row': 4,
+                          'values': {'resource_capacity': '550',
+                                     'resource_id': '5',
+                                     'store_weekly_visitor_count': '1170'}},
+                         {'source_row': 5,
+                          'values': {'resource_capacity': '900',
+                                     'resource_id': '6',
+                                     'store_weekly_visitor_count': '1820'}},
+                         {'source_row': 6,
+                          'values': {'resource_capacity': '650',
+                                     'resource_id': '7',
+                                     'store_weekly_visitor_count': '1820'}},
+                         {'source_row': 7,
+                          'values': {'resource_capacity': '750',
+                                     'resource_id': '8',
+                                     'store_weekly_visitor_count': '1170'}},
+                         {'source_row': 8,
+                          'values': {'resource_capacity': '820',
+                                     'resource_id': '9',
+                                     'store_weekly_visitor_count': '620'}},
+                         {'source_row': 9,
+                          'values': {'resource_capacity': '570',
+                                     'resource_id': '10',
+                                     'store_weekly_visitor_count': '1170'}}],
+             'returned_rows': 10,
+             'role': 'file_0',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['shelf_signage_style',
+                         'item_name',
+                         'item_value',
+                         'resource_requirement',
+                         'product_catalog_page_views'],
+             'file_index': 1,
+             'file_name': 'products.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 20,
+             'records': [{'source_row': 0,
+                          'values': {'item_name': '1',
+                                     'item_value': '50',
+                                     'product_catalog_page_views': '560',
+                                     'resource_requirement': '10',
+                                     'shelf_signage_style': 'Digital'}},
+                         {'source_row': 1,
+                          'values': {'item_name': '2',
+                                     'item_value': '70',
+                                     'product_catalog_page_views': '560',
+                                     'resource_requirement': '20',
+                                     'shelf_signage_style': 'Digital'}},
+                         {'source_row': 2,
+                          'values': {'item_name': '3',
+                                     'item_value': '30',
+                                     'product_catalog_page_views': '560',
+                                     'resource_requirement': '5',
+                                     'shelf_signage_style': 'Illustrated'}},
+                         {'source_row': 3,
+                          'values': {'item_name': '4',
+                                     'item_value': '60',
+                                     'product_catalog_page_views': '560',
+                                     'resource_requirement': '15',
+                                     'shelf_signage_style': 'Illustrated'}},
+                         {'source_row': 4,
+                          'values': {'item_name': '5',
+                                     'item_value': '80',
+                                     'product_catalog_page_views': '560',
+                                     'resource_requirement': '25',
+                                     'shelf_signage_style': 'Illustrated'}},
+                         {'source_row': 5,
+                          'values': {'item_name': '6',
+                                     'item_value': '90',
+                                     'product_catalog_page_views': '340',
+                                     'resource_requirement': '30',
+                                     'shelf_signage_style': 'Plain'}},
+                         {'source_row': 6,
+                          'values': {'item_name': '7',
+                                     'item_value': '40',
+                                     'product_catalog_page_views': '340',
+                                     'resource_requirement': '12',
+                                     'shelf_signage_style': 'Plain'}},
+                         {'source_row': 7,
+                          'values': {'item_name': '8',
+                                     'item_value': '100',
+                                     'product_catalog_page_views': '1040',
+                                     'resource_requirement': '35',
+                                     'shelf_signage_style': 'Digital'}},
+                         {'source_row': 8,
+                          'values': {'item_name': '9',
+                                     'item_value': '55',
+                                     'product_catalog_page_views': '1040',
+                                     'resource_requirement': '10',
+                                     'shelf_signage_style': 'Plain'}},
+                         {'source_row': 9,
+                          'values': {'item_name': '10',
+                                     'item_value': '75',
+                                     'product_catalog_page_views': '180',
+                                     'resource_requirement': '20',
+                                     'shelf_signage_style': 'Plain'}},
+                         {'source_row': 10,
+                          'values': {'item_name': '11',
+                                     'item_value': '65',
+                                     'product_catalog_page_views': '340',
+                                     'resource_requirement': '18',
+                                     'shelf_signage_style': 'Plain'}},
+                         {'source_row': 11,
+                          'values': {'item_name': '12',
+                                     'item_value': '95',
+                                     'product_catalog_page_views': '560',
+                                     'resource_requirement': '28',
+                                     'shelf_signage_style': 'Digital'}},
+                         {'source_row': 12,
+                          'values': {'item_name': '13',
+                                     'item_value': '45',
+                                     'product_catalog_page_views': '790',
+                                     'resource_requirement': '8',
+                                     'shelf_signage_style': 'Illustrated'}},
+                         {'source_row': 13,
+                          'values': {'item_name': '14',
+                                     'item_value': '85',
+                                     'product_catalog_page_views': '180',
+                                     'resource_requirement': '22',
+                                     'shelf_signage_style': 'Digital'}},
+                         {'source_row': 14,
+                          'values': {'item_name': '15',
+                                     'item_value': '70',
+                                     'product_catalog_page_views': '790',
+                                     'resource_requirement': '25',
+                                     'shelf_signage_style': 'Digital'}},
+                         {'source_row': 15,
+                          'values': {'item_name': '16',
+                                     'item_value': '110',
+                                     'product_catalog_page_views': '790',
+                                     'resource_requirement': '40',
+                                     'shelf_signage_style': 'Digital'}},
+                         {'source_row': 16,
+                          'values': {'item_name': '17',
+                                     'item_value': '50',
+                                     'product_catalog_page_views': '1380',
+                                     'resource_requirement': '14',
+                                     'shelf_signage_style': 'Illustrated'}},
+                         {'source_row': 17,
+                          'values': {'item_name': '18',
+                                     'item_value': '60',
+                                     'product_catalog_page_views': '1040',
+                                     'resource_requirement': '16',
+                                     'shelf_signage_style': 'Illustrated'}},
+                         {'source_row': 18,
+                          'values': {'item_name': '19',
+                                     'item_value': '120',
+                                     'product_catalog_page_views': '1040',
+                                     'resource_requirement': '50',
+                                     'shelf_signage_style': 'Digital'}},
+                         {'source_row': 19,
+                          'values': {'item_name': '20',
+                                     'item_value': '100',
+                                     'product_catalog_page_views': '1040',
+                                     'resource_requirement': '30',
+                                     'shelf_signage_style': 'Digital'}}],
+             'returned_rows': 20,
+             'role': 'file_1',
+             'table_id': 'file_1_view_0'}],
+ 'validation': {'fallback_reason': "Relationship references an unknown table_id: {'type': 'matrix', 'matrix_table_id': "
+                                   "'file_2_view_0', 'row_id_column': 'resource_id', 'row_axis': {'table_id': "
+                                   "'file_0_view_0', 'id_column': 'resource_id'}, 'column_axis': {'table_id': "
+                                   "'file_1_view_0', 'id_column': 'item_name'}}",
+                'planner_errors': ["Relationship references an unknown table_id: {'type': 'matrix', 'matrix_table_id': "
+                                   "'file_2_view_0', 'row_id_column': 'resource_id', 'row_axis': {'table_id': "
+                                   "'file_0_view_0', 'id_column': 'resource_id'}, 'column_axis': {'table_id': "
+                                   "'file_1_view_0', 'id_column': 'item_name'}}"],
+                'status': 'FALLBACK_FULL_DATA'}}
+import pandas as pd
+CSVQA_FRAMES = {t["table_id"]: pd.DataFrame([r["values"] for r in t["records"]], columns=t["columns"], index=[r["source_row"] for r in t["records"]]) for t in CSVQA_DATA["tables"]}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    shelves_df = CSVQA_FRAMES['file_0_view_0']
+    products_df = CSVQA_FRAMES['file_1_view_0']
+    I = [str(row['resource_id']) for (_, row) in shelves_df.iterrows()]
+    J = [str(row['item_name']) for (_, row) in products_df.iterrows()]
+    c_i = {}
+    for (_, row) in shelves_df.iterrows():
+        rid = str(row['resource_id'])
+        try:
+            c_i[rid] = float(row['resource_capacity'])
+        except Exception:
+            raise ValueError(f'Invalid resource_capacity for resource_id {rid}')
+    v_j = {}
+    a_j = {}
+    for (_, row) in products_df.iterrows():
+        j = str(row['item_name'])
+        try:
+            v_j[j] = float(row['item_value'])
+        except Exception:
+            raise ValueError(f'Invalid item_value for item_name {j}')
+        try:
+            a_j[j] = float(row['resource_requirement'])
+        except Exception:
+            raise ValueError(f'Invalid resource_requirement for item_name {j}')
+    if set(I) != set(c_i.keys()):
+        raise ValueError('Mismatch in shelf index set and capacities')
+    if set(J) != set(v_j.keys()) or set(J) != set(a_j.keys()):
+        raise ValueError('Mismatch in product index set and parameters')
+    m = gp.Model('BigMart_Shelf_Allocation')
+    m.setParam('MIPGap', 0.0001)
+    quantity_keys = [(i, j) for i in I for j in J]
+    quantity_vars = m.addVars(quantity_keys, lb=0, vtype=GRB.INTEGER, name='')
+    m.setObjective(gp.quicksum((v_j[j] * quantity_vars[i, j] for i in I for j in J)), GRB.MAXIMIZE)
+    for i in I:
+        m.addConstr(gp.quicksum((a_j[j] * quantity_vars[i, j] for j in J)) <= c_i[i])
+    m.optimize()
+    return m
+m = solve_problem()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')

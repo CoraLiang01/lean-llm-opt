@@ -1,0 +1,150 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to assign 40 tasks, each with a specified number of billions of instructions (BI), to 3 CPUs with different processing speeds (1.33, 2, and 2.66 GHz), such that each CPU can process only one task at a time, and the completion time of the last finishing task (makespan) is minimized.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem, specifically a parallel machine scheduling (unrelated parallel machines) makespan minimization.
+3.  **Define Index Sets:** The primary indices are:
+    -   Tasks: \( T = \{1, 2, ..., 40\} \) (from columns '1' to '40')
+    -   CPUs: \( P = \{1, 2, 3\} \) (corresponding to the three CPUs with given frequencies)
+4.  **Define Decision Variables:**
+    -   `assign[t, p]` = 1 if task \( t \) is assigned to CPU \( p \), 0 otherwise. Type: GRB.BINARY.
+    -   `C_max` = Completion time of the last finishing task (makespan). Type: GRB.CONTINUOUS.
+5.  **Identify Parameters (from Schema):**
+    -   Task sizes (in billions of instructions) from columns '1' to '40' in the CSV, corresponding to each task \( t \).
+    -   CPU speeds: fixed values [1.33, 2, 2.66] GHz for CPUs 1, 2, and 3, respectively.
+6.  **Formulate Objective:** Minimize `C_max`, the maximum completion time across all CPUs, i.e., minimize the time when the last assigned task finishes.
+7.  **Formulate Constraints:**
+    -   Assignment Constraint: Each task must be assigned to exactly one CPU: for all \( t \in T \), sum over \( p \in P \) of `assign[t, p]` = 1.
+    -   CPU Capacity Constraint: For each CPU \( p \), the total processing time of all tasks assigned to it (sum over \( t \) of (task size for \( t \) / CPU \( p \) speed) * `assign[t, p]`) must not exceed `C_max`.
+    -   Binary Constraint: For all \( t \in T, p \in P \), `assign[t, p]` ∈ {0, 1}.
+    -   Non-negativity: `C_max` ≥ 0.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+from gurobipy import Model, GRB, quicksum
+
+# Read the CSV file with explicit dtype and no NA conversion
+csv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others6/18.csv'
+df = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
+
+# Extract task identifiers (columns '1' to '40')
+task_ids = [str(i) for i in range(1, 41)]
+
+# Validate that all required columns are present
+missing_tasks = [tid for tid in task_ids if tid not in df.columns]
+if missing_tasks:
+    raise ValueError(f"Missing task columns in CSV: {missing_tasks}")
+
+# Extract task sizes (in billions of instructions, BI)
+# The only row is the one with Process == 'BI'
+bi_row = df[df['Process'].str.casefold().str.strip() == 'bi']
+if bi_row.shape[0] != 1:
+    raise ValueError("Could not find exactly one 'BI' row in the CSV.")
+
+task_bi = {}
+for tid in task_ids:
+    val = bi_row.iloc[0][tid]
+    try:
+        task_bi[tid] = float(val)
+    except Exception:
+        raise ValueError(f"Non-numeric or missing BI value for task {tid}: {val}")
+
+# Define CPUs and their speeds (GHz)
+cpu_ids = ['1', '2', '3']
+cpu_speeds = {'1': 1.33, '2': 2.0, '3': 2.66}
+
+# Build the model
+m = Model("makespan_parallel_machine")
+
+# Decision variables: assign_vars[task, cpu] = 1 if task assigned to cpu
+assign_vars = m.addVars(
+    task_ids, cpu_ids, vtype=GRB.BINARY, name=''
+)
+
+# Makespan variable
+C_max = m.addVar(vtype=GRB.CONTINUOUS, lb=0.0, name='C_max')
+
+# Constraint: Each task assigned to exactly one CPU
+for t in task_ids:
+    m.addConstr(
+        quicksum(assign_vars[t, p] for p in cpu_ids) == 1,
+        name=''
+    )
+
+# Constraint: For each CPU, total processing time <= C_max
+for p in cpu_ids:
+    m.addConstr(
+        quicksum(task_bi[t] / cpu_speeds[p] * assign_vars[t, p] for t in task_ids) <= C_max,
+        name=''
+    )
+
+# Objective: Minimize makespan
+m.setObjective(C_max, GRB.MINIMIZE)
+
+# Optimize
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 43 rows, 121 columns and 243 nonzeros
+Model fingerprint: 0xed6f09a5
+Variable types: 1 continuous, 120 integer (120 binary)
+Coefficient statistics:
+  Matrix range     [2e-01, 4e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Found heuristic solution: objective 27.3684210
+Presolve time: 0.00s
+Presolved: 43 rows, 121 columns, 243 nonzeros
+Variable types: 1 continuous, 120 integer (120 binary)
+
+Root relaxation: objective 2.282137e+01, 52 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0   22.82137    0    4   27.36842   22.82137  16.6%     -    0s
+H    0     0                      23.4000000   22.82137  2.47%     -    0s
+H    0     0                      23.0000000   22.82137  0.78%     -    0s
+H    0     0                      22.9000000   22.82137  0.34%     -    0s
+H    0     0                      22.8947368   22.82137  0.32%     -    0s
+H    0     0                      22.8571429   22.82137  0.16%     -    0s
+     0     0   22.82137    0    8   22.85714   22.82137  0.16%     -    0s
+     0     0   22.82137    0    6   22.85714   22.82137  0.16%     -    0s
+H    0     0                      22.8500000   22.82137  0.13%     -    0s
+     0     0   22.82137    0    6   22.85000   22.82137  0.13%     -    0s
+     0     0   22.82137    0   10   22.85000   22.82137  0.13%     -    0s
+     0     0   22.82137    0    6   22.85000   22.82137  0.13%     -    0s
+     0     0   22.82137    0    8   22.85000   22.82137  0.13%     -    0s
+     0     0   22.82137    0    8   22.85000   22.82137  0.13%     -    0s
+     0     0   22.82137    0    8   22.85000   22.82137  0.13%     -    0s
+     0     2   22.82137    0    8   22.85000   22.82137  0.13%     -    0s
+
+Cutting planes:
+  Gomory: 3
+  MIR: 1
+  Flow cover: 2
+  RLT: 3
+
+Explored 3479 nodes (5064 simplex iterations) in 0.37 seconds (0.11 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 7: 22.85 22.8571 22.8947 ... 27.3684
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.285000000000e+01, best bound 2.285000000000e+01, gap 0.0000%
+Optimal objective: 22.85
+Optimal solution: [('C0', -0.0), ('C1', 1.0), ('C2', 0.0), ('C3', -0.0), ('C4', 1.0), ('C5', 0.0), ('C6', 1.0), ('C7', -0.0), ('C8', -0.0), ('C9', 0.0), ('C10', 1.0), ('C11', -0.0), ('C12', 1.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', 1.0), ('C18', -0.0), ('C19', 1.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', 1.0), ('C24', 1.0), ('C25', -0.0), ('C26', -0.0), ('C27', 1.0), ('C28', -0.0), ('C29', -0.0), ('C30', 1.0), ('C31', -0.0), ('C32', -0.0), ('C33', 1.0), ('C34', -0.0), ('C35', -0.0), ('C36', 1.0), ('C37', -0.0), ('C38', -0.0), ('C39', 1.0), ('C40', 0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', 1.0), ('C45', -0.0), ('C46', -0.0), ('C47', 1.0), ('C48', 1.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', 1.0), ('C53', -0.0), ('C54', -0.0), ('C55', 1.0), ('C56', -0.0), ('C57', -0.0), ('C58', 1.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', 1.0), ('C63', 1.0), ('C64', -0.0), ('C65', -0.0), ('C66', 1.0), ('C67', -0.0), ('C68', 0.0), ('C69', 1.0), ('C70', -0.0), ('C71', -0.0), ('C72', -0.0), ('C73', 1.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', 1.0), ('C78', -0.0), ('C79', 1.0), ('C80', -0.0), ('C81', -0.0), ('C82', -0.0), ('C83', 1.0), ('C84', -0.0), ('C85', -0.0), ('C86', 1.0), ('C87', -0.0), ('C88', -0.0), ('C89', 1.0), ('C90', -0.0), ('C91', -0.0), ('C92', 1.0), ('C93', 0.0), ('C94', -0.0), ('C95', 1.0), ('C96', -0.0), ('C97', -0.0), ('C98', 1.0), ('C99', -0.0), ('C100', 1.0), ('C101', 0.0), ('C102', -0.0), ('C103', 1.0), ('C104', -0.0), ('C105', -0.0), ('C106', 1.0), ('C107', -0.0), ('C108', 0.0), ('C109', 1.0), ('C110', -0.0), ('C111', -0.0), ('C112', -0.0), ('C113', 1.0), ('C114', -0.0), ('C115', -0.0), ('C116', 1.0), ('C117', -0.0), ('C118', 1.0), ('C119', -0.0), ('C_max', 22.85)]

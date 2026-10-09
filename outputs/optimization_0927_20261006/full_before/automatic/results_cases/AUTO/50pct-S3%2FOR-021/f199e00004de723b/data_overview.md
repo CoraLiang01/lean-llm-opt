@@ -1,0 +1,12 @@
+{"values": {"customer_id": "C1", "demand_previous_period": "82", "demand": "94"}}
+{"values": {"customer_id": "C2", "demand_previous_period": "31", "demand": "39"}}
+{"values": {"customer_id": "C3", "demand_previous_period": "70", "demand": "65"}}
+{"values": {"customer_id": "C4", "demand_previous_period": "396", "demand": "435"}}
+{"values": {"supplier_id": "S1", "supply_capacity_previous_period": "2198", "supply_capacity": "2531"}}
+{"values": {"supplier_id": "S2", "supply_capacity_previous_period": "24", "supply_capacity": "20"}}
+{"values": {"supplier_id": "S3", "supply_capacity_previous_period": "191", "supply_capacity": "210"}}
+{"values": {"supplier_id": "S4", "supply_capacity_previous_period": "285", "supply_capacity": "241"}}
+{"values": {"supplier_id": "S1", "transportation_cost_to_C1": "543.756480860856", "previous_period_service_status": "Trial", "transportation_cost_to_C2": "23.685276141764653", "transportation_cost_to_C3": "23.676386730773032", "previous_period_transportation_cost_to_C2": "24.9571754706", "previous_period_transportation_cost_to_C1": "515.154889968", "transportation_cost_to_C4": "447.75143678673766"}}
+{"values": {"supplier_id": "S2", "transportation_cost_to_C1": "883.9151090405642", "previous_period_service_status": "Regular", "transportation_cost_to_C2": "0.04977684765576961", "transportation_cost_to_C3": "0.0350986687216299", "previous_period_transportation_cost_to_C2": "0.0518824083116", "previous_period_transportation_cost_to_C1": "776.165857249", "transportation_cost_to_C4": "44.45588531711622"}}
+{"values": {"supplier_id": "S3", "transportation_cost_to_C1": "537.3456896658107", "previous_period_service_status": "Trial", "transportation_cost_to_C2": "23.769274659075112", "transportation_cost_to_C3": "498.95659249465467", "previous_period_transportation_cost_to_C2": "19.3149125880", "previous_period_transportation_cost_to_C1": "482.966305872", "transportation_cost_to_C4": "440.60737890439776"}}
+{"values": {"supplier_id": "S4", "transportation_cost_to_C1": "1791.493192397229", "previous_period_service_status": "Trial", "transportation_cost_to_C2": "68.21633865655126", "transportation_cost_to_C3": "1432.4837339656747", "previous_period_transportation_cost_to_C2": "63.6390223327", "previous_period_transportation_cost_to_C1": "1929.61731753", "transportation_cost_to_C4": "1527.7635425462734"}}

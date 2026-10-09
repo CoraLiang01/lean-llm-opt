@@ -1,0 +1,485 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought:  
+All required data is present in the CSVs:  
+- Warehouses: IDs, fixed costs, and capacities (from warehouse.csv)  
+- Customers: IDs and demands (from demand.csv)  
+- Transportation costs per unit from each warehouse to each customer (from cost.csv)  
+The model must select which warehouses to open (binary variable), assign customer demand to open warehouses (continuous variable), respect warehouse capacities, and ensure all customer demand is met.  
+Let $y_i$ be 1 if warehouse $i$ is opened, 0 otherwise. Let $x_{ij}$ be the amount shipped from warehouse $i$ to customer $j$.  
+The objective is to minimize total fixed and transportation costs.  
+Each customer’s demand must be fully satisfied.  
+Each warehouse’s total shipments cannot exceed its capacity, and only open warehouses can ship.  
+All variables and parameters are explicitly listed below.
+
+Final Answer:
+
+##### Sets
+
+- $I = \{$W1, W2, W3, W4, W5, W6, W7, W8, W9, W10$\}$: set of warehouses  
+- $J = \{$C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20$\}$: set of customers
+
+##### Parameters
+
+- Fixed opening costs ($f_i$):
+
+  | Warehouse | Fixed Cost ($f_i$) | Capacity ($u_i$) |
+  |-----------|--------------------|------------------|
+  | W1        | 2000               | 1000             |
+  | W2        | 2500               | 1500             |
+  | W3        | 1800               | 1200             |
+  | W4        | 3200               | 2000             |
+  | W5        | 1500               | 800              |
+  | W6        | 4000               | 2500             |
+  | W7        | 2800               | 1800             |
+  | W8        | 1950               | 1100             |
+  | W9        | 3500               | 2100             |
+  | W10       | 2200               | 1300             |
+
+- Customer demands ($d_j$):
+
+  | Customer | Demand ($d_j$) |
+  |----------|---------------|
+  | C1       | 800           |
+  | C2       | 600           |
+  | C3       | 500           |
+  | C4       | 700           |
+  | C5       | 450           |
+  | C6       | 950           |
+  | C7       | 350           |
+  | C8       | 850           |
+  | C9       | 400           |
+  | C10      | 750           |
+  | C11      | 900           |
+  | C12      | 550           |
+  | C13      | 650           |
+  | C14      | 820           |
+  | C15      | 480           |
+  | C16      | 920           |
+  | C17      | 320           |
+  | C18      | 780           |
+  | C19      | 520           |
+  | C20      | 680           |
+
+- Transportation costs per unit ($c_{ij}$):
+
+  |        | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | C9 | C10 | C11 | C12 | C13 | C14 | C15 | C16 | C17 | C18 | C19 | C20 |
+  |--------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+  | W1     | 10 | 15 | 20 | 11 | 16 | 18 | 7  | 12 | 22 | 9   | 14  | 19  | 25  | 13  | 17  | 6   | 21  | 15  | 8   | 10  |
+  | W2     | 18 | 12 | 9  | 14 | 10 | 5  | 19 | 23 | 11 | 16  | 20  | 8   | 15  | 22  | 7   | 13  | 24  | 17  | 12  | 6   |
+  | W3     | 13 | 17 | 15 | 8  | 12 | 21 | 16 | 10 | 5  | 24  | 13  | 22  | 7   | 19  | 14  | 18  | 9   | 25  | 11  | 16  |
+  | W4     | 7  | 22 | 11 | 16 | 20 | 8  | 15 | 19 | 13 | 25  | 6   | 14  | 21  | 9   | 23  | 17  | 10  | 18  | 24  | 5   |
+  | W5     | 16 | 9  | 25 | 13 | 7  | 10 | 23 | 14 | 18 | 21  | 5   | 17  | 9   | 24  | 12  | 20  | 6   | 15  | 19  | 11  |
+  | W6     | 22 | 6  | 14 | 19 | 23 | 11 | 8  | 17 | 9  | 12  | 15  | 24  | 5   | 20  | 10  | 25  | 13  | 7   | 18  | 16  |
+  | W7     | 8  | 25 | 17 | 9  | 14 | 22 | 11 | 6  | 16 | 20  | 18  | 13  | 24  | 5   | 19  | 12  | 23  | 10  | 7   | 15  |
+  | W8     | 19 | 11 | 7  | 21 | 15 | 24 | 13 | 16 | 20 | 8   | 17  | 10  | 12  | 23  | 5   | 14  | 22  | 9   | 16  | 25  |
+  | W9     | 12 | 20 | 5  | 23 | 17 | 14 | 9  | 25 | 18 | 11  | 16  | 21  | 10  | 7   | 24  | 15  | 19  | 6   | 13  | 22  |
+  | W10    | 25 | 14 | 22 | 5  | 19 | 12 | 24 | 7  | 15 | 17  | 23  | 6   | 16  | 10  | 20  | 9   | 18  | 11  | 25  | 14  |
+
+##### Decision Variables
+
+- $y_i \in \{0,1\}$: 1 if warehouse $i$ is opened, 0 otherwise, for all $i \in I$
+- $x_{ij} \geq 0$: quantity shipped from warehouse $i$ to customer $j$, for all $i \in I$, $j \in J$
+
+##### Objective Function
+
+\[
+\min \sum_{i \in I} f_i y_i + \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij}
+\]
+
+##### Constraints
+
+1. **Demand satisfaction:**  
+   For every customer $j \in J$,
+   \[
+   \sum_{i \in I} x_{ij} = d_j
+   \]
+
+2. **Warehouse capacity:**  
+   For every warehouse $i \in I$,
+   \[
+   \sum_{j \in J} x_{ij} \leq u_i y_i
+   \]
+
+3. **Variable domains:**  
+   \[
+   x_{ij} \geq 0 \quad \forall i \in I,\, j \in J
+   \]
+   \[
+   y_i \in \{0,1\} \quad \forall i \in I
+   \]
+
+##### All parameters and sets are as listed above, with costs, capacities, and demands taken directly from the provided tables.[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+# Sets
+warehouses = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10']
+customers = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20']
+
+# Parameters
+fixed_cost = {
+    'W1': 2000,
+    'W2': 2500,
+    'W3': 1800,
+    'W4': 3200,
+    'W5': 1500,
+    'W6': 4000,
+    'W7': 2800,
+    'W8': 1950,
+    'W9': 3500,
+    'W10': 2200
+}
+
+capacity = {
+    'W1': 1000,
+    'W2': 1500,
+    'W3': 1200,
+    'W4': 2000,
+    'W5': 800,
+    'W6': 2500,
+    'W7': 1800,
+    'W8': 1100,
+    'W9': 2100,
+    'W10': 1300
+}
+
+demand = {
+    'C1': 800,
+    'C2': 600,
+    'C3': 500,
+    'C4': 700,
+    'C5': 450,
+    'C6': 950,
+    'C7': 350,
+    'C8': 850,
+    'C9': 400,
+    'C10': 750,
+    'C11': 900,
+    'C12': 550,
+    'C13': 650,
+    'C14': 820,
+    'C15': 480,
+    'C16': 920,
+    'C17': 320,
+    'C18': 780,
+    'C19': 520,
+    'C20': 680
+}
+
+cost = {
+    'W1':  {'C1': 10, 'C2': 15, 'C3': 20, 'C4': 11, 'C5': 16, 'C6': 18, 'C7': 7,  'C8': 12, 'C9': 22, 'C10': 9,  'C11': 14, 'C12': 19, 'C13': 25, 'C14': 13, 'C15': 17, 'C16': 6,  'C17': 21, 'C18': 15, 'C19': 8,  'C20': 10},
+    'W2':  {'C1': 18, 'C2': 12, 'C3': 9,  'C4': 14, 'C5': 10, 'C6': 5,  'C7': 19, 'C8': 23, 'C9': 11, 'C10': 16, 'C11': 20, 'C12': 8,  'C13': 15, 'C14': 22, 'C15': 7,  'C16': 13, 'C17': 24, 'C18': 17, 'C19': 12, 'C20': 6},
+    'W3':  {'C1': 13, 'C2': 17, 'C3': 15, 'C4': 8,  'C5': 12, 'C6': 21, 'C7': 16, 'C8': 10, 'C9': 5,  'C10': 24, 'C11': 13, 'C12': 22, 'C13': 7,  'C14': 19, 'C15': 14, 'C16': 18, 'C17': 9,  'C18': 25, 'C19': 11, 'C20': 16},
+    'W4':  {'C1': 7,  'C2': 22, 'C3': 11, 'C4': 16, 'C5': 20, 'C6': 8,  'C7': 15, 'C8': 19, 'C9': 13, 'C10': 25, 'C11': 6,  'C12': 14, 'C13': 21, 'C14': 9,  'C15': 23, 'C16': 17, 'C17': 10, 'C18': 18, 'C19': 24, 'C20': 5},
+    'W5':  {'C1': 16, 'C2': 9,  'C3': 25, 'C4': 13, 'C5': 7,  'C6': 10, 'C7': 23, 'C8': 14, 'C9': 18, 'C10': 21, 'C11': 5,  'C12': 17, 'C13': 9,  'C14': 24, 'C15': 12, 'C16': 20, 'C17': 6,  'C18': 15, 'C19': 19, 'C20': 11},
+    'W6':  {'C1': 22, 'C2': 6,  'C3': 14, 'C4': 19, 'C5': 23, 'C6': 11, 'C7': 8,  'C8': 17, 'C9': 9,  'C10': 12, 'C11': 15, 'C12': 24, 'C13': 5,  'C14': 20, 'C15': 10, 'C16': 25, 'C17': 13, 'C18': 7,  'C19': 18, 'C20': 16},
+    'W7':  {'C1': 8,  'C2': 25, 'C3': 17, 'C4': 9,  'C5': 14, 'C6': 22, 'C7': 11, 'C8': 6,  'C9': 16, 'C10': 20, 'C11': 18, 'C12': 13, 'C13': 24, 'C14': 5,  'C15': 19, 'C16': 12, 'C17': 23, 'C18': 10, 'C19': 7,  'C20': 15},
+    'W8':  {'C1': 19, 'C2': 11, 'C3': 7,  'C4': 21, 'C5': 15, 'C6': 24, 'C7': 13, 'C8': 16, 'C9': 20, 'C10': 8,  'C11': 17, 'C12': 10, 'C13': 12, 'C14': 23, 'C15': 5,  'C16': 14, 'C17': 22, 'C18': 9,  'C19': 16, 'C20': 25},
+    'W9':  {'C1': 12, 'C2': 20, 'C3': 5,  'C4': 23, 'C5': 17, 'C6': 14, 'C7': 9,  'C8': 25, 'C9': 18, 'C10': 11, 'C11': 16, 'C12': 21, 'C13': 10, 'C14': 7,  'C15': 24, 'C16': 15, 'C17': 19, 'C18': 6,  'C19': 13, 'C20': 22},
+    'W10': {'C1': 25, 'C2': 14, 'C3': 22, 'C4': 5,  'C5': 19, 'C6': 12, 'C7': 24, 'C8': 7,  'C9': 15, 'C10': 17, 'C11': 23, 'C12': 6,  'C13': 16, 'C14': 10, 'C15': 20, 'C16': 9,  'C17': 18, 'C18': 11, 'C19': 25, 'C20': 14}
+}
+
+# Validate data coverage
+for i in warehouses:
+    if i not in fixed_cost or i not in capacity or i not in cost:
+        raise ValueError(f"Missing fixed_cost, capacity, or cost for warehouse {i}")
+    for j in customers:
+        if j not in cost[i]:
+            raise ValueError(f"Missing cost for warehouse {i}, customer {j}")
+for j in customers:
+    if j not in demand:
+        raise ValueError(f"Missing demand for customer {j}")
+
+# Model
+m = gp.Model('Warehouse_Location')
+
+x_vars = m.addVars(warehouses, customers, lb=0, vtype=GRB.CONTINUOUS, name='')
+y_vars = m.addVars(warehouses, vtype=GRB.BINARY, name='')
+
+# Objective
+m.setObjective(
+    gp.quicksum(fixed_cost[i] * y_vars[i] for i in warehouses) +
+    gp.quicksum(cost[i][j] * x_vars[i, j] for i in warehouses for j in customers),
+    GRB.MINIMIZE
+)
+
+# Constraints
+
+# Demand satisfaction
+m.addConstrs(
+    (gp.quicksum(x_vars[i, j] for i in warehouses) == demand[j] for j in customers),
+    name=''
+)
+
+# Warehouse capacity
+m.addConstrs(
+    (gp.quicksum(x_vars[i, j] for j in customers) <= capacity[i] * y_vars[i] for i in warehouses),
+    name=''
+)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 30 rows, 210 columns and 410 nonzeros
+Model fingerprint: 0xb5a5480d
+Variable types: 200 continuous, 10 integer (10 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+03]
+  Objective range  [5e+00, 4e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [3e+02, 1e+03]
+Presolve time: 0.00s
+Presolved: 30 rows, 210 columns, 410 nonzeros
+Variable types: 200 continuous, 10 integer (10 binary)
+Found heuristic solution: objective 103290.00000
+
+Root relaxation: objective 9.960000e+04, 16 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 99600.0000    0    4 103290.000 99600.0000  3.57%     -    0s
+     0     0 99670.0000    0    3 103290.000 99670.0000  3.50%     -    0s
+H    0     0                    103090.00000 99670.0000  3.32%     -    0s
+
+Cutting planes:
+  Gomory: 1
+  Implied bound: 3
+
+Explored 1 nodes (18 simplex iterations) in 0.02 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 2: 103090 103290 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.030900000000e+05, best bound 1.030900000000e+05, gap 0.0000%
+ObjVal: 103090.0
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 80.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 920.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 950.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 130.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 350.0
+C40: 0.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 800.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 0.0
+C68: 0.0
+C69: 0.0
+C70: 870.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 330.0
+C80: 0.0
+C81: 0.0
+C82: 0.0
+C83: 0.0
+C84: 450.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 30.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 0.0
+C96: 320.0
+C97: 0.0
+C98: 0.0
+C99: 0.0
+C100: 0.0
+C101: 600.0
+C102: 0.0
+C103: 0.0
+C104: 0.0
+C105: 0.0
+C106: 270.0
+C107: 0.0
+C108: 400.0
+C109: 0.0
+C110: 0.0
+C111: 0.0
+C112: 650.0
+C113: 0.0
+C114: 0.0
+C115: 0.0
+C116: 0.0
+C117: 0.0
+C118: 0.0
+C119: 0.0
+C120: 0.0
+C121: 0.0
+C122: 0.0
+C123: 0.0
+C124: 0.0
+C125: 0.0
+C126: 0.0
+C127: 800.0
+C128: 0.0
+C129: 0.0
+C130: 0.0
+C131: 0.0
+C132: 0.0
+C133: 480.0
+C134: 0.0
+C135: 0.0
+C136: 0.0
+C137: 0.0
+C138: 520.0
+C139: 0.0
+C140: 0.0
+C141: 0.0
+C142: 0.0
+C143: 0.0
+C144: 0.0
+C145: 0.0
+C146: 0.0
+C147: 0.0
+C148: 0.0
+C149: 750.0
+C150: 0.0
+C151: 0.0
+C152: 0.0
+C153: 0.0
+C154: 350.0
+C155: 0.0
+C156: 0.0
+C157: 0.0
+C158: 0.0
+C159: 0.0
+C160: 0.0
+C161: 0.0
+C162: 500.0
+C163: 0.0
+C164: 0.0
+C165: 0.0
+C166: 0.0
+C167: 0.0
+C168: 0.0
+C169: 0.0
+C170: 0.0
+C171: 0.0
+C172: 0.0
+C173: 340.0
+C174: 0.0
+C175: 0.0
+C176: 0.0
+C177: 780.0
+C178: 0.0
+C179: 0.0
+C180: 0.0
+C181: 0.0
+C182: 0.0
+C183: 700.0
+C184: 0.0
+C185: 0.0
+C186: 0.0
+C187: 50.0
+C188: 0.0
+C189: 0.0
+C190: 0.0
+C191: 550.0
+C192: 0.0
+C193: 0.0
+C194: 0.0
+C195: 0.0
+C196: 0.0
+C197: 0.0
+C198: 0.0
+C199: 0.0
+C200: 1.0
+C201: 1.0
+C202: 0.0
+C203: 1.0
+C204: 1.0
+C205: 1.0
+C206: 1.0
+C207: 1.0
+C208: 1.0
+C209: 1.0
+Optimal objective: 103090.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 80.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 920.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 950.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 130.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 350.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 800.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 870.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 330.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 450.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 30.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 320.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 0.0), ('C101', 600.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 270.0), ('C107', 0.0), ('C108', 400.0), ('C109', 0.0), ('C110', 0.0), ('C111', 0.0), ('C112', 650.0), ('C113', 0.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 0.0), ('C118', 0.0), ('C119', 0.0), ('C120', 0.0), ('C121', 0.0), ('C122', 0.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', 800.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0), ('C132', 0.0), ('C133', 480.0), ('C134', 0.0), ('C135', 0.0), ('C136', 0.0), ('C137', 0.0), ('C138', 520.0), ('C139', 0.0), ('C140', 0.0), ('C141', 0.0), ('C142', 0.0), ('C143', 0.0), ('C144', 0.0), ('C145', 0.0), ('C146', 0.0), ('C147', 0.0), ('C148', 0.0), ('C149', 750.0), ('C150', 0.0), ('C151', 0.0), ('C152', 0.0), ('C153', 0.0), ('C154', 350.0), ('C155', 0.0), ('C156', 0.0), ('C157', 0.0), ('C158', 0.0), ('C159', 0.0), ('C160', 0.0), ('C161', 0.0), ('C162', 500.0), ('C163', 0.0), ('C164', 0.0), ('C165', 0.0), ('C166', 0.0), ('C167', 0.0), ('C168', 0.0), ('C169', 0.0), ('C170', 0.0), ('C171', 0.0), ('C172', 0.0), ('C173', 340.0), ('C174', 0.0), ('C175', 0.0), ('C176', 0.0), ('C177', 780.0), ('C178', 0.0), ('C179', 0.0), ('C180', 0.0), ('C181', 0.0), ('C182', 0.0), ('C183', 700.0), ('C184', 0.0), ('C185', 0.0), ('C186', 0.0), ('C187', 50.0), ('C188', 0.0), ('C189', 0.0), ('C190', 0.0), ('C191', 550.0), ('C192', 0.0), ('C193', 0.0), ('C194', 0.0), ('C195', 0.0), ('C196', 0.0), ('C197', 0.0), ('C198', 0.0), ('C199', 0.0), ('C200', 1.0), ('C201', 1.0), ('C202', 0.0), ('C203', 1.0), ('C204', 1.0), ('C205', 1.0), ('C206', 1.0), ('C207', 1.0), ('C208', 1.0), ('C209', 1.0)]

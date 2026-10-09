@@ -1,0 +1,185 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: 
+We have 10 bread types, each with a profit (Value) and a storage requirement (Weight). There is a single storage capacity constraint (from capacity.csv: Capacity = 180). The decision variable $x_i$ is the number of units of bread type $i$ to order, and must be a nonnegative integer. The objective is to maximize total expected profit.
+
+Final Answer:
+Let $x_i$ be the number of units of bread type $i$ to order each day, where $i$ indexes the following breads in the order given in products.csv:
+
+1. Baguette
+2. Croissant
+3. Sourdough
+4. Rye Bread
+5. Brioche
+6. Focaccia
+7. Ciabatta
+8. Pita
+9. Bagel
+10. English Muffin
+
+Parameters:
+- Profits ($p_i$): 
+  - Baguette: 888
+  - Croissant: 134
+  - Sourdough: 129
+  - Rye Bread: 370
+  - Brioche: 921
+  - Focaccia: 765
+  - Ciabatta: 154
+  - Pita: 837
+  - Bagel: 584
+  - English Muffin: 365
+
+- Weights ($w_i$): 
+  - Baguette: 4
+  - Croissant: 2
+  - Sourdough: 4
+  - Rye Bread: 3
+  - Brioche: 2
+  - Focaccia: 1
+  - Ciabatta: 2
+  - Pita: 1
+  - Bagel: 3
+  - English Muffin: 3
+
+- Total storage capacity: 180
+
+Mathematical Model:
+
+Maximize
+$$
+888x_1 + 134x_2 + 129x_3 + 370x_4 + 921x_5 + 765x_6 + 154x_7 + 837x_8 + 584x_9 + 365x_{10}
+$$
+
+Subject to
+$$
+4x_1 + 2x_2 + 4x_3 + 3x_4 + 2x_5 + 1x_6 + 2x_7 + 1x_8 + 3x_9 + 3x_{10} \leq 180
+$$
+
+$$
+x_i \in \mathbb{Z}_{\geq 0}, \quad \forall i = 1, \ldots, 10
+$$[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+# Define bread types in order
+bread_types = [
+    'Baguette',
+    'Croissant',
+    'Sourdough',
+    'Rye Bread',
+    'Brioche',
+    'Focaccia',
+    'Ciabatta',
+    'Pita',
+    'Bagel',
+    'English Muffin'
+]
+
+# Profits per bread type
+profits = {
+    'Baguette': 888,
+    'Croissant': 134,
+    'Sourdough': 129,
+    'Rye Bread': 370,
+    'Brioche': 921,
+    'Focaccia': 765,
+    'Ciabatta': 154,
+    'Pita': 837,
+    'Bagel': 584,
+    'English Muffin': 365
+}
+
+# Weights per bread type
+weights = {
+    'Baguette': 4,
+    'Croissant': 2,
+    'Sourdough': 4,
+    'Rye Bread': 3,
+    'Brioche': 2,
+    'Focaccia': 1,
+    'Ciabatta': 2,
+    'Pita': 1,
+    'Bagel': 3,
+    'English Muffin': 3
+}
+
+# Storage capacity
+storage_capacity = 180
+
+# Validate data coverage
+if set(bread_types) != set(profits.keys()) or set(bread_types) != set(weights.keys()):
+    raise ValueError("Mismatch in bread_types, profits, or weights keys.")
+
+# Create model
+m = gp.Model('Bakery_Bread_Order')
+
+# Decision variables: number of units to order for each bread type (nonnegative integer)
+x_vars = m.addVars(bread_types, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Objective: maximize total expected profit
+m.setObjective(
+    gp.quicksum(profits[b] * x_vars[b] for b in bread_types),
+    GRB.MAXIMIZE
+)
+
+# Storage capacity constraint
+m.addConstr(
+    gp.quicksum(weights[b] * x_vars[b] for b in bread_types) <= storage_capacity,
+    name='storage'
+)
+
+# Set MIPGap
+m.Params.MIPGap = 1e-4
+
+# Optimize
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 1 rows, 10 columns and 10 nonzeros
+Model fingerprint: 0x72fa128d
+Variable types: 0 continuous, 10 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 4e+00]
+  Objective range  [1e+02, 9e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+02, 2e+02]
+Found heuristic solution: objective 39960.000000
+Presolve removed 1 rows and 10 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 150660 39960 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.506600000000e+05, best bound 1.506600000000e+05, gap 0.0000%
+ObjVal: 150660.0
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: 180.0
+C8: -0.0
+C9: -0.0
+Optimal objective: 150660.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', 180.0), ('C8', -0.0), ('C9', -0.0)]

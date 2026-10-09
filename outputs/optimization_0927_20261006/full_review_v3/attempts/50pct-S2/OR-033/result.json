@@ -1,0 +1,228 @@
+{
+  "problem_id": "50pct-S2/OR-033",
+  "query": "A certain restaurant operates 24 hours a day and requires a minimum number of waitstaff as shown in 44.csv.\n\n    Each waitstaff works continuously for 8 hours a day. The goal is to find the minimum number of waitstaff that satisfies the above conditions and represent this problem as a linear programming model.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/Others_example/Others2/44.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 25.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the minimum number of waitstaff needed to cover all required time periods in a 24-hour restaurant, where each waitstaff works an 8-hour continuous shift, and each 30-minute period has a minimum staffing requirement as specified in the 'Requirement' column of 44.csv.\n2.  **Identify Model Type:** Based on the query, this is a Set Covering / Shift Scheduling problem, formulated as a Mixed Integer Program (MIP).\n3.  **Define Index Sets:** The primary indices are:\n    - Time periods (indexed by i), corresponding to each row in the CSV (48 half-hour periods covering 24 hours).\n    - Possible shift start times (indexed by s), one for each time period (since a shift can start at any period).\n4.  **Define Decision Variables:**\n    -   `x[s]` = Number of waitstaff starting their 8-hour shift at time period s. Type: GRB.INTEGER (non-negative integer).\n5.  **Identify Parameters (from Schema):**\n    -   Staffing requirement per period: from column 'Requirement' (Requirement[i]).\n    -   Number of time periods per shift: fixed at 16 (since 8 hours × 2 periods/hour).\n    -   Time period labels: from column 'Time' (for mapping and reporting).\n6.  **Formulate Objective:** Minimize the total number of waitstaff scheduled, i.e., minimize sum over all shift start times s of x[s].\n7.  **Formulate Constraints:**\n    -   Coverage Constraint: For each time period i, the sum of x[s] over all shift start times s whose 8-hour shift covers period i must be at least Requirement[i]. (This ensures that, at every period, the number of waitstaff on duty meets or exceeds the required minimum.)\n    -   Non-negativity and integrality: For all s, x[s] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/Others_example/Others2/44.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 48\nColumns: ['Time', 'CustomerFeedbackCountLastMonth', 'Requirement']\nParsed column types: {'Time': 'object', 'CustomerFeedbackCountLastMonth': 'int64', 'Requirement': 'int64'}\nPreview only (first 10 rows):\n           Time CustomerFeedbackCountLastMonth Requirement\n2:00am - 2:30am                             25           2\n2:30am - 3:00am                             10           3\n3:00am - 3:30am                             26           4\n3:30am - 4:00am                             30           6\n4:00am - 4:30am                             18           5\n4:30am - 5:00am                              6           4\n5:00am - 5:30am                             25           5\n5:30am - 6:00am                             14           6\n6:00am - 6:30am                              4           7\n6:30am - 7:00am                              8           8\nFull-file column statistics: {\"Time\": {\"missing\": 0, \"unique_nonempty\": 48}, \"CustomerFeedbackCountLastMonth\": {\"missing\": 0, \"unique_nonempty\": 25, \"numeric_range\": [2.0, 30.0]}, \"Requirement\": {\"missing\": 0, \"unique_nonempty\": 11, \"numeric_range\": [2.0, 12.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: []",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/Others_example/Others2/44.csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\nperiod_ids = list(df.index)\nperiod_labels = df['Time'].tolist()\ntry:\n    requirement = df['Requirement'].astype(int).to_dict()\nexcept Exception as e:\n    raise ValueError(f\"Failed to convert 'Requirement' column to int: {e}\")\nperiods_per_shift = 16\nnum_periods = len(period_ids)\nif num_periods != 48:\n    raise ValueError(f'Expected 48 periods, got {num_periods}')\nshift_start_ids = period_ids.copy()\ncovering_shifts = {i: [s for s in shift_start_ids if (i - s) % num_periods < periods_per_shift] for i in period_ids}\nm = gp.Model('WaitstaffScheduling')\nx_vars = m.addVars(shift_start_ids, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((x_vars[s] for s in shift_start_ids)), gp.GRB.MINIMIZE)\nfor i in period_ids:\n    m.addConstr(gp.quicksum((x_vars[s] for s in covering_shifts[i])) >= requirement[i], name=f'cover_{i}')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    total_waitstaff = sum((x_vars[s].X for s in shift_start_ids))\n    print(f'Optimal total value/cost: {total_waitstaff:.0f} (Minimum number of waitstaff)')\n    print('\\n--- Shift Start Schedule ---')\n    for s in shift_start_ids:\n        val = x_vars[s].X\n        if val > 1e-06:\n            print(f\"  Start at '{period_labels[s]}': {int(round(val))} waitstaff\")\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 25.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      2.0
+    ],
+    [
+      "C3",
+      1.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      5.0
+    ],
+    [
+      "C6",
+      2.0
+    ],
+    [
+      "C7",
+      2.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      1.0
+    ],
+    [
+      "C19",
+      1.0
+    ],
+    [
+      "C20",
+      1.0
+    ],
+    [
+      "C21",
+      4.0
+    ],
+    [
+      "C22",
+      1.0
+    ],
+    [
+      "C23",
+      1.0
+    ],
+    [
+      "C24",
+      0.0
+    ],
+    [
+      "C25",
+      0.0
+    ],
+    [
+      "C26",
+      -0.0
+    ],
+    [
+      "C27",
+      -0.0
+    ],
+    [
+      "C28",
+      -0.0
+    ],
+    [
+      "C29",
+      -0.0
+    ],
+    [
+      "C30",
+      0.0
+    ],
+    [
+      "C31",
+      0.0
+    ],
+    [
+      "C32",
+      1.0
+    ],
+    [
+      "C33",
+      -0.0
+    ],
+    [
+      "C34",
+      -0.0
+    ],
+    [
+      "C35",
+      -0.0
+    ],
+    [
+      "C36",
+      1.0
+    ],
+    [
+      "C37",
+      2.0
+    ],
+    [
+      "C38",
+      -0.0
+    ],
+    [
+      "C39",
+      -0.0
+    ],
+    [
+      "C40",
+      -0.0
+    ],
+    [
+      "C41",
+      -0.0
+    ],
+    [
+      "C42",
+      -0.0
+    ],
+    [
+      "C43",
+      -0.0
+    ],
+    [
+      "C44",
+      -0.0
+    ],
+    [
+      "C45",
+      -0.0
+    ],
+    [
+      "C46",
+      -0.0
+    ],
+    [
+      "C47",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "50pct-S2",
+  "seconds": 13.076,
+  "evaluated_utc": "2026-10-06T05:20:52.322651+00:00",
+  "notebook_source_sha256": "931b556d622a61c0f50a5f043598e8bc330499cf93884013edffeb6248929b21",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

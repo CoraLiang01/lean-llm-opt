@@ -1,0 +1,25 @@
+Here is the complete distance matrix from 20.csv, with all values and identifiers preserved. Each entry (i, j) represents the distance from location i to location j. The matrix is symmetric, and the diagonal entries (distance from a location to itself) are assumed to be zero or not provided.
+
+Distance Matrix (Locations 1 to 15):
+
+|   | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | 11 | 12 | 13 | 14 | 15 |
+|---|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1 | 0  | 67 | 55 | 80 | 21 | 77 | 78 | 74 | 85 | 28 | 55 | 53 | 66 | 89 | 78 |
+| 2 | 67 | 0  | 38 | 29 | 68 | 36 | 62 | 54 | 49 | 92 | 37 | 51 | 38 | 82 | 31 |
+| 3 | 55 | 38 | 0  | 28 | 44 | 27 | 56 | 34 | 33 | 68 | 70 | 55 | 46 | 32 | 40 |
+| 4 | 80 | 29 | 28 | 0  | 21 | 51 | 46 | 48 | 31 | 55 | 68 | 85 | 58 | 56 | 22 |
+| 5 | 21 | 68 | 44 | 21 | 0  | 42 | 57 | 31 | 55 | 79 | 49 | 70 | 43 | 55 | 78 |
+| 6 | 77 | 36 | 27 | 51 | 42 | 0  | 63 | 41 | 39 | 52 | 76 | 54 | 59 | 44 | 76 |
+| 7 | 78 | 62 | 56 | 46 | 57 | 63 | 0  | 38 | 35 | 37 | 55 | 54 | 51 | 14 | 64 |
+| 8 | 74 | 54 | 34 | 48 | 31 | 41 | 38 | 0  | 53 | 24 | 60 | 42 | 31 | 42 | 27 |
+| 9 | 85 | 49 | 33 | 31 | 55 | 39 | 35 | 53 | 0  | 88 | 28 | 65 | 12 | 63 | 45 |
+|10 | 28 | 92 | 68 | 55 | 79 | 52 | 37 | 24 | 88 | 0  | 84 | 40 | 43 | 81 | 37 |
+|11 | 55 | 37 | 70 | 68 | 49 | 76 | 55 | 60 | 28 | 84 | 0  | 41 | 38 | 56 | 35 |
+|12 | 53 | 51 | 55 | 85 | 70 | 54 | 54 | 42 | 65 | 40 | 41 | 0  | 65 | 47 | 38 |
+|13 | 66 | 38 | 46 | 58 | 43 | 59 | 51 | 31 | 12 | 43 | 38 | 65 | 0  | 35 | 77 |
+|14 | 89 | 82 | 32 | 56 | 55 | 44 | 14 | 42 | 63 | 81 | 56 | 47 | 35 | 0  | 54 |
+|15 | 78 | 31 | 40 | 22 | 78 | 76 | 64 | 27 | 45 | 37 | 35 | 38 | 77 | 54 | 0  |
+
+Note: The diagonal entries (distance from a location to itself) are shown as 0 for clarity, though the original data may have left them blank.
+
+You can use this matrix to formulate a mathematical program (such as an integer programming model for the Traveling Salesman Problem) to determine the optimal visiting order starting and ending at location 1, minimizing the total travel distance. If you need help with the mathematical formulation or code, let me know!

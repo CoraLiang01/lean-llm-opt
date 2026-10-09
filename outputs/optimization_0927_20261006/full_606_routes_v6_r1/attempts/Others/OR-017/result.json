@@ -1,0 +1,111 @@
+{
+  "problem_id": "OR-017",
+  "query": "A retail store is managing the sales of various product categories, with detailed revenue data available in the ‘Revenue’ column of the dataset. Each product category has its own demand level. The retailer aims to maximize total revenue by focusing on the initial inventory of products classified under ‘ZZ’. Inventory levels are detailed in the ‘Initial Inventory’ column. Demand quantities are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. The decision variables x_i represent the number of units of each ‘ZZ’ product i that the store plans to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 2015.08,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to maximize total revenue by determining how much demand to fulfill for each product in the 'ZZ' category, subject to initial inventory and demand constraints. The focus is only on products whose SKU contains 'ZZ'.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem.\n3.  **Define Index Sets:** The primary index is the set of products i where SKU contains 'ZZ' (i ∈ ZZ_products).\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of product i (with SKU containing 'ZZ') to fulfill (sell). Type: GRB.INTEGER.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Revenue' column (per-unit revenue for each product i).\n    -   Constraint coefficients: 'Demand' column (maximum demand for each product i), 'Initial Inventory' column (available inventory for each product i).\n    -   Constraint RHS: For each i, upper bounds are min('Demand', 'Initial Inventory').\n6.  **Formulate Objective:** Maximize the sum over all selected products i of ('Revenue'[i] * x[i]); that is, maximize total revenue from fulfilling demand for 'ZZ' products.\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand fulfillment): For each product i, x[i] ≤ 'Demand'[i] (cannot fulfill more than demand).\n    -   Constraint 2 (Inventory limit): For each product i, x[i] ≤ 'Initial Inventory'[i] (cannot fulfill more than available inventory).\n    -   Constraint 3 (Non-negativity and integrality): For each product i, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 5242\nColumns: ['SKU', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'SKU': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'float64'}\nPreview only (first 10 rows):\n  SKU Revenue Demand Initial Inventory\n00GVC   17.68      4              20.0\n00OK1    1.27     33             180.0\n0121I    2.03     60             310.0\n01IEO    4.96     81             430.0\n01IQT     1.5     14              70.0\n01L05  167.64     16             100.0\n01V7M     8.0     88             450.0\n01XVY    1.46      2              10.0\n029WA    5.03      4              20.0\n03C6L    1.23     68             360.0\nFull-file column statistics: {\"SKU\": {\"missing\": 0, \"unique_nonempty\": 5242}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 1942, \"numeric_range\": [0.02, 531.27]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 458, \"numeric_range\": [1.0, 7844.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 333, \"numeric_range\": [10.0, 57700.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"zz\", \"matching_columns\": [{\"column\": \"SKU\", \"exact\": 0, \"prefix\": 5, \"contains\": 18, \"examples\": [\"2L6ZZ\", \"2ZZWJ\", \"6BZZ3\"]}], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"dacf54be6dfa0cdc54adf6ecbdd715f96aa96862f9a875c433c54ecaee84af2a\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\n\ndef contains_zz(s):\n    return 'zz' in s.strip().casefold()\nzz_mask = df['SKU'].apply(contains_zz)\ndf_zz = df.loc[zz_mask].copy()\nrequired_cols = ['SKU', 'Revenue', 'Demand', 'Initial Inventory']\nfor col in required_cols:\n    if col not in df_zz.columns:\n        raise KeyError(f\"Required column '{col}' not found in CSV.\")\nfor col in ['Revenue', 'Demand', 'Initial Inventory']:\n    try:\n        if col == 'Revenue':\n            df_zz[col] = df_zz[col].astype(float)\n        elif col == 'Demand':\n            df_zz[col] = df_zz[col].astype(int)\n        elif col == 'Initial Inventory':\n            df_zz[col] = df_zz[col].astype(float)\n    except Exception as e:\n        raise ValueError(f\"Failed to convert column '{col}' to numeric: {e}\")\nzz_skus = df_zz['SKU'].tolist()\nrevenue = df_zz.set_index('SKU')['Revenue'].to_dict()\ndemand = df_zz.set_index('SKU')['Demand'].to_dict()\ninit_inventory = df_zz.set_index('SKU')['Initial Inventory'].to_dict()\nupper_bound = {}\nfor sku in zz_skus:\n    d = demand[sku]\n    inv = init_inventory[sku]\n    upper_bound[sku] = int(min(d, np.floor(inv)))\nm = gp.Model('MaximizeZZRevenue')\nx_vars = m.addVars(zz_skus, vtype=gp.GRB.INTEGER, lb=0, ub=[upper_bound[sku] for sku in zz_skus], name='')\nm.setObjective(gp.quicksum((revenue[sku] * x_vars[sku] for sku in zz_skus)), gp.GRB.MAXIMIZE)\nfor sku in zz_skus:\n    m.addConstr(x_vars[sku] <= demand[sku], name='dem_' + sku)\n    m.addConstr(x_vars[sku] <= int(np.floor(init_inventory[sku])), name='inv_' + sku)\n    m.addConstr(x_vars[sku] >= 0, name='nonneg_' + sku)\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 10729.68,
+  "final_solution": [
+    [
+      "C0",
+      12.0
+    ],
+    [
+      "C1",
+      2.0
+    ],
+    [
+      "C2",
+      40.0
+    ],
+    [
+      "C3",
+      133.0
+    ],
+    [
+      "C4",
+      180.0
+    ],
+    [
+      "C5",
+      86.0
+    ],
+    [
+      "C6",
+      2.0
+    ],
+    [
+      "C7",
+      2.0
+    ],
+    [
+      "C8",
+      40.0
+    ],
+    [
+      "C9",
+      22.0
+    ],
+    [
+      "C10",
+      2.0
+    ],
+    [
+      "C11",
+      37.0
+    ],
+    [
+      "C12",
+      2.0
+    ],
+    [
+      "C13",
+      2.0
+    ],
+    [
+      "C14",
+      4.0
+    ],
+    [
+      "C15",
+      82.0
+    ],
+    [
+      "C16",
+      2.0
+    ],
+    [
+      "C17",
+      2.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": false,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 13.271,
+  "evaluated_utc": "2026-10-06T08:45:13.719400+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

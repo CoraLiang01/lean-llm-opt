@@ -1,0 +1,161 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal integer number of production/purchase batches for each of 100 products, where each batch is 10 units, to maximize total profit. Each product consumes three limited resources per unit produced, and cannot be produced beyond its upper demand (in units). Unmet demand is allowed. The solution must respect resource capacities and batch-size/demand interactions.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with fixed batch sizes and resource constraints.
+3.  **Define Index Sets:** The primary index is Products (i ∈ set of 100 products from 'factory_products_100.csv'). Resources (r ∈ {R1, R2, R3}) are used in constraints.
+4.  **Define Decision Variables:**
+    -   `x[i]` = Number of batches of product i to produce/purchase. Type: GRB.INTEGER, x[i] ≥ 0.
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'profit_per_unit' (profit per unit for each product), 'batch_size_units' (units per batch, fixed at 10).
+    -   Constraint coefficients: 'r1_per_unit', 'r2_per_unit', 'r3_per_unit' (resource consumption per unit for each product).
+    -   Constraint RHS: 'upper_demand_units' (maximum allowed units per product), 'capacity' from 'resources_capacities.csv' (total available for each resource).
+6.  **Formulate Objective:** Maximize total profit, calculated as the sum over all products of (batch_size_units * x[i] * profit_per_unit[i]).
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Resource Limits): For each resource r ∈ {R1, R2, R3}, the total resource consumed by all products cannot exceed its capacity:  
+        sum over i of (batch_size_units * x[i] * r{r}_per_unit[i]) ≤ capacity[r].
+    -   Constraint 2 (Demand Upper Bound): For each product i, the total units produced cannot exceed its upper demand:  
+        batch_size_units * x[i] ≤ upper_demand_units[i].
+    -   Constraint 3 (Batch Integrality): For each product i, x[i] ∈ {0, 1, 2, ...} (integer, non-negative).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+from gurobipy import Model, GRB, quicksum
+
+# Read product data
+products_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/factory_products_100.csv',
+    sep=',', dtype=str, keep_default_na=False
+)
+
+# Normalize and convert numeric columns
+for col in ['profit_per_unit', 'r1_per_unit', 'r2_per_unit', 'r3_per_unit']:
+    products_df[col] = products_df[col].astype(float)
+products_df['upper_demand_units'] = products_df['upper_demand_units'].astype(int)
+products_df['batch_size_units'] = products_df['batch_size_units'].astype(int)
+
+# Set product as index for easy lookup
+products_df['product'] = products_df['product'].str.strip()
+products_df.set_index('product', inplace=True)
+product_ids = list(products_df.index)
+
+# Validate batch_size_units is constant and equals 10
+batch_sizes = products_df['batch_size_units'].unique()
+if len(batch_sizes) != 1 or batch_sizes[0] != 10:
+    raise ValueError("batch_size_units must be constant and equal to 10 for all products.")
+batch_size_units = int(batch_sizes[0])
+
+# Read resource capacities
+resources_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/resources_capacities.csv',
+    sep=',', dtype=str, keep_default_na=False
+)
+resources_df['resource'] = resources_df['resource'].str.strip()
+resources_df['capacity'] = resources_df['capacity'].astype(float)
+resource_ids = ['R1', 'R2', 'R3']
+
+# Validate all required resources are present
+missing_resources = set(resource_ids) - set(resources_df['resource'])
+if missing_resources:
+    raise ValueError(f"Missing resource capacities for: {missing_resources}")
+
+# Build resource capacity dict
+resource_capacity = resources_df.set_index('resource')['capacity'].to_dict()
+
+# Build per-product resource usage dicts
+r1_per_unit = products_df['r1_per_unit'].to_dict()
+r2_per_unit = products_df['r2_per_unit'].to_dict()
+r3_per_unit = products_df['r3_per_unit'].to_dict()
+profit_per_unit = products_df['profit_per_unit'].to_dict()
+upper_demand_units = products_df['upper_demand_units'].to_dict()
+
+# Model
+m = Model("factory_batch_production")
+
+# Decision variables: x[i] = number of batches of product i (integer, >=0)
+x_vars = m.addVars(product_ids, vtype=GRB.INTEGER, lb=0, name='x')
+
+# Objective: maximize total profit = sum_i (batch_size_units * x[i] * profit_per_unit[i])
+m.setObjective(
+    quicksum(batch_size_units * x_vars[i] * profit_per_unit[i] for i in product_ids),
+    GRB.MAXIMIZE
+)
+
+# Resource constraints
+for r, per_unit_dict in zip(
+    resource_ids,
+    [r1_per_unit, r2_per_unit, r3_per_unit]
+):
+    m.addConstr(
+        quicksum(batch_size_units * x_vars[i] * per_unit_dict[i] for i in product_ids) <= resource_capacity[r],
+        name=f"res_{r}"
+    )
+
+# Demand upper bound constraints
+for i in product_ids:
+    m.addConstr(
+        batch_size_units * x_vars[i] <= upper_demand_units[i],
+        name=f"demand_{i}"
+    )
+
+# Optimize
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 103 rows, 100 columns and 400 nonzeros
+Model fingerprint: 0x61267ef0
+Variable types: 0 continuous, 100 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [3e+00, 5e+01]
+  Objective range  [5e+01, 1e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+01, 3e+04]
+Found heuristic solution: objective 87591.500000
+Presolve removed 100 rows and 0 columns
+Presolve time: 0.00s
+Presolved: 3 rows, 100 columns, 300 nonzeros
+Variable types: 0 continuous, 100 integer (0 binary)
+
+Root relaxation: objective 1.086679e+05, 12 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 108667.881    0    3 87591.5000 108667.881  24.1%     -    0s
+H    0     0                    108550.40000 108667.881  0.11%     -    0s
+H    0     0                    108615.30000 108667.881  0.05%     -    0s
+H    0     0                    108624.60000 108667.881  0.04%     -    0s
+H    0     0                    108628.10000 108667.881  0.04%     -    0s
+H    0     0                    108640.50000 108667.881  0.03%     -    0s
+H    0     0                    108652.40000 108667.881  0.01%     -    0s
+     0     0 108667.291    0    4 108652.400 108667.291  0.01%     -    0s
+     0     0 108667.291    0    3 108652.400 108667.291  0.01%     -    0s
+     0     0 108667.291    0    4 108652.400 108667.291  0.01%     -    0s
+H    0     0                    108654.80000 108667.184  0.01%     -    0s
+H    0     0                    108657.90000 108667.184  0.01%     -    0s
+
+Cutting planes:
+  Gomory: 1
+
+Explored 1 nodes (21 simplex iterations) in 0.63 seconds (0.01 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 9: 108658 108655 108652 ... 87591.5
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.086579000000e+05, best bound 1.086671840675e+05, gap 0.0085%
+Optimal objective: 108657.90000000002
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', 38.0), ('C3', -0.0), ('C4', -0.0), ('C5', 22.0), ('C6', 44.0), ('C7', 0.0), ('C8', 27.0), ('C9', 12.0), ('C10', 30.0), ('C11', 0.0), ('C12', 0.0), ('C13', 60.0), ('C14', 55.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', -0.0), ('C22', 52.0), ('C23', 60.0), ('C24', 19.0), ('C25', 18.0), ('C26', 0.0), ('C27', -0.0), ('C28', 15.0), ('C29', -0.0), ('C30', -0.0), ('C31', 44.0), ('C32', 11.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 27.0), ('C37', 5.0), ('C38', -0.0), ('C39', 0.0), ('C40', 0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', 21.0), ('C45', 21.0), ('C46', 43.0), ('C47', 0.0), ('C48', -0.0), ('C49', 7.0), ('C50', 0.0), ('C51', 46.0), ('C52', 5.0), ('C53', 0.0), ('C54', 0.0), ('C55', 38.0), ('C56', 0.0), ('C57', -0.0), ('C58', 37.0), ('C59', 18.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', 45.0), ('C65', 0.0), ('C66', 22.0), ('C67', 21.0), ('C68', 13.0), ('C69', 0.0), ('C70', 0.0), ('C71', -0.0), ('C72', 0.0), ('C73', -0.0), ('C74', 0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', 4.0), ('C80', 0.0), ('C81', 39.0), ('C82', -0.0), ('C83', 54.0), ('C84', 23.0), ('C85', 55.0), ('C86', 0.0), ('C87', 0.0), ('C88', 15.0), ('C89', 17.0), ('C90', 10.0), ('C91', 0.0), ('C92', 0.0), ('C93', 18.0), ('C94', 2.0), ('C95', 25.0), ('C96', -0.0), ('C97', -0.0), ('C98', -0.0), ('C99', 57.0)]

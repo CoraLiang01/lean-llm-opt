@@ -1,0 +1,323 @@
+{
+  "problem_id": "OR-010",
+  "query": "The mobile device retailer specializes in a range of products, with revenue data detailed in the “Revenue” column. Demand exhibits heterogeneous patterns across products, and the expected demand for each product during the sales cycle is specified in the “Demand” column. The company seeks to maximize total revenue by optimizing order fulfillment strategies under constraints of fixed initial inventory (the “Initial Inventory” column), with no restocking or in-transit inventory permitted during the sales cycle.\n\nCustomer order demand for each product is assumed to be deterministic and known in advance, with demand quantities given directly in the “Demand” column. Decision variables x_i denote the non-negative integer quantity of orders fulfilled for product i. Because fulfillment cannot exceed either the available inventory or the realized demand, the fulfillment quantity must satisfy both inventory and demand constraints.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM1/MobileSalesDataset.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 4003445.21,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to maximize total revenue from fulfilling customer orders for a set of mobile device products, given fixed initial inventories and deterministic, known demands for each product. No restocking or in-transit inventory is allowed during the sales cycle, and fulfillment for each product cannot exceed either its available inventory or its demand.\n2.  **Identify Model Type:** Based on the query, this is a Linear Integer Programming (ILP) problem (specifically, a bounded assignment/fulfillment problem).\n3.  **Define Index Sets:** The primary index is the set of Products, as identified by the 'Product Name' column in the CSV file.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of product i to fulfill (i.e., quantity of orders fulfilled for product i). Type: GRB.INTEGER (non-negative).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Revenue' column (per-unit revenue for each product).\n    -   Constraint coefficients: Not applicable (each constraint applies directly to a single product).\n    -   Constraint RHS (limits): 'Demand' column (maximum possible fulfilled orders per product), 'Initial Inventory' column (maximum available units per product).\n6.  **Formulate Objective:** Maximize total revenue, i.e., maximize the sum over all products of (schema['Revenue'][i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand Limit): For each product i, x[i] ≤ schema['Demand'][i] (cannot fulfill more than demand).\n    -   Constraint 2 (Inventory Limit): For each product i, x[i] ≤ schema['Initial Inventory'][i] (cannot fulfill more than available inventory).\n    -   Constraint 3 (Non-negativity and Integrality): For each product i, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM1/MobileSalesDataset.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 71\nColumns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product Name': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'int64'}\nPreview only (first 10 rows):\n                    Product Name Revenue Demand Initial Inventory\n             Adams Group_service 1003.56     10                80\n          Anderson-Leach_against  549.92      6                40\n        Anderson-Valdez_somebody   169.7     75               560\n              Anderson-White_son 1285.81    121               820\n              Andrews LLC_matter 1269.71    130               960\n               Andrews PLC_enter  805.82    112               850\n            Andrews-Martin_build 1134.19    125               950\n              Arias-Mendoza_life 1479.23     54               360\n           Bennett and Sons_down  139.14     75               580\nBennett, Foster and Moreno_enter  518.67    102               800\nFull-file column statistics: {\"Product Name\": {\"missing\": 0, \"unique_nonempty\": 71}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 71, \"numeric_range\": [139.14, 1479.23]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 58, \"numeric_range\": [4.0, 138.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 50, \"numeric_range\": [30.0, 990.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"546b8280e3f202a912d4142466a543049ce016383542d9d5e4c4a3726490725f\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM1/MobileSalesDataset.csv'\ndf = pd.read_csv(csv_path, dtype=str, keep_default_na=False)\nrequired_columns = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nfor col in required_columns:\n    if col not in df.columns:\n        raise KeyError(f\"Required column '{col}' not found in CSV.\")\nproduct_ids = df['Product Name'].tolist()\n\ndef to_float_or_error(val, col, pid):\n    try:\n        return float(val)\n    except Exception:\n        raise ValueError(f\"Invalid float in column '{col}' for product '{pid}': '{val}'\")\n\ndef to_int_or_error(val, col, pid):\n    try:\n        return int(val)\n    except Exception:\n        raise ValueError(f\"Invalid int in column '{col}' for product '{pid}': '{val}'\")\nrevenue = {}\ndemand = {}\ninitial_inventory = {}\nfor (idx, row) in df.iterrows():\n    pid = row['Product Name']\n    revenue[pid] = to_float_or_error(row['Revenue'], 'Revenue', pid)\n    demand[pid] = to_int_or_error(row['Demand'], 'Demand', pid)\n    initial_inventory[pid] = to_int_or_error(row['Initial Inventory'], 'Initial Inventory', pid)\nm = gp.Model('MobileDeviceOrderFulfillment')\nx_vars = m.addVars(product_ids, vtype=gp.GRB.INTEGER, lb=0, name='')\nfor pid in product_ids:\n    m.addConstr(x_vars[pid] <= demand[pid], name=f'demand_limit_{pid}')\n    m.addConstr(x_vars[pid] <= initial_inventory[pid], name=f'inventory_limit_{pid}')\nm.setObjective(gp.quicksum((revenue[pid] * x_vars[pid] for pid in product_ids)), gp.GRB.MAXIMIZE)\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total revenue: {m.objVal:.2f}')\n    print('--- Fulfillment Plan ---')\n    for pid in product_ids:\n        fulfilled = int(round(x_vars[pid].X))\n        print(f'Product: {pid}')\n        print(f'  Fulfilled: {fulfilled} units')\n        print(f'  Demand: {demand[pid]}')\n        print(f'  Initial Inventory: {initial_inventory[pid]}')\n        print(f'  Per-unit Revenue: {revenue[pid]:.2f}')\n        print(f'  Revenue from this product: {revenue[pid] * fulfilled:.2f}')\n        print()\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 4003445.2099999995,
+  "final_solution": [
+    [
+      "C0",
+      10.0
+    ],
+    [
+      "C1",
+      6.0
+    ],
+    [
+      "C2",
+      75.0
+    ],
+    [
+      "C3",
+      121.0
+    ],
+    [
+      "C4",
+      130.0
+    ],
+    [
+      "C5",
+      112.0
+    ],
+    [
+      "C6",
+      125.0
+    ],
+    [
+      "C7",
+      54.0
+    ],
+    [
+      "C8",
+      75.0
+    ],
+    [
+      "C9",
+      102.0
+    ],
+    [
+      "C10",
+      48.0
+    ],
+    [
+      "C11",
+      4.0
+    ],
+    [
+      "C12",
+      125.0
+    ],
+    [
+      "C13",
+      9.0
+    ],
+    [
+      "C14",
+      132.0
+    ],
+    [
+      "C15",
+      29.0
+    ],
+    [
+      "C16",
+      43.0
+    ],
+    [
+      "C17",
+      5.0
+    ],
+    [
+      "C18",
+      40.0
+    ],
+    [
+      "C19",
+      48.0
+    ],
+    [
+      "C20",
+      87.0
+    ],
+    [
+      "C21",
+      79.0
+    ],
+    [
+      "C22",
+      20.0
+    ],
+    [
+      "C23",
+      33.0
+    ],
+    [
+      "C24",
+      60.0
+    ],
+    [
+      "C25",
+      25.0
+    ],
+    [
+      "C26",
+      42.0
+    ],
+    [
+      "C27",
+      52.0
+    ],
+    [
+      "C28",
+      116.0
+    ],
+    [
+      "C29",
+      95.0
+    ],
+    [
+      "C30",
+      66.0
+    ],
+    [
+      "C31",
+      25.0
+    ],
+    [
+      "C32",
+      78.0
+    ],
+    [
+      "C33",
+      138.0
+    ],
+    [
+      "C34",
+      32.0
+    ],
+    [
+      "C35",
+      28.0
+    ],
+    [
+      "C36",
+      84.0
+    ],
+    [
+      "C37",
+      102.0
+    ],
+    [
+      "C38",
+      112.0
+    ],
+    [
+      "C39",
+      7.0
+    ],
+    [
+      "C40",
+      62.0
+    ],
+    [
+      "C41",
+      109.0
+    ],
+    [
+      "C42",
+      81.0
+    ],
+    [
+      "C43",
+      131.0
+    ],
+    [
+      "C44",
+      26.0
+    ],
+    [
+      "C45",
+      109.0
+    ],
+    [
+      "C46",
+      65.0
+    ],
+    [
+      "C47",
+      121.0
+    ],
+    [
+      "C48",
+      90.0
+    ],
+    [
+      "C49",
+      31.0
+    ],
+    [
+      "C50",
+      24.0
+    ],
+    [
+      "C51",
+      122.0
+    ],
+    [
+      "C52",
+      101.0
+    ],
+    [
+      "C53",
+      76.0
+    ],
+    [
+      "C54",
+      100.0
+    ],
+    [
+      "C55",
+      125.0
+    ],
+    [
+      "C56",
+      45.0
+    ],
+    [
+      "C57",
+      80.0
+    ],
+    [
+      "C58",
+      64.0
+    ],
+    [
+      "C59",
+      98.0
+    ],
+    [
+      "C60",
+      102.0
+    ],
+    [
+      "C61",
+      40.0
+    ],
+    [
+      "C62",
+      110.0
+    ],
+    [
+      "C63",
+      59.0
+    ],
+    [
+      "C64",
+      97.0
+    ],
+    [
+      "C65",
+      90.0
+    ],
+    [
+      "C66",
+      43.0
+    ],
+    [
+      "C67",
+      96.0
+    ],
+    [
+      "C68",
+      21.0
+    ],
+    [
+      "C69",
+      55.0
+    ],
+    [
+      "C70",
+      30.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 11.096,
+  "evaluated_utc": "2026-10-06T08:42:11.808730+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

@@ -1,0 +1,128 @@
+Let $x_{ij}$ be the number of units of product $j$ (with item_name $j$) to be placed on shelf $i$ (with resource_id $i$). All $x_{ij}$ are nonnegative integers.
+
+**Parameters:**
+
+- For each shelf $i$ (resource_id from capacity.csv):
+    - Capacity: $C_i$ (resource_capacity)
+- For each product $j$ (item_name from products.csv):
+    - Value: $v_j$ (item_value)
+    - Weight: $w_j$ (resource_requirement)
+
+**Data:**
+
+From capacity.csv (in source order):
+
+| resource_id | resource_capacity |
+|-------------|------------------|
+| 1           | 500              |
+| 2           | 700              |
+| 3           | 600              |
+| 4           | 800              |
+| 5           | 550              |
+| 6           | 900              |
+| 7           | 650              |
+| 8           | 750              |
+| 9           | 820              |
+| 10          | 570              |
+
+From products.csv (in source order):
+
+| item_name | item_value | resource_requirement |
+|-----------|------------|---------------------|
+| 1         | 50         | 10                  |
+| 2         | 70         | 20                  |
+| 3         | 30         | 5                   |
+| 4         | 60         | 15                  |
+| 5         | 80         | 25                  |
+| 6         | 90         | 30                  |
+| 7         | 40         | 12                  |
+| 8         | 100        | 35                  |
+| 9         | 55         | 10                  |
+| 10        | 75         | 20                  |
+| 11        | 65         | 18                  |
+| 12        | 95         | 28                  |
+| 13        | 45         | 8                   |
+| 14        | 85         | 22                  |
+| 15        | 70         | 25                  |
+| 16        | 110        | 40                  |
+| 17        | 50         | 14                  |
+| 18        | 60         | 16                  |
+| 19        | 120        | 50                  |
+| 20        | 100        | 30                  |
+
+---
+
+### Mathematical Model
+
+**Decision Variables:**
+
+$$
+x_{ij} \in \mathbb{Z}_{\geq 0} \quad \forall\ i \in \{1,2,\ldots,10\},\ j \in \{1,2,\ldots,20\}
+$$
+
+**Objective:**
+
+$$
+\max \sum_{i \in \{1,\ldots,10\}} \sum_{j \in \{1,\ldots,20\}} v_j\, x_{ij}
+$$
+
+where $v_j$ is the item_value for product $j$.
+
+**Constraints:**
+
+For each shelf $i$ (resource_id):
+
+$$
+\sum_{j=1}^{20} w_j\, x_{ij} \leq C_i \qquad \forall\ i \in \{1,\ldots,10\}
+$$
+
+where $w_j$ is the resource_requirement for product $j$, and $C_i$ is the resource_capacity for shelf $i$.
+
+**Variable Domains:**
+
+$$
+x_{ij} \in \mathbb{Z}_{\geq 0} \qquad \forall\ i \in \{1,\ldots,10\},\ j \in \{1,\ldots,20\}
+$$
+
+---
+
+**Explicitly, with all coefficients:**
+
+Let $i$ index shelves (resource_id: 1 to 10), $j$ index products (item_name: 1 to 20).
+
+**Objective:**
+
+$$
+\max \Bigg[
+\sum_{i=1}^{10} \Big(
+50\,x_{i1} + 70\,x_{i2} + 30\,x_{i3} + 60\,x_{i4} + 80\,x_{i5} + 90\,x_{i6} + 40\,x_{i7} + 100\,x_{i8} + 55\,x_{i9} + 75\,x_{i10} + 65\,x_{i11} + 95\,x_{i12} + 45\,x_{i13} + 85\,x_{i14} + 70\,x_{i15} + 110\,x_{i16} + 50\,x_{i17} + 60\,x_{i18} + 120\,x_{i19} + 100\,x_{i20}
+\Big)
+\Bigg]
+$$
+
+**For each shelf $i$ (resource_id and resource_capacity as below):**
+
+- $i=1$, $C_1=500$
+- $i=2$, $C_2=700$
+- $i=3$, $C_3=600$
+- $i=4$, $C_4=800$
+- $i=5$, $C_5=550$
+- $i=6$, $C_6=900$
+- $i=7$, $C_7=650$
+- $i=8$, $C_8=750$
+- $i=9$, $C_9=820$
+- $i=10$, $C_{10}=570$
+
+For each $i$:
+
+$$
+10\,x_{i1} + 20\,x_{i2} + 5\,x_{i3} + 15\,x_{i4} + 25\,x_{i5} + 30\,x_{i6} + 12\,x_{i7} + 35\,x_{i8} + 10\,x_{i9} + 20\,x_{i10} + 18\,x_{i11} + 28\,x_{i12} + 8\,x_{i13} + 22\,x_{i14} + 25\,x_{i15} + 40\,x_{i16} + 14\,x_{i17} + 16\,x_{i18} + 50\,x_{i19} + 30\,x_{i20} \leq C_i
+$$
+
+for $i=1,\ldots,10$.
+
+**Variable domains:**
+
+$$
+x_{ij} \in \mathbb{Z}_{\geq 0} \qquad \forall\ i=1,\ldots,10;\ j=1,\ldots,20
+$$

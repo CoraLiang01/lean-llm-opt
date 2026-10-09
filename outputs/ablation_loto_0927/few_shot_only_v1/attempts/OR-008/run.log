@@ -1,0 +1,174 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+suppliers = [
+    "Supplier1",
+    "Supplier2",
+    "Supplier3",
+    "Supplier4",
+    "Supplier5"
+]
+
+customers = [
+    "Customer1",
+    "Customer2",
+    "Customer3",
+    "Customer4",
+    "Customer5",
+    "Customer6"
+]
+
+demand = {
+    "Customer1": 70,
+    "Customer2": 80,
+    "Customer3": 60,
+    "Customer4": 90,
+    "Customer5": 85,
+    "Customer6": 95
+}
+
+supply_capacity = {
+    "Supplier1": 200,
+    "Supplier2": 250,
+    "Supplier3": 230,
+    "Supplier4": 220,
+    "Supplier5": 210
+}
+
+cost = {
+    "Supplier1": {
+        "Customer1": 2,
+        "Customer2": 3,
+        "Customer3": 1,
+        "Customer4": 2,
+        "Customer5": 3,
+        "Customer6": 2
+    },
+    "Supplier2": {
+        "Customer1": 1,
+        "Customer2": 2,
+        "Customer3": 3,
+        "Customer4": 2,
+        "Customer5": 3,
+        "Customer6": 2
+    },
+    "Supplier3": {
+        "Customer1": 3,
+        "Customer2": 1,
+        "Customer3": 2,
+        "Customer4": 3,
+        "Customer5": 2,
+        "Customer6": 3
+    },
+    "Supplier4": {
+        "Customer1": 2,
+        "Customer2": 3,
+        "Customer3": 2,
+        "Customer4": 1,
+        "Customer5": 3,
+        "Customer6": 4
+    },
+    "Supplier5": {
+        "Customer1": 3,
+        "Customer2": 2,
+        "Customer3": 3,
+        "Customer4": 3,
+        "Customer5": 2,
+        "Customer6": 3
+    }
+}
+
+# Validate data coverage
+for i in suppliers:
+    if i not in cost or i not in supply_capacity:
+        raise ValueError(f"Missing cost or supply_capacity for supplier {i}")
+    for j in customers:
+        if j not in cost[i]:
+            raise ValueError(f"Missing cost for supplier {i}, customer {j}")
+for j in customers:
+    if j not in demand:
+        raise ValueError(f"Missing demand for customer {j}")
+
+m = gp.Model('FreshMart_Transportation')
+x = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+m.setObjective(
+    gp.quicksum(cost[i][j] * x[i, j] for i in suppliers for j in customers),
+    GRB.MINIMIZE
+)
+
+m.addConstrs(
+    (gp.quicksum(x[i, j] for i in suppliers) >= demand[j] for j in customers),
+    name='demand'
+)
+
+m.addConstrs(
+    (gp.quicksum(x[i, j] for j in customers) <= supply_capacity[i] for i in suppliers),
+    name='supply'
+)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 11 rows, 30 columns and 60 nonzeros
+Model fingerprint: 0x311c9173
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 4e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [6e+01, 2e+02]
+Presolve time: 0.00s
+Presolved: 11 rows, 30 columns, 60 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   4.800000e+02   0.000000e+00      0s
+       6    6.6000000e+02   0.000000e+00   0.000000e+00      0s
+
+Solved in 6 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  6.600000000e+02
+ObjVal: 660.0
+C0: 0.0
+C1: 0.0
+C2: 60.0
+C3: 0.0
+C4: 0.0
+C5: 95.0
+C6: 70.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 80.0
+C14: 0.0
+C15: 0.0
+C16: 85.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 90.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+Optimal objective: 660.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 60.0), ('C3', 0.0), ('C4', 0.0), ('C5', 95.0), ('C6', 70.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 80.0), ('C14', 0.0), ('C15', 0.0), ('C16', 85.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 90.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0)]

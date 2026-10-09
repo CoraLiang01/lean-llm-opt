@@ -1,0 +1,307 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'Amazon needs to allocate different types of air conditioners into different warehouse storage areas. '
+          'Specifically, Amazon has several storage areas, each with a capacity limit provided in ‚Äúcapacity.csv.‚Äù '
+          'The predefined value and size of each air conditioner type can be found in ‚Äúproducts.csv.‚Äù The '
+          'objective is to determine the optimal number of units of each air conditioner type to place in each storage '
+          'area to maximize the total value of the air conditioners across all areas, while ensuring that the total '
+          'size of the units in each area does not exceed its capacity. The decision variablesx_ijrepresent the number '
+          'of units of air conditioner type j to be placed in storage area i.The decision variables must be integers.',
+ 'relationships': [],
+ 'route': 'RA',
+ 'tables': [{'columns': ['inventory_audit_staff_count',
+                         'StorageID',
+                         'storage_area_cleaning_minutes_last_month',
+                         'storage_area_light_inspections_last_year',
+                         'storage_area_signage_updates_last_year',
+                         'Capacity'],
+             'file_index': 0,
+             'file_name': 'capacity.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 15,
+             'records': [{'source_row': 0,
+                          'values': {'Capacity': '1083',
+                                     'StorageID': '1',
+                                     'inventory_audit_staff_count': '5',
+                                     'storage_area_cleaning_minutes_last_month': '120',
+                                     'storage_area_light_inspections_last_year': '8',
+                                     'storage_area_signage_updates_last_year': '2'}},
+                         {'source_row': 1,
+                          'values': {'Capacity': '1840',
+                                     'StorageID': '2',
+                                     'inventory_audit_staff_count': '3',
+                                     'storage_area_cleaning_minutes_last_month': '300',
+                                     'storage_area_light_inspections_last_year': '8',
+                                     'storage_area_signage_updates_last_year': '3'}},
+                         {'source_row': 2,
+                          'values': {'Capacity': '770',
+                                     'StorageID': '3',
+                                     'inventory_audit_staff_count': '2',
+                                     'storage_area_cleaning_minutes_last_month': '120',
+                                     'storage_area_light_inspections_last_year': '3',
+                                     'storage_area_signage_updates_last_year': '1'}},
+                         {'source_row': 3,
+                          'values': {'Capacity': '1299',
+                                     'StorageID': '4',
+                                     'inventory_audit_staff_count': '5',
+                                     'storage_area_cleaning_minutes_last_month': '180',
+                                     'storage_area_light_inspections_last_year': '8',
+                                     'storage_area_signage_updates_last_year': '6'}},
+                         {'source_row': 4,
+                          'values': {'Capacity': '1259',
+                                     'StorageID': '5',
+                                     'inventory_audit_staff_count': '5',
+                                     'storage_area_cleaning_minutes_last_month': '180',
+                                     'storage_area_light_inspections_last_year': '2',
+                                     'storage_area_signage_updates_last_year': '6'}},
+                         {'source_row': 5,
+                          'values': {'Capacity': '543',
+                                     'StorageID': '6',
+                                     'inventory_audit_staff_count': '3',
+                                     'storage_area_cleaning_minutes_last_month': '180',
+                                     'storage_area_light_inspections_last_year': '4',
+                                     'storage_area_signage_updates_last_year': '1'}},
+                         {'source_row': 6,
+                          'values': {'Capacity': '1831',
+                                     'StorageID': '7',
+                                     'inventory_audit_staff_count': '3',
+                                     'storage_area_cleaning_minutes_last_month': '120',
+                                     'storage_area_light_inspections_last_year': '4',
+                                     'storage_area_signage_updates_last_year': '6'}},
+                         {'source_row': 7,
+                          'values': {'Capacity': '855',
+                                     'StorageID': '8',
+                                     'inventory_audit_staff_count': '5',
+                                     'storage_area_cleaning_minutes_last_month': '360',
+                                     'storage_area_light_inspections_last_year': '6',
+                                     'storage_area_signage_updates_last_year': '4'}},
+                         {'source_row': 8,
+                          'values': {'Capacity': '619',
+                                     'StorageID': '9',
+                                     'inventory_audit_staff_count': '5',
+                                     'storage_area_cleaning_minutes_last_month': '240',
+                                     'storage_area_light_inspections_last_year': '4',
+                                     'storage_area_signage_updates_last_year': '3'}},
+                         {'source_row': 9,
+                          'values': {'Capacity': '637',
+                                     'StorageID': '10',
+                                     'inventory_audit_staff_count': '5',
+                                     'storage_area_cleaning_minutes_last_month': '360',
+                                     'storage_area_light_inspections_last_year': '3',
+                                     'storage_area_signage_updates_last_year': '4'}},
+                         {'source_row': 10,
+                          'values': {'Capacity': '935',
+                                     'StorageID': '11',
+                                     'inventory_audit_staff_count': '3',
+                                     'storage_area_cleaning_minutes_last_month': '240',
+                                     'storage_area_light_inspections_last_year': '8',
+                                     'storage_area_signage_updates_last_year': '3'}},
+                         {'source_row': 11,
+                          'values': {'Capacity': '626',
+                                     'StorageID': '12',
+                                     'inventory_audit_staff_count': '4',
+                                     'storage_area_cleaning_minutes_last_month': '360',
+                                     'storage_area_light_inspections_last_year': '6',
+                                     'storage_area_signage_updates_last_year': '6'}},
+                         {'source_row': 12,
+                          'values': {'Capacity': '1457',
+                                     'StorageID': '13',
+                                     'inventory_audit_staff_count': '6',
+                                     'storage_area_cleaning_minutes_last_month': '240',
+                                     'storage_area_light_inspections_last_year': '6',
+                                     'storage_area_signage_updates_last_year': '2'}},
+                         {'source_row': 13,
+                          'values': {'Capacity': '1198',
+                                     'StorageID': '14',
+                                     'inventory_audit_staff_count': '2',
+                                     'storage_area_cleaning_minutes_last_month': '120',
+                                     'storage_area_light_inspections_last_year': '3',
+                                     'storage_area_signage_updates_last_year': '1'}},
+                         {'source_row': 14,
+                          'values': {'Capacity': '837',
+                                     'StorageID': '15',
+                                     'inventory_audit_staff_count': '6',
+                                     'storage_area_cleaning_minutes_last_month': '360',
+                                     'storage_area_light_inspections_last_year': '2',
+                                     'storage_area_signage_updates_last_year': '2'}}],
+             'returned_rows': 15,
+             'role': 'file_0',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['energy_label_review_count',
+                         'ProductName',
+                         'supplier_contact_channel',
+                         'supplier_service_tier',
+                         'warranty_months',
+                         'marketing_campaign_format',
+                         'product_manual_page_count',
+                         'Value',
+                         'Weight'],
+             'file_index': 1,
+             'file_name': 'products.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 10,
+             'records': [{'source_row': 0,
+                          'values': {'ProductName': 'Window Unit',
+                                     'Value': '4811',
+                                     'Weight': '114',
+                                     'energy_label_review_count': '2',
+                                     'marketing_campaign_format': 'Newsletter',
+                                     'product_manual_page_count': '48',
+                                     'supplier_contact_channel': 'Phone',
+                                     'supplier_service_tier': 'Standard',
+                                     'warranty_months': '36'}},
+                         {'source_row': 1,
+                          'values': {'ProductName': 'Portable Unit',
+                                     'Value': '1130',
+                                     'Weight': '200',
+                                     'energy_label_review_count': '3',
+                                     'marketing_campaign_format': 'Brochure',
+                                     'product_manual_page_count': '60',
+                                     'supplier_contact_channel': 'Email',
+                                     'supplier_service_tier': 'Standard',
+                                     'warranty_months': '24'}},
+                         {'source_row': 2,
+                          'values': {'ProductName': 'Split System',
+                                     'Value': '1611',
+                                     'Weight': '106',
+                                     'energy_label_review_count': '1',
+                                     'marketing_campaign_format': 'Newsletter',
+                                     'product_manual_page_count': '60',
+                                     'supplier_contact_channel': 'Email',
+                                     'supplier_service_tier': 'Priority',
+                                     'warranty_months': '12'}},
+                         {'source_row': 3,
+                          'values': {'ProductName': 'Ductless System',
+                                     'Value': '3368',
+                                     'Weight': '256',
+                                     'energy_label_review_count': '1',
+                                     'marketing_campaign_format': 'Brochure',
+                                     'product_manual_page_count': '60',
+                                     'supplier_contact_channel': 'Phone',
+                                     'supplier_service_tier': 'Standard',
+                                     'warranty_months': '36'}},
+                         {'source_row': 4,
+                          'values': {'ProductName': 'Central AC',
+                                     'Value': '2135',
+                                     'Weight': '268',
+                                     'energy_label_review_count': '2',
+                                     'marketing_campaign_format': 'Brochure',
+                                     'product_manual_page_count': '36',
+                                     'supplier_contact_channel': 'Email',
+                                     'supplier_service_tier': 'Priority',
+                                     'warranty_months': '24'}},
+                         {'source_row': 5,
+                          'values': {'ProductName': 'Hybrid AC',
+                                     'Value': '1046',
+                                     'Weight': '185',
+                                     'energy_label_review_count': '4',
+                                     'marketing_campaign_format': 'Web feature',
+                                     'product_manual_page_count': '48',
+                                     'supplier_contact_channel': 'Portal',
+                                     'supplier_service_tier': 'Priority',
+                                     'warranty_months': '24'}},
+                         {'source_row': 6,
+                          'values': {'ProductName': 'Geothermal AC',
+                                     'Value': '4030',
+                                     'Weight': '299',
+                                     'energy_label_review_count': '1',
+                                     'marketing_campaign_format': 'Newsletter',
+                                     'product_manual_page_count': '36',
+                                     'supplier_contact_channel': 'Portal',
+                                     'supplier_service_tier': 'Priority',
+                                     'warranty_months': '48'}},
+                         {'source_row': 7,
+                          'values': {'ProductName': 'Smart AC',
+                                     'Value': '3761',
+                                     'Weight': '131',
+                                     'energy_label_review_count': '6',
+                                     'marketing_campaign_format': 'Web feature',
+                                     'product_manual_page_count': '12',
+                                     'supplier_contact_channel': 'Portal',
+                                     'supplier_service_tier': 'Premium',
+                                     'warranty_months': '12'}},
+                         {'source_row': 8,
+                          'values': {'ProductName': 'Evaporative Cooler',
+                                     'Value': '3523',
+                                     'Weight': '139',
+                                     'energy_label_review_count': '2',
+                                     'marketing_campaign_format': 'Brochure',
+                                     'product_manual_page_count': '60',
+                                     'supplier_contact_channel': 'Email',
+                                     'supplier_service_tier': 'Premium',
+                                     'warranty_months': '12'}},
+                         {'source_row': 9,
+                          'values': {'ProductName': 'Package Unit',
+                                     'Value': '1701',
+                                     'Weight': '105',
+                                     'energy_label_review_count': '3',
+                                     'marketing_campaign_format': 'Newsletter',
+                                     'product_manual_page_count': '48',
+                                     'supplier_contact_channel': 'Email',
+                                     'supplier_service_tier': 'Standard',
+                                     'warranty_months': '48'}}],
+             'returned_rows': 10,
+             'role': 'file_1',
+             'table_id': 'file_1_view_0'}],
+ 'validation': {'fallback_reason': "Relationship references an unknown table_id: {'type': 'matrix', 'matrix_table_id': "
+                                   "'file_2_view_0', 'row_id_column': 'StorageID', 'row_axis': {'table_id': "
+                                   "'file_0_view_0', 'id_column': 'StorageID'}, 'column_axis': {'table_id': "
+                                   "'file_1_view_0', 'id_column': 'ProductName'}}",
+                'planner_errors': ["Relationship references an unknown table_id: {'type': 'matrix', 'matrix_table_id': "
+                                   "'file_2_view_0', 'row_id_column': 'StorageID', 'row_axis': {'table_id': "
+                                   "'file_0_view_0', 'id_column': 'StorageID'}, 'column_axis': {'table_id': "
+                                   "'file_1_view_0', 'id_column': 'ProductName'}}"],
+                'status': 'FALLBACK_FULL_DATA'}}
+import pandas as pd
+CSVQA_FRAMES = {t["table_id"]: pd.DataFrame([r["values"] for r in t["records"]], columns=t["columns"], index=[r["source_row"] for r in t["records"]]) for t in CSVQA_DATA["tables"]}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_FRAMES):
+    import pandas as pd
+    df_capacity = CSVQA_FRAMES['file_0_view_0']
+    df_products = CSVQA_FRAMES['file_1_view_0']
+    I = list(df_capacity['StorageID'])
+    J = list(df_products['ProductName'])
+    c_i = {}
+    for (idx, row) in df_capacity.iterrows():
+        storage_id = row['StorageID']
+        try:
+            c_i[storage_id] = float(row['Capacity'])
+        except Exception:
+            raise ValueError(f"Invalid Capacity for StorageID {storage_id}: {row['Capacity']}")
+    v_j = {}
+    w_j = {}
+    for (idx, row) in df_products.iterrows():
+        product_name = row['ProductName']
+        try:
+            v_j[product_name] = float(row['Value'])
+        except Exception:
+            raise ValueError(f"Invalid Value for ProductName {product_name}: {row['Value']}")
+        try:
+            w_j[product_name] = float(row['Weight'])
+        except Exception:
+            raise ValueError(f"Invalid Weight for ProductName {product_name}: {row['Weight']}")
+    if set(I) != set(df_capacity['StorageID']):
+        raise ValueError('Mismatch in StorageID index set.')
+    if set(J) != set(df_products['ProductName']):
+        raise ValueError('Mismatch in ProductName index set.')
+    if set(c_i.keys()) != set(I):
+        raise ValueError('Missing capacity data for some StorageIDs.')
+    if set(v_j.keys()) != set(J) or set(w_j.keys()) != set(J):
+        raise ValueError('Missing value or weight data for some ProductNames.')
+    m = gp.Model('Amazon_AC_Storage_Allocation')
+    quantity_keys = [(i, j) for i in I for j in J]
+    quantity_vars = m.addVars(quantity_keys, lb=0, vtype=GRB.INTEGER, name='')
+    m.setObjective(gp.quicksum((v_j[j] * quantity_vars[i, j] for i in I for j in J)), GRB.MAXIMIZE)
+    for i in I:
+        m.addConstr(gp.quicksum((w_j[j] * quantity_vars[i, j] for j in J)) <= c_i[i])
+    m.Params.MIPGap = 0.0001
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+m = solve_problem(CSVQA_FRAMES)

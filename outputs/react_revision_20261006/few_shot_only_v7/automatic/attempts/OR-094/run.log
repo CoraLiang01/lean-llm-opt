@@ -1,0 +1,287 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+#### Symbolic Model
+
+**Index Sets:**
+- $M$: set of radio models (from columns HiFi1_Minutes, ..., HiFi101_Minutes in workstation_times.csv)
+- $W$: set of workstations (from column Workstation in workstation_times.csv; $|W|=3$)
+
+**Parameters:**
+- $t_{wm}$: processing time (in minutes) required at workstation $w \in W$ for one unit of model $m \in M$ (from workstation_times.csv, column $m$ in row $w$)
+- $C_w$: total available minutes per day at workstation $w$ (given: $C_w = 1440$ for all $w$)
+- $d_w$: maintenance percentage at workstation $w$ (from workstation_times.csv, column Maintenance_Percent in row $w$)
+- $E_w$: effective daily capacity at workstation $w$, $E_w = C_w \cdot (1 - d_w/100)$
+
+**Decision Variables:**
+- $x_m \in \mathbb{Z}_{\geq 0}$: number of units of model $m \in M$ to produce per day
+- $s_w \geq 0$: idle time (in minutes) at workstation $w \in W$
+
+**Objective:**
+\[
+\min \sum_{w \in W} s_w
+\]
+
+**Constraints:**
+1. **Workstation time usage and idle time:**
+   \[
+   \sum_{m \in M} t_{wm} x_m + s_w = E_w, \quad \forall w \in W
+   \]
+2. **Nonnegativity and integrality:**
+   \[
+   x_m \in \mathbb{Z}_{\geq 0}, \quad \forall m \in M
+   \]
+   \[
+   s_w \geq 0, \quad \forall w \in W
+   \]
+
+---
+
+#### Data Mapping
+
+- $W$: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture13/workstation_times.csv, column Workstation
+- $M$: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture13/workstation_times.csv, columns HiFi1_Minutes through HiFi101_Minutes
+- $t_{wm}$: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture13/workstation_times.csv, value in column $m$ (HiFiX_Minutes) for row $w$ (Workstation)
+- $d_w$: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture13/workstation_times.csv, column Maintenance_Percent for row $w$ (Workstation)
+- $C_w$: fixed at 1440 for all $w$
+- $E_w$: computed as $C_w \cdot (1 - d_w/100)$ for each $w$ using $d_w$ above
+
+All index sets, parameters, and coefficients are mapped directly from the supplied file and columns as specified.[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read workstation_times.csv with robust encoding
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture13/workstation_times.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read {csv_path} with tried encodings.")
+
+    # Identify workstations and models
+    workstation_col = 'Workstation'
+    maintenance_col = 'Maintenance_Percent'
+    model_cols = [col for col in df.columns if col.startswith('HiFi') and col.endswith('_Minutes')]
+    if not model_cols:
+        raise ValueError("No model columns found in CSV.")
+    models = [col.replace('_Minutes', '') for col in model_cols]
+    workstations = df[workstation_col].tolist()
+    if len(workstations) != 3:
+        raise ValueError("Expected 3 workstations, found: %s" % workstations)
+
+    # Build processing time coefficients: t_{w,m}
+    t = {}
+    for idx, row in df.iterrows():
+        w = row[workstation_col]
+        for m_col, m in zip(model_cols, models):
+            val = row[m_col]
+            try:
+                t[(w, m)] = float(val)
+            except Exception:
+                raise ValueError(f"Invalid processing time for workstation {w}, model {m}: {val}")
+
+    # Build effective capacities E_w
+    total_minutes = 1440
+    E = {}
+    for idx, row in df.iterrows():
+        w = row[workstation_col]
+        maint = row[maintenance_col]
+        try:
+            maint_pct = float(maint)
+        except Exception:
+            raise ValueError(f"Invalid maintenance percent for workstation {w}: {maint}")
+        E[w] = total_minutes * (1 - maint_pct / 100.0)
+
+    # Validate all required coefficients
+    for w in workstations:
+        for m in models:
+            if (w, m) not in t:
+                raise ValueError(f"Missing processing time for workstation {w}, model {m}")
+        if w not in E:
+            raise ValueError(f"Missing effective capacity for workstation {w}")
+
+    # Build model
+    m = gp.Model("radio_idle_time_min")
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables
+    x_vars = m.addVars(models, lb=0, vtype=GRB.INTEGER, name='x')
+    s_vars = m.addVars(workstations, lb=0, vtype=GRB.CONTINUOUS, name='s')
+
+    # Objective: minimize total idle time
+    m.setObjective(gp.quicksum(s_vars[w] for w in workstations), GRB.MINIMIZE)
+
+    # Constraints: for each workstation, sum t_{w,m} x_m + s_w = E_w
+    for w in workstations:
+        m.addConstr(
+            gp.quicksum(t[(w, m)] * x_vars[m] for m in models) + s_vars[w] == E[w],
+            name=f"time_balance_{w}"
+        )
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 3 rows, 104 columns and 306 nonzeros
+Model fingerprint: 0x64f6fdbe
+Variable types: 3 continuous, 101 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 9e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 1e+03]
+Found heuristic solution: objective 3801.6000000
+Presolve removed 0 rows and 10 columns
+Presolve time: 0.00s
+Presolved: 3 rows, 94 columns, 276 nonzeros
+Variable types: 0 continuous, 94 integer (0 binary)
+
+Root relaxation: objective 6.000000e-01, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0    0.60000    0    3 3801.60000    0.60000   100%     -    0s
+H    0     0                       0.6000000    0.60000  0.00%     -    0s
+     0     0    0.60000    0    3    0.60000    0.60000  0.00%     -    0s
+
+Explored 1 nodes (3 simplex iterations) in 0.02 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 0.6 3801.6 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.000000000000e-01, best bound 6.000000000000e-01, gap 0.0000%
+ObjVal: 0.6000000000000001
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: 58.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: -0.0
+C43: 0.0
+C44: -0.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: 1.0
+C52: 1.0
+C53: -0.0
+C54: -0.0
+C55: -0.0
+C56: -0.0
+C57: -0.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: -0.0
+C62: -0.0
+C63: -0.0
+C64: 0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: 7.0
+C72: -0.0
+C73: -0.0
+C74: -0.0
+C75: -0.0
+C76: -0.0
+C77: -0.0
+C78: -0.0
+C79: -0.0
+C80: -0.0
+C81: -0.0
+C82: -0.0
+C83: -0.0
+C84: -0.0
+C85: -0.0
+C86: -0.0
+C87: -0.0
+C88: -0.0
+C89: -0.0
+C90: -0.0
+C91: 0.0
+C92: -0.0
+C93: -0.0
+C94: -0.0
+C95: -0.0
+C96: -0.0
+C97: 2.0
+C98: 89.0
+C99: 21.0
+C100: 23.0
+C101: 0.0
+C102: 0.4
+C103: 0.2
+Optimal objective: 0.6000000000000001
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', 58.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', 0.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', 1.0), ('C52', 1.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', 0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', 7.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0), ('C80', -0.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', -0.0), ('C90', -0.0), ('C91', 0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', -0.0), ('C96', -0.0), ('C97', 2.0), ('C98', 89.0), ('C99', 21.0), ('C100', 23.0), ('C101', 0.0), ('C102', 0.4), ('C103', 0.2)]

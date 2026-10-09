@@ -1,0 +1,430 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+Maximize
+39.62 x_1 - 178539 y_1 + 35.98 x_2 - 157708 y_2 + 37.96 x_3 - 85192 y_3
+
+Subject to
+x_1 <= 5732 (demand)
+x_1 <= 12892 (22-day individual production quota)
+x_1 >= 18 y_1 (minimum batch)
+x_1 <= 5732 y_1 (activation)
+x_2 <= 5607 (demand)
+x_2 <= 7238 (22-day individual production quota)
+x_2 >= 25 y_2 (minimum batch)
+x_2 <= 5607 y_2 (activation)
+x_3 <= 4653 (demand)
+x_3 <= 11902 (22-day individual production quota)
+x_3 >= 23 y_3 (minimum batch)
+x_3 <= 4653 y_3 (activation)
+x_1/586 + x_2/329 + x_3/541 <= 22 (shared production days)
+x_1, x_2, x_3 >= 0 integer; y_1, y_2, y_3 binary.
+
+###### Retrieved Information
+
+{
+  "daily_quota": {
+    "1": 586,
+    "2": 329,
+    "3": 541
+  },
+  "demand": {
+    "1": 5732,
+    "2": 5607,
+    "3": 4653
+  },
+  "fixed_cost": {
+    "1": 178539,
+    "2": 157708,
+    "3": 85192
+  },
+  "min_batch": {
+    "1": 18,
+    "2": 25,
+    "3": 23
+  },
+  "products": [
+    "A1",
+    "A2",
+    "A3"
+  ],
+  "profit": {
+    "1": 39.62,
+    "2": 35.98,
+    "3": 37.96
+  },
+  "quota": {
+    "1": 12892,
+    "2": 7238,
+    "3": 11902
+  }
+}
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+#### Decision Variables
+- $x_1$: Quantity of Product A to produce
+- $x_2$: Quantity of Product B to produce
+
+#### Objective Function
+Maximize total profit: 
+$\quad \quad \max \ 80x_1 + 125x_2$
+
+#### Constraints
+**1. Steel Constraint** 
+$\quad \quad 8x_1 + 5x_2 \leq 3500$ 
+
+**2. Iron Constraint** 
+$\quad \quad 6x_1 + 4x_2 \leq 1800$ 
+
+**3. Machine Hours Constraint** 
+$\quad \quad 4x_1 + 5x_2 \leq 2800$ 
+
+**4. Non-negativity** 
+$\quad \quad x_1 \geq 0, x_2 \geq 0$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal integer number of batches to produce/purchase for each of 100 products, where each batch is 10 units, in order to maximize total profit. The plan must respect three resource capacity constraints and ensure that no product’s total production exceeds its upper demand bound (unmet demand is allowed).
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem (integer batch decisions, linear constraints).
+3.  **Define Index Sets:** The primary indices are:
+    - Products: \( i \in \{\text{P1}, \text{P2}, ..., \text{P100}\} \)
+    - Resources: \( r \in \{\text{R1}, \text{R2}, \text{R3}\} \)
+4.  **Define Decision Variables:**
+    -   `x[i]` = Number of batches of product \( i \) to produce/purchase. Type: GRB.INTEGER (non-negative).
+        - Each batch is exactly 10 units, so total units for product \( i \) is \( 10 \times x[i] \).
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients:
+        - `profit_per_unit` (from factory_products_100.csv): profit earned per produced unit for each product.
+        - `batch_size_units` (from factory_products_100.csv): always 10, the number of units per batch.
+    -   Constraint coefficients:
+        - `r1_per_unit`, `r2_per_unit`, `r3_per_unit` (from factory_products_100.csv): resource consumption per unit for each product and resource.
+    -   Constraint RHS (limits):
+        - `upper_demand_units` (from factory_products_100.csv): maximum allowed units for each product.
+        - `capacity` (from resources_capacities.csv): total available amount for each resource (R1, R2, R3).
+6.  **Formulate Objective:** Maximize total profit across all products, i.e., maximize the sum over all products of (number of batches) × (batch size) × (profit per unit):
+    - Objective: Maximize \( \sum_{i} 10 \times x[i] \times \text{profit\_per\_unit}_i \)
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Resource Limits): For each resource \( r \in \{\text{R1}, \text{R2}, \text{R3}\} \), the total resource consumption across all products cannot exceed the available capacity:
+        - \( \sum_{i} 10 \times x[i] \times \text{rX\_per\_unit}_i \leq \text{capacity}_r \)
+        - Where rX is r1, r2, or r3 for each resource.
+    -   Constraint 2 (Demand Upper Bound): For each product \( i \), the total produced units cannot exceed the product’s upper demand:
+        - \( 10 \times x[i] \leq \text{upper\_demand\_units}_i \)
+        - Since batch size is 10, this ensures only feasible batch counts are chosen.
+    -   Constraint 3 (Non-negativity and Integrality): For each product \( i \):
+        - \( x[i] \geq 0 \), integer.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+
+# 1. Read data
+products_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/factory_products_100.csv', sep=',')
+resources_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture10/resources_capacities.csv', sep=',')
+
+# 2. Prepare index sets and parameters
+
+# Products: use all rows in products_df
+product_ids = products_df['product'].astype(str).tolist()
+
+# Resources: use all rows in resources_df
+resource_ids = resources_df['resource'].astype(str).tolist()
+
+# Batch size: should be 10 for all products, but read from data for robustness
+batch_size_per_product = products_df.set_index('product')['batch_size_units'].astype(int).to_dict()
+# Validate all batch sizes are 10
+if not all(v == 10 for v in batch_size_per_product.values()):
+    raise ValueError("Batch size is not 10 for all products.")
+
+batch_size = 10  # fixed
+
+# Profit per unit
+profit_per_unit = products_df.set_index('product')['profit_per_unit'].astype(float).to_dict()
+
+# Resource consumption per unit
+r1_per_unit = products_df.set_index('product')['r1_per_unit'].astype(float).to_dict()
+r2_per_unit = products_df.set_index('product')['r2_per_unit'].astype(float).to_dict()
+r3_per_unit = products_df.set_index('product')['r3_per_unit'].astype(float).to_dict()
+
+# Upper demand per product (units)
+upper_demand_units = products_df.set_index('product')['upper_demand_units'].astype(int).to_dict()
+
+# Resource capacities
+resource_capacities = resources_df.set_index('resource')['capacity'].astype(float).to_dict()
+
+# Map resource to per-unit consumption dict
+resource_consumption = {
+    'R1': r1_per_unit,
+    'R2': r2_per_unit,
+    'R3': r3_per_unit
+}
+
+# 3. Build Gurobi model
+m = gp.Model('BatchProductionPlanning')
+
+# 4. Decision variables: x[i] = number of batches of product i (integer, >=0)
+x = m.addVars(product_ids, vtype=gp.GRB.INTEGER, lb=0, name='x')
+
+# 5. Objective: maximize total profit = sum_i (batch_size * x[i] * profit_per_unit[i])
+m.setObjective(
+    gp.quicksum(batch_size * x[i] * profit_per_unit[i] for i in product_ids),
+    gp.GRB.MAXIMIZE
+)
+
+# 6. Constraints
+
+# Resource constraints: for each resource r, sum_i (batch_size * x[i] * rX_per_unit[i]) <= capacity_r
+for r in resource_ids:
+    if r not in resource_consumption:
+        raise KeyError(f"Resource '{r}' not found in resource_consumption mapping.")
+    m.addConstr(
+        gp.quicksum(batch_size * x[i] * resource_consumption[r][i] for i in product_ids) <= resource_capacities[r],
+        name=f"res_{r}"
+    )
+
+# Demand upper bound: for each product i, batch_size * x[i] <= upper_demand_units[i]
+for i in product_ids:
+    m.addConstr(
+        batch_size * x[i] <= upper_demand_units[i],
+        name=f"demand_{i}"
+    )
+
+# 7. Optimize
+m.optimize()
+
+# 8. Output results
+if m.status == gp.GRB.OPTIMAL:
+    print(f"Optimal total value/cost: {m.objVal:.2f}")
+    print("--- Optimal Batch Plan ---")
+    for i in product_ids:
+        batches = int(round(x[i].X))
+        units = batches * batch_size
+        print(f"Product {i}: {batches} batches ({units} units), Profit per unit: {profit_per_unit[i]:.2f}")
+else:
+    print(f"No optimal solution found. Status: {m.status}")
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 103 rows, 100 columns and 400 nonzeros
+Model fingerprint: 0x61267ef0
+Variable types: 0 continuous, 100 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [3e+00, 5e+01]
+  Objective range  [5e+01, 1e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+01, 3e+04]
+Found heuristic solution: objective 87591.500000
+Presolve removed 100 rows and 0 columns
+Presolve time: 0.00s
+Presolved: 3 rows, 100 columns, 300 nonzeros
+Variable types: 0 continuous, 100 integer (0 binary)
+
+Root relaxation: objective 1.086679e+05, 12 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 108667.881    0    3 87591.5000 108667.881  24.1%     -    0s
+H    0     0                    108550.40000 108667.881  0.11%     -    0s
+H    0     0                    108615.30000 108667.881  0.05%     -    0s
+H    0     0                    108624.60000 108667.881  0.04%     -    0s
+H    0     0                    108628.10000 108667.881  0.04%     -    0s
+H    0     0                    108640.50000 108667.881  0.03%     -    0s
+H    0     0                    108652.40000 108667.881  0.01%     -    0s
+     0     0 108667.291    0    4 108652.400 108667.291  0.01%     -    0s
+     0     0 108667.291    0    3 108652.400 108667.291  0.01%     -    0s
+     0     0 108667.291    0    4 108652.400 108667.291  0.01%     -    0s
+H    0     0                    108654.80000 108667.184  0.01%     -    0s
+H    0     0                    108657.90000 108667.184  0.01%     -    0s
+
+Cutting planes:
+  Gomory: 1
+
+Explored 1 nodes (21 simplex iterations) in 0.40 seconds (0.01 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 9: 108658 108655 108652 ... 87591.5
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.086579000000e+05, best bound 1.086671840675e+05, gap 0.0085%
+Optimal total value/cost: 108657.90
+--- Optimal Batch Plan ---
+Product P1: 0 batches (0 units), Profit per unit: 6.70
+Product P2: 0 batches (0 units), Profit per unit: 10.96
+Product P3: 38 batches (380 units), Profit per unit: 9.40
+Product P4: 0 batches (0 units), Profit per unit: 11.13
+Product P5: 0 batches (0 units), Profit per unit: 10.29
+Product P6: 22 batches (220 units), Profit per unit: 8.06
+Product P7: 44 batches (440 units), Profit per unit: 6.94
+Product P8: 0 batches (0 units), Profit per unit: 11.44
+Product P9: 27 batches (270 units), Profit per unit: 9.13
+Product P10: 12 batches (120 units), Profit per unit: 7.83
+Product P11: 30 batches (300 units), Profit per unit: 7.07
+Product P12: 0 batches (0 units), Profit per unit: 9.49
+Product P13: 0 batches (0 units), Profit per unit: 10.89
+Product P14: 60 batches (600 units), Profit per unit: 10.21
+Product P15: 55 batches (550 units), Profit per unit: 10.14
+Product P16: 0 batches (0 units), Profit per unit: 9.50
+Product P17: 0 batches (0 units), Profit per unit: 9.07
+Product P18: 0 batches (0 units), Profit per unit: 8.26
+Product P19: 0 batches (0 units), Profit per unit: 9.65
+Product P20: 0 batches (0 units), Profit per unit: 8.79
+Product P21: 0 batches (0 units), Profit per unit: 11.30
+Product P22: 0 batches (0 units), Profit per unit: 10.09
+Product P23: 52 batches (520 units), Profit per unit: 7.98
+Product P24: 60 batches (600 units), Profit per unit: 7.06
+Product P25: 19 batches (190 units), Profit per unit: 9.57
+Product P26: 18 batches (180 units), Profit per unit: 10.67
+Product P27: 0 batches (0 units), Profit per unit: 10.38
+Product P28: 0 batches (0 units), Profit per unit: 10.76
+Product P29: 15 batches (150 units), Profit per unit: 9.03
+Product P30: 0 batches (0 units), Profit per unit: 7.38
+Product P31: 0 batches (0 units), Profit per unit: 9.87
+Product P32: 44 batches (440 units), Profit per unit: 8.33
+Product P33: 11 batches (110 units), Profit per unit: 5.54
+Product P34: 0 batches (0 units), Profit per unit: 9.64
+Product P35: 0 batches (0 units), Profit per unit: 10.63
+Product P36: 0 batches (0 units), Profit per unit: 9.28
+Product P37: 27 batches (270 units), Profit per unit: 9.54
+Product P38: 5 batches (50 units), Profit per unit: 8.33
+Product P39: 0 batches (0 units), Profit per unit: 10.07
+Product P40: 0 batches (0 units), Profit per unit: 8.84
+Product P41: 0 batches (0 units), Profit per unit: 10.24
+Product P42: 0 batches (0 units), Profit per unit: 9.63
+Product P43: 0 batches (0 units), Profit per unit: 7.60
+Product P44: 0 batches (0 units), Profit per unit: 10.11
+Product P45: 21 batches (210 units), Profit per unit: 6.83
+Product P46: 21 batches (210 units), Profit per unit: 10.04
+Product P47: 43 batches (430 units), Profit per unit: 9.43
+Product P48: 0 batches (0 units), Profit per unit: 9.16
+Product P49: 0 batches (0 units), Profit per unit: 8.99
+Product P50: 7 batches (70 units), Profit per unit: 8.80
+Product P51: 0 batches (0 units), Profit per unit: 12.11
+Product P52: 46 batches (460 units), Profit per unit: 10.73
+Product P53: 5 batches (50 units), Profit per unit: 11.38
+Product P54: 0 batches (0 units), Profit per unit: 9.67
+Product P55: 0 batches (0 units), Profit per unit: 9.38
+Product P56: 38 batches (380 units), Profit per unit: 10.97
+Product P57: 0 batches (0 units), Profit per unit: 7.89
+Product P58: 0 batches (0 units), Profit per unit: 9.78
+Product P59: 37 batches (370 units), Profit per unit: 8.56
+Product P60: 18 batches (180 units), Profit per unit: 9.01
+Product P61: 0 batches (0 units), Profit per unit: 8.66
+Product P62: 0 batches (0 units), Profit per unit: 10.42
+Product P63: 0 batches (0 units), Profit per unit: 10.38
+Product P64: 0 batches (0 units), Profit per unit: 9.30
+Product P65: 45 batches (450 units), Profit per unit: 9.63
+Product P66: 0 batches (0 units), Profit per unit: 10.78
+Product P67: 22 batches (220 units), Profit per unit: 9.46
+Product P68: 21 batches (210 units), Profit per unit: 11.43
+Product P69: 13 batches (130 units), Profit per unit: 5.49
+Product P70: 0 batches (0 units), Profit per unit: 9.97
+Product P71: 0 batches (0 units), Profit per unit: 10.48
+Product P72: 0 batches (0 units), Profit per unit: 6.21
+Product P73: 0 batches (0 units), Profit per unit: 7.20
+Product P74: 0 batches (0 units), Profit per unit: 11.32
+Product P75: 0 batches (0 units), Profit per unit: 9.49
+Product P76: 0 batches (0 units), Profit per unit: 8.97
+Product P77: 0 batches (0 units), Profit per unit: 12.73
+Product P78: 0 batches (0 units), Profit per unit: 6.48
+Product P79: 0 batches (0 units), Profit per unit: 11.59
+Product P80: 4 batches (40 units), Profit per unit: 7.01
+Product P81: 0 batches (0 units), Profit per unit: 10.08
+Product P82: 39 batches (390 units), Profit per unit: 9.24
+Product P83: 0 batches (0 units), Profit per unit: 10.27
+Product P84: 54 batches (540 units), Profit per unit: 9.34
+Product P85: 23 batches (230 units), Profit per unit: 9.03
+Product P86: 55 batches (550 units), Profit per unit: 9.39
+Product P87: 0 batches (0 units), Profit per unit: 10.60
+Product P88: 0 batches (0 units), Profit per unit: 9.36
+Product P89: 15 batches (150 units), Profit per unit: 11.46
+Product P90: 17 batches (170 units), Profit per unit: 9.83
+Product P91: 10 batches (100 units), Profit per unit: 7.57
+Product P92: 0 batches (0 units), Profit per unit: 10.35
+Product P93: 0 batches (0 units), Profit per unit: 11.90
+Product P94: 18 batches (180 units), Profit per unit: 10.74
+Product P95: 2 batches (20 units), Profit per unit: 8.96
+Product P96: 25 batches (250 units), Profit per unit: 10.45
+Product P97: 0 batches (0 units), Profit per unit: 11.87
+Product P98: 0 batches (0 units), Profit per unit: 9.65
+Product P99: 0 batches (0 units), Profit per unit: 9.84
+Product P100: 57 batches (570 units), Profit per unit: 8.84
+Optimal objective: 108657.90000000002
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', 38.0), ('C3', -0.0), ('C4', -0.0), ('C5', 22.0), ('C6', 44.0), ('C7', 0.0), ('C8', 27.0), ('C9', 12.0), ('C10', 30.0), ('C11', 0.0), ('C12', 0.0), ('C13', 60.0), ('C14', 55.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', -0.0), ('C22', 52.0), ('C23', 60.0), ('C24', 19.0), ('C25', 18.0), ('C26', 0.0), ('C27', -0.0), ('C28', 15.0), ('C29', -0.0), ('C30', -0.0), ('C31', 44.0), ('C32', 11.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 27.0), ('C37', 5.0), ('C38', -0.0), ('C39', 0.0), ('C40', 0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', 21.0), ('C45', 21.0), ('C46', 43.0), ('C47', 0.0), ('C48', -0.0), ('C49', 7.0), ('C50', 0.0), ('C51', 46.0), ('C52', 5.0), ('C53', 0.0), ('C54', 0.0), ('C55', 38.0), ('C56', 0.0), ('C57', -0.0), ('C58', 37.0), ('C59', 18.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', 45.0), ('C65', 0.0), ('C66', 22.0), ('C67', 21.0), ('C68', 13.0), ('C69', 0.0), ('C70', 0.0), ('C71', -0.0), ('C72', 0.0), ('C73', -0.0), ('C74', 0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', 4.0), ('C80', 0.0), ('C81', 39.0), ('C82', -0.0), ('C83', 54.0), ('C84', 23.0), ('C85', 55.0), ('C86', 0.0), ('C87', 0.0), ('C88', 15.0), ('C89', 17.0), ('C90', 10.0), ('C91', 0.0), ('C92', 0.0), ('C93', 18.0), ('C94', 2.0), ('C95', 25.0), ('C96', -0.0), ('C97', -0.0), ('C98', -0.0), ('C99', 57.0)]

@@ -1,0 +1,1 @@
+Please upload or paste the contents of **cost_12x12.csv**. Once you provide the file or its data, I will retrieve and present all cost data, preserving machine and task identifiers and all cost values as requested.

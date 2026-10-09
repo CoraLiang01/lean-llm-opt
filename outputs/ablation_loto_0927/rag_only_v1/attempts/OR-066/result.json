@@ -1,0 +1,61 @@
+{
+  "problem_id": "OR-066",
+  "query": "Several supermarkets require inventory replenishment, and multiple suppliers located across various cities are capable of providing the needed goods. Each supplier incurs a one-time fixed cost when activated, with these costs detailed in “fixed_cost.csv.” Every supermarket must procure a unit of goods from the available suppliers. The per-unit transportation cost from each supplier to each supermarket is listed in “transportation_costs.csv,” while demand data is available in “demand.csv.” The goal is to identify which suppliers to activate in order to fulfill all supermarket demands at the lowest possible total cost. Binary decision variables y_i indicate whether supplier F_i is operational. Variables x_{ij} represent the share of supply that supermarket S_j receives from supplier F_i. These variables are used to determine the most cost-effective distribution strategy, minimizing the sum of fixed and transportation costs.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "FLP",
+  "true_route": "FLP",
+  "label_objective": 11396.51,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "FLP",
+  "assigned_route": "FLP",
+  "generated_model": "Let us define the following sets, parameters, and variables based on the provided CSV data:\n\nSets:\n- Facilities (Suppliers): \\( I = \\{S1, S2\\} \\)\n- Customers (Supermarkets): \\( J = \\{C1, C2\\} \\)\n\nParameters:\n- Fixed costs for opening each supplier:\n  - \\( f_{S1} = 105.97 \\)\n  - \\( f_{S2} = 85.31 \\)\n- Per-unit transportation costs from each supplier to each supermarket:\n  - \\( c_{S1,C1} = 2358.39 \\)\n  - \\( c_{S1,C2} = 1492.08 \\)\n  - \\( c_{S2,C1} = 0.07 \\)\n  - \\( c_{S2,C2} = 52.32 \\)\n- Demand at each supermarket:\n  - \\( d_{C1} = 144 \\)\n  - \\( d_{C2} = 216 \\)\n\nDecision Variables:\n- \\( y_i \\in \\{0,1\\} \\) for \\( i \\in I \\): 1 if supplier \\( i \\) is activated, 0 otherwise.\n- \\( x_{ij} \\geq 0 \\) for \\( i \\in I, j \\in J \\): Amount supplied from supplier \\( i \\) to supermarket \\( j \\).\n\nMathematical Model:\n\n\\[\n\\begin{align*}\n\\text{Minimize} \\quad & \\sum_{i \\in I} f_i y_i + \\sum_{i \\in I} \\sum_{j \\in J} c_{ij} x_{ij} \\\\\n= \\quad & 105.97\\,y_{S1} + 85.31\\,y_{S2} \\\\\n& + 2358.39\\,x_{S1,C1} + 1492.08\\,x_{S1,C2} \\\\\n& + 0.07\\,x_{S2,C1} + 52.32\\,x_{S2,C2}\n\\end{align*}\n\\]\n\nSubject to:\n\n1. Demand satisfaction at each supermarket:\n   \\[\n   \\sum_{i \\in I} x_{ij} = d_j \\quad \\forall j \\in J\n   \\]\n   Specifically:\n   \\[\n   x_{S1,C1} + x_{S2,C1} = 144\n   \\]\n   \\[\n   x_{S1,C2} + x_{S2,C2} = 216\n   \\]\n\n2. Supply only from open suppliers:\n   \\[\n   x_{ij} \\leq d_j y_i \\quad \\forall i \\in I, j \\in J\n   \\]\n   Specifically:\n   \\[\n   x_{S1,C1} \\leq 144\\,y_{S1}\n   \\]\n   \\[\n   x_{S1,C2} \\leq 216\\,y_{S1}\n   \\]\n   \\[\n   x_{S2,C1} \\leq 144\\,y_{S2}\n   \\]\n   \\[\n   x_{S2,C2} \\leq 216\\,y_{S2}\n   \\]\n\n3. Binary and non-negativity constraints:\n   \\[\n   y_{i} \\in \\{0,1\\} \\quad \\forall i \\in I\n   \\]\n   \\[\n   x_{ij} \\geq 0 \\quad \\forall i \\in I, j \\in J\n   \\]\n\nSummary of parameters:\n\n- Facilities: \\( I = \\{S1, S2\\} \\)\n- Customers: \\( J = \\{C1, C2\\} \\)\n- Fixed costs: \\( f_{S1} = 105.97, f_{S2} = 85.31 \\)\n- Transportation cost matrix:\n  \\[\n  \\begin{array}{c|cc}\n    & C1 & C2 \\\\\n    \\hline\n    S1 & 2358.39 & 1492.08 \\\\\n    S2 & 0.07 & 52.32 \\\\\n  \\end{array}\n  \\]\n- Demand vector: \\( d_{C1} = 144, d_{C2} = 216 \\)\n\nThis model determines which suppliers to activate (minimizing fixed and transportation costs) and how much each supplier should deliver to each supermarket to satisfy all demands.",
+  "csvqa_observation": "Document: demand.csv\n\nSource rows and data:\n\nRow 1:\n- customer: C1\n- demand: 144\n\nRow 2:\n- customer: C2\n- demand: 216\n\nAxis and shape:\n- Customer axis: [C1, C2]\n- Demand values: [144, 216]\n- Source orientation: Each row corresponds to a customer and their demand.\n\nNo facility or product axis is present in this file.",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_FULL_DATA",
+  "solve_code": "import gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_facility_location():\n    facilities = ['S1', 'S2']\n    customers = ['C1', 'C2']\n    fixed_cost = {'S1': 105.97, 'S2': 85.31}\n    transportation_cost = {('S1', 'C1'): 2358.39, ('S1', 'C2'): 1492.08, ('S2', 'C1'): 0.07, ('S2', 'C2'): 52.32}\n    demand = {'C1': 144, 'C2': 216}\n    for i in facilities:\n        if i not in fixed_cost:\n            raise ValueError(f'Missing fixed cost for facility {i}')\n    for j in customers:\n        if j not in demand:\n            raise ValueError(f'Missing demand for customer {j}')\n    for i in facilities:\n        for j in customers:\n            if (i, j) not in transportation_cost:\n                raise ValueError(f'Missing transportation cost for ({i},{j})')\n    m = gp.Model()\n    m.Params.MIPGap = 0.0001\n    y = m.addVars(facilities, vtype=GRB.BINARY, name='')\n    x = m.addVars(facilities, customers, lb=0, vtype=GRB.CONTINUOUS, name='')\n    obj = gp.quicksum((fixed_cost[i] * y[i] for i in facilities)) + gp.quicksum((transportation_cost[i, j] * x[i, j] for i in facilities for j in customers))\n    m.setObjective(obj, GRB.MINIMIZE)\n    for j in customers:\n        m.addConstr(gp.quicksum((x[i, j] for i in facilities)) == demand[j], name='')\n    for i in facilities:\n        for j in customers:\n            m.addConstr(x[i, j] <= demand[j] * y[i], name='')\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal {m.ObjVal}')\n        for v in m.getVars():\n            print(f'{v.VarName} {v.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_facility_location()",
+  "final_objective": 11396.51,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      1.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      0.0
+    ],
+    [
+      "C4",
+      144.0
+    ],
+    [
+      "C5",
+      216.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "rag_only",
+  "seconds": 19.392,
+  "classification_source": "final_101_V2_cache",
+  "classification_cache_sha256": "8b17fda06001ff4ebea07809838119bc81b6f49cb453b600aa87d5dc73881435",
+  "base_notebook_sha256": "a155d54c6df32abc8dfe263e03d00138848cfcca32422dff3c286f3b8c67f6b1",
+  "notebook_source_sha256": "46fee06fc332e35e0be1dfa22ffcc26af19505ba077e31214fd8b688913561e8",
+  "cache_fingerprint": "33fac0b81201381cacb5e5895ed26b5299c3077ca21dc7ea44b0dcf5d512053c",
+  "evaluated_utc": "2026-10-06T02:58:09.761555+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

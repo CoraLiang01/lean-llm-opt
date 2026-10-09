@@ -1,0 +1,43 @@
+{
+  "problem_id": "OR-011",
+  "query": "The supermarket offers a variety of top-selling products, with associated revenue data provided in the ‘Revenue’ column. Each product has its own demand level during the sales horizon. The company’s objective is to maximize total revenue by allocating the available inventory of products classified under ‘id999’. The initial inventory levels for the ‘id999’ products are detailed in the ‘Initial Inventory’ column. During the sales horizon, no restocking is allowed, and there are no in-transit inventories.\n\nDemand for each product during the sales period is assumed to be deterministic and known in advance, with demand quantities specified in the ‘Demand’ column. The decision variables x_i represent the number of units of each ‘id999’ product i that the company plans to fulfill, where each x_i is a non-negative integer. Because fulfilled orders cannot exceed either the available inventory or the realized demand, the fulfillment quantities must satisfy both inventory and demand constraints.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM2/OnlineRetailSalesDataset.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 3552260.54,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to maximize total revenue by allocating available inventory of products classified under ‘id999’, ensuring that the fulfilled quantity for each product does not exceed either its initial inventory or its deterministic demand during the sales horizon. No restocking or in-transit inventory is allowed.\n2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem (specifically, an integer allocation problem).\n3.  **Define Index Sets:** The primary index is the set of products with `id_number = 'id999'`.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of product i (with `id_number = 'id999'`) to fulfill during the sales horizon. Type: GRB.INTEGER (non-negative).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: `Revenue` column (per-unit revenue for each product).\n    -   Constraint coefficients and RHS:\n        -   `Demand` column (maximum possible fulfilled units per product).\n        -   `Initial Inventory` column (available inventory per product at the start).\n6.  **Formulate Objective:** Maximize the sum over all products i with `id_number = 'id999'` of (`Revenue[i]` * `x[i]`), i.e., maximize total revenue from fulfilled units.\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Inventory Limit): For each product i with `id_number = 'id999'`, `x[i] <= Initial Inventory[i]` (cannot fulfill more than available inventory).\n    -   Constraint 2 (Demand Limit): For each product i with `id_number = 'id999'`, `x[i] <= Demand[i]` (cannot fulfill more than realized demand).\n    -   Constraint 3 (Non-negativity and Integrality): For each product i with `id_number = 'id999'`, `x[i] >= 0` and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM2/OnlineRetailSalesDataset.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 900\nColumns: ['id_number', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'id_number': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'int64'}\nPreview only (first 10 rows):\nid_number Revenue Demand Initial Inventory\n    id100  127.57   7857             53990\n    id101  245.08   8626             59620\n    id102   341.4   7984             55100\n    id103   127.6   7881             54510\n    id104   31.19   8297             57510\n    id105  167.45   8118             56270\n    id106  399.92   8422             58230\n    id107   171.3   7881             54550\n    id108  412.76   8078             55960\n    id109   66.54   7756             53640\nFull-file column statistics: {\"id_number\": {\"missing\": 0, \"unique_nonempty\": 900}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 892, \"numeric_range\": [6.14, 499.93]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 588, \"numeric_range\": [7180.0, 8865.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 494, \"numeric_range\": [49500.0, 61440.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"id999\", \"matching_columns\": [{\"column\": \"id_number\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"id999\"]}], \"exact_matching_columns\": 1}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"ca60e0ec69d67d205ef6632cbe08a308c45fd4e48735c730b79da673e7c5659f\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM2/OnlineRetailSalesDataset.csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\nid_col = 'id_number'\nselected_ids = df[id_col].str.strip().str.casefold() == 'id999'\ndf_id999 = df[selected_ids].copy()\nif df_id999.shape[0] == 0:\n    raise ValueError(\"No products with id_number == 'id999' found in the dataset.\")\ndf_id999.set_index(id_col, inplace=True)\ntry:\n    revenue_dict = df_id999['Revenue'].astype(float).to_dict()\n    demand_dict = df_id999['Demand'].astype(int).to_dict()\n    inventory_dict = df_id999['Initial Inventory'].astype(int).to_dict()\nexcept Exception as e:\n    raise ValueError(f'Error converting numeric columns: {e}')\nproducts = list(df_id999.index)\nfor pid in products:\n    if pid not in revenue_dict or pid not in demand_dict or pid not in inventory_dict:\n        raise ValueError(f'Missing parameter(s) for product {pid}.')\nm = gp.Model('MaximizeRevenue_id999')\nx_vars = m.addVars(products, vtype=gp.GRB.INTEGER, lb=0, name='')\nfor pid in products:\n    m.addConstr(x_vars[pid] <= inventory_dict[pid], name=f'inv_{pid}')\nfor pid in products:\n    m.addConstr(x_vars[pid] <= demand_dict[pid], name=f'demand_{pid}')\nm.setObjective(gp.quicksum((revenue_dict[pid] * x_vars[pid] for pid in products)), gp.GRB.MAXIMIZE)\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 3552260.54,
+  "final_solution": [
+    [
+      "C0",
+      8171.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 13.225,
+  "evaluated_utc": "2026-10-06T08:42:32.054847+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

@@ -1,0 +1,96 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'A utility company must place emergency repair depots so that every service zone is covered by at least one '
+          'selected depot. Candidate depot opening costs and covered service zones are listed in facility_sites.csv, '
+          'and the full set of service zones is listed in service_zones.csv.\n'
+          '\n'
+          'Formulate a minimum-cost set covering model. For each candidate depot i, define y_i as a binary variable '
+          'equal to 1 if depot i is opened. The objective is to minimize total opening cost. The model should include '
+          'one coverage constraint for each service zone requiring at least one opened depot that covers that zone, '
+          'and binary restrictions for all depot-opening variables.',
+ 'relationships': [],
+ 'route': 'FLP',
+ 'tables': [{'columns': ['Center', 'OpeningCost', 'CoveredDistricts'],
+             'file_index': 0,
+             'file_name': 'facility_sites.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 8,
+             'records': [{'source_row': 0,
+                          'values': {'Center': 'B1', 'CoveredDistricts': 'Z1;Z2;Z5', 'OpeningCost': '11'}},
+                         {'source_row': 1,
+                          'values': {'Center': 'B2', 'CoveredDistricts': 'Z2;Z3;Z6', 'OpeningCost': '14'}},
+                         {'source_row': 2,
+                          'values': {'Center': 'B3', 'CoveredDistricts': 'Z4;Z5;Z8', 'OpeningCost': '10'}},
+                         {'source_row': 3,
+                          'values': {'Center': 'B4', 'CoveredDistricts': 'Z1;Z6;Z7', 'OpeningCost': '13'}},
+                         {'source_row': 4,
+                          'values': {'Center': 'B5', 'CoveredDistricts': 'Z3;Z7;Z9', 'OpeningCost': '16'}},
+                         {'source_row': 5,
+                          'values': {'Center': 'B6', 'CoveredDistricts': 'Z8;Z9;Z10', 'OpeningCost': '9'}},
+                         {'source_row': 6,
+                          'values': {'Center': 'B7', 'CoveredDistricts': 'Z4;Z10', 'OpeningCost': '12'}},
+                         {'source_row': 7,
+                          'values': {'Center': 'B8', 'CoveredDistricts': 'Z5;Z6;Z9', 'OpeningCost': '15'}}],
+             'returned_rows': 8,
+             'role': 'candidate depot costs and coverage',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['Zone'],
+             'file_index': 1,
+             'file_name': 'service_zones.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 10,
+             'records': [{'source_row': 0, 'values': {'Zone': 'Z1'}},
+                         {'source_row': 1, 'values': {'Zone': 'Z2'}},
+                         {'source_row': 2, 'values': {'Zone': 'Z3'}},
+                         {'source_row': 3, 'values': {'Zone': 'Z4'}},
+                         {'source_row': 4, 'values': {'Zone': 'Z5'}},
+                         {'source_row': 5, 'values': {'Zone': 'Z6'}},
+                         {'source_row': 6, 'values': {'Zone': 'Z7'}},
+                         {'source_row': 7, 'values': {'Zone': 'Z8'}},
+                         {'source_row': 8, 'values': {'Zone': 'Z9'}},
+                         {'source_row': 9, 'values': {'Zone': 'Z10'}}],
+             'returned_rows': 10,
+             'role': 'service zones to cover',
+             'table_id': 'file_1_view_0'}],
+ 'validation': {'matrix_checks': [], 'status': 'OK'}}
+import pandas as pd
+CSVQA_FRAMES = {t["table_id"]: pd.DataFrame([r["values"] for r in t["records"]], columns=t["columns"], index=[r["source_row"] for r in t["records"]]) for t in CSVQA_DATA["tables"]}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_FRAMES):
+    facility_frame = CSVQA_FRAMES['file_0_view_0']
+    depots = []
+    opening_cost = {}
+    covered_zones = {}
+    for (_, row) in facility_frame.iterrows():
+        depot = row['Center']
+        depots.append(depot)
+        opening_cost[depot] = float(row['OpeningCost'])
+        covered_zones[depot] = set((z.strip() for z in row['CoveredDistricts'].split(';') if z.strip()))
+    zones_frame = CSVQA_FRAMES['file_1_view_0']
+    zones = []
+    for (_, row) in zones_frame.iterrows():
+        zone = row['Zone']
+        zones.append(zone)
+    depots_covering_zone = {zone: [] for zone in zones}
+    for depot in depots:
+        for zone in covered_zones[depot]:
+            if zone in depots_covering_zone:
+                depots_covering_zone[zone].append(depot)
+    for zone in zones:
+        if not depots_covering_zone[zone]:
+            raise ValueError(f'Zone {zone} is not covered by any depot.')
+    m = gp.Model('SetCoveringDepots')
+    m.Params.MIPGap = 0.0001
+    y_vars = m.addVars(depots, vtype=GRB.BINARY, name='')
+    m.setObjective(gp.quicksum((opening_cost[i] * y_vars[i] for i in depots)), GRB.MINIMIZE)
+    m.addConstrs((gp.quicksum((y_vars[i] for i in depots_covering_zone[j])) >= 1 for j in zones), name='')
+    m.optimize()
+    return m
+m = solve_problem(CSVQA_FRAMES)
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')

@@ -1,0 +1,135 @@
+{
+  "problem_id": "OR-028",
+  "query": "A company offers a variety of products with revenue data provided in the ‘Revenue’ column. The goal is to determine which demands to meet within the sales horizon using the initial inventory specified in the ‘Initial Inventory’ column. Demand quantities are provided in the ‘Demand’ column and are assumed to be deterministic and known in advance. Decision variables x_i represent the number of units of each product that will be fulfilled.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM19/WomenClothingEcommerceSalesData.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 285816.0,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine, for each product, how much demand to fulfill within a sales horizon, given initial inventory and known deterministic demand, in order to maximize total revenue.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem (all variables are continuous or integer, no fixed charges or binary activation).\n3.  **Define Index Sets:** The primary index is Products (indexed by i), as identified by the 'Product Name' column.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of product i to fulfill (i.e., demand met for product i). Type: GRB.INTEGER.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Revenue' column (per-unit revenue for each product).\n    -   Constraint coefficients: 'Demand' column (maximum possible demand to fulfill for each product).\n    -   Constraint RHS: 'Initial Inventory' column (maximum available inventory for each product).\n6.  **Formulate Objective:** Maximize total revenue, i.e., maximize sum over all products i of ('Revenue'[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand Fulfillment): For each product i, x[i] ≤ 'Demand'[i] (cannot fulfill more than demand).\n    -   Constraint 2 (Inventory Limit): For each product i, x[i] ≤ 'Initial Inventory'[i] (cannot fulfill more than available inventory).\n    -   Constraint 3 (Non-negativity): For each product i, x[i] ≥ 0 and integer (cannot fulfill negative or fractional units).\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM19/WomenClothingEcommerceSalesData.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 24\nColumns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product Name': 'object', 'Revenue': 'int64', 'Demand': 'int64', 'Initial Inventory': 'int64'}\nPreview only (first 10 rows):\nProduct Name Revenue Demand Initial Inventory\n     sku_I27     238      6                30\n    sku_I499     287      4                20\n    sku_I719     268     16                80\n     sku_T18     318     14                70\n     sku_T29     207      4                20\n     sku_T39     258     32               160\n    sku_T499     249      8                40\n      sku_T9     227      2                10\n    sku_3081     198     10                50\n     sku_339     254      8                40\nFull-file column statistics: {\"Product Name\": {\"missing\": 0, \"unique_nonempty\": 24}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 17, \"numeric_range\": [198.0, 318.0]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 13, \"numeric_range\": [2.0, 570.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 13, \"numeric_range\": [10.0, 2870.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"787a59fc40631bfa6a6503230b94c0cf332567918d0b52c9608fe3a733e8f9be\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM19/WomenClothingEcommerceSalesData.csv'\ndf = pd.read_csv(csv_path, dtype=str, keep_default_na=False)\nrequired_columns = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nfor col in required_columns:\n    if col not in df.columns:\n        raise KeyError(f\"Required column '{col}' not found in CSV.\")\ndf['Product Name'] = df['Product Name'].str.strip()\nproducts = df['Product Name'].tolist()\ntry:\n    revenue = dict(zip(products, df['Revenue'].astype(int)))\n    demand = dict(zip(products, df['Demand'].astype(int)))\n    initial_inventory = dict(zip(products, df['Initial Inventory'].astype(int)))\nexcept Exception as e:\n    raise ValueError(f'Error converting numeric columns: {e}')\nfor p in products:\n    if p not in revenue or p not in demand or p not in initial_inventory:\n        raise ValueError(f\"Missing parameter for product '{p}'.\")\nm = gp.Model('DemandFulfillment')\nx_vars = m.addVars(products, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.addConstrs((x_vars[p] <= demand[p] for p in products), name='')\nm.addConstrs((x_vars[p] <= initial_inventory[p] for p in products), name='')\nm.setObjective(gp.quicksum((revenue[p] * x_vars[p] for p in products)), gp.GRB.MAXIMIZE)\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 285816.0,
+  "final_solution": [
+    [
+      "C0",
+      6.0
+    ],
+    [
+      "C1",
+      4.0
+    ],
+    [
+      "C2",
+      16.0
+    ],
+    [
+      "C3",
+      14.0
+    ],
+    [
+      "C4",
+      4.0
+    ],
+    [
+      "C5",
+      32.0
+    ],
+    [
+      "C6",
+      8.0
+    ],
+    [
+      "C7",
+      2.0
+    ],
+    [
+      "C8",
+      10.0
+    ],
+    [
+      "C9",
+      8.0
+    ],
+    [
+      "C10",
+      18.0
+    ],
+    [
+      "C11",
+      2.0
+    ],
+    [
+      "C12",
+      4.0
+    ],
+    [
+      "C13",
+      8.0
+    ],
+    [
+      "C14",
+      2.0
+    ],
+    [
+      "C15",
+      198.0
+    ],
+    [
+      "C16",
+      32.0
+    ],
+    [
+      "C17",
+      18.0
+    ],
+    [
+      "C18",
+      570.0
+    ],
+    [
+      "C19",
+      6.0
+    ],
+    [
+      "C20",
+      26.0
+    ],
+    [
+      "C21",
+      6.0
+    ],
+    [
+      "C22",
+      33.0
+    ],
+    [
+      "C23",
+      33.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 9.501,
+  "evaluated_utc": "2026-10-06T08:50:00.285317+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

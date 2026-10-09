@@ -1,0 +1,362 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+#### Decision Variables
+- $x_1$: Quantity of Product A to produce
+- $x_2$: Quantity of Product B to produce
+
+#### Objective Function
+Maximize total profit: 
+$\quad \quad \max \ 80x_1 + 125x_2$
+
+#### Constraints
+**1. Steel Constraint** 
+$\quad \quad 8x_1 + 5x_2 \leq 3500$ 
+
+**2. Iron Constraint** 
+$\quad \quad 6x_1 + 4x_2 \leq 1800$ 
+
+**3. Machine Hours Constraint** 
+$\quad \quad 4x_1 + 5x_2 \leq 2800$ 
+
+**4. Non-negativity** 
+$\quad \quad x_1 \geq 0, x_2 \geq 0$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A specialty chemical factory produces three premium products (A, B, C) by blending three raw materials (1, 2, 3). The factory supplies custom formulations to high-end manufacturers:
+
+Product A is a precision industrial lubricant requiring ≥50% Material 1 and ≤25% Material 2
+Product B is an aerospace-grade adhesive requiring ≥25% Material 1 and ≤50% Material 2
+Product C is a general-purpose compound with no material restrictions
+Raw material costs and availability are in raw_materials.csv, while product specifications and selling prices are in products.csv. Determine the optimal blending plan to maximize daily profit.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+#### Decision Variables
+- $x_{ij}$: kg of material $j$ used in product $i$ 
+$i \in \{\text{A}, \text{B}, \text{C}\}, j \in \{1,2,3\}$
+
+#### Objective Function
+Maximize profit: 
+$\quad \quad \max \ 60(x_{A1} + x_{A2} + x_{A3}) + 70(x_{B1} + x_{B2} + x_{B3}) + 60(x_{C1} + x_{C2} + x_{C3})$
+$\quad \quad - 65(x_{A1} + x_{B1} + x_{C1}) - 25(x_{A2} + x_{B2} + x_{C2}) - 35(x_{A3} + x_{B3} + x_{C3})$
+
+#### Constraints
+**1. Material Availability** 
+$\quad \quad x_{A1} + x_{B1} + x_{C1} \leq 100$ 
+$\quad \quad x_{A2} + x_{B2} + x_{C2} \leq 100$ 
+$\quad \quad x_{A3} + x_{B3} + x_{C3} \leq 60$ 
+
+**2. Product A Specifications** 
+$\quad \quad x_{A1} \geq 0.5(x_{A1} + x_{A2} + x_{A3})$ 
+$\quad \quad x_{A2} \leq 0.25(x_{A1} + x_{A2} + x_{A3})$ 
+
+**3. Product B Specifications** 
+$\quad \quad x_{B1} \geq 0.25(x_{B1} + x_{B2} + x_{B3})$ 
+$\quad \quad x_{B2} \leq 0.5(x_{B1} + x_{B2} + x_{B3})$ 
+
+**4. Non-negativity** 
+$\quad \quad x_{ij} \geq 0 \quad \forall i,j$
+</EXAMPLE>...
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/react_revision_20261006/few_shot_only_v7_direct_model_20261006T071958Z/frozen_notebook.ipynb:cell25:106: LangChainDeprecationWarning: The method `Chain.run` was deprecated in langchain-classic 0.1.0 and will be removed in 1.0. Use `invoke` instead.
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal continuous production plan for three products (I, II, III), each requiring two procedures (A and B), with each procedure performed on specific eligible equipment types. The goal is to maximize profit, considering processing times, raw material costs, selling prices, available equipment operating times, and equipment costs at full load, as specified in the CSV.
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) production planning and assignment problem with assignment restrictions.
+3.  **Define Index Sets:** The primary indices are:
+    - Products: {I, II, III}
+    - Procedures: {A, B}
+    - Equipment: {A1, A2, B1, B2, B3}
+      (Note: Only equipment explicitly allowed for each product/procedure, as per the query.)
+4.  **Define Decision Variables:**
+    - `x[p, e]` = Quantity of product `p` processed on equipment `e` for its respective procedure. Type: GRB.CONTINUOUS.
+      (Only define variables for allowed (product, equipment) pairs per procedure, as described in the query.)
+5.  **Identify Parameters (from Schema):**
+    - Processing time per unit: from the intersection of "Equipment / Cost" row for each equipment and product columns.
+    - Raw material cost per unit: from the "Raw Material Cost (yuan/unit)" row, per product.
+    - Selling price per unit: from the "Unit Price (yuan/unit)" row, per product.
+    - Available equipment operating time: from "Available Equipment Operating Time" column, per equipment.
+    - Equipment cost at full load: from "Equipment Cost at Full Load (yuan)", per equipment.
+6.  **Formulate Objective:** Maximize total profit, calculated as:
+    - Total revenue: sum over all products of (selling price per unit × total units produced of that product)
+    - Minus total raw material cost: sum over all products of (raw material cost per unit × total units produced of that product)
+    - Minus total equipment cost: sum over all equipment of (equipment cost at full load × (total equipment time used / available equipment operating time))
+    - Where "total units produced of a product" is the common value assigned to both its procedure A and B assignments (since both must be completed for each unit produced).
+7.  **Formulate Constraints:**
+    - **Procedure Completion Consistency:** For each product, the number of units processed in procedure A (sum over eligible A equipment) must equal the number processed in procedure B (sum over eligible B equipment), ensuring each unit completes both procedures.
+    - **Equipment Time Limits:** For each equipment, the total processing time assigned (sum over all products assigned to that equipment: units × processing time per unit) must not exceed the available equipment operating time.
+    - **Assignment Restrictions:** Only allow assignments (i.e., define variables and include in sums) for (product, equipment) pairs permitted by the query:
+        - Product I: A1 or A2 for procedure A; B1, B2, or B3 for procedure B.
+        - Product II: A1 or A2 for procedure A; B1 only for procedure B.
+        - Product III: A2 only for procedure A; B2 only for procedure B.
+    - **Non-negativity:** All production assignment variables `x[p, e]` ≥ 0.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+
+# Read CSV with all fields as string, no NA conversion
+csv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv'
+df = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)
+
+# --- 1. Define index sets as per query ---
+products = ['Product I', 'Product II', 'Product III']
+product_short = {'Product I': 'I', 'Product II': 'II', 'Product III': 'III'}
+procedures = ['A', 'B']
+equipments_A = ['A1', 'A2']
+equipments_B = ['B1', 'B2', 'B3']
+equipments = equipments_A + equipments_B
+
+# Assignment restrictions per query
+# For each product, which equipment can be used for each procedure
+eligible_equipment = {
+    # procedure: {product: [equipments]}
+    'A': {
+        'Product I': ['A1', 'A2'],
+        'Product II': ['A1', 'A2'],
+        'Product III': ['A2'],
+    },
+    'B': {
+        'Product I': ['B1', 'B2', 'B3'],
+        'Product II': ['B1'],
+        'Product III': ['B2'],
+    }
+}
+
+# --- 2. Extract parameters from CSV ---
+
+# Helper: get row by matching "Equipment / Cost" or other header
+def get_row(label):
+    idx = df['Equipment / Cost'].str.casefold() == label.casefold()
+    if not idx.any():
+        raise ValueError(f"Row '{label}' not found in CSV.")
+    return df[idx].iloc[0]
+
+# Processing time per unit: for each equipment and product
+processing_time = {}  # (equipment, product) -> float
+for eq in equipments:
+    row = df[df['Equipment / Cost'].str.casefold() == eq.casefold()]
+    if row.empty:
+        raise ValueError(f"Equipment '{eq}' not found in CSV.")
+    row = row.iloc[0]
+    for prod in products:
+        val = row[prod]
+        try:
+            pt = float(val)
+        except Exception:
+            raise ValueError(f"Processing time missing or invalid for equipment '{eq}', product '{prod}'.")
+        processing_time[(eq, prod)] = pt
+
+# Raw material cost per unit: per product
+raw_material_row = get_row('Raw Material Cost (yuan/unit)')
+raw_material_cost = {}
+for prod in products:
+    try:
+        raw_material_cost[prod] = float(raw_material_row[prod])
+    except Exception:
+        raise ValueError(f"Raw material cost missing or invalid for product '{prod}'.")
+
+# Selling price per unit: per product
+unit_price_row = get_row('Unit Price (yuan/unit)')
+selling_price = {}
+for prod in products:
+    try:
+        selling_price[prod] = float(unit_price_row[prod])
+    except Exception:
+        raise ValueError(f"Selling price missing or invalid for product '{prod}'.")
+
+# Available equipment operating time: per equipment
+available_time = {}
+for eq in equipments:
+    row = df[df['Equipment / Cost'].str.casefold() == eq.casefold()]
+    if row.empty:
+        raise ValueError(f"Equipment '{eq}' not found in CSV.")
+    val = row['Available Equipment Operating Time']
+    try:
+        available_time[eq] = float(val)
+    except Exception:
+        raise ValueError(f"Available equipment operating time missing or invalid for equipment '{eq}'.")
+
+# Equipment cost at full load: per equipment
+equipment_cost = {}
+for eq in equipments:
+    row = df[df['Equipment / Cost'].str.casefold() == eq.casefold()]
+    if row.empty:
+        raise ValueError(f"Equipment '{eq}' not found in CSV.")
+    val = row['Equipment Cost at Full Load (yuan)']
+    try:
+        equipment_cost[eq] = float(val)
+    except Exception:
+        raise ValueError(f"Equipment cost at full load missing or invalid for equipment '{eq}'.")
+
+# --- 3. Build model ---
+
+def solve_problem():
+    m = gp.Model('FactoryProductionPlan')
+
+    # --- 4. Decision variables ---
+    # x_vars[(product, procedure, equipment)] = units of product processed on equipment for procedure
+    x_keys = []
+    for proc in procedures:
+        for prod in products:
+            for eq in eligible_equipment[proc][prod]:
+                x_keys.append( (prod, proc, eq) )
+    x_vars = m.addVars(x_keys, lb=0.0, vtype=gp.GRB.CONTINUOUS, name='x')
+
+    # --- 5. Expressions for total units produced per product ---
+    # For each product, total units produced is the sum over eligible equipment for procedure A (or B)
+    total_produced_A = {}
+    total_produced_B = {}
+    for prod in products:
+        total_produced_A[prod] = gp.quicksum(
+            x_vars[prod, 'A', eq] for eq in eligible_equipment['A'][prod]
+        )
+        total_produced_B[prod] = gp.quicksum(
+            x_vars[prod, 'B', eq] for eq in eligible_equipment['B'][prod]
+        )
+
+    # --- 6. Constraints ---
+
+    # (a) Procedure completion consistency: For each product, units after A == units after B
+    for prod in products:
+        m.addConstr(
+            total_produced_A[prod] == total_produced_B[prod],
+            name=f'consistency_{product_short[prod]}'
+        )
+
+    # (b) Equipment time limits: For each equipment, total assigned time <= available
+    for eq in equipments:
+        # For each equipment, sum over all (product, procedure) pairs where this equipment is eligible
+        relevant_x = []
+        for proc in procedures:
+            for prod in products:
+                if eq in eligible_equipment[proc][prod]:
+                    relevant_x.append( (prod, proc, eq) )
+        expr = gp.quicksum(
+            x_vars[key] * processing_time[(eq, key[0])] for key in relevant_x
+        )
+        m.addConstr(
+            expr <= available_time[eq],
+            name=f'timelimit_{eq}'
+        )
+
+    # (c) Non-negativity: handled by lb=0 in addVars
+
+    # --- 7. Objective function ---
+    # Maximize profit = total revenue - total raw material cost - total equipment cost
+
+    # (i) Total revenue: sum over products of (selling price * total units produced)
+    total_revenue = gp.quicksum(
+        selling_price[prod] * total_produced_A[prod] for prod in products
+    )
+
+    # (ii) Total raw material cost: sum over products of (raw material cost * total units produced)
+    total_raw_material_cost = gp.quicksum(
+        raw_material_cost[prod] * total_produced_A[prod] for prod in products
+    )
+
+    # (iii) Total equipment cost: sum over equipment of (equipment cost at full load * (total time used / available time))
+    total_equipment_cost = gp.quicksum(
+        equipment_cost[eq] * (
+            gp.quicksum(
+                x_vars[prod, proc, eq] * processing_time[(eq, prod)]
+                for proc in procedures
+                for prod in products
+                if (prod, proc, eq) in x_vars
+            ) / available_time[eq]
+        )
+        for eq in equipments
+    )
+
+    m.setObjective(
+        total_revenue - total_raw_material_cost - total_equipment_cost,
+        gp.GRB.MAXIMIZE
+    )
+
+    # --- 8. Optimize ---
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+# --- 9. Output ---
+if m.status == gp.GRB.OPTIMAL:
+    print(f"ObjVal: {m.objVal:.6f}")
+    for v in m.getVars():
+        print(f"{v.VarName} {v.X:.6f}")
+else:
+    print(f"Solver status: {m.status}")
+```
+Traceback (most recent call last):
+  File "<string>", line 29, in <module>
+ValueError: could not convert string to float: ''
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_react_revision_20261006.py", line 112, in worker
+    record = ns["execute_pipeline_case"](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/react_revision_20261006/few_shot_only_v7_direct_model_20261006T071958Z/frozen_notebook.ipynb:cell29", line 148, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/react_revision_20261006/few_shot_only_v7_direct_model_20261006T071958Z/frozen_notebook.ipynb:cell29", line 48, in execute_code
+  File "<string>", line 31, in <module>
+ValueError: Processing time missing or invalid for equipment 'A1', product 'Product III'.

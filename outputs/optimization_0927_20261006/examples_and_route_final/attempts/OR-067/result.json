@@ -1,0 +1,82 @@
+{
+  "problem_id": "OR-067",
+  "query": "In the construction industry, we have a set of managers and a set of construction projects. Each manager incurs different costs for each project, based on their experience and expertise. The cost information for each manager and project is saved in the CSV file \"manager_project_costs.csv\", where each row represents a manager, and each column represents the cost for that manager to complete a specific project. The objective is to find the optimal assignment that minimizes the total cost of completing all projects. Each manager must be assigned to exactly one project, and each project must be managed by exactly one manager. The goal is to minimize the total cost while satisfying these one-to-one assignment constraints.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP2/manager_project_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "AP",
+  "true_route": "AP",
+  "label_objective": 9000.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to assign each manager to exactly one construction project, and each project to exactly one manager, in order to minimize the total assignment cost. The costs for each manager-project pair are given in the CSV file.\n2.  **Identify Model Type:** Based on the query, this is an Assignment Problem, which is a special case of a Linear Programming (LP) or Mixed Integer Programming (MIP) problem with binary variables.\n3.  **Define Index Sets:** The primary indices are Managers (set M, from the rows of the CSV) and Projects (set P, from the columns 'P1', 'P2', 'P3').\n4.  **Define Decision Variables:**\n    -   `x[m,p]` = 1 if manager m is assigned to project p; 0 otherwise. Type: GRB.BINARY.\n5.  **Identify Parameters (from Schema):**\n    -   Assignment cost for each manager-project pair comes from the CSV columns: 'P1', 'P2', 'P3' (with manager IDs from 'Unnamed: 0').\n6.  **Formulate Objective:** Minimize the total assignment cost: sum over all managers and projects of (cost[m,p] * x[m,p]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Manager Assignment): For each manager m, sum over all projects p of x[m,p] = 1 (each manager is assigned to exactly one project).\n    -   Constraint 2 (Project Assignment): For each project p, sum over all managers m of x[m,p] = 1 (each project is assigned to exactly one manager).\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP2/manager_project_costs.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 3\nColumns: ['Unnamed: 0', 'P1', 'P2', 'P3']\nParsed column types: {'Unnamed: 0': 'object', 'P1': 'int64', 'P2': 'int64', 'P3': 'int64'}\nPreview only (first 10 rows):\nUnnamed: 0   P1   P2   P3\n        MA 3000 3200 3100\n        MB 2800 3300 2900\n        MC 2900 3100 3000\nFull-file column statistics: {\"Unnamed: 0\": {\"missing\": 0, \"unique_nonempty\": 3}, \"P1\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [2800.0, 3000.0]}, \"P2\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [3100.0, 3300.0]}, \"P3\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [2900.0, 3100.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"manager_project_costs.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncosts_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP2/manager_project_costs.csv'\ndf = pd.read_csv(costs_path, sep=',', dtype=str, keep_default_na=False)\nmanagers = df['Unnamed: 0'].astype(str).str.strip().tolist()\nproject_cols = [col for col in df.columns if col != 'Unnamed: 0']\nprojects = [col.strip() for col in project_cols]\ncost = {}\nfor (idx, row) in df.iterrows():\n    m = str(row['Unnamed: 0']).strip()\n    for p in project_cols:\n        p_clean = p.strip()\n        try:\n            c = int(row[p])\n        except Exception as e:\n            raise ValueError(f\"Invalid cost value for manager '{m}', project '{p_clean}': {row[p]}\")\n        cost[m, p_clean] = c\nfor m in managers:\n    for p in projects:\n        if (m, p) not in cost:\n            raise ValueError(f\"Missing cost for manager '{m}', project '{p}'.\")\nm = gp.Model('ManagerProjectAssignment')\nx_vars = m.addVars(managers, projects, vtype=gp.GRB.BINARY, name='')\nm.setObjective(gp.quicksum((cost[mgr, prj] * x_vars[mgr, prj] for mgr in managers for prj in projects)), gp.GRB.MINIMIZE)\nfor mgr in managers:\n    m.addConstr(gp.quicksum((x_vars[mgr, prj] for prj in projects)) == 1, name=f'assign_mgr_{mgr}')\nfor prj in projects:\n    m.addConstr(gp.quicksum((x_vars[mgr, prj] for mgr in managers)) == 1, name=f'assign_prj_{prj}')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total assignment cost: {m.objVal:.2f}')\n    print('--- Assignment ---')\n    for mgr in managers:\n        for prj in projects:\n            if x_vars[mgr, prj].X > 0.5:\n                print(f'Manager {mgr} assigned to Project {prj} (Cost: {cost[mgr, prj]})')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 9000.0,
+  "final_solution": [
+    [
+      "C0",
+      1.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      1.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      1.0
+    ],
+    [
+      "C8",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "loto_variant": "examples_and_route",
+  "held_out_type": "AP",
+  "disabled_workflow_route": "AP",
+  "allowed_labels": "TP,NRM,RA,FLP,Mixture,Others",
+  "reference_sha256": "6b2987f96aeacece9f458d55aca072436922aec963be16223ac30a8890f79097",
+  "reference_count_after": 14,
+  "route_allowed": true,
+  "classification_correct": false,
+  "solution_correct": true,
+  "experiment_method": "examples_and_route",
+  "seconds": 14.782,
+  "classification_source": "fold_agent",
+  "classification_cache_sha256": "52ec80ea04cf1b59e48c6b602023d28f0778e866bf7e176463a1ce3f3db6e2ee",
+  "base_notebook_sha256": "abae7197f1ecd8e16bdc642756e08db68374aeda38c3e803b595c7e0573fc448",
+  "notebook_source_sha256": "83c6ac1e07877bf63ffb7c28408cb0118055abeb17e2d8e8076bfe189adcabe7",
+  "cache_fingerprint": "61605261bc690d8c4137eb4259b4ba4b2489dfce5bfc767976781bcdab1b76e2",
+  "evaluated_utc": "2026-10-06T04:08:46.267063+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

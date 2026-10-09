@@ -1,0 +1,519 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mQuestion: A fund manager holds a portfolio of 6 assets and is considering using 120 European option types for hedging. Each option’s per-contract cost, delta, gamma, vega, and trading limits are given in OptionCharacteristics.csv. The underlying asset(s) each option refers to are given in Option_AssetReferenceMatrix.csv, with A[i,j]=1 if option i references asset j and 0 otherwise. (Note: some options may reference more than one asset.)
+
+    Variables:
+    Let x_i be the integer number of contracts (positive for buy/long, negative for sell/short) for option i,\ i=1,\dots,120.
+
+    Objective:
+    Minimize total hedging cost:
+    \min \sum_{i=1}^{120} \text{Cost}[i] \cdot |x_i|
+
+    Subject to:
+
+    For each Greek G \in \{\Delta,\Gamma,\text{Vega}\}, the net portfolio exposure after hedging must satisfy:
+    \bigg| G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G[i] \cdot A[i,j] \cdot x_i \bigg| \leq \text{Tolerance}_G
+
+    Where:
+    • G_{\text{initial}} is the initial exposure for that Greek (given).
+    • G[i] is the per-contract Greek exposure of option i (from OptionCharacteristics.csv).
+    • A[i,j] is from Option_AssetReferenceMatrix.csv.
+    • \text{Tolerance}_G is the band for each risk metric (given).
+
+    Trading limits:
+    \text{MaxShort}[i] \leq x_i \leq \text{MaxLong}[i], \quad i=1,\dots,120
+
+    Data provided:
+    • OptionCharacteristics.csv: Option, Cost, Delta, Gamma, Vega, MaxLong, MaxShort
+    • Option_AssetReferenceMatrix.csv: binary matrix (120 × 6) showing which option references which asset (A[i,j])
+    • Initial net Delta = 0.25, Gamma = 0.08, Vega = 0.17
+    • Risk band tolerances: |\Delta| \le 0.06,\ |\Gamma| \le 0.05,\ |\text{Vega}| \le 0.07
+
+    Task:
+    Find the optimal integer positions x_i,\ i=1,\dots,120 that minimize total hedging cost, such that all risk exposures after hedging are within their respective bands, while respecting per-option trading limits and using the asset-reference information in the constraints.
+
+Thought: I need to identify the mathematical structure: the objective is to minimize total hedging cost by choosing integer positions in options, subject to risk exposure constraints (for Delta, Gamma, Vega) that are coupled via an asset-reference matrix, and per-option trading limits. The constraints involve summing exposures across options and assets, with each option possibly referencing multiple assets. There are no assignment, transportation, facility location, or network revenue management structures. The main structure is resource allocation (choosing x_i to minimize cost under constraints), but the coupling via the asset-reference matrix and the risk exposures (which are not simple additive resource constraints) may introduce a non-standard mechanism. I should call FileQA to compare with structurally similar labeled problems.
+
+Action: FileQA
+
+Action Input: integer option-position decisions to minimize total hedging cost, subject to risk-exposure constraints (Delta, Gamma, Vega) that are coupled via an option-asset reference matrix, with per-option trading limits; each option may reference multiple assets; exposures after hedging must be within tolerance bands
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A financial institution wants to form a revenue-maximizing portfolio by investing in a selection of 10 structured financial products (e.g., CDOs, CLOs, MBS, etc.). Each product provides a specific expected revenue per unit invested, involves exposure to various risk factors (market, credit, interest rate, etc.), and is subject to upper limits on allocation in ProductCharacteristics_IndividualCaps.csv. The portfolio must satisfy the upper exposure limits for the nine risk factors and the All-in Investment budget limit in RiskFactorLimits.csv, and adhere to product-specific allocation caps.
+
+Your task:
+Maximize expected portfolio revenue while satisfying the diversification/risk constraints and allocation bounds.
+Type: Mixture
+
+[Retrieved example 2]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP
+
+[Retrieved example 4]
+prompt: A bank is planning its loan allocation strategy across 7 different industry sectors (S1, S2, S3, S4, S5, S6, S7). Within each of these sectors, the bank can provide loans across up to 6 loan types, labeled L1 through L6 (for example: Short-Term, Medium-Term, Long-Term, Consumer, SME, and Real Estate).
+
+The bank has the following data, organized in three separate CSV tables:
+
+ProjectedInterestIncome.csv:
+Each cell represents the expected interest income earned per million dollars invested in a given combination of sector and loan type (sector *loan type).
+
+RiskWeight.csv:
+Each cell shows the estimated risk weight associated with lending one million dollars in the corresponding combination of sector and loan type.
+(Risk weights reflect factors such as the financial health of the sector, characteristics of the loan type, and current macroeconomic trends.)
+
+LendingAllocationCaps.csv:
+Each cell indicates the maximum allowable allocation (in millions of dollars) that can be lent in each combination of industry sector and loan type.
+
+The bank wants to determine a lending allocation plan across the sectors and loan types to maximize the total expected interest income while:
+Do not exceeding the per-loan-type allocation (per sector) caps;
+Total risk-weighted exposure must stay below a regulatory cap: Total risk-weighted exposure cap: $14.0$;
+Minimum lending requirement: The total lending across all sectors and loan types must be at least $30 million;
+All allocations must be in integer millions.
+Type: Mixture
+
+[Retrieved example 5]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem involves integer decisions on option positions to minimize hedging cost, subject to risk-exposure constraints (Delta, Gamma, Vega) that are coupled via an option-asset reference matrix. Each option may reference multiple assets, so the risk constraints are not simple additive resource constraints but involve a nontrivial coupling between options and assets. The retrieved examples show that when portfolio allocation or hedging is subject to risk or diversification constraints that couple decisions across multiple assets or risk factors, the problem is labeled Mixture rather than RA. There are no assignment, transportation, facility location, or NRM structures. The coupling via the asset-reference matrix and the multi-risk constraints materially change the formulation from a clean resource allocation model.
+
+Final Answer: Mixture[0m
+
+[1m> Finished chain.[0m
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A financial institution wants to form a revenue-maximizing portfolio by investing in a selection of 10 structured financial products (e.g., CDOs, CLOs, MBS, etc.). Each product provides a specific expected revenue per unit invested, involves exposure to various risk factors (market, credit, interest rate, etc.), and is subject to upper limits on allocation in ProductCharacteristics_IndividualCaps.csv. The portfolio must satisfy the upper exposure limits for the nine risk factors and the All-in Investment budget limit in RiskFactorLimits.csv, and adhere to product-specific allocation caps.
+
+Your task:
+Maximize expected portfolio revenue while satisfying the diversification/risk constraints and allocation bounds.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+Let $\mathbf{x} = [x_1,x_2,\ldots,x_{10}]^\top$ be the vector of investment amounts (in million dollars). 
+Let each constraint coefficient vector be $\mathbf{m}, \mathbf{c}, \mathbf{i}, \mathbf{f}, \mathbf{l}, \mathbf{r}, \mathbf{e}, \mathbf{v}, \mathbf{g}$ as defined below.
+
+---
+
+**Objective:**
+$$
+\text{Maximize} \quad Z = \mathbf{p} \cdot \mathbf{x} = \sum_{i=1}^{10} p_i x_i
+$$
+where $\mathbf{p} = [73,76,65,70,68,75,67,74,69,72]$.
+
+---
+
+**Subject to:**
+
+**Total invested:**
+$$
+\sum_{i=1}^{10} x_i \leq 35
+$$
+
+**Box constraints:**
+$$
+\mathbf{0} \leq \mathbf{x} \leq \mathbf{u}
+$$
+where $\mathbf{u} = [12,8,10,9,7,11,8,10,9,12]$.
+
+---
+
+**Risk factor limits (all written as vector dot products):**
+
+- Market Risk:
+$$
+\mathbf{m} \cdot \mathbf{x} \leq 42
+$$
+where $\mathbf{m} = [5.1,6.0,3.8,5.3,4.8,6.7,4.0,5.8,4.7,5.6]$
+
+- Credit Risk:
+$$
+\mathbf{c} \cdot \mathbf{x} \leq 50
+$$
+where $\mathbf{c} = [6.2,7.1,5.7,6.4,6.1,6.5,5.8,6.3,6.0,6.6]$
+
+- Interest Rate Risk:
+$$
+\mathbf{i} \cdot \mathbf{x} \leq 29
+$$
+where $\mathbf{i} = [3.4,3.8,2.9,3.2,3.1,4.1,3.0,3.7,3.3,3.5]$
+
+- FX Risk:
+$$
+\mathbf{f} \cdot \mathbf{x} \leq 39
+$$
+where $\mathbf{f} = [4.2,4.6,3.4,4.8,4.0,5.1,3.7,4.9,4.1,4.5]$
+
+- Liquidity Risk:
+$$
+\mathbf{l} \cdot \mathbf{x} \leq 25
+$$
+where $\mathbf{l} = [2.8,2.6,2.4,3.3,2.9,3.7,2.5,3.0,2.8,2.7]$
+
+- IR Risk:
+$$
+\mathbf{r} \cdot \mathbf{x} \leq 49
+$$
+where $\mathbf{r} = [5.9,4.8,6.2,5.1,4.9,6.3,5.6,6.1,5.2,5.4]$
+
+- Equity Risk:
+$$
+\mathbf{e} \cdot \mathbf{x} \leq 25
+$$
+where $\mathbf{e} = [2.7,2.5,2.2,2.6,2.3,3.0,2.4,2.9,2.7,2.8]$
+
+- Volatility:
+$$
+\mathbf{v} \cdot \mathbf{x} \leq 36
+$$
+where $\mathbf{v} = [4.5,5.1,3.9,4.8,4.4,5.4,4.0,5.0,4.3,4.7]$
+
+- Regulatory Risk:
+$$
+\mathbf{g} \cdot \mathbf{x} \leq 27
+$$
+where $\mathbf{g} = [2.2,3.0,2.7,2.5,2.4,3.3,2.6,3.2,2.3,2.8]$
+
+---
+
+**Domain:**
+$$
+x_i \geq 0 \quad \text{for all } i = 1, \ldots, 10
+$$
+
+The source limits contain nine named risk factors plus All-in Investment <= 35. This reference uses these upper bounds, product-specific allocation caps and nonnegative investment amounts.
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+Maximize
+39.62 x_1 - 178539 y_1 + 35.98 x_2 - 157708 y_2 + 37.96 x_3 - 85192 y_3
+
+Subject to
+x_1 <= 5732 (demand)
+x_1 <= 12892 (22-day individual production quota)
+x_1 >= 18 y_1 (minimum batch)
+x_1 <= 5732 y_1 (activation)
+x_2 <= 5607 (demand)
+x_2 <= 7238 (22-day individual production quota)
+x_2 >= 25 y_2 (minimum batch)
+x_2 <= 5607 y_2 (activation)
+x_3 <= 4653 (demand)
+x_3 <= 11902 (22-day individual production quota)
+x_3 >= 23 y_3 (minimum batch)
+x_3 <= 4653 y_3 (activation)
+x_1/586 + x_2/329 + x_3/541 <= 22 (shared production days)
+x_1, x_2, x_3 >= 0 integer; y_1, y_2, y_3 binary.
+
+###### Retrieved Information
+
+{
+  "daily_quota": {
+    "1": 586,
+    "2": 329,
+    "3": 541
+  },
+  "demand": {
+    "1": 5732,
+    "2": 5607,
+    "3": 4653
+  },
+  "fixed_cost": {
+    "1": 178539,
+    "2": 157708,
+    "3": 85192
+  },
+  "min_batch": {
+    "1": 18,
+    "2": 25,
+    "3": 23
+  },
+  "products": [
+    "A1",
+    "A2",
+    "A3"
+  ],
+  "profit": {
+    "1": 39.62,
+    "2": 35.98,
+    "3": 37.96
+  },
+  "quota": {
+    "1": 12892,
+    "2": 7238,
+    "3": 11902
+  }
+}
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+#### Decision Variables
+- $x_1$: Quantity of Product A to produce
+- $x_2$: Quantity of Product B to produce
+
+#### Objective Function
+Maximize total profit: 
+$\quad \quad \max \ 80x_1 + 125x_2$
+
+#### Constraints
+**1. Steel Constraint** 
+$\quad \quad 8x_1 + 5x_2 \leq 3500$ 
+
+**2. Iron Constraint** 
+$\quad \quad 6x_1 + 4x_2 \leq 1800$ 
+
+**3. Machine Hours Constraint** 
+$\quad \quad 4x_1 + 5x_2 \leq 2800$ 
+
+**4. Non-negativity** 
+$\quad \quad x_1 \geq 0, x_2 \geq 0$
+</EXAMPLE>...
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/optimization_0927_20261006/full_review_v6/frozen_notebook.ipynb:cell25:155: LangChainDeprecationWarning: The class `LLMChain` was deprecated in LangChain 0.1.17 and will be removed in 1.0. Use `RunnableSequence, e.g., `prompt | llm`` instead.
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/optimization_0927_20261006/full_review_v6/frozen_notebook.ipynb:cell25:157: LangChainDeprecationWarning: The method `Chain.run` was deprecated in langchain-classic 0.1.0 and will be removed in 1.0. Use `invoke` instead.
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal integer number of contracts to buy or sell for each of 120 European options, in order to minimize total hedging cost, while ensuring that the net Delta, Gamma, and Vega exposures of a 6-asset portfolio after hedging are within specified tolerance bands. Each option may reference one or more assets, and there are per-option trading limits.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Linear Programming (MILP) problem with absolute value terms in the objective.
+3.  **Define Index Sets:** The primary indices are:
+    - Options: \( i = 1, \ldots, 120 \) (from OptionCharacteristics.csv)
+    - Assets: \( j = 1, \ldots, 6 \) (from Option_AssetReferenceMatrix.csv)
+    - Greeks: \( G \in \{\Delta, \Gamma, \text{Vega}\} \)
+4.  **Define Decision Variables:**
+    - \( x[i] \): Integer number of contracts of option \( i \) to buy (positive) or sell (negative). Type: GRB.INTEGER.
+    - \( z[i] \): Auxiliary variable representing \( |x[i]| \) for each option \( i \). Type: GRB.INTEGER (non-negative).
+5.  **Identify Parameters (from Schema):**
+    - OptionCharacteristics.csv:
+        - 'Cost': Per-contract cost for each option (\( \text{Cost}[i] \)), used in the objective.
+        - 'Delta', 'Gamma', 'Vega': Per-contract Greek exposures (\( \text{Delta}[i] \), \( \text{Gamma}[i] \), \( \text{Vega}[i] \)), used in constraints.
+        - 'MaxLong', 'MaxShort': Upper and lower trading limits for each option (\( \text{MaxLong}[i] \), \( \text{MaxShort}[i] \)), used as variable bounds.
+    - Option_AssetReferenceMatrix.csv:
+        - \( A[i,j] \): Binary indicator if option \( i \) references asset \( j \).
+    - Initial exposures and tolerances (from query):
+        - \( G_{\text{initial}} \): Initial net exposure for each Greek (Delta = 0.25, Gamma = 0.08, Vega = 0.17).
+        - \( \text{Tolerance}_G \): Risk band for each Greek (Delta: 0.06, Gamma: 0.05, Vega: 0.07).
+6.  **Formulate Objective:** Minimize total hedging cost, i.e., minimize \( \sum_{i=1}^{120} \text{Cost}[i] \cdot z[i] \), where \( z[i] = |x[i]| \).
+7.  **Formulate Constraints:**
+    - For each Greek \( G \in \{\Delta, \Gamma, \text{Vega}\} \):
+        - The net post-hedge exposure must satisfy:
+            \[
+            \left| G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G[i] \cdot A[i,j] \cdot x[i] \right| \leq \text{Tolerance}_G
+            \]
+          (where \( G[i] \) is the per-contract Greek for option \( i \), and \( A[i,j] \) indicates asset reference).
+    - For each option \( i \):
+        - Trading limits: \( \text{MaxShort}[i] \leq x[i] \leq \text{MaxLong}[i] \).
+        - Absolute value definition: \( z[i] \geq x[i] \), \( z[i] \geq -x[i] \), \( z[i] \geq 0 \).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+
+# 1. Read data
+# Read OptionCharacteristics.csv
+optchar_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture16/OptionCharacteristics.csv'
+optchar_df = pd.read_csv(optchar_path, sep=',', dtype=str, keep_default_na=False)
+
+# Read Option_AssetReferenceMatrix.csv
+assetref_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture16/Option_AssetReferenceMatrix.csv'
+assetref_df = pd.read_csv(assetref_path, sep=',', dtype=str, keep_default_na=False)
+
+# 2. Prepare index sets and parameters
+
+# Option IDs (business keys)
+option_ids = optchar_df['Option'].tolist()
+n_options = len(option_ids)
+
+# Asset IDs (column names in assetref_df, except for the first column)
+asset_columns = [col for col in assetref_df.columns if col != 'Unnamed: 0']
+asset_ids = asset_columns
+n_assets = len(asset_ids)
+
+# Greeks
+greek_names = ['Delta', 'Gamma', 'Vega']
+greek_initial = {'Delta': 0.25, 'Gamma': 0.08, 'Vega': 0.17}
+greek_tolerance = {'Delta': 0.06, 'Gamma': 0.05, 'Vega': 0.07}
+
+# 3. Build parameter dictionaries
+
+# Ensure all required columns are present
+required_optchar_cols = ['Option', 'Cost', 'Delta', 'Gamma', 'Vega', 'MaxLong', 'MaxShort']
+for col in required_optchar_cols:
+    if col not in optchar_df.columns:
+        raise KeyError(f"Missing required column '{col}' in OptionCharacteristics.csv")
+
+# Option characteristics: convert to correct types
+optchar_df['Cost'] = optchar_df['Cost'].astype(float)
+optchar_df['Delta'] = optchar_df['Delta'].astype(float)
+optchar_df['Gamma'] = optchar_df['Gamma'].astype(float)
+optchar_df['Vega'] = optchar_df['Vega'].astype(float)
+optchar_df['MaxLong'] = optchar_df['MaxLong'].astype(int)
+optchar_df['MaxShort'] = optchar_df['MaxShort'].astype(int)
+
+# Map: option_id -> parameter
+cost = dict(zip(optchar_df['Option'], optchar_df['Cost']))
+delta = dict(zip(optchar_df['Option'], optchar_df['Delta']))
+gamma = dict(zip(optchar_df['Option'], optchar_df['Gamma']))
+vega = dict(zip(optchar_df['Option'], optchar_df['Vega']))
+maxlong = dict(zip(optchar_df['Option'], optchar_df['MaxLong']))
+maxshort = dict(zip(optchar_df['Option'], optchar_df['MaxShort']))
+
+# Asset reference matrix: option_id x asset_id -> 0/1
+# Set index to Option ID for lookup
+assetref_df = assetref_df.set_index('Unnamed: 0')
+# Ensure all option_ids are present in assetref_df
+if not set(option_ids).issubset(set(assetref_df.index)):
+    missing = set(option_ids) - set(assetref_df.index)
+    raise KeyError(f"Option(s) missing in Option_AssetReferenceMatrix.csv: {missing}")
+
+# Build asset reference matrix: A[option_id][asset_id]
+A = {}
+for opt in option_ids:
+    A[opt] = {}
+    for asset in asset_ids:
+        val = assetref_df.loc[opt, asset]
+        try:
+            A[opt][asset] = int(val)
+        except Exception:
+            raise ValueError(f"Invalid value for A[{opt}][{asset}]: '{val}'")
+
+# 4. Build Gurobi model
+m = gp.Model('OptionHedging')
+
+# 5. Decision variables
+# x_vars: integer, can be negative (short), bounded by MaxShort and MaxLong
+x_vars = m.addVars(option_ids, vtype=gp.GRB.INTEGER, lb=[maxshort[opt] for opt in option_ids], ub=[maxlong[opt] for opt in option_ids], name='x')
+
+# z_vars: integer, >= 0, auxiliary for |x|
+z_vars = m.addVars(option_ids, vtype=gp.GRB.INTEGER, lb=0, name='z')
+
+# 6. Objective: Minimize total hedging cost
+m.setObjective(gp.quicksum(cost[opt] * z_vars[opt] for opt in option_ids), gp.GRB.MINIMIZE)
+
+# 7. Constraints
+
+# Absolute value constraints: z[i] >= x[i], z[i] >= -x[i]
+for opt in option_ids:
+    m.addConstr(z_vars[opt] >= x_vars[opt], name=f'abs_pos_{opt}')
+    m.addConstr(z_vars[opt] >= -x_vars[opt], name=f'abs_neg_{opt}')
+
+# For each Greek, enforce risk band
+for greek in greek_names:
+    # Get per-option Greek vector
+    if greek == 'Delta':
+        greek_vec = delta
+    elif greek == 'Gamma':
+        greek_vec = gamma
+    elif greek == 'Vega':
+        greek_vec = vega
+    else:
+        raise ValueError(f"Unknown Greek: {greek}")
+
+    # Compute total net exposure after hedging:
+    # G_initial + sum_{i=1}^{120} sum_{j=1}^{6} G[i] * A[i,j] * x[i]
+    # This is equivalent to:
+    # G_initial + sum_{i} G[i] * (sum_{j} A[i,j]) * x[i]
+    # But since A[i,j] can be 0/1, and options may reference multiple assets,
+    # we must sum over both indices.
+
+    # For each option, sum over assets
+    greek_contrib = {}
+    for opt in option_ids:
+        # For this option, sum over all referenced assets
+        asset_sum = sum(A[opt][asset] for asset in asset_ids)
+        greek_contrib[opt] = greek_vec[opt] * asset_sum
+
+    # The total exposure is:
+    # greek_initial + sum_{opt} greek_contrib[opt] * x_vars[opt]
+    expr = greek_initial[greek] + gp.quicksum(greek_contrib[opt] * x_vars[opt] for opt in option_ids)
+
+    # Add two constraints for absolute value:
+    m.addConstr(expr <= greek_tolerance[greek], name=f'{greek}_upper')
+    m.addConstr(expr >= -greek_tolerance[greek], name=f'{greek}_lower')
+
+# 8. Optimize
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 246 rows, 240 columns and 1196 nonzeros
+Model fingerprint: 0x7d49bb53
+Variable types: 0 continuous, 240 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e-02, 1e+00]
+  Objective range  [3e+00, 1e+01]
+  Bounds range     [5e+00, 1e+01]
+  RHS range        [3e-02, 3e-01]
+Found heuristic solution: objective 9245.0000000
+Presolve added 2 rows and 2 columns
+Presolve time: 0.02s
+Presolved: 248 rows, 242 columns, 1084 nonzeros
+Variable types: 0 continuous, 242 integer (0 binary)
+
+Root relaxation: objective 8.359328e-01, 170 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0    0.83593    0    6 9245.00000    0.83593   100%     -    0s
+H    0     0                      67.0000000    0.83593  98.8%     -    0s
+H    0     0                      11.0000000    0.83593  92.4%     -    0s
+H    0     0                       7.0000000    0.83593  88.1%     -    0s
+     0     0    2.79875    0    8    7.00000    2.79875  60.0%     -    0s
+     0     0    2.79875    0    6    7.00000    2.79875  60.0%     -    0s
+     0     0    2.79875    0    8    7.00000    2.79875  60.0%     -    0s
+     0     0    4.00000    0   10    7.00000    4.00000  42.9%     -    0s
+H    0     0                       6.0000000    4.00000  33.3%     -    0s
+
+Cutting planes:
+  Gomory: 3
+  Zero half: 1
+
+Explored 1 nodes (287 simplex iterations) in 0.26 seconds (0.01 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 6: 6 7 11 ... 9245
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.000000000000e+00, best bound 6.000000000000e+00, gap 0.0000%
+Optimal objective: 6.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', -1.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 0.0), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0), ('C111', 0.0), ('C112', 0.0), ('C113', 0.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 0.0), ('C118', 0.0), ('C119', 0.0), ('C120', 0.0), ('C121', 0.0), ('C122', 0.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0), ('C132', 0.0), ('C133', 0.0), ('C134', 0.0), ('C135', 0.0), ('C136', 0.0), ('C137', 0.0), ('C138', 0.0), ('C139', 0.0), ('C140', 0.0), ('C141', 0.0), ('C142', 0.0), ('C143', 0.0), ('C144', 0.0), ('C145', 0.0), ('C146', 0.0), ('C147', 0.0), ('C148', 0.0), ('C149', 0.0), ('C150', 0.0), ('C151', 0.0), ('C152', 0.0), ('C153', 0.0), ('C154', 0.0), ('C155', 0.0), ('C156', 0.0), ('C157', 0.0), ('C158', 0.0), ('C159', 0.0), ('C160', 0.0), ('C161', 0.0), ('C162', 0.0), ('C163', 0.0), ('C164', 0.0), ('C165', 0.0), ('C166', 0.0), ('C167', 0.0), ('C168', 0.0), ('C169', 0.0), ('C170', 0.0), ('C171', 0.0), ('C172', 0.0), ('C173', 0.0), ('C174', 0.0), ('C175', 0.0), ('C176', 0.0), ('C177', 0.0), ('C178', 0.0), ('C179', 0.0), ('C180', 0.0), ('C181', 0.0), ('C182', 0.0), ('C183', 0.0), ('C184', 0.0), ('C185', 0.0), ('C186', 0.0), ('C187', 0.0), ('C188', 0.0), ('C189', 0.0), ('C190', 0.0), ('C191', 0.0), ('C192', 0.0), ('C193', 0.0), ('C194', 0.0), ('C195', 0.0), ('C196', 0.0), ('C197', 0.0), ('C198', 0.0), ('C199', 0.0), ('C200', 0.0), ('C201', 0.0), ('C202', 0.0), ('C203', 1.0), ('C204', 0.0), ('C205', 0.0), ('C206', 0.0), ('C207', 0.0), ('C208', 0.0), ('C209', 0.0), ('C210', 0.0), ('C211', 0.0), ('C212', 0.0), ('C213', 0.0), ('C214', 0.0), ('C215', 0.0), ('C216', 0.0), ('C217', 0.0), ('C218', 0.0), ('C219', 0.0), ('C220', 0.0), ('C221', 0.0), ('C222', 0.0), ('C223', 0.0), ('C224', 0.0), ('C225', 0.0), ('C226', 0.0), ('C227', 0.0), ('C228', 0.0), ('C229', 0.0), ('C230', 0.0), ('C231', 0.0), ('C232', 0.0), ('C233', 0.0), ('C234', 0.0), ('C235', 0.0), ('C236', 0.0), ('C237', 0.0), ('C238', 0.0), ('C239', 0.0)]

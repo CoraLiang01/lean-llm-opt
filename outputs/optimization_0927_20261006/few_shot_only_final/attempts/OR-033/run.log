@@ -1,0 +1,174 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought:
+The user requests an abstract mathematical optimization model for maximizing total revenue from "Baby" products, using the columns "Revenue", "Demand", and "Initial Inventory" from table_id "file_0_view_0". The decision variables $x_i$ represent the fulfilled units for each "Baby" product $i$. The model must include index sets, parameters, variables, objective, and constraints, all defined symbolically. Data mapping must reference the exact table_id and column names.
+
+Final Answer:
+
+**Sets:**
+
+- $I$ : Index set of all products classified as "Baby" in table_id "file_0_view_0", column "Product Name".
+
+**Parameters:**
+
+- $A_i$ : Revenue per unit of product $i \in I$ (from "file_0_view_0", column "Revenue").
+- $d_i$ : Demand for product $i \in I$ (from "file_0_view_0", column "Demand").
+- $I_i$ : Initial inventory for product $i \in I$ (from "file_0_view_0", column "Initial Inventory").
+
+**Decision Variables:**
+
+- $x_i$ : Number of units of product $i \in I$ to fulfill; $x_i \in \mathbb{Z}_+$.
+
+**Objective:**
+
+$$
+\max \sum_{i \in I} A_i \cdot x_i
+$$
+
+**Constraints:**
+
+1. **Inventory Constraint:**
+   $$
+   x_i \leq I_i, \quad \forall i \in I
+   $$
+2. **Demand Constraint:**
+   $$
+   x_i \leq d_i, \quad \forall i \in I
+   $$
+3. **Non-negativity and Integrality:**
+   $$
+   x_i \in \mathbb{Z}_+, \quad \forall i \in I
+   $$
+
+**Data Mapping:**
+
+- Table: "file_0_view_0"
+    - Product Name $\rightarrow$ index set $I$ (filtered for "Baby" products)
+    - Revenue $\rightarrow$ parameter $A_i$
+    - Demand $\rightarrow$ parameter $d_i$
+    - Initial Inventory $\rightarrow$ parameter $I_i$[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+def parse_baby_products_from_csvqa(CSVQA_DATA):
+    # Find the table with table_id "file_0_view_0"
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise ValueError("Table with table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+    # Identify column indices
+    columns = table["columns"]
+    try:
+        idx_product = columns.index("Product Name")
+        idx_revenue = columns.index("Revenue")
+        idx_demand = columns.index("Demand")
+        idx_inventory = columns.index("Initial Inventory")
+    except ValueError as e:
+        raise ValueError(f"Missing required column: {e}")
+
+    # Regex to match 'Baby' in product name (case-insensitive, whole word)
+    baby_regex = re.compile(r'\bBaby\b', re.IGNORECASE)
+
+    items = []
+    revenue = {}
+    demand = {}
+    inventory = {}
+
+    for rec in table["records"]:
+        values = rec["values"]
+        product_name = values["Product Name"]
+        if not isinstance(product_name, str):
+            continue
+        if not baby_regex.search(product_name):
+            continue
+        # Parse numeric fields
+        try:
+            revenue_val = float(values["Revenue"])
+            demand_val = int(float(values["Demand"]))
+            inventory_val = int(float(values["Initial Inventory"]))
+        except Exception as e:
+            raise ValueError(f"Failed to parse numeric fields for product '{product_name}': {e}")
+
+        items.append(product_name)
+        revenue[product_name] = revenue_val
+        demand[product_name] = demand_val
+        inventory[product_name] = inventory_val
+
+    if not items:
+        raise ValueError("No products classified as 'Baby' found in the data.")
+
+    # Validate all required data present
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f"Missing data for product '{i}'.")
+
+    return items, revenue, demand, inventory
+
+def build_and_solve_baby_inventory_model(CSVQA_DATA):
+    items, revenue, demand, inventory = parse_baby_products_from_csvqa(CSVQA_DATA)
+
+    # Validate dimensions
+    if not (set(items) == set(revenue.keys()) == set(demand.keys()) == set(inventory.keys())):
+        raise ValueError("Mismatch in index sets for items, revenue, demand, or inventory.")
+
+    m = gp.Model('Baby_Product_Inventory')
+    m.Params.MIPGap = 1e-4
+
+    x_vars = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    m.setObjective(gp.quicksum(revenue[i] * x_vars[i] for i in items), GRB.MAXIMIZE)
+
+    m.addConstrs((x_vars[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((x_vars[i] <= demand[i] for i in items), name='dem')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for v in x_vars.values():
+            print(f'{v.VarName}: {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = build_and_solve_baby_inventory_model(CSVQA_DATA)
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 2 rows, 1 columns and 2 nonzeros
+Model fingerprint: 0x0183cf80
+Variable types: 0 continuous, 1 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [3e+02, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [8e+05, 6e+06]
+Found heuristic solution: objective 1.955062e+08
+Presolve removed 2 rows and 1 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.95506e+08 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.955061880000e+08, best bound 1.955061880000e+08, gap 0.0000%
+ObjVal: 195506188.0
+C0: 765850.0
+Optimal objective: 195506188.0
+Optimal solution: [('C0', 765850.0)]

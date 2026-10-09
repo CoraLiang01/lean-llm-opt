@@ -1,0 +1,126 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine a fair daily wage for each worker in a mutual-aid renovation group, such that for every participant, the total income they earn from working on others’ homes equals the total amount they pay for work done on their own home. The daily wage of the first worker (Carpenter) is fixed at 60.00 yuan. Each worker contributes exactly 10 work days in total across all projects.
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) feasibility problem (system of linear equations with one fixed variable).
+3.  **Define Index Sets:** The primary indices are:
+    -   `W`: Set of all workers (columns in the CSV except 'Owner'; e.g., ['Carpenter', 'Electrician', ..., 'Worker_150']).
+    -   `H`: Set of all homeowners (rows in the CSV; each corresponds to a worker).
+4.  **Define Decision Variables:**
+    -   `w[j]` = Daily wage rate for worker `j` in yuan. Type: GRB.CONTINUOUS, with `w['Carpenter']` fixed at 60.00.
+5.  **Identify Parameters (from Schema):**
+    -   `days[i][j]`: Number of days worker `j` worked on homeowner `i`'s home. From the CSV, where row `i` is homeowner, column `j` is worker.
+    -   The mapping between homeowners and workers is one-to-one: homeowner `i` is also worker `i` (by order).
+6.  **Formulate Objective:** There is no optimization objective; the goal is to find feasible daily wages that satisfy all fairness constraints and the fixed wage for the Carpenter.
+7.  **Formulate Constraints:**
+    -   **Fairness Constraint (for each participant/worker `k`):** The total income worker `k` earns from working on others’ homes equals the total amount they pay for work done on their own home. For each worker `k`:
+        -   Income: sum over all homeowners `i ≠ k` of `days[i][k] * w[k]`
+        -   Expenditure: sum over all workers `j ≠ k` of `days[k][j] * w[j]`
+        -   Constraint: sum_{i ≠ k} days[i][k] * w[k] = sum_{j ≠ k} days[k][j] * w[j]
+        -   Or, equivalently, for all `k`: sum_{i} days[i][k] * w[k] - days[k][k] * w[k] = sum_{j} days[k][j] * w[j] - days[k][k] * w[k] ⇒ sum_{i} days[i][k] * w[k] = sum_{j} days[k][j] * w[j]
+    -   **Fixed Wage Constraint:** w['Carpenter'] = 60.00
+    -   **(Implicit) Non-negativity:** Wages should be non-negative (w[j] ≥ 0), unless negative wages are allowed by context (not specified here).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+import gurobipy as gp
+from gurobipy import GRB
+
+# Read the CSV file with explicit types
+work_days_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture17/work_days.csv'
+df = pd.read_csv(work_days_path, sep=',', dtype=str, keep_default_na=False)
+
+# Extract workers (columns except 'Owner')
+worker_columns = [col for col in df.columns if col != 'Owner']
+num_workers = len(worker_columns)
+
+# Validate: number of rows == number of workers (one-to-one mapping)
+if df.shape[0] != num_workers:
+    raise ValueError(f"Number of rows ({df.shape[0]}) does not match number of workers ({num_workers}).")
+
+# Map: homeowner index <-> worker name
+# Homeowner i is worker worker_columns[i], and df.iloc[i]['Owner'] should match worker_columns[i]
+for i, worker in enumerate(worker_columns):
+    owner_id = df.iloc[i]['Owner'].strip()
+    if owner_id != worker:
+        raise ValueError(f"Row {i} Owner '{owner_id}' does not match worker column '{worker}'.")
+
+# Build days[i][j]: days worker j worked on homeowner i's home
+# All values are integers, but read as str, so convert
+days = {}
+for i, owner in enumerate(worker_columns):
+    days[owner] = {}
+    for j, worker in enumerate(worker_columns):
+        val = df.iloc[i][worker]
+        try:
+            days[owner][worker] = int(val)
+        except Exception:
+            raise ValueError(f"Invalid integer in days[{owner}][{worker}]: '{val}'")
+
+# Validate: each worker's total contributed days == 10
+for worker in worker_columns:
+    total_days = sum(days[owner][worker] for owner in worker_columns)
+    if total_days != 10:
+        raise ValueError(f"Worker '{worker}' contributed {total_days} days (expected 10).")
+
+# Build the model
+m = gp.Model("mutual_wage_balance")
+m.Params.MIPGap = 1e-4
+
+# Decision variables: w[j] for each worker j
+wage_vars = m.addVars(worker_columns, lb=0.0, vtype=GRB.CONTINUOUS, name='w')
+
+# Fix wage of the first worker (Carpenter) to 60.00
+first_worker = worker_columns[0]
+wage_vars[first_worker].lb = 60.00
+wage_vars[first_worker].ub = 60.00
+
+# For each worker k, add the fairness constraint:
+# sum_{i} days[i][k] * w[k] == sum_{j} days[k][j] * w[j]
+for k in worker_columns:
+    income = sum(days[owner][k] * wage_vars[k] for owner in worker_columns)
+    expenditure = gp.quicksum(days[k][worker] * wage_vars[worker] for worker in worker_columns)
+    m.addConstr(income == expenditure, name='')
+
+# No objective (feasibility problem), but Gurobi requires one; set a dummy
+m.setObjective(0, GRB.MINIMIZE)
+
+m.optimize()
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 150 rows, 150 columns and 1459 nonzeros
+Model fingerprint: 0x58d16548
+Coefficient statistics:
+  Matrix range     [1e+00, 9e+00]
+  Objective range  [0e+00, 0e+00]
+  Bounds range     [6e+01, 6e+01]
+  RHS range        [0e+00, 0e+00]
+Presolve removed 1 rows and 2 columns
+Presolve time: 0.00s
+Presolved: 149 rows, 148 columns, 1453 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   2.855031e+02   0.000000e+00      0s
+     148    0.0000000e+00   0.000000e+00   0.000000e+00      0s
+
+Solved in 148 iterations and 0.01 seconds (0.01 work units)
+Optimal objective  0.000000000e+00
+Optimal objective: 0.0
+Optimal solution: [('C0', 60.0), ('C1', 34.19783533288568), ('C2', 28.534300036944323), ('C3', 39.436270351684286), ('C4', 56.75567673995266), ('C5', 31.998885828641956), ('C6', 31.9557364124464), ('C7', 73.78194847084802), ('C8', 43.86892720033449), ('C9', 28.788792072882245), ('C10', 38.05802870656226), ('C11', 64.57386973092494), ('C12', 37.01198733022915), ('C13', 53.07821941058359), ('C14', 52.96851343778704), ('C15', 28.502960334803614), ('C16', 49.55205502996125), ('C17', 23.971192708049358), ('C18', 29.825391973043878), ('C19', 22.679311169448493), ('C20', 43.50696401274713), ('C21', 30.542595414348533), ('C22', 26.647419742018663), ('C23', 34.031864958907214), ('C24', 51.865862557014644), ('C25', 54.56568528028415), ('C26', 44.08301520234658), ('C27', 51.06452022679763), ('C28', 56.31498877949008), ('C29', 42.36584098387708), ('C30', 17.605080326492367), ('C31', 44.196407278167264), ('C32', 58.03320976288385), ('C33', 27.287275565303357), ('C34', 49.193033761666065), ('C35', 50.56840432434088), ('C36', 45.7966896444609), ('C37', 62.27502057491762), ('C38', 65.73934977911813), ('C39', 43.29295108853568), ('C40', 22.732654434909684), ('C41', 45.1205194333964), ('C42', 25.0112884716999), ('C43', 44.73279017811622), ('C44', 17.209910491166973), ('C45', 34.36620727404188), ('C46', 71.70581538719162), ('C47', 52.31848822365756), ('C48', 43.0956867420021), ('C49', 21.089859672890448), ('C50', 54.69406374642691), ('C51', 32.83059950649322), ('C52', 49.808897439096654), ('C53', 72.93787319189363), ('C54', 55.578987019443666), ('C55', 38.5048645889256), ('C56', 39.42004265575576), ('C57', 38.98343891588866), ('C58', 34.062350433345784), ('C59', 41.37799340063824), ('C60', 38.60438957509216), ('C61', 57.98936618415725), ('C62', 59.57742030969387), ('C63', 32.99209842483215), ('C64', 38.455266958586385), ('C65', 23.901195376944553), ('C66', 41.252522612898915), ('C67', 32.10857165453812), ('C68', 55.56443077212503), ('C69', 39.066256593897926), ('C70', 16.508177846353718), ('C71', 42.9915634971813), ('C72', 24.940698891306983), ('C73', 43.58113578472472), ('C74', 54.03569532350573), ('C75', 33.88284809148772), ('C76', 6.212266597548063), ('C77', 30.10086603321524), ('C78', 27.444311747851195), ('C79', 22.381427293432672), ('C80', 54.19400574271626), ('C81', 33.630451762179355), ('C82', 31.4856229467491), ('C83', 38.86613163198995), ('C84', 29.061242883644177), ('C85', 65.43836845933423), ('C86', 19.872553409868523), ('C87', 23.46538013137571), ('C88', 36.648435894568536), ('C89', 69.9269434032558), ('C90', 23.03211114938592), ('C91', 44.78604526734179), ('C92', 54.58147773772371), ('C93', 43.944471414039626), ('C94', 53.023509581595704), ('C95', 52.39091000324996), ('C96', 41.730449852026055), ('C97', 40.39090382897117), ('C98', 71.99789389577687), ('C99', 34.57967271464544), ('C100', 47.838278035660466), ('C101', 22.027551286444847), ('C102', 39.93690282665061), ('C103', 83.2271558925023), ('C104', 34.625819315330475), ('C105', 31.298221756615515), ('C106', 22.57278896466813), ('C107', 36.771033751473624), ('C108', 71.55336598497804), ('C109', 28.401835483250277), ('C110', 59.42016223198002), ('C111', 37.02436443375293), ('C112', 71.52733055978366), ('C113', 36.41153585113934), ('C114', 59.26594339767798), ('C115', 26.12815536754551), ('C116', 49.24349957621088), ('C117', 58.44665260320027), ('C118', 20.848810165781366), ('C119', 39.860447775889156), ('C120', 18.25463587832881), ('C121', 44.712784239914825), ('C122', 29.29032382042973), ('C123', 34.625635351987704), ('C124', 19.223493190767535), ('C125', 35.83248712880353), ('C126', 26.110185324668848), ('C127', 54.004868717407476), ('C128', 61.291540816300326), ('C129', 70.50461650937086), ('C130', 47.98208738797039), ('C131', 44.09978294503237), ('C132', 45.00643858505775), ('C133', 41.86081440369087), ('C134', 54.667516113351766), ('C135', 40.888830718286265), ('C136', 53.86630957707761), ('C137', 30.58128900970944), ('C138', 15.902779499327869), ('C139', 34.45696403162425), ('C140', 39.23123227709054), ('C141', 40.25374546635982), ('C142', 43.401441232919204), ('C143', 64.90959354810978), ('C144', 57.3077316249395), ('C145', 46.404460415422534), ('C146', 55.70027554532873), ('C147', 47.04389117982301), ('C148', 38.09199384792905), ('C149', 27.93370893654855)]

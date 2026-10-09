@@ -1,0 +1,673 @@
+--- earlier_full_before:cell0
++++ current_full:cell0
+@@ -1,2 +1,3 @@
+-# 0927 full baseline before optimization
+-Shared definitions extracted from the linked LOTO notebook before fold restrictions.
++# LEAN-LLM-OPT — 0927 通用最小修改版
++
++完整全量验证：outputs/optimization_0927_20261006/full_review_v6_completed。保留 ReAct、原模型和执行机制；NRM 使用原 planned，其余 route 使用 legacy。数据校验、标识符映射和提示要求为通用规则，没有题号分支或参考答案参与生成。实验入口默认关闭；失败记录保留，新一轮使用新输出目录。
+--- earlier_full_before:cell2
++++ current_full:cell2
+@@ -8,6 +8,7 @@
+ import numpy as np
+ import os
+ import openai
++import httpx
+ import pandas as pd
+ import pprint
+ import re
+--- earlier_full_before:cell3
++++ current_full:cell3
+@@ -2,9 +2,9 @@
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/ablation_loto_0927/examples_and_route_v1"
++RESULTS_DIR = PROJECT_ROOT / "outputs/review_0927_20261006/manual_full_full_review_v6_completed"
+ # Edit this one value when the notebook file is renamed.
+-NOTEBOOK_FILENAME = "full_before.ipynb"
++NOTEBOOK_FILENAME = "LEAN_LLM_OPT_4.1_Large-scale_0927.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+ NOTEBOOK_PATH = (
+     _NOTEBOOK_CANDIDATE if _NOTEBOOK_CANDIDATE.is_absolute()
+@@ -30,16 +30,8 @@
+ RAG_EXAMPLES_ALL_PATH = "Large_Scale_Or_Files/RAG_Examples_All.csv"
+ CACHE_SCHEMA_VERSION = "rag-101-cache"
+ 
+-BASE_NOTEBOOK_PATH = PROJECT_ROOT / "LEAN_LLM_OPT_4.1_Large-scale_0927.ipynb"
+-BASE_NOTEBOOK_SHA256 = hashlib.sha256(BASE_NOTEBOOK_PATH.read_bytes()).hexdigest()
+-CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/final_101_V2/automatic/results.csv"
+-CLASSIFICATION_RESULTS_SHA256 = hashlib.sha256(CLASSIFICATION_RESULTS_PATH.read_bytes()).hexdigest()
+ MATCH_REL_TOL = 1e-4
+ MATCH_ABS_TOL = 1e-4
+ 
+-EXPERIMENT_METHOD = "examples_and_route"
++EXPERIMENT_METHOD = "full"
+ 
+-LOTO_VARIANT = "examples_and_route"
+-LOTO_REMOVE_ROUTE = True
+-LOTO_BASE_NOTEBOOK = BASE_NOTEBOOK_PATH.name
+-LOTO_BASE_SHA256 = BASE_NOTEBOOK_SHA256
+--- earlier_full_before:cell5
++++ current_full:cell5
+@@ -1,3 +1,17 @@
++HTTP_RETRY_EVENTS = []
++
++
++def _record_http_request(request):
++    index = int(request.headers.get("x-stainless-retry-count", "0"))
++    if index:
++        HTTP_RETRY_EVENTS.append({"endpoint": request.url.path, "retry_index": index})
++
++
++@lru_cache(maxsize=1)
++def _get_http_client():
++    return httpx.Client(timeout=180, event_hooks={"request": [_record_http_request]})
++
++
+ class ModelOutputTruncated(RuntimeError):
+     """The API explicitly reported an incomplete model response."""
+ 
+@@ -33,10 +47,10 @@
+ def make_llm(*, timeout=180):
+     return ChatOpenAI(
+         model_name=MODEL_SNAPSHOT, openai_api_key=require_api_key(),
+-        temperature=0.0, top_p=1, n=1, max_retries=0, timeout=timeout,
++        temperature=0.0, top_p=1, n=1, max_retries=1, http_client=_get_http_client(), timeout=timeout,
+         callbacks=[RejectTruncatedOutput()],
+     )
+ 
+ 
+ def make_embeddings():
+-    return OpenAIEmbeddings(model=EMBEDDING_MODEL, openai_api_key=require_api_key(), max_retries=0)
++    return OpenAIEmbeddings(model=EMBEDDING_MODEL, openai_api_key=require_api_key(), max_retries=1, http_client=_get_http_client())
+--- earlier_full_before:cell7
++++ current_full:cell7
+@@ -80,22 +80,11 @@
+ 
+ 
+ def _read_csv(path):
+-    """Read values as text and remove only empty structure or a clear export index."""
++    """Preserve every parsed source row, column and text value, including index-like IDs."""
+     frame = read_csv_compat(path, dtype=str, keep_default_na=False)
+     frame.columns = [str(column).lstrip("\ufeff") for column in frame.columns]
+-    if frame.empty:
+-        return frame
+-    nonempty = frame.apply(lambda column: column.astype(str).str.strip().ne(""))
+-    frame = frame.loc[nonempty.any(axis=1), nonempty.any(axis=0)].copy()
+-    for column in list(frame.columns):
+-        values = frame[column].astype(str).tolist()
+-        sequential = values in (
+-            [str(i) for i in range(len(values))],
+-            [str(i) for i in range(1, len(values) + 1)],
+-        )
+-        if sequential and re.fullmatch(r"(?:unnamed(?::\s*\d+)?|index)", column.strip(), re.I):
+-            frame = frame.drop(columns=column)
+     return frame
++
+ 
+ 
+ def _load_tables(dataset_address):
+@@ -137,7 +126,7 @@
+                     "contains": int(values.str.contains(wanted, regex=False).sum()),
+                 }
+                 if counts["contains"]:
+-                    value_matches[str(column)] = counts
++                    value_matches[str(column)] = {**counts, "matching_values": frame.loc[values.str.contains(wanted, regex=False), column].drop_duplicates().head(4).tolist()}
+             term_matches[term] = {
+                 "column_matches": [str(column) for column in frame.columns if key(column) == key(term)],
+                 "value_matches": value_matches,
+--- earlier_full_before:cell9
++++ current_full:cell9
+@@ -20,6 +20,13 @@
+ file>. A physical file may appear in multiple table specifications and roles may repeat. Every input
+ file must appear in tables or ignored_file_indices. Ignore a file only when the query does not need it.
+ Every explicit subset must have a filter and every filter must quote supporting query evidence.
++For a query-named category fragment or family, inspect actual matching_values and exact/prefix/contains
++counts before choosing the supported predicate. Do not equate a fragment to a complete source label
++when the query describes a family and the profile shows no exact match. For family/category codes,
++prefer an exact match when present, otherwise a supported prefix if present; use unrestricted
++contains only if the query asks for an anywhere-substring or no exact/prefix match exists.
++Scalar predicates (exact, eq, ne, prefix, contains, gt, ge, lt, le) require a scalar value, not an array.
++Copy evidence from the query; typographic quotation marks may be preserved. Preserve literal identifiers.
+ Declare a matrix relationship only when the profile exposes its two axes unambiguously. When one label
+ column contains both decision entities and scalar parameter rows, retain every row that supplies a
+ query-required coefficient, price, cost, capacity, or bound; use separate logical views when helpful.
+@@ -68,7 +75,15 @@
+         convert = lambda value: str(value).strip().casefold()
+     if dtype != "string" and values.loc[~missing].isna().any():
+         raise ValueError(f"Cannot reliably parse {series.name!r} as {dtype}")
++    if operator in {"prefix", "contains"} and dtype != "string":
++        raise ValueError("prefix/contains require string data")
+     value = condition.get("value")
++    if isinstance(value, list) and operator not in {"in", "not_in", "between"}:
++        if len(value) != 1:
++            raise ValueError("Scalar operators require a scalar value")
++        value = value[0]  # A singleton has one unambiguous scalar meaning.
++    if value is None:
++        raise ValueError("Non-null predicates require a value")
+     wanted = [convert(item) for item in value] if isinstance(value, list) else convert(value)
+     if operator in {"in", "not_in", "between"} and not isinstance(wanted, list):
+         raise ValueError(f"Operator {operator!r} requires a list value")
+@@ -93,20 +108,26 @@
+ 
+ def _execute_plan(plan, tables, query, route):
+     """Validate and execute a query-driven plan; validate only declared relationships."""
+-    key = lambda value: "".join(ch for ch in str(value or "").casefold() if ch.isalnum())
++    quote_map = str.maketrans({"“": '"', "”": '"', "‘": "'", "’": "'"})
++    key = lambda value: re.sub(r"\s+", " ", str(value).translate(quote_map)).strip().casefold()
+     route = normalize_route(route)
+     if normalize_route(plan.get("route")) != route:
+         raise ValueError(f"CSVQA plan route does not match {route}")
+     specs = plan.get("tables")
+-    if not isinstance(specs, list) or not specs:
++    if not isinstance(specs, list) or not specs or any(not isinstance(spec, dict) for spec in specs):
+         raise ValueError("CSVQA plan requires a non-empty tables list")
+     ignored = plan.get("ignored_file_indices") or []
+     if not isinstance(ignored, list) or any(isinstance(i, bool) or not isinstance(i, int) for i in ignored):
+         raise ValueError("ignored_file_indices must be a list of integers")
+     by_index = {table["file_index"]: table for table in tables}
+-    used = {spec.get("file_index") for spec in specs}
++    indices = [spec.get("file_index") for spec in specs]
++    if any(isinstance(i, bool) or not isinstance(i, int) for i in indices):
++        raise ValueError("file_index must be an integer")
++    if len(ignored) != len(set(ignored)):
++        raise ValueError("ignored_file_indices must be distinct")
++    used = set(indices)
+     if used & set(ignored) or (used | set(ignored)) != set(by_index):
+-        raise ValueError("Every input file must be used or explicitly ignored exactly once")
++        raise ValueError("Every input file must be used in one or more views, or explicitly ignored")
+ 
+     payload_tables, payload_by_id, used_conditions, view_counts = [], {}, [], {}
+     for spec in specs:
+@@ -146,10 +167,7 @@
+             dtype, evidence = condition.get("dtype", "string"), str(condition.get("evidence") or "")
+             if column not in frame.columns or operator not in FILTER_OPERATORS or dtype not in FILTER_DTYPES:
+                 raise ValueError(f"Invalid filter for table {table_id!r}: {condition}")
+-            raw_values = condition.get("value", [])
+-            raw_values = raw_values if isinstance(raw_values, list) else [raw_values]
+-            value_supported = bool(raw_values) and all(key(value) in key(query) for value in raw_values)
+-            if not evidence.strip() or (key(evidence) not in key(query) and not value_supported):
++            if not evidence.strip() or key(evidence) not in key(query):
+                 raise ValueError(f"Filter lacks query evidence: {condition}")
+             mask = _apply_condition(frame[column], condition)
+             combined = mask if combined is None else (combined & mask if logic == "and" else combined | mask)
+@@ -196,6 +214,8 @@
+             raise ValueError(f"Unsupported relationship: {relationship!r}")
+         matrix_id = relationship.get("matrix_table_id")
+         row_axis_spec, column_axis_spec = relationship.get("row_axis") or {}, relationship.get("column_axis") or {}
++        if not isinstance(row_axis_spec, dict) or not isinstance(column_axis_spec, dict):
++            raise ValueError("Matrix axis specifications must be objects")
+         row_axis_id, column_axis_id = row_axis_spec.get("table_id"), column_axis_spec.get("table_id")
+         if any(table_id not in payload_by_id for table_id in (matrix_id, row_axis_id, column_axis_id)):
+             raise ValueError(f"Relationship references an unknown table_id: {relationship}")
+@@ -211,7 +231,7 @@
+                 raise ValueError(f"Matrix ID column {column!r} is not selected for {table['table_id']!r}")
+ 
+         def axis_keys(values, axis_name):
+-            normalized = [key(value) for value in values]
++            normalized = [str(value).strip() for value in values]
+             if any(not value for value in normalized) or len(set(normalized)) != len(normalized):
+                 raise ValueError(f"Matrix {axis_name} IDs must be non-empty and unique: {values}")
+             return normalized
+@@ -224,8 +244,10 @@
+             "matrix_table_id": matrix_id,
+             "shape": [len(matrix_table["records"]), len(matrix_columns)],
+             "expected_shape": [len(row_ids), len(column_ids)],
+-            "row_ids_aligned": axis_keys(matrix_row_ids, "matrix row") == axis_keys(row_ids, "row axis"),
+-            "column_ids_aligned": axis_keys(matrix_columns, "matrix column") == axis_keys(column_ids, "column axis"),
++            "row_ids_aligned": set(axis_keys(matrix_row_ids, "matrix row")) == set(axis_keys(row_ids, "row axis")),
++            "column_ids_aligned": set(axis_keys(matrix_columns, "matrix column")) == set(axis_keys(column_ids, "column axis")),
++            "row_order_matches": matrix_row_ids == row_ids,
++            "column_order_matches": matrix_columns == column_ids,
+         }
+         if checks["shape"] != checks["expected_shape"] or not checks["row_ids_aligned"] or not checks["column_ids_aligned"]:
+             raise ValueError(f"Matrix validation failed: {checks}")
+--- earlier_full_before:cell11
++++ current_full:cell11
+@@ -5,11 +5,32 @@
+         for source_row, row in table["frame"].iterrows():
+             values = {str(column): str(row[column]) for column in row.index}
+             documents.append(Document(
+-                page_content=json.dumps({"values": values}, ensure_ascii=False),
++                page_content=json.dumps({"source": str(table["path"]), "values": values}, ensure_ascii=False),
+                 metadata={"source": str(table["path"]), "source_order": source_order},
+             ))
+             source_order += 1
+     return documents
++
++
++def validate_legacy_source_rows(observation, documents):
++    """Accept only exact source-row evidence, including original fields and multiplicity."""
++    from collections import Counter
++    original = [json.loads(document.page_content) for document in documents]
++    observed = json.loads(str(observation))
++    if not isinstance(observed, list) or (original and not observed):
++        raise ValueError("Legacy extraction must return a nonempty source-row array")
++    def signature(row):
++        if not isinstance(row, dict) or not isinstance(row.get("values"), dict):
++            raise ValueError("Legacy extraction row is missing its original field mapping")
++        return (str(row.get("source", "")), tuple(sorted(
++            (str(column), str(value)) for column, value in row["values"].items())))
++    available = Counter(signature(row) for row in original)
++    for row in observed:
++        key = signature(row)
++        if available[key] <= 0:
++            raise ValueError("Legacy extraction contains altered/derived fields, a foreign row, or an extra duplicate")
++        available[key] -= 1
++    return str(observation)
+ 
+ 
+ def build_csvqa_components(
+@@ -26,7 +47,13 @@
+     def rag_answer(tool_query):
+         documents = load_csv_documents(dataset_address)
+         prompt = ChatPromptTemplate.from_messages([
+-            ("system", system_prompt),
++            ("system", system_prompt +
++                "\nResponse format: return one JSON array, with one object per source row. "
++                "Each object has source (the exact supplied source path) and values "
++                "(a mapping of exact column names to original source values). "
++                "Preserve source order, identifiers, signs and blank values. "
++                "Do not add prose, Markdown, numbered headings or ellipses. "
++                "An unrelated column does not create a model coefficient or constraint."),
+             (
+                 "human",
+                 "Original user query (the only authority for subsets):\n{user_query}\n\n"
+@@ -38,7 +65,14 @@
+         })
+         if not str(result or "").strip():
+             raise RuntimeError("Legacy CSVQA model returned an empty result")
+-        return str(result)
++        try:
++            observation = validate_legacy_source_rows(result, documents)
++            return observation, "LEGACY_VALIDATED_SOURCE_ROWS", None, str(result)
++        except (KeyError, TypeError, ValueError) as exc:
++            # Recover original evidence; selection remains the modeling agent's query-based task.
++            observation = json.dumps([json.loads(d.page_content) for d in documents], ensure_ascii=False)
++            print(f"[Rejected legacy extraction]: {exc}\n{result}")
++            return observation, "LEGACY_SOURCE_VALIDATION_FALLBACK", str(exc), str(result)
+ 
+     def qa_wrapper(tool_query):
+         plan, planner_outputs, errors, status, fallback_reason = None, [], [], "LEGACY_FULL_DATA", None
+@@ -86,12 +120,15 @@
+                 }, ensure_ascii=False, sort_keys=True)
+                 status = "FALLBACK_FULL_DATA"
+         else:
+-            observation = rag_answer(tool_query)
++            observation, status, fallback_reason, legacy_output = rag_answer(tool_query)
++            if fallback_reason:
++                errors.append(fallback_reason)
+         trace = {
+             "version": "GPT4.1-LO", "mode": "planned" if planned else "legacy",
+             "status": status, "plan": plan, "planner_attempt_count": attempt_count,
+             "planner_outputs": planner_outputs, "planner_errors": errors,
+             "validation_errors": errors, "fallback_reason": fallback_reason,
++            "legacy_extraction_output": legacy_output if not planned else None,
+             "payload_hash": hashlib.sha256(observation.encode("utf-8")).hexdigest(),
+         }
+         state.clear()
+--- earlier_full_before:cell15
++++ current_full:cell15
+@@ -1,3 +1,6 @@
++QUERY_SEMANTICS_GUIDANCE = '\nThe original query is authoritative when a reference example or intermediate plan conflicts with it.\nEligibility or authorization permits a choice; it does not force selection. When an integer\nquantity may be zero or within [L,U], use a binary selected flag with L*selected <= quantity\n<= U*selected, and enforce positive quantity iff selected (quantity >= selected when L is zero).\nAn activation flag means iff its stated condition holds: an item flag iff positive quantity;\na group flag iff at least one member is selected (member_flag <= group_flag for every member,\ngroup_flag <= sum(member_flags)); a pair flag iff both members are selected (the two upper\nbounds and the lower bound). Enforce both directions regardless of fee/bonus signs.\nKeep unconditional aggregate bounds unconditional. Do not add restrictions, lazy constraints,\nfixed-zero decisions, or mandatory selections without support in the current query.\n'
++
++
+ def formulate_with_csvqa(query, dataset_address, route, system_prompt, tool_description, prefix, suffix):
+     """Run the shared CSVQA agent with the route's prompt and fixed data mode."""
+     llm, qa_tool, csvqa_result = build_csvqa_components(
+@@ -5,6 +8,9 @@
+     )
+     prefix += ("\nPreserve the original objective sense, full expression, and constant terms. "
+                "Do not replace it with an optimizer-equivalent objective with a different value.")
++    prefix += "\nPreserve the current query's conditional versus unconditional bounds. A fixed activation fee does not make a quantity lower bound conditional: apply an unconditional bound even when a category has no selected item. Use activation-conditioned bounds only if the query explicitly makes them conditional."
++    prefix += QUERY_SEMANTICS_GUIDANCE
++    prefix += "\nUse the ReAct protocol: after reasoning/tools, begin the final model with the literal marker Final Answer:. Any complete source fallback is evidence, not automatic selection: apply only the original query's subset and eligibility rules in the model."
+     agent = initialize_agent(
+         tools=[qa_tool], llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+         agent_kwargs={"prefix": prefix, "suffix": suffix}, verbose=True,
+@@ -17,7 +23,9 @@
+ @lru_cache(maxsize=1)
+ def _load_rag_table():
+     """Read the unified examples once, preserving every field as text."""
+-    frame = read_csv_compat(RAG_EXAMPLES_ALL_PATH, dtype=str, keep_default_na=False)
++    reference_path = Path(RAG_EXAMPLES_ALL_PATH).expanduser()
++    reference_path = reference_path if reference_path.is_absolute() else PROJECT_ROOT / reference_path
++    frame = read_csv_compat(reference_path, dtype=str, keep_default_na=False)
+     required = {"prompt", "Data_address", "Related", "Required Data", "Label", "Code", "Type"}
+     missing = required.difference(frame.columns)
+     if missing:
+@@ -78,7 +86,9 @@
+     blocks = []
+     for raw in example["Data_address"].splitlines():
+         if raw.strip():
+-            frame = read_csv_compat(raw.strip(), dtype=str, keep_default_na=False)
++            path = Path(raw.strip()).expanduser()
++            path = path if path.is_absolute() else PROJECT_ROOT / path
++            frame = read_csv_compat(path, dtype=str, keep_default_na=False)
+             blocks.append(f"Source: {raw.strip()}\n{frame.to_json(orient='records', force_ascii=False)}")
+     return "\n\n".join(blocks)
+ 
+@@ -114,7 +124,9 @@
+     route_instruction = """Call CSVQA exactly once and return an ABSTRACT model. Define
+ index sets, parameters, variables, objective, and constraints symbolically. Include a short Data
+ Mapping that identifies every source by exact table_id and exact column name. Do not copy record
+-values or literal record counts."""
++values or literal record counts. When CSVQA has applied a validated filter, use its returned
++records directly and retain that exact predicate in Data Mapping; never re-filter by a guessed
++complete label. For FALLBACK_FULL_DATA, state and implement the query-supported selection explicitly."""
+     prefix = f"""You are an assistant that formulates mathematical optimization models.
+ 
+     The examples below illustrate model structure only; never copy their data.
+--- earlier_full_before:cell21
++++ current_full:cell21
+@@ -1,6 +1,6 @@
+ def get_AP_response(query, dataset_address):
+     few_shot_examples = build_formulation_examples("AP", query, k=1)
+-    csvqa_system_prompt = 'Retrieve the documents in order from top to bottom. Use the retrieved context to answer the question. If mention a certain kind of product, retrieve all the relavant product information detail judging by its product name. If not mention a certain kind of product, retrieve all the data instead.Context: {context}'
++    csvqa_system_prompt = 'Retrieve the complete assignment data needed by the query, preserving IDs and costs together with eligibility, availability and qualification fields. For ordered qualifications, use the order stated in the query, never alphabetical order. Preserve the fields needed to verify each assignment pair; do not label an unverified pair eligible. Context: {context}'
+     csvqa_tool_description = 'Use this tool to answer Querys based on the provided CSV data and retrieve product data similar to the input query.'
+ 
+     prefix = f"""You are an assistant that generates a mathematical model based on the user's description and provided CSV data.
+@@ -10,6 +10,11 @@
+             {few_shot_examples}
+ 
+             Note: Please retrieve all neccessary information from the CSV file to generate the answer. When you generate the answer, please output required parameters in a whole text, including all vectors and matrices.
++
++            Verify every assignment pair against ALL query eligibility conditions. For ordered
++            qualifications, construct ranks from the query-stated order, not lexical comparison.
++            Keep qualification and availability fields with the cost parameters so the code can
++            enforce eligibility; a listed cost alone does not make a pair eligible.
+ 
+             When you need to retrieve information from the CSV file, use the provided tool.
+ 
+--- earlier_full_before:cell25
++++ current_full:cell25
+@@ -65,6 +65,9 @@
+     return "\n\n---\n\n".join(blocks)
+ 
+ 
++SOURCE_TABLE_GUIDANCE = '\nIdentify logical tables from actual schema fields and table tags, never a guessed file index.\nA logical table may span several files: collect all its rows before query-directed selection,\njoining or aggregation. Apply a query-specified revision/as-of/deletion/retransmission rule to\nEVERY applicable table, before numeric conversion or sums. Compare revisions numerically,\nretain the latest eligible event by the full stated record key, then remove its tombstone.\nDo not convert blank fields in deleted or other-table rows into numeric parameters, and do\nnot silently coerce required malformed numbers to zero. Do not collapse distinct signed\ncomponents into a single last-write dictionary entry when the query requires their sum.\nKeep already consistent opaque business IDs as keys. Use a lookup only when crossing key\nnamespaces; a display label is not a replacement for a working canonical key.\nConvert all quantities in a resource comparison to the same stated unit, on both sides.\n'
++
++
+ def get_Others_response(user_query: str, dataset_address: str):
+     examples = retrieve_rag_examples("Others", user_query, k=3)
+     llm2 = make_llm()
+@@ -142,6 +145,8 @@
+     -   ... (Other constraints) ...
+ [Abstract Model Plan END]
+ """
++        abstract_model_template += "\nPreserve the current query's conditional versus unconditional bounds. A fixed activation fee does not make a quantity lower bound conditional: apply an unconditional bound even when a category has no selected item. Use activation-conditioned bounds only if the query explicitly makes them conditional.\nReturn exactly one concise abstract plan with the seven requested sections. Describe each constraint family once. Use symbolic index sets and exact field mappings; do not enumerate source rows, repeat examples, or emit code. Preserve every required variable, domain, objective term and boundary condition."
++        abstract_model_template += QUERY_SEMANTICS_GUIDANCE + SOURCE_TABLE_GUIDANCE
+         abstract_prompt = PromptTemplate(
+             template=abstract_model_template,
+             input_variables=["query", "schema", "few_shot_examples"]
+@@ -165,7 +170,7 @@
+ Your task is to strictly follow the User Query, CSV Schema, and "Abstract Model Plan" to translate them into a single, complete, executable Gurobi Python code block.
+ The code must start with ```python and end with ```.
+ The code must include the necessary imports from gurobipy, pandas, numpy, re, math or json. Do not import sys or os.
+-Create exactly one Gurobi model in m or model and call its optimize() exactly once, both at top level. Do not wrap model creation or solving in functions or try/except; let errors propagate to the execution harness. Do not write files or call computeIIS().
++Create exactly one Gurobi model in m and call its optimize() exactly once, both at top level. Do not wrap model creation or solving in functions or try/except; let errors propagate to the execution harness. Do not write files or call computeIIS().
+ The code must read all supplied CSV files needed by the model, at these exact newline-separated paths:
+ {dataset_address}
+ Read their complete contents at runtime. The schema preview is not the full dataset.
+@@ -179,6 +184,15 @@
+ Series.apply receives one cell value, not a row; use vectorized column predicates or DataFrame.apply
+ with axis=1 when a predicate needs a row. Every comprehension must use the indices it binds, not
+ stale variables from a preceding loop. Do not silently skip failed conversions or missing coefficients.
++Use Series.str.strip().str.casefold() for vectorized string normalization, or apply a scalar function;
++Series has no casefold() method. For arbitrary CSV headers (spaces, punctuation, numeric names),
++use row[column] or explicit arrays, not getattr on itertuples(), which renames invalid field names.
++Series.to_dict() uses the DataFrame index, not an ID column: set the validated entity ID as index
++or construct dictionaries with explicit ID/value pairs. Preserve identifier case by default. If
++normalization is required, apply the same mapping to entity values and matrix column labels.
++When a supplied identity/lookup table relates opaque references to entity IDs, resolve foreign
++keys through that table and validate coverage; never compare an opaque reference directly to
++a display label as if they were the same key.
+ Use setObjective for the exact metric requested by the query, including all additive constants,
+ signs and units. An optimizer-equivalent objective is not an equivalent reported objective value;
+ do not drop constant terms and then merely restore them in printed output.
+@@ -225,6 +239,9 @@
+ [Your Gurobi Code]
+ """
+ 
++        code_gen_template += "\nGive each decision-variable container a distinct name ending in _vars; never reuse it as a loop variable, scalar key, parameter or row object. In a generator expression, index the decision container with the locally bound key, not with a shadowed container. quicksum takes an iterable; a scalar constant is used directly.\nRead source CSVs with dtype=str and keep_default_na=False, then explicitly convert the required numeric fields. Preserve blank forbidden entries and exact identifiers.\nPreserve the current query's conditional versus unconditional bounds. A fixed activation fee does not make a quantity lower bound conditional: apply an unconditional bound even when a category has no selected item. Use activation-conditioned bounds only if the query explicitly makes them conditional.\n\nMandatory result interface: expose exactly one solved, live Gurobi model at module scope as m. Create and solve m at top level as required above; keep it live until result extraction. Never assign optimize()'s return to m. Do not dispose the model or leave its context manager before the harness extracts the result. Printed objectives cannot replace this model object.\n"
++        code_gen_template += QUERY_SEMANTICS_GUIDANCE + SOURCE_TABLE_GUIDANCE
++        code_gen_template += "\nDataFrame.columns is an Index, not a dictionary: test column_name in df.columns, then access df[column_name]. Do not call columns.get(). Gurobi comparisons are TempConstr objects: pass them to addConstr, never multiply them or pass them to quicksum. For a positive-quantity prerequisite, use the already linked binary selection flags: selected_item <= selected_prerequisite, without a quantity ratio."
+         code_gen_prompt = PromptTemplate(
+             template=code_gen_template,
+             input_variables=["query", "schema", "abstract_plan", "dataset_address", "few_shot_examples"]
+@@ -301,7 +318,6 @@
+         split_at_label = split_at_address[1].split("Related:", 1)
+         label = split_at_label[0].strip() 
+ 
+-        label = label.replace("{", "{{").replace("}", "}}")
+         example = (
+             "<EXAMPLE>\n"
+             f"Question: {problem_description}\n\n"
+@@ -348,7 +364,7 @@
+     "- Use a fixed structure INSIDE LaTeX: Indices/Sets; Given Parameters (convert all tables to arrays); Decision Variables (with domains); Objective; Constraints; Domain lines.\n"
+     "- For multi-period problems, you MUST include state-balance recurrences and initial/terminal conditions explicitly.\n"
+     "- Avoid nonlinear forms when possible: rewrite ratios/logic using linear constraints + binaries (big-M) with clearly defined M.\n\n"
+-    "You should decide VARIABLE–TYPE first!\n (If not mentioned or ambiguous, integer by default!)"
++    "You should decide VARIABLE–TYPE first!\n (Use integers for indivisible item counts, binaries for choices, and continuous variables for explicitly divisible flows or material.)"
+     "### FIRST RESPONSE FORMAT (exactly 3 lines) ###\n"
+     "Thought: <brief>\n"
+     "Action: ORLM_QA\n"
+@@ -378,7 +394,6 @@
+     )
+ 
+     openai.api_request_timeout = 60  
+-    query = query.replace('{','{{').replace('}','}}')
+     output = agent.run({"input": query})
+ 
+     return output
+--- earlier_full_before:cell27
++++ current_full:cell27
+@@ -1,7 +1,7 @@
+ def _legacy_records_from_observation(legacy_observation):
+     """Parse legacy evidence only when its structure is unambiguous.
+ 
+-    New runs use planned JSON payloads. This compatibility parser accepts JSON
++    Legacy runs use source-tagged JSON rows. This compatibility parser accepts JSON
+     arrays/objects, JSON Lines, CSV, and Markdown tables, but rejects ragged or
+     otherwise ambiguous input instead of silently constructing malformed records.
+     """
+@@ -15,7 +15,7 @@
+             raise ValueError("Legacy observation row has no mapping of values")
+         if any(key is None or not str(key).strip() for key in values):
+             raise ValueError("Legacy observation contains a missing CSV column name")
+-        return {"source": source, "values": {str(key).strip(): value for key, value in values.items()}}
++        return {"source": source or str(row.get("source", "")), "values": {str(key): value for key, value in values.items()}}
+ 
+     text = str(legacy_observation or "").strip()
+     if not text:
+@@ -83,7 +83,7 @@
+         if "|" in lines[0] and len(lines) >= 2 and "-" in lines[1]:
+             split_row = lambda line: [part.strip() for part in line.strip().strip("|").split("|")]
+             headers, separator = split_row(lines[0]), split_row(lines[1])
+-            if not headers or len(headers) != len(separator) or any(not h for h in headers):
++            if not headers or len(headers) != len(separator) or len(headers) != len(set(headers)) or any(not h for h in headers):
+                 raise ValueError("Malformed Markdown table header")
+             if any(not re.fullmatch(r":?-{1,}:?", cell) for cell in separator):
+                 raise ValueError("Malformed Markdown table separator")
+@@ -95,7 +95,7 @@
+             continue
+ 
+         reader = csv.DictReader(io.StringIO("\n".join(lines)), skipinitialspace=True)
+-        if not reader.fieldnames or any(field is None or not field.strip() for field in reader.fieldnames):
++        if not reader.fieldnames or len(reader.fieldnames) != len(set(reader.fieldnames)) or any(field is None or not field.strip() for field in reader.fieldnames):
+             raise ValueError("Legacy CSV observation has invalid column names")
+         for row in reader:
+             if None in row or any(value is None for value in row.values()):
+@@ -114,7 +114,8 @@
+ You are an expert in mathematical optimization and Python programming.
+ Write executable Python code that solves the provided mathematical optimization
+ model with Gurobi, including every decision variable, objective, and constraint.
+-Preserve the formulation's variable domains. Return code only, without explanations
++Preserve variable domains consistent with the original query; the original query takes
++precedence over conflicting intermediate wording. Return code only, without explanations
+ or Markdown fences.
+ 
+ Mathematical Optimization Model:
+@@ -169,11 +170,13 @@
+ raise an explicit error for missing data instead of guessing, padding, or silently dropping entries.
+ For |linear expression| <= bound, use expression <= bound and expression >= -bound;
+ do not pass a non-variable expression to addGenConstrAbs.
+-Leave the solved Gurobi model in m or model. If using a function, return the model
++Leave the solved Gurobi model in m. If using a function, return the model
+ and assign it to m. Set MIPGap=1e-4 before optimize().
+ If Status == GRB.OPTIMAL, print ObjVal and every variable's VarName and X.
+ Otherwise print the solver status; do not report an incumbent as optimal.
+ """
++
++CSV_SOLVER_INSTRUCTIONS += QUERY_SEMANTICS_GUIDANCE
+ 
+ 
+ def retrieve_csv_code_example(route, query):
+@@ -224,6 +227,7 @@
+             examples,
+         ])
+     parts.append(CSV_SOLVER_INSTRUCTIONS)
++    parts.append("\nGive each decision-variable container a distinct name ending in _vars; never reuse it as a loop variable, scalar key, parameter or row object. In a generator expression, index the decision container with the locally bound key, not with a shadowed container. quicksum takes an iterable; a scalar constant is used directly.\nWhen the task permits CSV reading, use dtype=str and keep_default_na=False, then explicitly convert the required numeric fields; otherwise use only the supplied records or formulation data. Preserve blank forbidden entries and exact identifiers.\nPreserve the current query's conditional versus unconditional bounds. A fixed activation fee does not make a quantity lower bound conditional: apply an unconditional bound even when a category has no selected item. Use activation-conditioned bounds only if the query explicitly makes them conditional.\n\nMandatory result interface: expose exactly one solved, live Gurobi model at module scope as m. A function that creates a model must explicitly return m, and its caller must assign that result to m. Never assign optimize()'s return to m. Do not dispose the model or leave its context manager before the harness extracts the result. Printed objectives cannot replace this model object.\n")
+     response = make_llm().invoke([HumanMessage(content="\n\n".join(parts))])
+     code = response.content
+     if bind_observation:
+@@ -241,3 +245,5 @@
+ def get_code(output, selected_problem, original_query=""):
+     """Generate self-contained code for a query-only formulation."""
+     return _generate_code(output, selected_problem, original_query=original_query)
++
++CSV_ROUTE_HINT["AP"] += ' Eligibility is a decision-pair mask. A nonblank cost for an ineligible pair is valid source data: exclude or fix that decision to zero; do not reject the dataset because such a pair has a listed cost. Evaluate query-stated availability and qualification rules from the supplied eligibility fields, using the stated ordinal rank instead of alphabetical order.'
+--- earlier_full_before:cell29
++++ current_full:cell29
+@@ -53,6 +53,7 @@
+     """Classify, formulate, generate code, and solve; retain progress if a step fails."""
+     record = {**case_fields(case), "forced_route": forced_route,
+               "experiment_mode": "forced" if forced_route else "automatic"}
++    HTTP_RETRY_EVENTS.clear()
+     query, address = record["query"], record["dataset_address"]
+     try:
+         if forced_route is not None and not address:
+@@ -61,13 +62,15 @@
+         classification = invoke_classifier(query) if forced_route is None else {}
+         label = classification.get("normalized_label")
+         route = normalize_route(forced_route) if forced_route is not None else class_to_workflow_route(label)
+-        record.update(predicted_label=label, assigned_route=route if address else "Others")
++        route = route if address else "Others"
++        record.update(predicted_label=label, assigned_route=route)
+         record["pipeline_stage"] = "formulation"
+         formulation = invoke_formulation(route, query, address)
+         mode = CSVQA_MODE_BY_ROUTE[route] if address else None
+         payload = formulation.get("observation", "") if mode == "planned" else ""
+         record.update(generated_model=formulation["formulation"], csvqa_observation=formulation.get("observation", ""), csvqa_mode=mode,
+                       csvqa_status=formulation.get("trace", {}).get("status"))
++        record["csvqa_trace"] = json.dumps(formulation.get("trace", {}), ensure_ascii=False)
+         model_text = formulation["formulation"]
+         if (not isinstance(model_text, str) or not model_text.strip()
+                 or "agent stopped due to" in model_text.lower()):
+@@ -91,9 +94,11 @@
+         record["solve_code"] = source
+         record["pipeline_stage"] = "solve"
+         objective, solution = execute_code(record["solve_code"])
++        record.update(api_retry_count=len(HTTP_RETRY_EVENTS), api_retry_events=json.dumps(HTTP_RETRY_EVENTS))
+         record.update(final_objective=objective, final_solution=solution, final_ok=True,
+                       record_status="completed", cache_source="computed", pipeline_stage="completed")
+         return record
+-    except Exception as exc:
++    except BaseException as exc:
++        record.update(api_retry_count=len(HTTP_RETRY_EVENTS), api_retry_events=json.dumps(HTTP_RETRY_EVENTS))
+         exc.pipeline_context = record
+         raise
+--- earlier_full_before:cell31
++++ current_full:cell31
+@@ -30,7 +30,11 @@
+     if "problem_id" not in frame:
+         frame["problem_id"] = [f"OR-{index + 1:03d}" if isinstance(index, (int, np.integer)) else f"OR-{position:03d}"
+                                for position, index in enumerate(frame.index, 1)]
++    if frame.empty or frame["problem_id"].isna().any():
++        raise ValueError("Cases require nonempty IDs")
+     frame["problem_id"] = frame["problem_id"].astype(str)
++    if frame["problem_id"].str.strip().eq("").any() or frame["problem_id"].duplicated().any():
++        raise ValueError("Cases require unique nonempty IDs")
+     addresses = frame.get("dataset_address", frame.get("Dataset_address", pd.Series("", index=frame.index)))
+     frame["dataset_address"] = addresses.map(resolve_dataset_address)
+     labels = frame.get("true_label", frame.get("Problem Type", pd.Series(None, index=frame.index, dtype=object)))
+--- earlier_full_before:cell33
++++ current_full:cell33
+@@ -16,7 +16,7 @@
+ 
+ 
+ CSV_VALUE_READERS = {
+-    **dict.fromkeys(("final_ok", "classification_correct", "solution_correct"), lambda value: value == "True"),
++    **dict.fromkeys(("final_ok", "classification_correct", "solution_correct", "external_deadline_exceeded", "route_allowed"), lambda value: value == "True"),
+     **dict.fromkeys(("final_objective", "label_objective"), float),
+ }
+ _RESULT_LOCK = RLock()
+@@ -36,7 +36,8 @@
+             normalize_data_address(record.get("dataset_address")), record.get("forced_route") or "AUTO")
+ 
+ 
+-RECORD_ARTIFACT_FILES = {"generated_model": "model.md", "solve_code": "solve.py", "csvqa_observation": "data_overview.md"}
++RECORD_ARTIFACT_FILES = {
++    "csvqa_trace": "csvqa_trace.json","generated_model": "model.md", "solve_code": "solve.py", "csvqa_observation": "data_overview.md"}
+ 
+ 
+ def _sha256_bytes(data):
+@@ -49,6 +50,8 @@
+     for field in RECORD_ARTIFACT_FILES:
+         relative = row.pop(field + "_path", None)
+         expected_hash = row.pop(field + "_sha256", None)
++        if not relative and not expected_hash and row.get("record_status") == "error":
++            continue  # A failed stage may never have produced this artifact.
+         artifact = root / relative if relative else None
+         if artifact is None or not artifact.is_file() or not expected_hash:
+             return None
+@@ -78,9 +81,9 @@
+ 
+ 
+ def reusable_record(csv_path, record, fingerprint):
+-    """Reuse only successful, intact results from the same code and data."""
+-    if (not record or record.get("record_status") != "completed"
+-            or not record.get("final_ok") or record.get("cache_fingerprint") != fingerprint):
++    """Resume intact recorded attempts, including failures, without selective retries."""
++    if (not record or record.get("record_status") not in {"completed", "error"}
++            or record.get("cache_fingerprint") != fingerprint):
+         return None
+     return materialize_record(csv_path, record)
+ 
+--- earlier_full_before:cell35
++++ current_full:cell35
+@@ -1,13 +1,16 @@
+ def run_test(test, *, output_csv=RESULTS_DIR / "results.csv", routes=None, reuse_auto_csv=None,
+              reuse_completed=True, continue_on_error=True, rel_tol=1e-4, abs_tol=1e-4):
+-    """Reuse matching successful results; retry failures. False disables all result reuse."""
++    """Resume the same immutable round; use a fresh output directory for a new round."""
+     frame = load_benchmark(test) if isinstance(test, (str, Path)) else prepare_cases(test)
+     selected_routes = [None] if routes is None else [normalize_route(route) for route in routes]
+     if not selected_routes or len(selected_routes) != len(set(selected_routes)):
+         raise ValueError("Provide a non-empty list of distinct routes")
+     if routes is not None and frame["dataset_address"].eq("").any():
+         raise ValueError("Forced-route tests require case CSV inputs; use routes=None for query-only tests")
+-    cached = {record_key(row): row for row in load_records(output_csv)} if reuse_completed else {}
++    existing = load_records(output_csv)
++    if existing and not reuse_completed:
++        raise ValueError("Use a fresh round directory; existing attempts cannot be overwritten")
++    cached = {record_key(row): row for row in existing}
+     auto_cached = ({record_key(row): row for row in load_records(reuse_auto_csv)}
+                    if reuse_completed and reuse_auto_csv else {})
+     # Fingerprint every run before saving records so a first run is reusable later.
+@@ -18,7 +21,12 @@
+         for route in selected_routes:
+             key = (case["problem_id"], str(case["Query"]), case["dataset_address"], route or "AUTO")
+             fingerprint = case_fingerprint(case, route, source_fingerprint=source)
+-            record = reusable_record(output_csv, cached.get(key), fingerprint)
++            previous = cached.get(key)
++            if previous and previous.get("cache_fingerprint") != fingerprint:
++                raise ValueError("Code/data changed; use a fresh version directory")
++            record = reusable_record(output_csv, previous, fingerprint)
++            if previous and record is None:
++                raise ValueError("Recorded artifacts are missing/corrupt; do not replace the attempt")
+             if record is not None:
+                 record["cache_source"] = "csv"
+             elif route is not None and route == case.get("true_route"):

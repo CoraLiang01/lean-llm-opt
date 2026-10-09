@@ -1,0 +1,119 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/capacity.csv",
+    "values": {
+      "refrigeration_service_visits": "8",
+      "Capacity": "875"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Spinach",
+      "Weight": "230",
+      "supplier_catalog_revision_count": "3",
+      "supplier_quality_rating": "3.2",
+      "Value": "64",
+      "catalog_display_group": "Featured"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Shiitake Mushrooms",
+      "Weight": "637",
+      "supplier_catalog_revision_count": "3",
+      "supplier_quality_rating": "4.1",
+      "Value": "75",
+      "catalog_display_group": "Featured"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Apples",
+      "Weight": "773",
+      "supplier_catalog_revision_count": "1",
+      "supplier_quality_rating": "4.7",
+      "Value": "68",
+      "catalog_display_group": "Seasonal"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Carrots",
+      "Weight": "653",
+      "supplier_catalog_revision_count": "3",
+      "supplier_quality_rating": "4.7",
+      "Value": "11",
+      "catalog_display_group": "Featured"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Basil",
+      "Weight": "755",
+      "supplier_catalog_revision_count": "6",
+      "supplier_quality_rating": "4.1",
+      "Value": "91",
+      "catalog_display_group": "Seasonal"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Potatoes",
+      "Weight": "670",
+      "supplier_catalog_revision_count": "6",
+      "supplier_quality_rating": "3.5",
+      "Value": "31",
+      "catalog_display_group": "Everyday"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Green Beans",
+      "Weight": "505",
+      "supplier_catalog_revision_count": "1",
+      "supplier_quality_rating": "4.1",
+      "Value": "90",
+      "catalog_display_group": "Featured"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Blueberries",
+      "Weight": "821",
+      "supplier_catalog_revision_count": "6",
+      "supplier_quality_rating": "3.5",
+      "Value": "56",
+      "catalog_display_group": "Seasonal"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Oranges",
+      "Weight": "83",
+      "supplier_catalog_revision_count": "4",
+      "supplier_quality_rating": "3.2",
+      "Value": "10",
+      "catalog_display_group": "Seasonal"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Watermelons",
+      "Weight": "249",
+      "supplier_catalog_revision_count": "3",
+      "supplier_quality_rating": "4.4",
+      "Value": "24",
+      "catalog_display_group": "Everyday"
+    }
+  }
+]

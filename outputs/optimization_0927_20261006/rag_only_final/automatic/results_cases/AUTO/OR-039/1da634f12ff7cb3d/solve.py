@@ -1,0 +1,49 @@
+LEGACY_OBSERVATION = '[{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 1","Capacity":"100"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 2","Capacity":"80"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 3","Capacity":"120"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 4","Capacity":"90"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 5","Capacity":"50"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 6","Capacity":"30"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 7","Capacity":"110"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 8","Capacity":"40"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 9","Capacity":"60"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv","values":{"Warehouse ID":"Warehouse 10","Capacity":"35"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"Sedans","Value":"1200","Weight":"20"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"SUVs","Value":"1800","Weight":"15"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"Electric Vehicles","Value":"2500","Weight":"25"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"Hybrid Vehicles","Value":"2000","Weight":"18"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"Trucks","Value":"1500","Weight":"10"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"Sports Cars","Value":"3000","Weight":"5"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"Compact Cars","Value":"1000","Weight":"22"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"Luxury Sedans","Value":"3500","Weight":"8"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"Vans","Value":"1600","Weight":"12"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv","values":{"ProductName":"Pickup Trucks","Value":"1700","Weight":"7"}}]'
+LEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 1', 'Capacity': '100'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 2', 'Capacity': '80'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 3', 'Capacity': '120'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 4', 'Capacity': '90'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 5', 'Capacity': '50'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 6', 'Capacity': '30'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 7', 'Capacity': '110'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 8', 'Capacity': '40'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 9', 'Capacity': '60'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', 'values': {'Warehouse ID': 'Warehouse 10', 'Capacity': '35'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'Sedans', 'Value': '1200', 'Weight': '20'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'SUVs', 'Value': '1800', 'Weight': '15'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'Electric Vehicles', 'Value': '2500', 'Weight': '25'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'Hybrid Vehicles', 'Value': '2000', 'Weight': '18'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'Trucks', 'Value': '1500', 'Weight': '10'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'Sports Cars', 'Value': '3000', 'Weight': '5'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'Compact Cars', 'Value': '1000', 'Weight': '22'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'Luxury Sedans', 'Value': '3500', 'Weight': '8'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'Vans', 'Value': '1600', 'Weight': '12'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', 'values': {'ProductName': 'Pickup Trucks', 'Value': '1700', 'Weight': '7'}}]
+import pandas as pd
+from gurobipy import Model, GRB, quicksum
+warehouse_records = [r for r in LEGACY_RECORDS if r['source'].endswith('capacity.csv')]
+product_records = [r for r in LEGACY_RECORDS if r['source'].endswith('products.csv')]
+warehouses = []
+cap_w = {}
+for rec in warehouse_records:
+    w_id = rec['values']['Warehouse ID']
+    warehouses.append(w_id)
+    try:
+        cap_w[w_id] = int(rec['values']['Capacity'])
+    except Exception:
+        raise ValueError(f'Invalid capacity for warehouse {w_id}')
+products = []
+val_p = {}
+wt_p = {}
+for rec in product_records:
+    p_id = rec['values']['ProductName']
+    products.append(p_id)
+    try:
+        val_p[p_id] = int(rec['values']['Value'])
+        wt_p[p_id] = int(rec['values']['Weight'])
+    except Exception:
+        raise ValueError(f'Invalid value/weight for product {p_id}')
+if len(warehouses) == 0 or len(products) == 0:
+    raise ValueError('No warehouses or products found in LEGACY_RECORDS')
+for w in warehouses:
+    if w not in cap_w:
+        raise ValueError(f'Missing capacity for warehouse {w}')
+for p in products:
+    if p not in val_p or p not in wt_p:
+        raise ValueError(f'Missing value/weight for product {p}')
+m = Model()
+m.setParam('MIPGap', 0.0001)
+x_vars = m.addVars(warehouses, products, vtype=GRB.INTEGER, lb=0, name='')
+m.setObjective(quicksum((val_p[p] * x_vars[w, p] for w in warehouses for p in products)), GRB.MAXIMIZE)
+for w in warehouses:
+    m.addConstr(quicksum((wt_p[p] * x_vars[w, p] for p in products)) <= cap_w[w], name=f'cap_{w}')
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for w in warehouses:
+        for p in products:
+            v = x_vars[w, p]
+            print(f'{v.VarName} {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

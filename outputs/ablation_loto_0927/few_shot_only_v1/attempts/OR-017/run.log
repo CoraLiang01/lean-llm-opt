@@ -1,0 +1,123 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Extract table records
+table_id = "file_0_view_0"
+tables = CSVQA_DATA["tables"]
+records = None
+for t in tables:
+    if t["table_id"] == table_id:
+        records = t["records"]
+        break
+if records is None:
+    raise ValueError("Table file_0_view_0 not found in CSVQA_DATA.")
+
+# Identify all SKUs classified under 'ZZ'
+zz_pattern = re.compile(r'ZZ')
+items = []
+revenue = {}
+demand = {}
+inventory = {}
+
+for rec in records:
+    sku = rec["values"]["SKU"]
+    if not isinstance(sku, str):
+        continue
+    if zz_pattern.search(sku):
+        items.append(sku)
+        try:
+            a_i = rec["values"]["Revenue"]
+            d_i = rec["values"]["Demand"]
+            s_i = rec["values"]["Initial Inventory"]
+        except KeyError as e:
+            raise ValueError(f"Missing required column in record: {e}")
+        # Validate numeric types
+        try:
+            a_i = float(a_i)
+            d_i = int(float(d_i))
+            s_i = int(float(s_i))
+        except Exception as e:
+            raise ValueError(f"Non-numeric value in record for SKU {sku}: {e}")
+        revenue[sku] = a_i
+        demand[sku] = d_i
+        inventory[sku] = s_i
+
+if not items:
+    raise ValueError("No SKUs classified under 'ZZ' found in the data.")
+
+# Validate all coefficients are present for each item
+for i in items:
+    if i not in revenue or i not in demand or i not in inventory:
+        raise ValueError(f"Missing data for SKU {i}.")
+
+# Build and solve the model
+m = gp.Model('RetailStore_ZZ_RevMax')
+x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Objective: maximize total revenue
+m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+# Constraints: demand and inventory limits
+m.addConstrs((x[i] <= demand[i] for i in items), name='')
+m.addConstrs((x[i] <= inventory[i] for i in items), name='')
+
+# Set MIPGap for solution precision
+m.Params.MIPGap = 1e-4
+
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for variable in m.getVars():
+        print(f'{variable.VarName}: {variable.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 36 rows, 18 columns and 36 nonzeros
+Model fingerprint: 0xde52bb4a
+Variable types: 0 continuous, 18 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+00, 1e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+00, 1e+03]
+Found heuristic solution: objective 10729.680000
+Presolve removed 36 rows and 18 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 10729.7 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.072968000000e+04, best bound 1.072968000000e+04, gap 0.0000%
+ObjVal: 10729.68
+C0: 12.0
+C1: 2.0
+C2: 40.0
+C3: 133.0
+C4: 180.0
+C5: 86.0
+C6: 2.0
+C7: 2.0
+C8: 40.0
+C9: 22.0
+C10: 2.0
+C11: 37.0
+C12: 2.0
+C13: 2.0
+C14: 4.0
+C15: 82.0
+C16: 2.0
+C17: 2.0
+Optimal objective: 10729.68
+Optimal solution: [('C0', 12.0), ('C1', 2.0), ('C2', 40.0), ('C3', 133.0), ('C4', 180.0), ('C5', 86.0), ('C6', 2.0), ('C7', 2.0), ('C8', 40.0), ('C9', 22.0), ('C10', 2.0), ('C11', 37.0), ('C12', 2.0), ('C13', 2.0), ('C14', 4.0), ('C15', 82.0), ('C16', 2.0), ('C17', 2.0)]

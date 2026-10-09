@@ -1,0 +1,363 @@
+{
+  "problem_id": "OR-044",
+  "query": "A supermarket manager needs to select a variety of products to stock in different sections of the store. Particularly, the store has several sections, each with a display space limit provided in \"capacity.csv.\" The predefined price and shelf space requirement of each product are detailed in \"products.csv.\" The objective is to determine the optimal number of units of each product to stock in each section to maximize the total revenue, while ensuring that the total space used by the products in each section does not exceed the available capacity. The decision variables x_ij denote the number of units of product j to be placed in section i.The decision variables must be integers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 8000.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "RA",
+  "assigned_route": "RA",
+  "generated_model": "##### Mathematical Model\n\nLet  \n- $I$ = set of sections, indexed by $i$ (from capacity.csv, SectionID)  \n- $J$ = set of products, indexed by $j$ (from products.csv, ProductName)  \n- $x_{ij}$ = number of units of product $j$ to stock in section $i$ (integer, $\\geq 0$)  \n- $v_j$ = value (price) of product $j$  \n- $w_j$ = shelf space requirement of product $j$  \n- $C_i$ = display space capacity of section $i$  \n\n**Objective:**  \n$$\n\\max \\sum_{i \\in I} \\sum_{j \\in J} v_j \\, x_{ij}\n$$\n\n**Subject to:**  \n- Section capacity constraints (for all $i \\in I$):  \n$$\n\\sum_{j \\in J} w_j \\, x_{ij} \\leq C_i\n$$\n\n- Integer and nonnegativity constraints (for all $i \\in I$, $j \\in J$):  \n$$\nx_{ij} \\in \\mathbb{Z}_{\\geq 0}\n$$\n\n---\n\n##### Data Mapping\n\n- $I$: SectionID from `/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv`\n- $J$: ProductName from `/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv`\n- $C_i$: Capacity from `/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv`, keyed by SectionID\n- $v_j$: Value from `/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv`, keyed by ProductName\n- $w_j$: Weight from `/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv`, keyed by ProductName\n- $x_{ij}$: Number of units of product $j$ in section $i$ (decision variable, integer, $\\geq 0$)",
+  "csvqa_observation": "{\"tables\": [{\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv\", \"columns\": [\"SectionID\", \"Capacity\"], \"records\": [{\"SectionID\": \"1\", \"Capacity\": \"100\"}, {\"SectionID\": \"2\", \"Capacity\": \"150\"}, {\"SectionID\": \"3\", \"Capacity\": \"120\"}, {\"SectionID\": \"4\", \"Capacity\": \"130\"}, {\"SectionID\": \"5\", \"Capacity\": \"90\"}, {\"SectionID\": \"6\", \"Capacity\": \"110\"}, {\"SectionID\": \"7\", \"Capacity\": \"160\"}, {\"SectionID\": \"8\", \"Capacity\": \"140\"}]}, {\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv\", \"columns\": [\"ProductName\", \"Value\", \"Weight\"], \"records\": [{\"ProductName\": \"1\", \"Value\": \"10\", \"Weight\": \"2\"}, {\"ProductName\": \"2\", \"Value\": \"15\", \"Weight\": \"3\"}, {\"ProductName\": \"3\", \"Value\": \"8\", \"Weight\": \"1\"}, {\"ProductName\": \"4\", \"Value\": \"12\", \"Weight\": \"2\"}, {\"ProductName\": \"5\", \"Value\": \"20\", \"Weight\": \"4\"}, {\"ProductName\": \"6\", \"Value\": \"25\", \"Weight\": \"5\"}, {\"ProductName\": \"7\", \"Value\": \"5\", \"Weight\": \"1\"}, {\"ProductName\": \"8\", \"Value\": \"30\", \"Weight\": \"6\"}, {\"ProductName\": \"9\", \"Value\": \"18\", \"Weight\": \"3\"}, {\"ProductName\": \"10\", \"Value\": \"22\", \"Weight\": \"4\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "DIRECT_FULL_SOURCE",
+  "csvqa_trace": "{\"status\": \"DIRECT_FULL_SOURCE\", \"formulation_protocol\": \"ReAct\", \"csvqa_call_count\": 0, \"planner_attempt_count\": 0, \"repair_count\": 0, \"fallback_count\": 0, \"retry_count\": 0, \"protocol_retry_count\": 0, \"protocol_retry_events\": \"[]\"}",
+  "solve_code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_problem():\n    csv_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']\n    capacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv'\n    products_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv'\n    for enc in csv_encodings:\n        try:\n            capacity_df = pd.read_csv(capacity_path, dtype=str, keep_default_na=False, encoding=enc)\n            break\n        except Exception:\n            continue\n    else:\n        raise RuntimeError(f'Could not read {capacity_path} with tried encodings.')\n    for enc in csv_encodings:\n        try:\n            products_df = pd.read_csv(products_path, dtype=str, keep_default_na=False, encoding=enc)\n            break\n        except Exception:\n            continue\n    else:\n        raise RuntimeError(f'Could not read {products_path} with tried encodings.')\n    if not {'SectionID', 'Capacity'}.issubset(capacity_df.columns):\n        raise ValueError('capacity.csv missing required columns.')\n    if not {'ProductName', 'Value', 'Weight'}.issubset(products_df.columns):\n        raise ValueError('products.csv missing required columns.')\n    sections = capacity_df['SectionID'].tolist()\n    products = products_df['ProductName'].tolist()\n    try:\n        capacity_dict = capacity_df.set_index('SectionID')['Capacity'].astype(float).to_dict()\n    except Exception:\n        raise ValueError('Non-numeric or missing Capacity in capacity.csv.')\n    try:\n        value_dict = products_df.set_index('ProductName')['Value'].astype(float).to_dict()\n        weight_dict = products_df.set_index('ProductName')['Weight'].astype(float).to_dict()\n    except Exception:\n        raise ValueError('Non-numeric or missing Value/Weight in products.csv.')\n    for s in sections:\n        if s not in capacity_dict:\n            raise ValueError(f'Missing capacity for section {s}.')\n    for p in products:\n        if p not in value_dict or p not in weight_dict:\n            raise ValueError(f'Missing value/weight for product {p}.')\n    keys = [(i, j) for i in sections for j in products]\n    m = gp.Model('Supermarket_Section_Allocation')\n    quantity_vars = m.addVars(keys, lb=0, vtype=GRB.INTEGER, name='')\n    m.setObjective(gp.quicksum((value_dict[j] * quantity_vars[i, j] for i in sections for j in products)), GRB.MAXIMIZE)\n    m.addConstrs((gp.quicksum((weight_dict[j] * quantity_vars[i, j] for j in products)) <= capacity_dict[i] for i in sections), name='')\n    m.Params.MIPGap = 0.0001\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal: {m.ObjVal}')\n        for var in m.getVars():\n            print(f'{var.VarName}: {var.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_problem()",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 8000.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      100.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      150.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ],
+    [
+      "C20",
+      -0.0
+    ],
+    [
+      "C21",
+      -0.0
+    ],
+    [
+      "C22",
+      120.0
+    ],
+    [
+      "C23",
+      -0.0
+    ],
+    [
+      "C24",
+      -0.0
+    ],
+    [
+      "C25",
+      -0.0
+    ],
+    [
+      "C26",
+      -0.0
+    ],
+    [
+      "C27",
+      -0.0
+    ],
+    [
+      "C28",
+      -0.0
+    ],
+    [
+      "C29",
+      -0.0
+    ],
+    [
+      "C30",
+      -0.0
+    ],
+    [
+      "C31",
+      -0.0
+    ],
+    [
+      "C32",
+      130.0
+    ],
+    [
+      "C33",
+      -0.0
+    ],
+    [
+      "C34",
+      -0.0
+    ],
+    [
+      "C35",
+      -0.0
+    ],
+    [
+      "C36",
+      -0.0
+    ],
+    [
+      "C37",
+      -0.0
+    ],
+    [
+      "C38",
+      -0.0
+    ],
+    [
+      "C39",
+      -0.0
+    ],
+    [
+      "C40",
+      -0.0
+    ],
+    [
+      "C41",
+      -0.0
+    ],
+    [
+      "C42",
+      90.0
+    ],
+    [
+      "C43",
+      -0.0
+    ],
+    [
+      "C44",
+      -0.0
+    ],
+    [
+      "C45",
+      -0.0
+    ],
+    [
+      "C46",
+      -0.0
+    ],
+    [
+      "C47",
+      -0.0
+    ],
+    [
+      "C48",
+      -0.0
+    ],
+    [
+      "C49",
+      -0.0
+    ],
+    [
+      "C50",
+      -0.0
+    ],
+    [
+      "C51",
+      -0.0
+    ],
+    [
+      "C52",
+      110.0
+    ],
+    [
+      "C53",
+      -0.0
+    ],
+    [
+      "C54",
+      -0.0
+    ],
+    [
+      "C55",
+      -0.0
+    ],
+    [
+      "C56",
+      -0.0
+    ],
+    [
+      "C57",
+      -0.0
+    ],
+    [
+      "C58",
+      -0.0
+    ],
+    [
+      "C59",
+      -0.0
+    ],
+    [
+      "C60",
+      -0.0
+    ],
+    [
+      "C61",
+      -0.0
+    ],
+    [
+      "C62",
+      160.0
+    ],
+    [
+      "C63",
+      -0.0
+    ],
+    [
+      "C64",
+      -0.0
+    ],
+    [
+      "C65",
+      -0.0
+    ],
+    [
+      "C66",
+      -0.0
+    ],
+    [
+      "C67",
+      -0.0
+    ],
+    [
+      "C68",
+      -0.0
+    ],
+    [
+      "C69",
+      -0.0
+    ],
+    [
+      "C70",
+      -0.0
+    ],
+    [
+      "C71",
+      -0.0
+    ],
+    [
+      "C72",
+      140.0
+    ],
+    [
+      "C73",
+      -0.0
+    ],
+    [
+      "C74",
+      -0.0
+    ],
+    [
+      "C75",
+      -0.0
+    ],
+    [
+      "C76",
+      -0.0
+    ],
+    [
+      "C77",
+      -0.0
+    ],
+    [
+      "C78",
+      -0.0
+    ],
+    [
+      "C79",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 9.48,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "81cb4ef9b2224a9f9d2240bd0310b1a117237453f774d9c7fd0d556f3a283d61",
+  "cache_fingerprint": "d742155cd17e961a240c49dd13a6a647bc389d97dff2a86714827dc7056d61d7",
+  "evaluated_utc": "2026-10-06T06:29:49.486701+00:00"
+}

@@ -1,0 +1,51 @@
+{
+  "problem_id": "OR-027",
+  "query": "The supermarket offers a variety of products with revenue data provided in the ‘Revenue’ column. The company aims to maximize total revenue using the initial inventory of products classified under ‘Organ’. Inventory levels are detailed in the ‘Initial Inventory’ column. Demand quantities are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. Decision variables x_i indicate the number of units of each ‘Organ’ product i that will be fulfilled.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM18/SupermartGrocerySales-RetailAnalyticsDataset.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 784297054.1,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal fulfillment quantities for each product in the 'Organ' category (i.e., products whose 'Sub Category' contains \"Organic\") to maximize total revenue, given deterministic demand and initial inventory constraints.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem.\n3.  **Define Index Sets:** The primary index is the set of products in the 'Organ' category, i.e., all rows where 'Sub Category' contains \"Organic\".\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of 'Organ' product i to fulfill (i.e., to allocate to demand). Type: GRB.CONTINUOUS (or GRB.INTEGER if only integer units are allowed; the query does not specify, so default to continuous).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Revenue' column (per-unit revenue for each product i).\n    -   Constraint coefficients: 'Demand' column (maximum units that can be fulfilled for each product i), 'Initial Inventory' column (maximum available units for each product i).\n    -   Constraint RHS: For each product i, the minimum of 'Demand' and 'Initial Inventory' (since fulfillment cannot exceed either).\n6.  **Formulate Objective:** Maximize total revenue, i.e., maximize the sum over all 'Organ' products i of ('Revenue'[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand fulfillment): For each 'Organ' product i, x[i] ≤ 'Demand'[i] (cannot fulfill more than demand).\n    -   Constraint 2 (Inventory limit): For each 'Organ' product i, x[i] ≤ 'Initial Inventory'[i] (cannot fulfill more than available inventory).\n    -   Constraint 3 (Non-negativity): For each 'Organ' product i, x[i] ≥ 0 (cannot fulfill negative quantities).\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM18/SupermartGrocerySales-RetailAnalyticsDataset.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 23\nColumns: ['Sub Category', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Sub Category': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'float64'}\nPreview only (first 10 rows):\n     Sub Category Revenue  Demand Initial Inventory\n     Atta & Flour   165.2  715183         5346490.0\n         Biscuits  181.93  924398         6840830.0\n    Breads & Buns  189.99 1006220         7425860.0\n            Cakes  484.65  924932         6856120.0\n          Chicken  207.75  702263         5204970.0\n       Chocolates  437.69  994869         7338980.0\n          Cookies  315.21 1031871         7682130.0\n    Dals & Pulses    47.4  714036         5233710.0\nEdible Oil & Ghee   100.8  900971         6680860.0\n             Eggs  308.44  774463         5751560.0\nFull-file column statistics: {\"Sub Category\": {\"missing\": 0, \"unique_nonempty\": 23}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 23, \"numeric_range\": [47.4, 918.45]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 23, \"numeric_range\": [674626.0, 1419411.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 23, \"numeric_range\": [4983230.0, 10514390.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"organ\", \"matching_columns\": [{\"column\": \"Sub Category\", \"exact\": 0, \"prefix\": 3, \"contains\": 3, \"examples\": [\"Organic Fruits\", \"Organic Staples\", \"Organic Vegetables\"]}], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"bceb66cc5984d5813509998336af1b68fda63c227fcda21390696985f9b5b0f7\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM18/SupermartGrocerySales-RetailAnalyticsDataset.csv'\ndf = pd.read_csv(csv_path, dtype=str, keep_default_na=False)\n\ndef is_organ(row):\n    return 'organic' in row['Sub Category'].strip().casefold()\norgan_mask = df.apply(is_organ, axis=1)\norgan_df = df[organ_mask].copy()\nif organ_df.shape[0] == 0:\n    raise ValueError(\"No products found in 'Sub Category' containing 'Organic'.\")\norgan_df.set_index('Sub Category', inplace=True)\nfor col in ['Revenue', 'Demand', 'Initial Inventory']:\n    try:\n        organ_df[col] = pd.to_numeric(organ_df[col], errors='raise')\n    except Exception as e:\n        raise ValueError(f\"Column '{col}' contains non-numeric values for selected 'Organ' products.\") from e\norgan_products = organ_df.index.tolist()\nrevenue = organ_df['Revenue'].to_dict()\ndemand = organ_df['Demand'].to_dict()\ninventory = organ_df['Initial Inventory'].to_dict()\nm = gp.Model('OrganProductRevenueMaximization')\nx_vars = m.addVars(organ_products, lb=0.0, vtype=gp.GRB.CONTINUOUS, name='')\nfor i in organ_products:\n    m.addConstr(x_vars[i] <= demand[i], name=f'demand_{i}')\n    m.addConstr(x_vars[i] <= inventory[i], name=f'inventory_{i}')\nm.setObjective(gp.quicksum((revenue[i] * x_vars[i] for i in organ_products)), gp.GRB.MAXIMIZE)\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 784297054.11,
+  "final_solution": [
+    [
+      "C0",
+      678906.0
+    ],
+    [
+      "C1",
+      749927.0
+    ],
+    [
+      "C2",
+      699808.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 8.254,
+  "evaluated_utc": "2026-10-06T08:49:34.440883+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

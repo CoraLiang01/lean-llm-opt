@@ -1,0 +1,210 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'In the construction industry, a set of managers and a set of construction projects are given. Assigning '
+          'manager i to project j incurs a cost that depends on the manager‚Äôs experience and expertise. These costs '
+          'are provided in the CSV file "manager_project_costs.csv", where each row corresponds to a manager and each '
+          'column corresponds to a project. The task is to determine a minimum-cost one-to-one assignment of managers '
+          'to projects, such that each manager is assigned to exactly one project and each project is assigned to '
+          'exactly one manager.',
+ 'relationships': [],
+ 'route': 'AP',
+ 'tables': [{'columns': ['Unnamed: 0',
+                         'previous_period_P2',
+                         'P1',
+                         'P2',
+                         'previous_period_P1',
+                         'P3',
+                         'P4',
+                         'previous_period_P4',
+                         'previous_period_P3',
+                         'previous_period_P6',
+                         'four_periods_ago_assignment_status',
+                         'two_periods_ago_P2',
+                         'two_periods_ago_P4',
+                         'two_periods_ago_P1',
+                         'P5',
+                         'previous_period_P5',
+                         'three_periods_ago_assignment_status',
+                         'previous_period_assignment_status',
+                         'two_periods_ago_assignment_status',
+                         'two_periods_ago_P3',
+                         'P6'],
+             'file_index': 0,
+             'file_name': 'manager_project_costs.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 6,
+             'records': [{'source_row': 0,
+                          'values': {'P1': '2216',
+                                     'P2': '1911',
+                                     'P3': '1661',
+                                     'P4': '2122',
+                                     'P5': '1442',
+                                     'P6': '1442',
+                                     'Unnamed: 0': 'MA',
+                                     'four_periods_ago_assignment_status': 'Completed',
+                                     'previous_period_P1': '2635',
+                                     'previous_period_P2': '2170',
+                                     'previous_period_P3': '1969',
+                                     'previous_period_P4': '2452',
+                                     'previous_period_P5': '1469',
+                                     'previous_period_P6': '1174',
+                                     'previous_period_assignment_status': 'Reserved',
+                                     'three_periods_ago_assignment_status': 'Completed',
+                                     'two_periods_ago_P1': '2229',
+                                     'two_periods_ago_P2': '1789',
+                                     'two_periods_ago_P3': '1517',
+                                     'two_periods_ago_P4': '2508',
+                                     'two_periods_ago_assignment_status': 'Completed'}},
+                         {'source_row': 1,
+                          'values': {'P1': '1100',
+                                     'P2': '1271',
+                                     'P3': '2764',
+                                     'P4': '2557',
+                                     'P5': '1036',
+                                     'P6': '1036',
+                                     'Unnamed: 0': 'MB',
+                                     'four_periods_ago_assignment_status': 'Available',
+                                     'previous_period_P1': '1073',
+                                     'previous_period_P2': '1212',
+                                     'previous_period_P3': '2952',
+                                     'previous_period_P4': '2798',
+                                     'previous_period_P5': '837',
+                                     'previous_period_P6': '1069',
+                                     'previous_period_assignment_status': 'Available',
+                                     'three_periods_ago_assignment_status': 'Available',
+                                     'two_periods_ago_P1': '943',
+                                     'two_periods_ago_P2': '1187',
+                                     'two_periods_ago_P3': '2497',
+                                     'two_periods_ago_P4': '2915',
+                                     'two_periods_ago_assignment_status': 'Completed'}},
+                         {'source_row': 2,
+                          'values': {'P1': '2827',
+                                     'P2': '2784',
+                                     'P3': '2206',
+                                     'P4': '2216',
+                                     'P5': '2677',
+                                     'P6': '2677',
+                                     'Unnamed: 0': 'MC',
+                                     'four_periods_ago_assignment_status': 'Available',
+                                     'previous_period_P1': '2526',
+                                     'previous_period_P2': '2451',
+                                     'previous_period_P3': '2540',
+                                     'previous_period_P4': '2622',
+                                     'previous_period_P5': '2566',
+                                     'previous_period_P6': '2729',
+                                     'previous_period_assignment_status': 'Reserved',
+                                     'three_periods_ago_assignment_status': 'Available',
+                                     'two_periods_ago_P1': '2659',
+                                     'two_periods_ago_P2': '3025',
+                                     'two_periods_ago_P3': '2198',
+                                     'two_periods_ago_P4': '2314',
+                                     'two_periods_ago_assignment_status': 'Available'}},
+                         {'source_row': 3,
+                          'values': {'P1': '2627',
+                                     'P2': '1273',
+                                     'P3': '2610',
+                                     'P4': '1957',
+                                     'P5': '1594',
+                                     'P6': '1594',
+                                     'Unnamed: 0': 'MD',
+                                     'four_periods_ago_assignment_status': 'Available',
+                                     'previous_period_P1': '2359',
+                                     'previous_period_P2': '1091',
+                                     'previous_period_P3': '2668',
+                                     'previous_period_P4': '2076',
+                                     'previous_period_P5': '1833',
+                                     'previous_period_P6': '1312',
+                                     'previous_period_assignment_status': 'Completed',
+                                     'three_periods_ago_assignment_status': 'Reserved',
+                                     'two_periods_ago_P1': '2817',
+                                     'two_periods_ago_P2': '1179',
+                                     'two_periods_ago_P3': '2804',
+                                     'two_periods_ago_P4': '1877',
+                                     'two_periods_ago_assignment_status': 'Completed'}},
+                         {'source_row': 4,
+                          'values': {'P1': '3359',
+                                     'P2': '1003',
+                                     'P3': '2554',
+                                     'P4': '1706',
+                                     'P5': '2065',
+                                     'P6': '2065',
+                                     'Unnamed: 0': 'ME',
+                                     'four_periods_ago_assignment_status': 'Available',
+                                     'previous_period_P1': '3620',
+                                     'previous_period_P2': '1018',
+                                     'previous_period_P3': '2736',
+                                     'previous_period_P4': '1834',
+                                     'previous_period_P5': '1775',
+                                     'previous_period_P6': '1779',
+                                     'previous_period_assignment_status': 'Assigned',
+                                     'three_periods_ago_assignment_status': 'Completed',
+                                     'two_periods_ago_P1': '3941',
+                                     'two_periods_ago_P2': '1186',
+                                     'two_periods_ago_P3': '2756',
+                                     'two_periods_ago_P4': '1392',
+                                     'two_periods_ago_assignment_status': 'Completed'}},
+                         {'source_row': 5,
+                          'values': {'P1': '1579',
+                                     'P2': '2289',
+                                     'P3': '2368',
+                                     'P4': '1922',
+                                     'P5': '2740',
+                                     'P6': '2740',
+                                     'Unnamed: 0': 'MF',
+                                     'four_periods_ago_assignment_status': 'Completed',
+                                     'previous_period_P1': '1639',
+                                     'previous_period_P2': '2667',
+                                     'previous_period_P3': '2571',
+                                     'previous_period_P4': '2214',
+                                     'previous_period_P5': '2667',
+                                     'previous_period_P6': '2196',
+                                     'previous_period_assignment_status': 'Available',
+                                     'three_periods_ago_assignment_status': 'Completed',
+                                     'two_periods_ago_P1': '1500',
+                                     'two_periods_ago_P2': '2382',
+                                     'two_periods_ago_P3': '2702',
+                                     'two_periods_ago_P4': '1852',
+                                     'two_periods_ago_assignment_status': 'Available'}}],
+             'returned_rows': 6,
+             'role': 'file_0',
+             'table_id': 'file_0_view_0'}],
+ 'validation': {'fallback_reason': "Matrix ID column 'column_header' is not selected for 'file_0_view_0'",
+                'planner_errors': ["Matrix ID column 'column_header' is not selected for 'file_0_view_0'"],
+                'status': 'FALLBACK_FULL_DATA'}}
+import pandas as pd
+CSVQA_FRAMES = {t["table_id"]: pd.DataFrame([r["values"] for r in t["records"]], columns=t["columns"], index=[r["source_row"] for r in t["records"]]) for t in CSVQA_DATA["tables"]}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_FRAMES):
+    frame = CSVQA_FRAMES['file_0_view_0']
+    managers = list(frame['Unnamed: 0'])
+    projects = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+    cost = {}
+    for (idx, row) in frame.iterrows():
+        manager = row['Unnamed: 0']
+        cost[manager] = {}
+        for project in projects:
+            try:
+                cost[manager][project] = float(row[project])
+            except Exception:
+                raise ValueError(f'Missing or invalid cost for manager {manager}, project {project}')
+    if set(cost.keys()) != set(managers):
+        raise ValueError('Mismatch in manager identifiers between data and index set')
+    for manager in managers:
+        if set(cost[manager].keys()) != set(projects):
+            raise ValueError(f'Mismatch in project identifiers for manager {manager}')
+    m = gp.Model('manager_project_assignment')
+    x_vars = m.addVars(managers, projects, vtype=GRB.BINARY, name='')
+    m.setObjective(gp.quicksum((cost[i][j] * x_vars[i, j] for i in managers for j in projects)), GRB.MINIMIZE)
+    m.addConstrs((gp.quicksum((x_vars[i, j] for j in projects)) == 1 for i in managers), name='')
+    m.addConstrs((gp.quicksum((x_vars[i, j] for i in managers)) == 1 for j in projects), name='')
+    m.Params.MIPGap = 0.0001
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+m = solve_problem(CSVQA_FRAMES)

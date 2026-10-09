@@ -1,0 +1,43 @@
+{
+  "problem_id": "OR-018",
+  "query": "The supermarket offers a variety of top-selling products, with associated data provided in the ‘Revenue’ column. Each product has its own demand level. The retailer aims to maximize total revenue by focusing on the initial inventory of products classified under ‘Baby’. Inventory levels are detailed in the ‘Initial Inventory’ column. During the sales horizon, no restocking is allowed. Demand quantities for ‘Baby’ products are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. The decision variables x_i represent the number of units of each ‘Baby’ product i that the retailer plans to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 782819438.6,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal fulfillment plan for products in the 'Baby' category, maximizing total revenue given initial inventory and deterministic demand, with no restocking allowed during the sales horizon.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem (bounded resource allocation).\n3.  **Define Index Sets:** The primary index is the set of 'Baby' products (i ∈ Baby_Products), filtered from the 'Product Name' column where the name starts with 'Baby'.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of 'Baby' product i to fulfill (i.e., to sell). Type: GRB.INTEGER (since units are discrete).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Revenue' column (revenue per unit for each product i).\n    -   Constraint coefficients: Not applicable (each variable is bounded individually).\n    -   Constraint RHS: 'Demand' column (maximum units that can be sold for each product i), 'Initial Inventory' column (maximum units available for each product i).\n6.  **Formulate Objective:** Maximize total revenue from 'Baby' products: sum over i of ('Revenue'[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand fulfillment): For each 'Baby' product i, x[i] ≤ 'Demand'[i] (cannot fulfill more than demand).\n    -   Constraint 2 (Inventory limit): For each 'Baby' product i, x[i] ≤ 'Initial Inventory'[i] (cannot sell more than available inventory).\n    -   Constraint 3 (Non-negativity and integrality): For each 'Baby' product i, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 12\nColumns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product Name': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'int64'}\nPreview only (first 10 rows):\n          Product Name Revenue  Demand Initial Inventory\n      Baby Food_255.28  255.28 3066513          22749210\n       Beverages_47.45   47.45 2961484          22049510\n          Cereal_205.7   205.7 2621950          19459680\n        Clothes_109.28  109.28 2660974          19754410\n       Cosmetics_437.2   437.2 2896197          21366410\n           Fruits_9.33    9.33 3169426          23410830\n      Household_668.27  668.27 2846953          20986130\n           Meat_421.89  421.89 2546972          19011970\nOffice Supplies_651.21  651.21 2855686          21062780\n   Personal Care_81.73   81.73 2855360          21265920\nFull-file column statistics: {\"Product Name\": {\"missing\": 0, \"unique_nonempty\": 12}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 12, \"numeric_range\": [9.33, 668.27]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 12, \"numeric_range\": [2546972.0, 3169426.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 12, \"numeric_range\": [19011970.0, 23410830.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"baby\", \"matching_columns\": [{\"column\": \"Product Name\", \"exact\": 0, \"prefix\": 1, \"contains\": 1, \"examples\": [\"Baby Food_255.28\"]}], \"exact_matching_columns\": 0}, {\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"1b03fdcb4f95386f7c02743c08b14439c453f24685cfacac6118252eb728c17c\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\n\ndef is_baby_product(name):\n    return name.strip().casefold().startswith('baby')\nbaby_mask = df['Product Name'].apply(is_baby_product)\nbaby_df = df[baby_mask].copy()\nif baby_df.shape[0] == 0:\n    raise ValueError(\"No 'Baby' products found in the data (Product Name starting with 'Baby').\")\nbaby_df.set_index('Product Name', inplace=True, drop=False)\nfor col in ['Revenue', 'Demand', 'Initial Inventory']:\n    if col not in baby_df.columns:\n        raise KeyError(f\"Required column '{col}' not found in the CSV.\")\n    try:\n        baby_df[col] = pd.to_numeric(baby_df[col], errors='raise')\n    except Exception as e:\n        raise ValueError(f\"Column '{col}' contains non-numeric values: {e}\")\nbaby_products = list(baby_df.index)\nrevenue = baby_df['Revenue'].to_dict()\ndemand = baby_df['Demand'].to_dict()\ninit_inventory = baby_df['Initial Inventory'].to_dict()\nm = gp.Model('BabyProductRevenueMax')\nx_vars = m.addVars(baby_products, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((revenue[i] * x_vars[i] for i in baby_products)), gp.GRB.MAXIMIZE)\nm.addConstrs((x_vars[i] <= demand[i] for i in baby_products), name='')\nm.addConstrs((x_vars[i] <= init_inventory[i] for i in baby_products), name='')\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 782819438.64,
+  "final_solution": [
+    [
+      "C0",
+      3066513.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 10.516,
+  "evaluated_utc": "2026-10-06T08:45:25.281995+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

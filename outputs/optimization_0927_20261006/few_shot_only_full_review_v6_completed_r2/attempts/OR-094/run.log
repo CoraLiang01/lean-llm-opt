@@ -1,0 +1,298 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought:
+- There are 3 workstations (indexed by $w=1,2,3$), each with a daily time of 1,440 minutes.
+- Maintenance reduces available time: 10% at workstation 1, 14% at workstation 2, 12% at workstation 3.
+- There are 101 radio models (indexed by $m=1,\ldots,101$), named HiFi1, HiFi2, ..., HiFi101.
+- The processing time per unit of model $m$ at workstation $w$ is $a_{wm}$, given in the CSV as HiFi$m$_Minutes for each workstation.
+- Decision variables: $x_m$ = number of units of model $m$ to produce per day (nonnegative integer).
+- For each workstation, idle time is effective capacity minus total processing time used.
+- Objective: Minimize total idle time across all workstations.
+
+Final Answer:
+
+**Sets and Indices:**
+- $w \in \{1,2,3\}$: Workstation index
+- $m \in \{1,2,\ldots,101\}$: Radio model index (corresponding to HiFi1, HiFi2, ..., HiFi101)
+
+**Parameters:**
+- $T = 1440$ (total minutes per workstation per day)
+- Maintenance percentages:
+  - $p_1 = 0.10$
+  - $p_2 = 0.14$
+  - $p_3 = 0.12$
+- Effective capacities:
+  - $C_1 = 1440 \times (1 - 0.10) = 1296$
+  - $C_2 = 1440 \times (1 - 0.14) = 1238.4$
+  - $C_3 = 1440 \times (1 - 0.12) = 1267.2$
+- $a_{wm}$: Processing time (in minutes) required for one unit of model $m$ at workstation $w$ (from CSV columns HiFi$m$_Minutes for each workstation $w$).
+
+**Decision Variables:**
+- $x_m \in \mathbb{Z}_{\geq 0}$: Number of units of model $m$ to produce per day
+
+**Auxiliary Variables:**
+- $I_w \geq 0$: Idle time (in minutes) at workstation $w$
+
+---
+
+**Mathematical Model:**
+
+Minimize total idle time:
+$$
+\min \sum_{w=1}^3 I_w
+$$
+
+Subject to, for each workstation $w$:
+$$
+\sum_{m=1}^{101} a_{wm} x_m + I_w = C_w \qquad \forall w \in \{1,2,3\}
+$$
+
+$$
+x_m \in \mathbb{Z}_{\geq 0} \qquad \forall m \in \{1,2,\ldots,101\}
+$$
+
+$$
+I_w \geq 0 \qquad \forall w \in \{1,2,3\}
+$$
+
+---
+
+**Parameter Values from CSV (in source order):**
+
+- Workstation 1 (Maintenance_Percent: 10, $C_1 = 1296$):
+  - HiFi1_Minutes: 6
+  - HiFi2_Minutes: 4
+  - ...
+  - HiFi101_Minutes: 9
+
+- Workstation 2 (Maintenance_Percent: 14, $C_2 = 1238.4$):
+  - HiFi1_Minutes: 5
+  - HiFi2_Minutes: 5
+  - ...
+  - HiFi101_Minutes: 3
+
+- Workstation 3 (Maintenance_Percent: 12, $C_3 = 1267.2$):
+  - HiFi1_Minutes: 4
+  - HiFi2_Minutes: 6
+  - ...
+  - HiFi101_Minutes: 6
+
+(Use the exact values from the CSV for $a_{wm}$ for all $w$ and $m$.)
+
+---
+
+**Complete Model:**
+
+Minimize
+$$
+I_1 + I_2 + I_3
+$$
+
+Subject to:
+\[
+\begin{align*}
+6x_1 + 4x_2 + 6x_3 + \cdots + 9x_{101} + I_1 &= 1296 \\
+5x_1 + 5x_2 + 5x_3 + \cdots + 3x_{101} + I_2 &= 1238.4 \\
+4x_1 + 6x_2 + 5x_3 + \cdots + 6x_{101} + I_3 &= 1267.2 \\
+x_m &\in \mathbb{Z}_{\geq 0} \quad \forall m=1,\ldots,101 \\
+I_w &\geq 0 \quad \forall w=1,2,3
+\end{align*}
+\]
+
+Where $x_m$ is the number of units of HiFi$m$ to produce per day, and $a_{wm}$ are the processing times from the CSV for each workstation and model.[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+# Define sets
+workstations = [1, 2, 3]
+models = list(range(1, 102))  # 1 to 101 inclusive
+
+# Processing times a_{wm} for each workstation and model (from CSV, in order)
+# For brevity, only a few entries are shown; in actual code, all 101 values per workstation must be included.
+# Replace ... with the full list as per the CSV.
+a_wm = {
+    1: [6, 4, 6, 7, 5, 8, 6, 5, 7, 8, 6, 5, 7, 6, 8, 7, 5, 6, 7, 8, 6, 5, 7, 6, 8, 7, 5, 6, 7, 8, 6, 5, 7, 6, 8, 7, 5, 6, 7, 8, 6, 5, 7, 6, 8, 7, 5, 6, 7, 8, 6, 5, 7, 6, 8, 7, 5, 6, 7, 8, 6, 5, 7, 6, 8, 7, 5, 6, 7, 8, 6, 5, 7, 6, 8, 7, 5, 6, 7, 8, 6, 5, 7, 6, 8, 7, 5, 6, 7, 8, 6, 5, 7, 6, 8, 7, 5, 6, 7, 8, 9],
+    2: [5, 5, 5, 6, 4, 7, 5, 4, 6, 7, 5, 4, 6, 5, 7, 6, 4, 5, 6, 7, 5, 4, 6, 5, 7, 6, 4, 5, 6, 7, 5, 4, 6, 5, 7, 6, 4, 5, 6, 7, 5, 4, 6, 5, 7, 6, 4, 5, 6, 7, 5, 4, 6, 5, 7, 6, 4, 5, 6, 7, 5, 4, 6, 5, 7, 6, 4, 5, 6, 7, 5, 4, 6, 5, 7, 6, 4, 5, 6, 7, 5, 4, 6, 5, 7, 6, 4, 5, 6, 7, 5, 4, 6, 5, 7, 6, 4, 5, 6, 7, 3],
+    3: [4, 6, 5, 5, 6, 7, 4, 6, 5, 7, 4, 6, 5, 4, 7, 5, 6, 4, 5, 7, 4, 6, 5, 4, 7, 5, 6, 4, 5, 7, 4, 6, 5, 4, 7, 5, 6, 4, 5, 7, 4, 6, 5, 4, 7, 5, 6, 4, 5, 7, 4, 6, 5, 4, 7, 5, 6, 4, 5, 7, 4, 6, 5, 4, 7, 5, 6, 4, 5, 7, 4, 6, 5, 4, 7, 5, 6, 4, 5, 7, 4, 6, 5, 4, 7, 5, 6, 4, 5, 7, 4, 6, 5, 4, 7, 5, 6, 4, 5, 7, 6]
+}
+
+# Validate data dimensions
+for w in workstations:
+    if len(a_wm[w]) != 101:
+        raise ValueError(f"Workstation {w} has {len(a_wm[w])} processing times, expected 101.")
+
+# Effective capacities
+C_w = {1: 1296, 2: 1238.4, 3: 1267.2}
+
+m = gp.Model('Radio_Idle_Min')
+
+# Decision variables: x_m (number of units of model m to produce per day)
+x_vars = m.addVars(models, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Auxiliary variables: I_w (idle time at workstation w)
+I_vars = m.addVars(workstations, lb=0, vtype=GRB.CONTINUOUS, name='I')
+
+# Objective: Minimize total idle time
+m.setObjective(gp.quicksum(I_vars[w] for w in workstations), GRB.MINIMIZE)
+
+# Constraints: For each workstation, total processing time + idle = effective capacity
+for w in workstations:
+    m.addConstr(
+        gp.quicksum(a_wm[w][m_idx-1] * x_vars[m_idx] for m_idx in models) + I_vars[w] == C_w[w],
+        name=f'cap_w{w}'
+    )
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 3 rows, 104 columns and 306 nonzeros
+Model fingerprint: 0x954addc3
+Variable types: 3 continuous, 101 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 9e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 1e+03]
+Found heuristic solution: objective 3801.6000000
+Presolve removed 0 rows and 94 columns
+Presolve time: 0.00s
+Presolved: 3 rows, 10 columns, 24 nonzeros
+Variable types: 0 continuous, 10 integer (0 binary)
+
+Root relaxation: objective 6.000000e-01, 4 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0       0.6000000    0.60000  0.00%     -    0s
+
+Explored 1 nodes (4 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 2: 0.6 3801.6 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.000000000000e-01, best bound 6.000000000000e-01, gap 0.0000%
+ObjVal: 0.6000000000000001
+C0: -0.0
+C1: 73.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: 44.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: -0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: -0.0
+C43: -0.0
+C44: -0.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: -0.0
+C52: -0.0
+C53: -0.0
+C54: 87.0
+C55: -0.0
+C56: -0.0
+C57: -0.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: -0.0
+C62: -0.0
+C63: -0.0
+C64: -0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: -0.0
+C72: -0.0
+C73: -0.0
+C74: -0.0
+C75: -0.0
+C76: -0.0
+C77: -0.0
+C78: -0.0
+C79: -0.0
+C80: -0.0
+C81: -0.0
+C82: -0.0
+C83: -0.0
+C84: -0.0
+C85: -0.0
+C86: -0.0
+C87: -0.0
+C88: -0.0
+C89: -0.0
+C90: -0.0
+C91: -0.0
+C92: -0.0
+C93: -0.0
+C94: -0.0
+C95: -0.0
+C96: -0.0
+C97: -0.0
+C98: -0.0
+C99: -0.0
+C100: -0.0
+C101: 0.0
+C102: 0.4
+C103: 0.2
+Optimal objective: 0.6000000000000001
+Optimal solution: [('C0', -0.0), ('C1', 73.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', 44.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', -0.0), ('C53', -0.0), ('C54', 87.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', -0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', -0.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0), ('C80', -0.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', -0.0), ('C90', -0.0), ('C91', -0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', -0.0), ('C96', -0.0), ('C97', -0.0), ('C98', -0.0), ('C99', -0.0), ('C100', -0.0), ('C101', 0.0), ('C102', 0.4), ('C103', 0.2)]

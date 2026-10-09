@@ -1,0 +1,15 @@
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal integer allocation of various products to different display shelves in a store, maximizing the total value of products displayed, while ensuring that the total weight of products on each shelf does not exceed its capacity.
+2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem (specifically, a multi-dimensional integer knapsack allocation).
+3.  **Define Index Sets:** The primary indices are Shelves (from `capacity.csv`, indexed by `ShelfID`) and Products (from `products.csv`, indexed by `ProductName`).
+4.  **Define Decision Variables:**
+    -   `x[i,j]` = Number of units of product `j` placed on shelf `i`. Type: GRB.INTEGER (non-negative).
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: `Value` (from `products.csv`, per product).
+    -   Constraint coefficients: `Weight` (from `products.csv`, per product).
+    -   Constraint RHS (limits): `Capacity` (from `capacity.csv`, per shelf).
+6.  **Formulate Objective:** Maximize the total value of products placed across all shelves, i.e., maximize the sum over all shelves and products of (`Value[j]` * `x[i,j]`).
+7.  **Formulate Constraints:**
+    -   Shelf Capacity Constraint: For each shelf `i`, the sum over all products of (`Weight[j]` * `x[i,j]`) ≤ `Capacity[i]`.
+    -   Non-negativity and Integrality: For all shelves `i` and products `j`, `x[i,j]` ≥ 0 and integer.
+[Abstract Model Plan END]

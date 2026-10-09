@@ -1,0 +1,308 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+#### Abstract Mathematical Model
+
+**Index Sets:**
+- $C$: set of components (from processing_time_unit.csv columns C1–C111, unit_price.csv Unnamed: 0)
+- $W$: set of workshops (from processing_time_unit.csv Unnamed: 0, total_working_hours.csv workshop)
+
+**Parameters:**
+- $t_{w,c}$: unit processing time of component $c$ in workshop $w$ (from processing_time_unit.csv, row $w$, column $c$)
+- $p_c$: unit price of component $c$ (from unit_price.csv, row $c$, column unit_price)
+- $T_w$: total available working hours in workshop $w$ (from total_working_hours.csv, row $w$, column total_hours)
+
+**Decision Variables:**
+- $x_c \in \mathbb{Z}_{\geq 0}$: number of units to produce of component $c$
+
+**Objective:**
+\[
+\max \sum_{c \in C} p_c \, x_c
+\]
+
+**Constraints:**
+\[
+\sum_{c \in C} t_{w,c} \, x_c \leq T_w \qquad \forall w \in W
+\]
+\[
+x_c \in \mathbb{Z}_{\geq 0} \qquad \forall c \in C
+\]
+
+---
+
+#### Data Mapping
+
+- $C$: processing_time_unit.csv columns C1–C111; unit_price.csv Unnamed: 0
+- $W$: processing_time_unit.csv Unnamed: 0; total_working_hours.csv workshop
+- $t_{w,c}$: processing_time_unit.csv, row [Unnamed: 0 = $w$], column $c$
+- $p_c$: unit_price.csv, row [Unnamed: 0 = $c$], column unit_price
+- $T_w$: total_working_hours.csv, row [workshop = $w$], column total_hours
+
+- $x_c$: number of units to produce of component $c$ (decision variable, nonnegative integer)[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with fallback encodings
+    csv_paths = {
+        'processing_time_unit': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others8/processing_time_unit.csv',
+        'unit_price': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others8/unit_price.csv',
+        'total_working_hours': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others8/total_working_hours.csv'
+    }
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    def read_csv_with_fallback(path):
+        for enc in encodings:
+            try:
+                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)
+            except Exception:
+                continue
+        raise RuntimeError(f'Failed to read {path} with tried encodings.')
+    df_time = read_csv_with_fallback(csv_paths['processing_time_unit'])
+    df_price = read_csv_with_fallback(csv_paths['unit_price'])
+    df_hours = read_csv_with_fallback(csv_paths['total_working_hours'])
+
+    # Workshops (resources)
+    workshops = list(df_hours['workshop'])
+    # Components (activities)
+    component_cols = [col for col in df_time.columns if col != 'Unnamed: 0']
+    components = component_cols
+
+    # Build processing time: workshop x component
+    processing_time = {}
+    for w_idx, w in enumerate(df_time['Unnamed: 0']):
+        for c in components:
+            val = df_time.at[w_idx, c]
+            if val == '':
+                raise ValueError(f'Missing processing time for workshop {w}, component {c}')
+            try:
+                processing_time[(w, c)] = float(val)
+            except Exception:
+                raise ValueError(f'Non-numeric processing time for workshop {w}, component {c}: {val}')
+
+    # Build unit price: component
+    if len(df_price) != len(components):
+        raise ValueError('unit_price.csv row count does not match number of components')
+    unit_price = {}
+    for idx, c in enumerate(components):
+        val = df_price.at[idx, 'unit_price']
+        if val == '':
+            raise ValueError(f'Missing unit price for component {c}')
+        try:
+            unit_price[c] = float(val)
+        except Exception:
+            raise ValueError(f'Non-numeric unit price for component {c}: {val}')
+
+    # Build total working hours: workshop
+    total_hours = {}
+    for idx, row in df_hours.iterrows():
+        w = row['workshop']
+        val = row['total_hours']
+        if val == '':
+            raise ValueError(f'Missing total_hours for workshop {w}')
+        try:
+            total_hours[w] = float(val)
+        except Exception:
+            raise ValueError(f'Non-numeric total_hours for workshop {w}: {val}')
+
+    # Validate all workshops and components are covered
+    for w in workshops:
+        for c in components:
+            if (w, c) not in processing_time:
+                raise ValueError(f'Missing processing time for workshop {w}, component {c}')
+    for c in components:
+        if c not in unit_price:
+            raise ValueError(f'Missing unit price for component {c}')
+    for w in workshops:
+        if w not in total_hours:
+            raise ValueError(f'Missing total_hours for workshop {w}')
+
+    # Model
+    m = gp.Model('factory_production')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_c >= 0, integer
+    quantity_vars = m.addVars(components, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total output value
+    m.setObjective(gp.quicksum(unit_price[c] * quantity_vars[c] for c in components), GRB.MAXIMIZE)
+
+    # Constraints: for each workshop, total processing time used <= available hours
+    for w in workshops:
+        m.addConstr(
+            gp.quicksum(processing_time[(w, c)] * quantity_vars[c] for c in components) <= total_hours[w],
+            name=f'cap_{w}'
+        )
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 5 rows, 111 columns and 459 nonzeros
+Model fingerprint: 0xb7327e7a
+Variable types: 0 continuous, 111 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [5e-01, 5e+00]
+  Objective range  [5e+01, 2e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [6e+03, 8e+03]
+Found heuristic solution: objective 663646.00000
+Presolve removed 0 rows and 59 columns
+Presolve time: 0.00s
+Presolved: 5 rows, 52 columns, 191 nonzeros
+Found heuristic solution: objective 663543.00000
+Variable types: 0 continuous, 52 integer (0 binary)
+Found heuristic solution: objective 664136.00000
+
+Root relaxation: objective 1.382145e+06, 10 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 1382144.57    0    4 664136.000 1382144.57   108%     -    0s
+H    0     0                    1381728.0000 1382144.57  0.03%     -    0s
+H    0     0                    1381895.0000 1382144.57  0.02%     -    0s
+H    0     0                    1381944.0000 1382144.57  0.01%     -    0s
+H    0     0                    1382045.0000 1382144.57  0.01%     -    0s
+
+Explored 1 nodes (10 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 7: 1.38204e+06 1.38194e+06 1.3819e+06 ... 663543
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.382045000000e+06, best bound 1.382144573201e+06, gap 0.0072%
+ObjVal: 1382045.0
+C0: -0.0
+C1: 0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: 0.0
+C6: 0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: 0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: 0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: 0.0
+C27: -0.0
+C28: -0.0
+C29: 0.0
+C30: 0.0
+C31: -0.0
+C32: 0.0
+C33: -0.0
+C34: 0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: 0.0
+C40: 0.0
+C41: -0.0
+C42: -0.0
+C43: -0.0
+C44: -0.0
+C45: -0.0
+C46: 1.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: -0.0
+C52: 0.0
+C53: 0.0
+C54: -0.0
+C55: 0.0
+C56: 1.0
+C57: 0.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: -0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: -0.0
+C66: -0.0
+C67: 0.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: -0.0
+C72: -0.0
+C73: -0.0
+C74: 0.0
+C75: -0.0
+C76: 0.0
+C77: 4882.0
+C78: 0.0
+C79: 0.0
+C80: -0.0
+C81: -0.0
+C82: 0.0
+C83: 3025.0
+C84: -0.0
+C85: 0.0
+C86: -0.0
+C87: -0.0
+C88: -0.0
+C89: 0.0
+C90: 1290.0
+C91: 0.0
+C92: -0.0
+C93: -0.0
+C94: -0.0
+C95: 0.0
+C96: -0.0
+C97: 0.0
+C98: 0.0
+C99: -0.0
+C100: -0.0
+C101: -0.0
+C102: -0.0
+C103: -0.0
+C104: -0.0
+C105: 0.0
+C106: -0.0
+C107: -0.0
+C108: 0.0
+C109: 105.0
+C110: -0.0
+Optimal objective: 1382045.0
+Optimal solution: [('C0', -0.0), ('C1', 0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', 0.0), ('C6', 0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', 0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', 0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', 0.0), ('C27', -0.0), ('C28', -0.0), ('C29', 0.0), ('C30', 0.0), ('C31', -0.0), ('C32', 0.0), ('C33', -0.0), ('C34', 0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', 0.0), ('C40', 0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', -0.0), ('C45', -0.0), ('C46', 1.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', 0.0), ('C53', 0.0), ('C54', -0.0), ('C55', 0.0), ('C56', 1.0), ('C57', 0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', -0.0), ('C66', -0.0), ('C67', 0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', -0.0), ('C72', -0.0), ('C73', -0.0), ('C74', 0.0), ('C75', -0.0), ('C76', 0.0), ('C77', 4882.0), ('C78', 0.0), ('C79', 0.0), ('C80', -0.0), ('C81', -0.0), ('C82', 0.0), ('C83', 3025.0), ('C84', -0.0), ('C85', 0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', 0.0), ('C90', 1290.0), ('C91', 0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', 0.0), ('C96', -0.0), ('C97', 0.0), ('C98', 0.0), ('C99', -0.0), ('C100', -0.0), ('C101', -0.0), ('C102', -0.0), ('C103', -0.0), ('C104', -0.0), ('C105', 0.0), ('C106', -0.0), ('C107', -0.0), ('C108', 0.0), ('C109', 105.0), ('C110', -0.0)]

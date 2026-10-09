@@ -1,0 +1,175 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+# Data
+suppliers = ['MOUNT AYR', 'WAUKEE', 'WAVERLY', 'PELLA', 'DES MOINES']
+stores = ['CLARINDA', 'FORT MADISON', 'SIOUX CITY', 'TOLEDO', 'BANCROFT']
+
+demand = {
+    'CLARINDA': 2397,
+    'FORT MADISON': 1889,
+    'SIOUX CITY': 2518,
+    'TOLEDO': 3218,
+    'BANCROFT': 1813
+}
+
+fixed_cost = {
+    'MOUNT AYR': 96.58,
+    'WAUKEE': 94.06,
+    'WAVERLY': 94.37,
+    'PELLA': 82.88,
+    'DES MOINES': 94.96
+}
+
+cost = {
+    'MOUNT AYR': {
+        'CLARINDA': 694.68,
+        'FORT MADISON': 17.48,
+        'SIOUX CITY': 20.07,
+        'TOLEDO': 199.02,
+        'BANCROFT': 1685.53
+    },
+    'WAUKEE': {
+        'CLARINDA': 15.13,
+        'FORT MADISON': 1.50,
+        'SIOUX CITY': 1.43,
+        'TOLEDO': 27.88,
+        'BANCROFT': 90.69
+    },
+    'WAVERLY': {
+        'CLARINDA': 2.34,
+        'FORT MADISON': 349.34,
+        'SIOUX CITY': 246.60,
+        'TOLEDO': 41.30,
+        'BANCROFT': 78.73
+    },
+    'PELLA': {
+        'CLARINDA': 1181.60,
+        'FORT MADISON': 1458.53,
+        'SIOUX CITY': 1646.36,
+        'TOLEDO': 1924.55,
+        'BANCROFT': 38.93
+    },
+    'DES MOINES': {
+        'CLARINDA': 1030.80,
+        'FORT MADISON': 43.48,
+        'SIOUX CITY': 932.43,
+        'TOLEDO': 55.39,
+        'BANCROFT': 103.84
+    }
+}
+
+M = sum(demand.values())
+
+# Validate data coverage
+for i in suppliers:
+    if i not in fixed_cost:
+        raise ValueError(f'Missing fixed cost for supplier {i}')
+    if i not in cost:
+        raise ValueError(f'Missing cost row for supplier {i}')
+    for j in stores:
+        if j not in cost[i]:
+            raise ValueError(f'Missing cost for supplier {i}, store {j}')
+for j in stores:
+    if j not in demand:
+        raise ValueError(f'Missing demand for store {j}')
+
+# Model
+m = gp.Model('Iowa_Liquor_Facility_Location')
+
+x = m.addVars(suppliers, stores, lb=0, vtype=GRB.CONTINUOUS, name='')
+y = m.addVars(suppliers, vtype=GRB.BINARY, name='')
+
+# Objective
+m.setObjective(
+    gp.quicksum(cost[i][j] * x[i, j] for i in suppliers for j in stores) +
+    gp.quicksum(fixed_cost[i] * y[i] for i in suppliers),
+    GRB.MINIMIZE
+)
+
+# Constraints
+m.addConstrs(
+    (gp.quicksum(x[i, j] for i in suppliers) == demand[j] for j in stores),
+    name=''
+)
+m.addConstrs(
+    (gp.quicksum(x[i, j] for j in stores) <= M * y[i] for i in suppliers),
+    name=''
+)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 10 rows, 30 columns and 55 nonzeros
+Model fingerprint: 0x712edc9e
+Variable types: 25 continuous, 5 integer (5 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+04]
+  Objective range  [1e+00, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [2e+03, 3e+03]
+Presolve time: 0.00s
+Presolved: 10 rows, 30 columns, 55 nonzeros
+Variable types: 25 continuous, 5 integer (5 binary)
+Found heuristic solution: objective 172804.00000
+
+Root relaxation: objective 1.724336e+05, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 172433.560    0    3 172804.000 172433.560  0.21%     -    0s
+*    0     0               0    172612.46000 172612.460  0.00%     -    0s
+
+Explored 1 nodes (6 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 2: 172612 172804 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.726124600000e+05, best bound 1.726124600000e+05, gap 0.0000%
+ObjVal: 172612.46
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 1889.0
+C7: 2518.0
+C8: 3218.0
+C9: 0.0
+C10: 2397.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 1813.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: -0.0
+C26: 1.0
+C27: 1.0
+C28: 1.0
+C29: -0.0
+Optimal objective: 172612.46
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 1889.0), ('C7', 2518.0), ('C8', 3218.0), ('C9', 0.0), ('C10', 2397.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 1813.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', -0.0), ('C26', 1.0), ('C27', 1.0), ('C28', 1.0), ('C29', -0.0)]

@@ -1,0 +1,116 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S1/Large-scale-or/AP_testing/AP3/manager_project_costs.csv",
+    "values": {
+      "Unnamed: 0": "MA",
+      "document_page_count": "16",
+      "P1": "2216",
+      "P2": "1911",
+      "archive_revision_number": "4",
+      "P3": "1661",
+      "P4": "2122",
+      "archive_batch_number": "304",
+      "record_view_count": "91",
+      "P5": "1442",
+      "attachment_count": "1",
+      "record_display_theme": "Slate",
+      "archive_storage_medium": "Paper",
+      "P6": "1442"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S1/Large-scale-or/AP_testing/AP3/manager_project_costs.csv",
+    "values": {
+      "Unnamed: 0": "MB",
+      "document_page_count": "4",
+      "P1": "1100",
+      "P2": "1271",
+      "archive_revision_number": "6",
+      "P3": "2764",
+      "P4": "2557",
+      "archive_batch_number": "301",
+      "record_view_count": "76",
+      "P5": "1036",
+      "attachment_count": "1",
+      "record_display_theme": "Olive",
+      "archive_storage_medium": "Digital",
+      "P6": "1036"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S1/Large-scale-or/AP_testing/AP3/manager_project_costs.csv",
+    "values": {
+      "Unnamed: 0": "MC",
+      "document_page_count": "16",
+      "P1": "2827",
+      "P2": "2784",
+      "archive_revision_number": "1",
+      "P3": "2206",
+      "P4": "2216",
+      "archive_batch_number": "301",
+      "record_view_count": "27",
+      "P5": "2677",
+      "attachment_count": "3",
+      "record_display_theme": "Olive",
+      "archive_storage_medium": "Paper",
+      "P6": "2677"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S1/Large-scale-or/AP_testing/AP3/manager_project_costs.csv",
+    "values": {
+      "Unnamed: 0": "MD",
+      "document_page_count": "6",
+      "P1": "2627",
+      "P2": "1273",
+      "archive_revision_number": "3",
+      "P3": "2610",
+      "P4": "1957",
+      "archive_batch_number": "301",
+      "record_view_count": "58",
+      "P5": "1594",
+      "attachment_count": "4",
+      "record_display_theme": "Slate",
+      "archive_storage_medium": "Hybrid",
+      "P6": "1594"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S1/Large-scale-or/AP_testing/AP3/manager_project_costs.csv",
+    "values": {
+      "Unnamed: 0": "ME",
+      "document_page_count": "6",
+      "P1": "3359",
+      "P2": "1003",
+      "archive_revision_number": "3",
+      "P3": "2554",
+      "P4": "1706",
+      "archive_batch_number": "305",
+      "record_view_count": "43",
+      "P5": "2065",
+      "attachment_count": "4",
+      "record_display_theme": "Azure",
+      "archive_storage_medium": "Hybrid",
+      "P6": "2065"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S1/Large-scale-or/AP_testing/AP3/manager_project_costs.csv",
+    "values": {
+      "Unnamed: 0": "MF",
+      "document_page_count": "8",
+      "P1": "1579",
+      "P2": "2289",
+      "archive_revision_number": "4",
+      "P3": "2368",
+      "P4": "1922",
+      "archive_batch_number": "304",
+      "record_view_count": "58",
+      "P5": "2740",
+      "attachment_count": "5",
+      "record_display_theme": "Azure",
+      "archive_storage_medium": "Hybrid",
+      "P6": "2740"
+    }
+  }
+]

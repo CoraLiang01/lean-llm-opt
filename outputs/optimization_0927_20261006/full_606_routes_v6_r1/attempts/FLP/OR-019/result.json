@@ -1,0 +1,47 @@
+{
+  "problem_id": "OR-019",
+  "query": "The supermarket offers a variety of top-selling products, with revenue data provided in the ‘Revenue’ column. Each product has its own demand level. The retailer aims to maximize total revenue by focusing on the initial inventory of products classified under ‘27in’. Inventory levels are provided in the ‘Initial Inventory’ column. Demand quantities for ‘27in’ products are given in the ‘Demand’ column and are assumed to be deterministic and known in advance. The decision variables x_i represent the number of units of each ‘27in’ product i that the company plans to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM10/SalesDataAnalysis.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 7123134.69,
+  "forced_route": "FLP",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "FLP",
+  "generated_model": "##### Decision Variables\n\n$x_i \\in \\mathbb{Z}_{\\geq 0}$: Number of units of ‘27in’ product $i$ to fulfill, for each $i \\in I$ (where $I$ is the set of ‘27in’ products).\n\n##### Parameters\n\nLet $I = \\{$\n- $1$: 27in 4K Gaming Monitor\n- $2$: 27in FHD Monitor\n$\\}$\n\nProduct data:\n- 27in 4K Gaming Monitor: Revenue = 389.99, Demand = 12474, Initial Inventory = 62440\n- 27in FHD Monitor: Revenue = 149.99, Demand = 15057, Initial Inventory = 75500\n\nLet:\n- $r_i$: Revenue per unit of product $i$\n- $d_i$: Demand for product $i$\n- $s_i$: Initial inventory for product $i$\n\nSo,\n- $r_1 = 389.99$, $d_1 = 12474$, $s_1 = 62440$\n- $r_2 = 149.99$, $d_2 = 15057$, $s_2 = 75500$\n\n##### Objective Function\n\n\\[\n\\max \\; 389.99\\,x_1 + 149.99\\,x_2\n\\]\n\n##### Constraints\n\n1. Demand fulfillment: $x_i \\leq d_i \\quad \\forall i \\in I$\n2. Inventory limit: $x_i \\leq s_i \\quad \\forall i \\in I$\n3. Nonnegativity and integrality: $x_i \\in \\mathbb{Z}_{\\geq 0} \\quad \\forall i \\in I$\n\n##### Complete Model\n\n\\[\n\\begin{align*}\n\\max \\quad & 389.99\\,x_1 + 149.99\\,x_2 \\\\\n\\text{s.t.} \\quad & x_1 \\leq 12474 \\\\\n                  & x_2 \\leq 15057 \\\\\n                  & x_1 \\leq 62440 \\\\\n                  & x_2 \\leq 75500 \\\\\n                  & x_1, x_2 \\in \\mathbb{Z}_{\\geq 0}\n\\end{align*}\n\\]\n\nWhere:\n- $x_1$: units of 27in 4K Gaming Monitor fulfilled\n- $x_2$: units of 27in FHD Monitor fulfilled",
+  "csvqa_observation": "[{\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM10/SalesDataAnalysis.csv\", \"values\": {\"Product Name\": \"27in 4K Gaming Monitor\", \"Revenue\": \"389.99\", \"Demand\": \"12474\", \"Initial Inventory\": \"62440\"}}, {\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM10/SalesDataAnalysis.csv\", \"values\": {\"Product Name\": \"27in FHD Monitor\", \"Revenue\": \"149.99\", \"Demand\": \"15057\", \"Initial Inventory\": \"75500\"}}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_VALIDATED_SOURCE_ROWS",
+  "csvqa_trace": "{\"version\": \"GPT4.1-LO\", \"mode\": \"legacy\", \"status\": \"LEGACY_VALIDATED_SOURCE_ROWS\", \"plan\": null, \"planner_attempt_count\": 0, \"planner_outputs\": [], \"planner_errors\": [], \"validation_errors\": [], \"fallback_reason\": null, \"legacy_extraction_output\": \"[{\\\"source\\\": \\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM10/SalesDataAnalysis.csv\\\", \\\"values\\\": {\\\"Product Name\\\": \\\"27in 4K Gaming Monitor\\\", \\\"Revenue\\\": \\\"389.99\\\", \\\"Demand\\\": \\\"12474\\\", \\\"Initial Inventory\\\": \\\"62440\\\"}}, {\\\"source\\\": \\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM10/SalesDataAnalysis.csv\\\", \\\"values\\\": {\\\"Product Name\\\": \\\"27in FHD Monitor\\\", \\\"Revenue\\\": \\\"149.99\\\", \\\"Demand\\\": \\\"15057\\\", \\\"Initial Inventory\\\": \\\"75500\\\"}}]\", \"payload_hash\": \"5649dd40fc0bfd3af3a3dad0393ab86f9b1772dba6c7243f2dac423a3d2c6744\"}",
+  "solve_code": "import gurobipy as gp\nfrom gurobipy import GRB\nproducts = {1: '27in 4K Gaming Monitor', 2: '27in FHD Monitor'}\nrevenue = {1: 389.99, 2: 149.99}\ndemand = {1: 12474, 2: 15057}\ninventory = {1: 62440, 2: 75500}\nfor i in products:\n    if i not in revenue or i not in demand or i not in inventory:\n        raise ValueError(f'Missing data for product {i}: {products.get(i, str(i))}')\nm = gp.Model('27in_Product_Revenue_Maximization')\nx_vars = m.addVars(products.keys(), lb=0, vtype=GRB.INTEGER, name='')\nm.setObjective(gp.quicksum((revenue[i] * x_vars[i] for i in products)), GRB.MAXIMIZE)\nm.addConstrs((x_vars[i] <= demand[i] for i in products), name='')\nm.addConstrs((x_vars[i] <= inventory[i] for i in products), name='')\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for v in m.getVars():\n        print(f'{v.VarName}: {v.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 7123134.6899999995,
+  "final_solution": [
+    [
+      "C0",
+      12474.0
+    ],
+    [
+      "C1",
+      15057.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 14.871,
+  "evaluated_utc": "2026-10-06T08:45:34.188216+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

@@ -1,0 +1,95 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/UFLP_testing/UFLP9/demand.csv",
+    "values": {
+      "customer_newsletter_open_count_2025_q4": "3",
+      "customer_support_ticket_count": "8",
+      "customer": "C1",
+      "demand": "1083"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/UFLP_testing/UFLP9/demand.csv",
+    "values": {
+      "customer_newsletter_open_count_2025_q4": "8",
+      "customer_support_ticket_count": "12",
+      "customer": "C2",
+      "demand": "776"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/UFLP_testing/UFLP9/demand.csv",
+    "values": {
+      "customer_newsletter_open_count_2025_q4": "1",
+      "customer_support_ticket_count": "3",
+      "customer": "C3",
+      "demand": "16214"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/UFLP_testing/UFLP9/fixed_cost.csv",
+    "values": {
+      "facility_reception_desk_count_2025_q4": "4",
+      "facility_staff_count": "20",
+      "Unnamed: 0": "S1",
+      "fixed_costs": "102.33"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/UFLP_testing/UFLP9/fixed_cost.csv",
+    "values": {
+      "facility_reception_desk_count_2025_q4": "4",
+      "facility_staff_count": "50",
+      "Unnamed: 0": "S2",
+      "fixed_costs": "94.92"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/UFLP_testing/UFLP9/fixed_cost.csv",
+    "values": {
+      "facility_reception_desk_count_2025_q4": "1",
+      "facility_staff_count": "35",
+      "Unnamed: 0": "S3",
+      "fixed_costs": "91.83"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/UFLP_testing/UFLP9/transportation_costs.csv",
+    "values": {
+      "Unnamed: 0": "S1",
+      "carrier_communication_channel": "Phone",
+      "C1": "1506.22",
+      "C2": "70.9",
+      "operations_region": "South",
+      "C3": "8.44",
+      "annual_inspection_count": "2",
+      "carrier_coordination_meeting_count_2025_q4": "8"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/UFLP_testing/UFLP9/transportation_costs.csv",
+    "values": {
+      "Unnamed: 0": "S2",
+      "carrier_communication_channel": "Email",
+      "C1": "1732.65",
+      "C2": "1780.72",
+      "operations_region": "East",
+      "C3": "567.44",
+      "annual_inspection_count": "2",
+      "carrier_coordination_meeting_count_2025_q4": "3"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S2/Large-scale-or/UFLP_testing/UFLP9/transportation_costs.csv",
+    "values": {
+      "Unnamed: 0": "S3",
+      "carrier_communication_channel": "Portal",
+      "C1": "115.66",
+      "C2": "100.76",
+      "operations_region": "West",
+      "C3": "64.68",
+      "annual_inspection_count": "4",
+      "carrier_coordination_meeting_count_2025_q4": "6"
+    }
+  }
+]

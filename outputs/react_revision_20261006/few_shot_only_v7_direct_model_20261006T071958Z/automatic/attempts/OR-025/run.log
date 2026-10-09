@@ -1,0 +1,202 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I have the required current data and can formulate the model.
+Final Answer:
+#### Abstract Mathematical Model
+
+**Index Set:**
+- $I$ : Set of all products where `Product Name` begins with "TABLET" (from the current table).
+
+**Parameters:**
+- $A_i$ : Revenue per unit of product $i \in I$ (from column `Revenue`).
+- $d_i$ : Demand for product $i \in I$ (from column `Demand`).
+- $s_i$ : Initial inventory for product $i \in I$ (from column `Initial Inventory`).
+
+**Decision Variables:**
+- $x_i$ : Number of units of product $i \in I$ to fulfill, $x_i \in \mathbb{Z}_+$ (non-negative integers).
+
+**Objective:**
+\[
+\max \sum_{i \in I} A_i x_i
+\]
+
+**Constraints:**
+1. **Inventory Constraint:**  
+   \[
+   x_i \leq s_i \quad \forall i \in I
+   \]
+2. **Demand Constraint:**  
+   \[
+   x_i \leq d_i \quad \forall i \in I
+   \]
+3. **Non-negativity and Integrality:**  
+   \[
+   x_i \in \mathbb{Z}_+, \quad \forall i \in I
+   \]
+
+---
+
+#### Data Mapping
+
+- **Source Table:** `/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM16/SmartphoneRetailOutletSalesData.csv`
+- **Table ID:** `file_0_view_0`
+- **Index Set $I$:** All records where `Product Name` starts with "TABLET"
+- **Parameter $A_i$:** Column `Revenue`
+- **Parameter $d_i$:** Column `Demand`
+- **Parameter $s_i$:** Column `Initial Inventory`[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with robust encoding
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM16/SmartphoneRetailOutletSalesData.csv"
+    tried_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in tried_encodings:
+        try:
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError("Could not decode CSV with tried encodings.")
+
+    # Filter for products where Product Name starts with "TABLET" (case-insensitive)
+    if 'Product Name' not in df.columns:
+        raise ValueError("Missing 'Product Name' column in source data.")
+    tablet_mask = df['Product Name'].str.casefold().str.startswith('tablet')
+    tablet_df = df.loc[tablet_mask].copy()
+
+    # Check required columns
+    for col in ['Revenue', 'Demand', 'Initial Inventory']:
+        if col not in tablet_df.columns:
+            raise ValueError(f"Missing '{col}' column in source data.")
+
+    # Prepare index set I: unique product names starting with "TABLET"
+    items = tablet_df['Product Name'].tolist()
+    if len(items) == 0:
+        raise ValueError("No products found with 'Product Name' starting with 'TABLET'.")
+
+    # Map parameters: Revenue, Demand, Initial Inventory
+    # Use full product name as key
+    revenue = {}
+    demand = {}
+    inventory = {}
+
+    for idx, row in tablet_df.iterrows():
+        key = row['Product Name']
+        try:
+            A_i = float(row['Revenue'])
+        except Exception:
+            raise ValueError(f"Non-numeric or missing Revenue for product '{key}'.")
+        try:
+            d_i = int(float(row['Demand']))
+        except Exception:
+            raise ValueError(f"Non-numeric or missing Demand for product '{key}'.")
+        try:
+            s_i = int(float(row['Initial Inventory']))
+        except Exception:
+            raise ValueError(f"Non-numeric or missing Initial Inventory for product '{key}'.")
+        if key in revenue:
+            # If duplicate, sum repeated rows by key
+            revenue[key] += A_i
+            demand[key] += d_i
+            inventory[key] += s_i
+        else:
+            revenue[key] = A_i
+            demand[key] = d_i
+            inventory[key] = s_i
+
+    # Validate all items have all parameters
+    for key in items:
+        if key not in revenue or key not in demand or key not in inventory:
+            raise ValueError(f"Missing parameter(s) for product '{key}'.")
+
+    # Build Gurobi model
+    m = gp.Model('Tablet_Revenue_Maximization')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    quantity_vars = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * quantity_vars[i] for i in items), GRB.MAXIMIZE)
+
+    # Constraints: x_i <= s_i (inventory), x_i <= d_i (demand)
+    m.addConstrs((quantity_vars[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((quantity_vars[i] <= demand[i] for i in items), name='dem')
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 54 rows, 27 columns and 54 nonzeros
+Model fingerprint: 0xcdecee02
+Variable types: 0 continuous, 27 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+03, 5e+04]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+00, 3e+02]
+Found heuristic solution: objective 5486959.8300
+Presolve removed 54 rows and 27 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 5.48696e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.486959830000e+06, best bound 5.486959830000e+06, gap 0.0000%
+ObjVal: 5486959.829999999
+C0: 2.0
+C1: 43.0
+C2: 6.0
+C3: 6.0
+C4: 20.0
+C5: 22.0
+C6: 3.0
+C7: 16.0
+C8: 2.0
+C9: 2.0
+C10: 32.0
+C11: 14.0
+C12: 2.0
+C13: 2.0
+C14: 6.0
+C15: 2.0
+C16: 6.0
+C17: 2.0
+C18: 6.0
+C19: 6.0
+C20: 6.0
+C21: 12.0
+C22: 60.0
+C23: 8.0
+C24: 8.0
+C25: 38.0
+C26: 4.0
+Optimal objective: 5486959.829999999
+Optimal solution: [('C0', 2.0), ('C1', 43.0), ('C2', 6.0), ('C3', 6.0), ('C4', 20.0), ('C5', 22.0), ('C6', 3.0), ('C7', 16.0), ('C8', 2.0), ('C9', 2.0), ('C10', 32.0), ('C11', 14.0), ('C12', 2.0), ('C13', 2.0), ('C14', 6.0), ('C15', 2.0), ('C16', 6.0), ('C17', 2.0), ('C18', 6.0), ('C19', 6.0), ('C20', 6.0), ('C21', 12.0), ('C22', 60.0), ('C23', 8.0), ('C24', 8.0), ('C25', 38.0), ('C26', 4.0)]

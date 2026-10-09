@@ -1,0 +1,360 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/capacity.csv",
+    "values": {
+      "capacity_two_periods_ago": "780",
+      "previous_period_capacity": "678",
+      "Capacity": "765"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "2992",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Sedan",
+      "two_periods_ago_unit_value": "2567",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "2524",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "99",
+      "previous_period_resource_requirement": "117"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "4092",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "SUV",
+      "two_periods_ago_unit_value": "4566",
+      "previous_period_replenishment_policy": "Daily",
+      "Value": "4614",
+      "previous_period_stock_status": "Overstock",
+      "Weight": "55",
+      "previous_period_resource_requirement": "59"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "7691",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Truck",
+      "two_periods_ago_unit_value": "6887",
+      "previous_period_replenishment_policy": "On demand",
+      "Value": "8416",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "75",
+      "previous_period_resource_requirement": "80"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "6358",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Convertible",
+      "two_periods_ago_unit_value": "5428",
+      "previous_period_replenishment_policy": "Daily",
+      "Value": "5917",
+      "previous_period_stock_status": "Overstock",
+      "Weight": "94",
+      "previous_period_resource_requirement": "92"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "9278",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Minivan",
+      "two_periods_ago_unit_value": "10024",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "9048",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "80",
+      "previous_period_resource_requirement": "91"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "965",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Coupe",
+      "two_periods_ago_unit_value": "1195",
+      "previous_period_replenishment_policy": "Daily",
+      "Value": "1140",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "82",
+      "previous_period_resource_requirement": "67"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "8223",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Hatchback",
+      "two_periods_ago_unit_value": "7188",
+      "previous_period_replenishment_policy": "Daily",
+      "Value": "8962",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "71",
+      "previous_period_resource_requirement": "65"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "2008",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Station Wagon",
+      "two_periods_ago_unit_value": "2136",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "1888",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "100",
+      "previous_period_resource_requirement": "101"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "6946",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Electric Car",
+      "two_periods_ago_unit_value": "7920",
+      "previous_period_replenishment_policy": "Daily",
+      "Value": "8487",
+      "previous_period_stock_status": "Overstock",
+      "Weight": "28",
+      "previous_period_resource_requirement": "32"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "4936",
+      "two_periods_ago_stock_status": "Balanced",
+      "ProductName": "Hybrid Car",
+      "two_periods_ago_unit_value": "4648",
+      "previous_period_replenishment_policy": "On demand",
+      "Value": "4425",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "93",
+      "previous_period_resource_requirement": "95"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "4330",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Luxury Sedan",
+      "two_periods_ago_unit_value": "5613",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "4717",
+      "previous_period_stock_status": "Stockout",
+      "Weight": "84",
+      "previous_period_resource_requirement": "71"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "4069",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Sports Car",
+      "two_periods_ago_unit_value": "4814",
+      "previous_period_replenishment_policy": "Daily",
+      "Value": "4210",
+      "previous_period_stock_status": "Overstock",
+      "Weight": "83",
+      "previous_period_resource_requirement": "69"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "1469",
+      "two_periods_ago_stock_status": "Balanced",
+      "ProductName": "Crossover",
+      "two_periods_ago_unit_value": "1169",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "1226",
+      "previous_period_stock_status": "Stockout",
+      "Weight": "62",
+      "previous_period_resource_requirement": "71"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "8768",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Diesel Truck",
+      "two_periods_ago_unit_value": "6768",
+      "previous_period_replenishment_policy": "On demand",
+      "Value": "7400",
+      "previous_period_stock_status": "Stockout",
+      "Weight": "90",
+      "previous_period_resource_requirement": "104"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "3976",
+      "two_periods_ago_stock_status": "Balanced",
+      "ProductName": "Compact SUV",
+      "two_periods_ago_unit_value": "3739",
+      "previous_period_replenishment_policy": "On demand",
+      "Value": "4639",
+      "previous_period_stock_status": "Overstock",
+      "Weight": "99",
+      "previous_period_resource_requirement": "106"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "7747",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Luxury SUV",
+      "two_periods_ago_unit_value": "8363",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "7712",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "96",
+      "previous_period_resource_requirement": "91"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "3267",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Cargo Van",
+      "two_periods_ago_unit_value": "2865",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "3299",
+      "previous_period_stock_status": "Stockout",
+      "Weight": "21",
+      "previous_period_resource_requirement": "22"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "8706",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Pickup Truck",
+      "two_periods_ago_unit_value": "11183",
+      "previous_period_replenishment_policy": "Daily",
+      "Value": "9895",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "39",
+      "previous_period_resource_requirement": "40"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "3786",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Roadster",
+      "two_periods_ago_unit_value": "4078",
+      "previous_period_replenishment_policy": "On demand",
+      "Value": "4496",
+      "previous_period_stock_status": "Overstock",
+      "Weight": "99",
+      "previous_period_resource_requirement": "88"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "5413",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Muscle Car",
+      "two_periods_ago_unit_value": "5002",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "4526",
+      "previous_period_stock_status": "Overstock",
+      "Weight": "81",
+      "previous_period_resource_requirement": "79"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "5080",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Off-road Vehicle",
+      "two_periods_ago_unit_value": "5121",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "5688",
+      "previous_period_stock_status": "Stockout",
+      "Weight": "6",
+      "previous_period_resource_requirement": "7"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "3144",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Camper Van",
+      "two_periods_ago_unit_value": "3225",
+      "previous_period_replenishment_policy": "Daily",
+      "Value": "3007",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "58",
+      "previous_period_resource_requirement": "64"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "3759",
+      "two_periods_ago_stock_status": "Stockout",
+      "ProductName": "Compact Car",
+      "two_periods_ago_unit_value": "2995",
+      "previous_period_replenishment_policy": "Weekly",
+      "Value": "3623",
+      "previous_period_stock_status": "Balanced",
+      "Weight": "37",
+      "previous_period_resource_requirement": "44"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "8702",
+      "two_periods_ago_stock_status": "Balanced",
+      "ProductName": "Motorcycle",
+      "two_periods_ago_unit_value": "9973",
+      "previous_period_replenishment_policy": "On demand",
+      "Value": "8474",
+      "previous_period_stock_status": "Stockout",
+      "Weight": "15",
+      "previous_period_resource_requirement": "16"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA3/CarSales2/products.csv",
+    "values": {
+      "previous_period_unit_value": "8153",
+      "two_periods_ago_stock_status": "Overstock",
+      "ProductName": "Electric SUV",
+      "two_periods_ago_unit_value": "8210",
+      "previous_period_replenishment_policy": "Daily",
+      "Value": "8372",
+      "previous_period_stock_status": "Overstock",
+      "Weight": "37",
+      "previous_period_resource_requirement": "30"
+    }
+  }
+]

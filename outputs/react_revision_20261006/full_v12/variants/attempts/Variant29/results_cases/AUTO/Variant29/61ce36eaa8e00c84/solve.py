@@ -1,0 +1,659 @@
+CSVQA_DATA = {'ignored_file_indices': [1, 6],
+ 'query': 'The bakery needs an order for its next production run. How many units of each bread option should it order '
+          'to earn the highest net benefit within the available storage, staff time and energy? The supplied tables '
+          'describe the current plan; use their rows directly. The item rows give unit_benefit_cents and '
+          'item_fee_cents: earn the former per unit and pay the latter once for any positive quantity. Use 1000 ml per '
+          'liter, 60 minutes per hour and 1000 wh per kwh when comparing resource use with capacity. Only authorized=1 '
+          'options can be ordered. Quantities are nonnegative integers: zero, or minimum_lot through maximum_order. '
+          'For each resource, total per-unit usage times quantities must fit the signed sum of capacity_ledger '
+          'entries. Meet every category minimum_quantity and maximum_quantity, and pay its activation_fee_cents once '
+          'if any option is ordered. Do not select both members of an incompatible pair. An ordered item must have its '
+          'requires prerequisite ordered as well; no quantity ratio applies. A bundle earns bonus_cents once only when '
+          'both options have positive quantities; an unauthorized option cannot trigger a bonus. Report the maximum '
+          'net benefit in USD cents. All fixed fees and bonuses are in the same unit.',
+ 'relationships': [],
+ 'route': 'Others',
+ 'tables': [{'columns': ['item_ref', 'prerequisite_ref'],
+             'file_index': 0,
+             'file_name': 'export_01.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 16,
+             'records': [{'source_row': 0,
+                          'values': {'item_ref': 'Re3f595d2bf06', 'prerequisite_ref': 'R78298f0f56a2'}},
+                         {'source_row': 1,
+                          'values': {'item_ref': 'R5dfabf4dd5b4', 'prerequisite_ref': 'R189b5f29bad1'}},
+                         {'source_row': 2,
+                          'values': {'item_ref': 'R0ae04f41cbb0', 'prerequisite_ref': 'R436178c5636f'}},
+                         {'source_row': 3,
+                          'values': {'item_ref': 'Rc4fc45bcfcbb', 'prerequisite_ref': 'R189b5f29bad1'}},
+                         {'source_row': 4,
+                          'values': {'item_ref': 'R56cb3a436a5a', 'prerequisite_ref': 'R35897c8759f2'}},
+                         {'source_row': 5,
+                          'values': {'item_ref': 'Rc3e636c6aeef', 'prerequisite_ref': 'Rdce4df21cd05'}},
+                         {'source_row': 6,
+                          'values': {'item_ref': 'R802e24035203', 'prerequisite_ref': 'R35897c8759f2'}},
+                         {'source_row': 7,
+                          'values': {'item_ref': 'Rd9d3a145aada', 'prerequisite_ref': 'R189b5f29bad1'}},
+                         {'source_row': 8,
+                          'values': {'item_ref': 'R19b312900bfe', 'prerequisite_ref': 'R35897c8759f2'}},
+                         {'source_row': 9,
+                          'values': {'item_ref': 'R640d4c97690d', 'prerequisite_ref': 'R35897c8759f2'}},
+                         {'source_row': 10,
+                          'values': {'item_ref': 'R21299c03820c', 'prerequisite_ref': 'R7e7dbfff0dc6'}},
+                         {'source_row': 11,
+                          'values': {'item_ref': 'Rd207cec92d9d', 'prerequisite_ref': 'R35897c8759f2'}},
+                         {'source_row': 12,
+                          'values': {'item_ref': 'R7e2a2c482e77', 'prerequisite_ref': 'R189b5f29bad1'}},
+                         {'source_row': 13,
+                          'values': {'item_ref': 'R3ae1681715ca', 'prerequisite_ref': 'R436178c5636f'}},
+                         {'source_row': 14,
+                          'values': {'item_ref': 'R025a74a1a060', 'prerequisite_ref': 'R189b5f29bad1'}},
+                         {'source_row': 15,
+                          'values': {'item_ref': 'Re0a6ccc90076', 'prerequisite_ref': 'R7e7dbfff0dc6'}}],
+             'returned_rows': 16,
+             'role': 'item prerequisites',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['item_ref',
+                         'category',
+                         'authorized',
+                         'minimum_lot',
+                         'maximum_order',
+                         'unit_benefit_cents',
+                         'item_fee_cents'],
+             'file_index': 2,
+             'file_name': 'export_03.csv',
+             'filters': {'conditions': [{'column': 'authorized',
+                                         'dtype': 'number',
+                                         'evidence': 'Only authorized=1 options can be ordered.',
+                                         'inclusive': 'both',
+                                         'operator': 'eq',
+                                         'value': 1}],
+                         'logic': 'and'},
+             'original_rows': 28,
+             'records': [{'source_row': 0,
+                          'values': {'authorized': '1',
+                                     'category': 'G3',
+                                     'item_fee_cents': '493',
+                                     'item_ref': 'Re0a6ccc90076',
+                                     'maximum_order': '11',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '965'}},
+                         {'source_row': 1,
+                          'values': {'authorized': '1',
+                                     'category': 'G3',
+                                     'item_fee_cents': '200',
+                                     'item_ref': 'R35897c8759f2',
+                                     'maximum_order': '13',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1569'}},
+                         {'source_row': 3,
+                          'values': {'authorized': '1',
+                                     'category': 'G3',
+                                     'item_fee_cents': '121',
+                                     'item_ref': 'R7e7dbfff0dc6',
+                                     'maximum_order': '10',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1074'}},
+                         {'source_row': 4,
+                          'values': {'authorized': '1',
+                                     'category': 'G3',
+                                     'item_fee_cents': '258',
+                                     'item_ref': 'Rd207cec92d9d',
+                                     'maximum_order': '7',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '349'}},
+                         {'source_row': 6,
+                          'values': {'authorized': '1',
+                                     'category': 'G2',
+                                     'item_fee_cents': '274',
+                                     'item_ref': 'R9ec3bcfe9357',
+                                     'maximum_order': '12',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '278'}},
+                         {'source_row': 7,
+                          'values': {'authorized': '1',
+                                     'category': 'G2',
+                                     'item_fee_cents': '157',
+                                     'item_ref': 'R640d4c97690d',
+                                     'maximum_order': '13',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '281'}},
+                         {'source_row': 8,
+                          'values': {'authorized': '1',
+                                     'category': 'G3',
+                                     'item_fee_cents': '227',
+                                     'item_ref': 'Rd9d3a145aada',
+                                     'maximum_order': '8',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1229'}},
+                         {'source_row': 9,
+                          'values': {'authorized': '1',
+                                     'category': 'G1',
+                                     'item_fee_cents': '292',
+                                     'item_ref': 'R19b312900bfe',
+                                     'maximum_order': '10',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1578'}},
+                         {'source_row': 10,
+                          'values': {'authorized': '1',
+                                     'category': 'G1',
+                                     'item_fee_cents': '448',
+                                     'item_ref': 'Rc3e636c6aeef',
+                                     'maximum_order': '11',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1435'}},
+                         {'source_row': 11,
+                          'values': {'authorized': '1',
+                                     'category': 'G2',
+                                     'item_fee_cents': '256',
+                                     'item_ref': 'Re3f595d2bf06',
+                                     'maximum_order': '10',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '499'}},
+                         {'source_row': 12,
+                          'values': {'authorized': '1',
+                                     'category': 'G2',
+                                     'item_fee_cents': '282',
+                                     'item_ref': 'Ra2a0eb0dfe79',
+                                     'maximum_order': '7',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '811'}},
+                         {'source_row': 13,
+                          'values': {'authorized': '1',
+                                     'category': 'G0',
+                                     'item_fee_cents': '298',
+                                     'item_ref': 'R2efa1a0852bf',
+                                     'maximum_order': '9',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1457'}},
+                         {'source_row': 15,
+                          'values': {'authorized': '1',
+                                     'category': 'G1',
+                                     'item_fee_cents': '146',
+                                     'item_ref': 'R78298f0f56a2',
+                                     'maximum_order': '13',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1175'}},
+                         {'source_row': 16,
+                          'values': {'authorized': '1',
+                                     'category': 'G0',
+                                     'item_fee_cents': '462',
+                                     'item_ref': 'R189b5f29bad1',
+                                     'maximum_order': '11',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '319'}},
+                         {'source_row': 17,
+                          'values': {'authorized': '1',
+                                     'category': 'G0',
+                                     'item_fee_cents': '191',
+                                     'item_ref': 'Rc4fc45bcfcbb',
+                                     'maximum_order': '10',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '444'}},
+                         {'source_row': 18,
+                          'values': {'authorized': '1',
+                                     'category': 'G0',
+                                     'item_fee_cents': '476',
+                                     'item_ref': 'R21299c03820c',
+                                     'maximum_order': '13',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '808'}},
+                         {'source_row': 19,
+                          'values': {'authorized': '1',
+                                     'category': 'G1',
+                                     'item_fee_cents': '490',
+                                     'item_ref': 'R83c7f04f7b54',
+                                     'maximum_order': '9',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1419'}},
+                         {'source_row': 20,
+                          'values': {'authorized': '1',
+                                     'category': 'G0',
+                                     'item_fee_cents': '144',
+                                     'item_ref': 'Rafc569d2d978',
+                                     'maximum_order': '11',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '328'}},
+                         {'source_row': 21,
+                          'values': {'authorized': '1',
+                                     'category': 'G3',
+                                     'item_fee_cents': '498',
+                                     'item_ref': 'R436178c5636f',
+                                     'maximum_order': '7',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '593'}},
+                         {'source_row': 22,
+                          'values': {'authorized': '1',
+                                     'category': 'G1',
+                                     'item_fee_cents': '272',
+                                     'item_ref': 'Rec957fff5de1',
+                                     'maximum_order': '10',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1127'}},
+                         {'source_row': 23,
+                          'values': {'authorized': '1',
+                                     'category': 'G2',
+                                     'item_fee_cents': '101',
+                                     'item_ref': 'R802e24035203',
+                                     'maximum_order': '13',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '987'}},
+                         {'source_row': 24,
+                          'values': {'authorized': '1',
+                                     'category': 'G2',
+                                     'item_fee_cents': '206',
+                                     'item_ref': 'R0ae04f41cbb0',
+                                     'maximum_order': '13',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1510'}},
+                         {'source_row': 25,
+                          'values': {'authorized': '1',
+                                     'category': 'G2',
+                                     'item_fee_cents': '381',
+                                     'item_ref': 'Rdce4df21cd05',
+                                     'maximum_order': '11',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '1596'}},
+                         {'source_row': 27,
+                          'values': {'authorized': '1',
+                                     'category': 'G1',
+                                     'item_fee_cents': '486',
+                                     'item_ref': 'R025a74a1a060',
+                                     'maximum_order': '13',
+                                     'minimum_lot': '2',
+                                     'unit_benefit_cents': '252'}}],
+             'returned_rows': 24,
+             'role': 'item options',
+             'table_id': 'file_2_view_0'},
+            {'columns': ['item_ref', 'resource', 'amount', 'unit'],
+             'file_index': 3,
+             'file_name': 'export_04.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 84,
+             'records': [{'source_row': 0,
+                          'values': {'amount': '6', 'item_ref': 'Ra2a0eb0dfe79', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 1,
+                          'values': {'amount': '8', 'item_ref': 'Re0a6ccc90076', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 2,
+                          'values': {'amount': '8', 'item_ref': 'Rafc569d2d978', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 3,
+                          'values': {'amount': '5', 'item_ref': 'R640d4c97690d', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 4,
+                          'values': {'amount': '5', 'item_ref': 'R5dfabf4dd5b4', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 5,
+                          'values': {'amount': '4', 'item_ref': 'R025a74a1a060', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 6,
+                          'values': {'amount': '3', 'item_ref': 'R436178c5636f', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 7,
+                          'values': {'amount': '5', 'item_ref': 'R83c7f04f7b54', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 8,
+                          'values': {'amount': '4', 'item_ref': 'Rdce4df21cd05', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 9,
+                          'values': {'amount': '5', 'item_ref': 'Re3f595d2bf06', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 10,
+                          'values': {'amount': '6', 'item_ref': 'R21299c03820c', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 11,
+                          'values': {'amount': '4', 'item_ref': 'R9ec3bcfe9357', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 12,
+                          'values': {'amount': '5', 'item_ref': 'R0ae04f41cbb0', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 13,
+                          'values': {'amount': '3', 'item_ref': 'R436178c5636f', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 14,
+                          'values': {'amount': '4', 'item_ref': 'Re0a6ccc90076', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 15,
+                          'values': {'amount': '8', 'item_ref': 'R56cb3a436a5a', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 16,
+                          'values': {'amount': '6', 'item_ref': 'Rc4fc45bcfcbb', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 17,
+                          'values': {'amount': '5', 'item_ref': 'Rd9d3a145aada', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 18,
+                          'values': {'amount': '6', 'item_ref': 'Rd9d3a145aada', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 19,
+                          'values': {'amount': '8', 'item_ref': 'Ra2a0eb0dfe79', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 20,
+                          'values': {'amount': '2', 'item_ref': 'R56cb3a436a5a', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 21,
+                          'values': {'amount': '7', 'item_ref': 'R7e2a2c482e77', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 22,
+                          'values': {'amount': '6', 'item_ref': 'R802e24035203', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 23,
+                          'values': {'amount': '7', 'item_ref': 'R5dfabf4dd5b4', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 24,
+                          'values': {'amount': '9', 'item_ref': 'R3ae1681715ca', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 25,
+                          'values': {'amount': '6', 'item_ref': 'R9ec3bcfe9357', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 26,
+                          'values': {'amount': '5', 'item_ref': 'R2efa1a0852bf', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 27,
+                          'values': {'amount': '9', 'item_ref': 'Rafc569d2d978', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 28,
+                          'values': {'amount': '4', 'item_ref': 'Ra2a0eb0dfe79', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 29,
+                          'values': {'amount': '6', 'item_ref': 'R189b5f29bad1', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 30,
+                          'values': {'amount': '5', 'item_ref': 'R56cb3a436a5a', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 31,
+                          'values': {'amount': '4', 'item_ref': 'R35897c8759f2', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 32,
+                          'values': {'amount': '9', 'item_ref': 'R0ae04f41cbb0', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 33,
+                          'values': {'amount': '6', 'item_ref': 'R19b312900bfe', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 34,
+                          'values': {'amount': '5', 'item_ref': 'Rec957fff5de1', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 35,
+                          'values': {'amount': '4', 'item_ref': 'R19b312900bfe', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 36,
+                          'values': {'amount': '5', 'item_ref': 'R7e7dbfff0dc6', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 37,
+                          'values': {'amount': '8', 'item_ref': 'Rc3e636c6aeef', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 38,
+                          'values': {'amount': '4', 'item_ref': 'R21299c03820c', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 39,
+                          'values': {'amount': '5', 'item_ref': 'R9ec3bcfe9357', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 40,
+                          'values': {'amount': '5', 'item_ref': 'R19b312900bfe', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 41,
+                          'values': {'amount': '3', 'item_ref': 'R78298f0f56a2', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 42,
+                          'values': {'amount': '3', 'item_ref': 'R5dfabf4dd5b4', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 43,
+                          'values': {'amount': '6', 'item_ref': 'R802e24035203', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 44,
+                          'values': {'amount': '2', 'item_ref': 'R7e7dbfff0dc6', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 45,
+                          'values': {'amount': '8', 'item_ref': 'R7e2a2c482e77', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 46,
+                          'values': {'amount': '6', 'item_ref': 'R436178c5636f', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 47,
+                          'values': {'amount': '8', 'item_ref': 'Rafc569d2d978', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 48,
+                          'values': {'amount': '5', 'item_ref': 'R802e24035203', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 49,
+                          'values': {'amount': '4', 'item_ref': 'Re3f595d2bf06', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 50,
+                          'values': {'amount': '5', 'item_ref': 'R78298f0f56a2', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 51,
+                          'values': {'amount': '4', 'item_ref': 'Rc4fc45bcfcbb', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 52,
+                          'values': {'amount': '3', 'item_ref': 'R189b5f29bad1', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 53,
+                          'values': {'amount': '2', 'item_ref': 'Rdce4df21cd05', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 54,
+                          'values': {'amount': '9', 'item_ref': 'Rd9d3a145aada', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 55,
+                          'values': {'amount': '6', 'item_ref': 'R7e2a2c482e77', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 56,
+                          'values': {'amount': '8', 'item_ref': 'Rec957fff5de1', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 57,
+                          'values': {'amount': '6', 'item_ref': 'R83c7f04f7b54', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 58,
+                          'values': {'amount': '8', 'item_ref': 'R7e7dbfff0dc6', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 59,
+                          'values': {'amount': '6', 'item_ref': 'R025a74a1a060', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 60,
+                          'values': {'amount': '8', 'item_ref': 'Rec957fff5de1', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 61,
+                          'values': {'amount': '2', 'item_ref': 'R0ae04f41cbb0', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 62,
+                          'values': {'amount': '2', 'item_ref': 'R35897c8759f2', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 63,
+                          'values': {'amount': '6', 'item_ref': 'R640d4c97690d', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 64,
+                          'values': {'amount': '4', 'item_ref': 'R78298f0f56a2', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 65,
+                          'values': {'amount': '5', 'item_ref': 'R2efa1a0852bf', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 66,
+                          'values': {'amount': '7', 'item_ref': 'Re0a6ccc90076', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 67,
+                          'values': {'amount': '9', 'item_ref': 'R83c7f04f7b54', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 68,
+                          'values': {'amount': '9', 'item_ref': 'Rd207cec92d9d', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 69,
+                          'values': {'amount': '9', 'item_ref': 'R2efa1a0852bf', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 70,
+                          'values': {'amount': '7', 'item_ref': 'Rd207cec92d9d', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 71,
+                          'values': {'amount': '5', 'item_ref': 'R189b5f29bad1', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 72,
+                          'values': {'amount': '2', 'item_ref': 'R35897c8759f2', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 73,
+                          'values': {'amount': '8', 'item_ref': 'Rc3e636c6aeef', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 74,
+                          'values': {'amount': '5', 'item_ref': 'R3ae1681715ca', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 75,
+                          'values': {'amount': '4', 'item_ref': 'Rc3e636c6aeef', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 76,
+                          'values': {'amount': '5', 'item_ref': 'R3ae1681715ca', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 77,
+                          'values': {'amount': '6', 'item_ref': 'Rd207cec92d9d', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 78,
+                          'values': {'amount': '3', 'item_ref': 'R025a74a1a060', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 79,
+                          'values': {'amount': '6', 'item_ref': 'R640d4c97690d', 'resource': 'labor', 'unit': 'hour'}},
+                         {'source_row': 80,
+                          'values': {'amount': '5', 'item_ref': 'Re3f595d2bf06', 'resource': 'space', 'unit': 'liter'}},
+                         {'source_row': 81,
+                          'values': {'amount': '2', 'item_ref': 'R21299c03820c', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 82,
+                          'values': {'amount': '5', 'item_ref': 'Rdce4df21cd05', 'resource': 'power', 'unit': 'kwh'}},
+                         {'source_row': 83,
+                          'values': {'amount': '6', 'item_ref': 'Rc4fc45bcfcbb', 'resource': 'labor', 'unit': 'hour'}}],
+             'returned_rows': 84,
+             'role': 'item resource usage',
+             'table_id': 'file_3_view_0'},
+            {'columns': ['category', 'minimum_quantity', 'maximum_quantity', 'activation_fee_cents'],
+             'file_index': 4,
+             'file_name': 'export_05.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 4,
+             'records': [{'source_row': 0,
+                          'values': {'activation_fee_cents': '150',
+                                     'category': 'G2',
+                                     'maximum_quantity': '16',
+                                     'minimum_quantity': '4'}},
+                         {'source_row': 1,
+                          'values': {'activation_fee_cents': '277',
+                                     'category': 'G0',
+                                     'maximum_quantity': '19',
+                                     'minimum_quantity': '7'}},
+                         {'source_row': 2,
+                          'values': {'activation_fee_cents': '187',
+                                     'category': 'G3',
+                                     'maximum_quantity': '22',
+                                     'minimum_quantity': '10'}},
+                         {'source_row': 3,
+                          'values': {'activation_fee_cents': '343',
+                                     'category': 'G1',
+                                     'maximum_quantity': '21',
+                                     'minimum_quantity': '9'}}],
+             'returned_rows': 4,
+             'role': 'category constraints',
+             'table_id': 'file_4_view_0'},
+            {'columns': ['item_a', 'item_b'],
+             'file_index': 5,
+             'file_name': 'export_06.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 6,
+             'records': [{'source_row': 0, 'values': {'item_a': 'R7e2a2c482e77', 'item_b': 'R189b5f29bad1'}},
+                         {'source_row': 1, 'values': {'item_a': 'Rec957fff5de1', 'item_b': 'Rc3e636c6aeef'}},
+                         {'source_row': 2, 'values': {'item_a': 'Rc3e636c6aeef', 'item_b': 'Rdce4df21cd05'}},
+                         {'source_row': 3, 'values': {'item_a': 'Rc4fc45bcfcbb', 'item_b': 'R025a74a1a060'}},
+                         {'source_row': 4, 'values': {'item_a': 'R436178c5636f', 'item_b': 'R3ae1681715ca'}},
+                         {'source_row': 5, 'values': {'item_a': 'Rc3e636c6aeef', 'item_b': 'R802e24035203'}}],
+             'returned_rows': 6,
+             'role': 'incompatible item pairs',
+             'table_id': 'file_5_view_0'},
+            {'columns': ['item_a', 'item_b', 'bonus_cents'],
+             'file_index': 7,
+             'file_name': 'export_08.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 8,
+             'records': [{'source_row': 0,
+                          'values': {'bonus_cents': '196', 'item_a': 'Re3f595d2bf06', 'item_b': 'R19b312900bfe'}},
+                         {'source_row': 1,
+                          'values': {'bonus_cents': '256', 'item_a': 'Rafc569d2d978', 'item_b': 'R640d4c97690d'}},
+                         {'source_row': 2,
+                          'values': {'bonus_cents': '153', 'item_a': 'Re3f595d2bf06', 'item_b': 'Re0a6ccc90076'}},
+                         {'source_row': 3,
+                          'values': {'bonus_cents': '227', 'item_a': 'Rc3e636c6aeef', 'item_b': 'Rafc569d2d978'}},
+                         {'source_row': 4,
+                          'values': {'bonus_cents': '101', 'item_a': 'Re3f595d2bf06', 'item_b': 'R640d4c97690d'}},
+                         {'source_row': 5,
+                          'values': {'bonus_cents': '394', 'item_a': 'Rc3e636c6aeef', 'item_b': 'Re3f595d2bf06'}},
+                         {'source_row': 6,
+                          'values': {'bonus_cents': '454', 'item_a': 'R83c7f04f7b54', 'item_b': 'R436178c5636f'}},
+                         {'source_row': 7,
+                          'values': {'bonus_cents': '409', 'item_a': 'R3ae1681715ca', 'item_b': 'R7e7dbfff0dc6'}}],
+             'returned_rows': 8,
+             'role': 'bundle bonuses',
+             'table_id': 'file_7_view_0'},
+            {'columns': ['resource', 'entry', 'amount', 'unit'],
+             'file_index': 8,
+             'file_name': 'export_09.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 6,
+             'records': [{'source_row': 0,
+                          'values': {'amount': '11820', 'entry': 'opening', 'resource': 'labor', 'unit': 'minute'}},
+                         {'source_row': 1,
+                          'values': {'amount': '276000', 'entry': 'opening', 'resource': 'space', 'unit': 'ml'}},
+                         {'source_row': 2,
+                          'values': {'amount': '-360', 'entry': 'reservation', 'resource': 'labor', 'unit': 'minute'}},
+                         {'source_row': 3,
+                          'values': {'amount': '212000', 'entry': 'opening', 'resource': 'power', 'unit': 'wh'}},
+                         {'source_row': 4,
+                          'values': {'amount': '-6000', 'entry': 'reservation', 'resource': 'space', 'unit': 'ml'}},
+                         {'source_row': 5,
+                          'values': {'amount': '-6000', 'entry': 'reservation', 'resource': 'power', 'unit': 'wh'}}],
+             'returned_rows': 6,
+             'role': 'resource capacity ledger',
+             'table_id': 'file_8_view_0'}],
+ 'validation': {'matrix_checks': [], 'status': 'OK'}}
+import pandas as pd
+CSVQA_FRAMES = {t["table_id"]: pd.DataFrame([r["values"] for r in t["records"]], columns=t["columns"], index=[r["source_row"] for r in t["records"]]) for t in CSVQA_DATA["tables"]}
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+
+def solve_problem(CSVQA_FRAMES):
+    items_df = CSVQA_FRAMES['file_2_view_0']
+    items_df = items_df[items_df['authorized'].astype(str).str.strip() == '1']
+    I = list(items_df['item_ref'])
+    categories_df = CSVQA_FRAMES['file_4_view_0']
+    C = list(categories_df['category'])
+    item_resource_df = CSVQA_FRAMES['file_3_view_0']
+    resource_cap_df = CSVQA_FRAMES['file_8_view_0']
+    R = sorted(set(item_resource_df['resource']).union(set(resource_cap_df['resource'])))
+    bundle_df = CSVQA_FRAMES['file_7_view_0']
+    B = []
+    for (_, row) in bundle_df.iterrows():
+        (i, j) = (row['item_a'], row['item_b'])
+        if i in I and j in I:
+            B.append((i, j))
+    prereq_df = CSVQA_FRAMES['file_0_view_0']
+    P = []
+    for (_, row) in prereq_df.iterrows():
+        (i, pre) = (row['item_ref'], row['prerequisite_ref'])
+        if i in I and pre in I:
+            P.append((i, pre))
+    inc_df = CSVQA_FRAMES['file_5_view_0']
+    Q = []
+    for (_, row) in inc_df.iterrows():
+        (i, j) = (row['item_a'], row['item_b'])
+        if i in I and j in I:
+            Q.append((i, j))
+    u_i = {}
+    f_i = {}
+    cat_of = {}
+    min_i = {}
+    max_i = {}
+    for (_, row) in items_df.iterrows():
+        i = row['item_ref']
+        u_i[i] = float(row['unit_benefit_cents'])
+        f_i[i] = float(row['item_fee_cents'])
+        cat_of[i] = row['category']
+        min_i[i] = int(row['minimum_lot'])
+        max_i[i] = int(row['maximum_order'])
+    min_c = {}
+    max_c = {}
+    F_c = {}
+    for (_, row) in categories_df.iterrows():
+        c = row['category']
+        min_c[c] = int(row['minimum_quantity'])
+        max_c[c] = int(row['maximum_quantity'])
+        F_c[c] = float(row['activation_fee_cents'])
+    bonus_ij = {}
+    for (_, row) in bundle_df.iterrows():
+        (i, j) = (row['item_a'], row['item_b'])
+        if i in I and j in I:
+            bonus_ij[i, j] = float(row['bonus_cents'])
+    a_ir = {(i, r): 0.0 for i in I for r in R}
+    unit_ir = {}
+    for (_, row) in item_resource_df.iterrows():
+        i = row['item_ref']
+        r = row['resource']
+        if i in I and r in R:
+            amt = float(row['amount'])
+            unit = row['unit']
+            a_ir[i, r] = amt
+            unit_ir[i, r] = unit
+    cap_r = {}
+    capunit_r = {}
+    for r in R:
+        cap_r[r] = 0.0
+        capunit_r[r] = None
+    for (_, row) in resource_cap_df.iterrows():
+        r = row['resource']
+        amt = float(row['amount'])
+        unit = row['unit']
+        cap_r[r] += amt
+        capunit_r[r] = unit
+    for (i, r) in list(a_ir.keys()):
+        if (i, r) in unit_ir:
+            unit = unit_ir[i, r]
+            if unit.casefold() == 'liter':
+                a_ir[i, r] *= 1000.0
+            elif unit.casefold() == 'hour':
+                a_ir[i, r] *= 60.0
+            elif unit.casefold() == 'kwh':
+                a_ir[i, r] *= 1000.0
+    for r in R:
+        unit = capunit_r[r]
+        if unit is None:
+            continue
+        if unit.casefold() == 'liter':
+            cap_r[r] *= 1000.0
+        elif unit.casefold() == 'hour':
+            cap_r[r] *= 60.0
+        elif unit.casefold() == 'kwh':
+            cap_r[r] *= 1000.0
+    m = gp.Model('BakeryOrder')
+    m.setParam('MIPGap', 0.0001)
+    quantity_vars = m.addVars(I, vtype=gp.GRB.INTEGER, lb=0, name='')
+    activate_vars = m.addVars(I, vtype=gp.GRB.BINARY, name='')
+    cat_active_vars = m.addVars(C, vtype=gp.GRB.BINARY, name='')
+    bundle_vars = m.addVars(B, vtype=gp.GRB.BINARY, name='')
+    for i in I:
+        m.addConstr(quantity_vars[i] <= max_i[i] * activate_vars[i])
+        m.addConstr(quantity_vars[i] >= min_i[i] * activate_vars[i])
+        m.addConstr(quantity_vars[i] >= 0)
+    for i in I:
+        c = cat_of[i]
+        m.addConstr(cat_active_vars[c] >= activate_vars[i])
+    for c in C:
+        m.addConstr(gp.quicksum((quantity_vars[i] for i in I if cat_of[i] == c)) >= min_c[c])
+        m.addConstr(gp.quicksum((quantity_vars[i] for i in I if cat_of[i] == c)) <= max_c[c])
+    for r in R:
+        m.addConstr(gp.quicksum((a_ir[i, r] * quantity_vars[i] for i in I)) <= cap_r[r])
+    for (i, j) in Q:
+        m.addConstr(activate_vars[i] + activate_vars[j] <= 1)
+    for (i, pre) in P:
+        m.addConstr(activate_vars[i] <= activate_vars[pre])
+    for (i, j) in B:
+        m.addConstr(bundle_vars[i, j] <= activate_vars[i])
+        m.addConstr(bundle_vars[i, j] <= activate_vars[j])
+        m.addConstr(bundle_vars[i, j] >= activate_vars[i] + activate_vars[j] - 1)
+    obj = gp.quicksum((u_i[i] * quantity_vars[i] for i in I)) - gp.quicksum((f_i[i] * activate_vars[i] for i in I)) - gp.quicksum((F_c[c] * cat_active_vars[c] for c in C)) + gp.quicksum((bonus_ij[i, j] * bundle_vars[i, j] for (i, j) in B))
+    m.setObjective(obj, gp.GRB.MAXIMIZE)
+    m.optimize()
+    return m
+m = solve_problem(CSVQA_FRAMES)

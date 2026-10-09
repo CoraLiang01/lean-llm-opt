@@ -1,0 +1,170 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/customer_demand.csv",
+    "values": {
+      "customer_id": "C1",
+      "two_periods_ago_demand": "100",
+      "three_periods_ago_demand": "89",
+      "demand_previous_period": "82",
+      "demand": "94",
+      "four_periods_ago_demand": "109"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/customer_demand.csv",
+    "values": {
+      "customer_id": "C2",
+      "two_periods_ago_demand": "33",
+      "three_periods_ago_demand": "36",
+      "demand_previous_period": "31",
+      "demand": "39",
+      "four_periods_ago_demand": "32"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/customer_demand.csv",
+    "values": {
+      "customer_id": "C3",
+      "two_periods_ago_demand": "55",
+      "three_periods_ago_demand": "73",
+      "demand_previous_period": "70",
+      "demand": "65",
+      "four_periods_ago_demand": "71"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/customer_demand.csv",
+    "values": {
+      "customer_id": "C4",
+      "two_periods_ago_demand": "350",
+      "three_periods_ago_demand": "395",
+      "demand_previous_period": "396",
+      "demand": "435",
+      "four_periods_ago_demand": "515"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S1",
+      "supply_capacity_previous_period": "2198",
+      "two_periods_ago_supply_capacity": "2428",
+      "supply_capacity": "2531",
+      "four_periods_ago_supply_capacity": "2858",
+      "three_periods_ago_supply_capacity": "2418"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S2",
+      "supply_capacity_previous_period": "24",
+      "two_periods_ago_supply_capacity": "19",
+      "supply_capacity": "20",
+      "four_periods_ago_supply_capacity": "22",
+      "three_periods_ago_supply_capacity": "22"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S3",
+      "supply_capacity_previous_period": "191",
+      "two_periods_ago_supply_capacity": "183",
+      "supply_capacity": "210",
+      "four_periods_ago_supply_capacity": "192",
+      "three_periods_ago_supply_capacity": "201"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S4",
+      "supply_capacity_previous_period": "285",
+      "two_periods_ago_supply_capacity": "236",
+      "supply_capacity": "241",
+      "four_periods_ago_supply_capacity": "285",
+      "three_periods_ago_supply_capacity": "259"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/transportation_costs.csv",
+    "values": {
+      "supplier_id": "S1",
+      "two_periods_ago_service_status": "Seasonal",
+      "two_periods_ago_transportation_cost_to_C2": "28.0788948661",
+      "previous_period_transportation_cost_to_C3": "19.6490333479",
+      "transportation_cost_to_C1": "543.756480860856",
+      "previous_period_service_status": "Trial",
+      "transportation_cost_to_C2": "23.685276141764653",
+      "transportation_cost_to_C3": "23.676386730773032",
+      "previous_period_transportation_cost_to_C4": "499.377177448",
+      "two_periods_ago_transportation_cost_to_C3": "28.1488561842",
+      "previous_period_transportation_cost_to_C2": "24.9571754706",
+      "previous_period_transportation_cost_to_C1": "515.154889968",
+      "two_periods_ago_transportation_cost_to_C1": "438.757104407",
+      "three_periods_ago_service_status": "Seasonal",
+      "transportation_cost_to_C4": "447.75143678673766"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/transportation_costs.csv",
+    "values": {
+      "supplier_id": "S2",
+      "two_periods_ago_service_status": "Trial",
+      "two_periods_ago_transportation_cost_to_C2": "0.0527385700913",
+      "previous_period_transportation_cost_to_C3": "0.0338351166477",
+      "transportation_cost_to_C1": "883.9151090405642",
+      "previous_period_service_status": "Regular",
+      "transportation_cost_to_C2": "0.04977684765576961",
+      "transportation_cost_to_C3": "0.0350986687216299",
+      "previous_period_transportation_cost_to_C4": "41.0149997936",
+      "two_periods_ago_transportation_cost_to_C3": "0.0389489926804",
+      "previous_period_transportation_cost_to_C2": "0.0518824083116",
+      "previous_period_transportation_cost_to_C1": "776.165857249",
+      "two_periods_ago_transportation_cost_to_C1": "875.959873059",
+      "three_periods_ago_service_status": "Suspended",
+      "transportation_cost_to_C4": "44.45588531711622"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/transportation_costs.csv",
+    "values": {
+      "supplier_id": "S3",
+      "two_periods_ago_service_status": "Regular",
+      "two_periods_ago_transportation_cost_to_C2": "26.4837258251",
+      "previous_period_transportation_cost_to_C3": "407.847118705",
+      "transportation_cost_to_C1": "537.3456896658107",
+      "previous_period_service_status": "Trial",
+      "transportation_cost_to_C2": "23.769274659075112",
+      "transportation_cost_to_C3": "498.95659249465467",
+      "previous_period_transportation_cost_to_C4": "449.419526482",
+      "two_periods_ago_transportation_cost_to_C3": "538.324267642",
+      "previous_period_transportation_cost_to_C2": "19.3149125880",
+      "previous_period_transportation_cost_to_C1": "482.966305872",
+      "two_periods_ago_transportation_cost_to_C1": "596.292511822",
+      "three_periods_ago_service_status": "Regular",
+      "transportation_cost_to_C4": "440.60737890439776"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/TP_testing/TP9/transportation_costs.csv",
+    "values": {
+      "supplier_id": "S4",
+      "two_periods_ago_service_status": "Seasonal",
+      "two_periods_ago_transportation_cost_to_C2": "78.1008861279",
+      "previous_period_transportation_cost_to_C3": "1501.24295320",
+      "transportation_cost_to_C1": "1791.493192397229",
+      "previous_period_service_status": "Trial",
+      "transportation_cost_to_C2": "68.21633865655126",
+      "transportation_cost_to_C3": "1432.4837339656747",
+      "previous_period_transportation_cost_to_C4": "1292.79350970",
+      "two_periods_ago_transportation_cost_to_C3": "1642.19935262",
+      "previous_period_transportation_cost_to_C2": "63.6390223327",
+      "previous_period_transportation_cost_to_C1": "1929.61731753",
+      "two_periods_ago_transportation_cost_to_C1": "2061.47121649",
+      "three_periods_ago_service_status": "Seasonal",
+      "transportation_cost_to_C4": "1527.7635425462734"
+    }
+  }
+]

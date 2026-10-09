@@ -1,0 +1,366 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+Maximize
+39.62 x_1 - 178539 y_1 + 35.98 x_2 - 157708 y_2 + 37.96 x_3 - 85192 y_3
+
+Subject to
+x_1 <= 5732 (demand)
+x_1 <= 12892 (22-day individual production quota)
+x_1 >= 18 y_1 (minimum batch)
+x_1 <= 5732 y_1 (activation)
+x_2 <= 5607 (demand)
+x_2 <= 7238 (22-day individual production quota)
+x_2 >= 25 y_2 (minimum batch)
+x_2 <= 5607 y_2 (activation)
+x_3 <= 4653 (demand)
+x_3 <= 11902 (22-day individual production quota)
+x_3 >= 23 y_3 (minimum batch)
+x_3 <= 4653 y_3 (activation)
+x_1/586 + x_2/329 + x_3/541 <= 22 (shared production days)
+x_1, x_2, x_3 >= 0 integer; y_1, y_2, y_3 binary.
+
+###### Retrieved Information
+
+{
+  "daily_quota": {
+    "1": 586,
+    "2": 329,
+    "3": 541
+  },
+  "demand": {
+    "1": 5732,
+    "2": 5607,
+    "3": 4653
+  },
+  "fixed_cost": {
+    "1": 178539,
+    "2": 157708,
+    "3": 85192
+  },
+  "min_batch": {
+    "1": 18,
+    "2": 25,
+    "3": 23
+  },
+  "products": [
+    "A1",
+    "A2",
+    "A3"
+  ],
+  "profit": {
+    "1": 39.62,
+    "2": 35.98,
+    "3": 37.96
+  },
+  "quota": {
+    "1": 12892,
+    "2": 7238,
+    "3": 11902
+  }
+}
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+**Objective Function:**
+$$
+\min Z = 200\,x_{1} + 250\,x_{2} + 380\,x_{3} + 350\,x_{4} + 50\,y_{3} + 50\,y_{4}
+$$
+
+**Constraints:**
+
+Flour demand constraint:
+$$
+30\,x_{1} + 20\,x_{2} + 40\,x_{3} + 10\,x_{4} = 100
+$$
+
+Rice demand constraint:
+$$
+20\,x_{1} + 30\,x_{2} + 10\,x_{3} + 40\,x_{4} = 80
+$$
+
+Supplier usage constraints for new suppliers:
+$$
+x_{3} \leq M\,y_{3}
+$$
+$$
+x_{4} \leq M\,y_{4}
+$$
+
+Existing-supplier order bounds (zero orders are allowed):
+$$
+x_{1} \geq 0
+$$
+$$
+x_{2} \geq 0
+$$
+
+Non-negativity for new suppliers:
+$$
+x_{3} \geq 0
+$$
+$$
+x_{4} \geq 0
+$$
+
+Binary variables for new supplier selection:
+$$
+y_{3} \in \{0,1\}
+$$
+$$
+y_{4} \in \{0,1\}
+$$
+
+Where $M$ is a sufficiently large constant (e.g., $M = 100$).
+
+**Decision Variables:**
+$$
+x_{i} \geq 0, \quad i = 1,2,3,4
+$$
+$$
+y_{j} \in \{0,1\}, \quad j = 3,4
+$$
+
+**Retrieved Information**
+
+- Supplier 1: Existing Supplier, Flour per batch = 30, Rice per batch = 20, Price per batch = 200, No new-supplier activation fee
+- Supplier 2: Existing Supplier, Flour per batch = 20, Rice per batch = 30, Price per batch = 250, No new-supplier activation fee
+- Supplier 3: New Supplier, Flour per batch = 40, Rice per batch = 10, Price per batch = 380, Administrative fee = 50
+- Supplier 4: New Supplier, Flour per batch = 10, Rice per batch = 40, Price per batch = 350, Administrative fee = 50
+
+- Demand: Flour = 100 kg, Rice = 80 kg
+
+- $x_{i}$: Continuous batch equivalents ordered from supplier $i$ ($i=1,2,3,4$)
+- $y_{j}$: Binary variable indicating if new supplier $j$ ($j=3,4$) is selected (1 if selected, 0 otherwise)
+
+Secondary objective, with strictly lower lexicographic priority than total cost: minimize y_3 + y_4. Existing suppliers are available with nonnegative continuous orders, including zero. Fractional batches are allowed for all suppliers. Supplier type and If new supplier consistently identify 1/2 as existing and 3/4 as new. The New supplier administrative fee field applies only where If new supplier is Yes; the stored values for suppliers 1/2 are inactive in this model.
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine which suppliers to activate and how much each branch should source from each supplier, so that all branch demands are met and the total cost (fixed supplier activation costs plus transportation costs) is minimized.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem, specifically a Fixed-Charge Facility Location (Uncapacitated Facility Location) problem.
+3.  **Define Index Sets:** The primary indices are:
+    - Suppliers (i ∈ Suppliers, from 'fixed_cost.csv' and 'transportation_costs.csv' rows)
+    - Branches/Customers (j ∈ Branches, from 'demand.csv' and 'transportation_costs.csv' columns)
+4.  **Define Decision Variables:**
+    -   `x[i,j]` = Quantity of goods supplied from supplier i to branch j. Type: GRB.CONTINUOUS (≥ 0).
+    -   `y[i]` = 1 if supplier i is activated (operational), 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   Fixed activation costs for each supplier: 'fixed_costs' column in 'fixed_cost.csv', keyed by supplier.
+    -   Transportation cost per unit from each supplier to each branch: 'transportation_costs.csv', with suppliers as rows and branches as columns.
+    -   Demand for each branch: 'demand' column in 'demand.csv', keyed by branch.
+6.  **Formulate Objective:** Minimize the total cost, which is the sum of all supplier fixed activation costs (for activated suppliers) plus the sum of all transportation costs (quantity shipped times per-unit cost for each supplier-branch pair).
+7.  **Formulate Constraints:**
+    -   Demand Satisfaction: For each branch j, the sum over all suppliers i of x[i,j] must equal the demand of branch j (from 'demand.csv').
+    -   Supplier Activation Linking: For each supplier i and branch j, x[i,j] ≤ M * y[i], where M is a sufficiently large constant (e.g., the total demand across all branches), ensuring that no goods are shipped from a supplier unless it is activated.
+    -   Non-negativity: All x[i,j] ≥ 0.
+    -   Binary Activation: All y[i] ∈ {0,1}.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+import math
+
+# 1. Read all required CSVs with dtype=str and keep_default_na=False
+demand_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP5/demand.csv'
+fixed_cost_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP5/fixed_cost.csv'
+transport_cost_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP5/transportation_costs.csv'
+
+demand_df = pd.read_csv(demand_path, dtype=str, keep_default_na=False)
+fixed_cost_df = pd.read_csv(fixed_cost_path, dtype=str, keep_default_na=False)
+transport_cost_df = pd.read_csv(transport_cost_path, dtype=str, keep_default_na=False)
+
+# 2. Normalize and extract entity sets and parameters
+
+# Branches (customers)
+if 'customer' not in demand_df.columns or 'demand' not in demand_df.columns:
+    raise KeyError("demand.csv must have columns 'customer' and 'demand'")
+branches = demand_df['customer'].astype(str).str.strip().tolist()
+branch_set = set(branches)
+demand_dict = {}
+for idx, row in demand_df.iterrows():
+    branch = str(row['customer']).strip()
+    try:
+        demand = int(row['demand'])
+    except Exception:
+        raise ValueError(f"Invalid demand value for branch {branch}: {row['demand']}")
+    demand_dict[branch] = demand
+
+# Suppliers
+if 'Unnamed: 0' not in fixed_cost_df.columns or 'fixed_costs' not in fixed_cost_df.columns:
+    raise KeyError("fixed_cost.csv must have columns 'Unnamed: 0' and 'fixed_costs'")
+suppliers = fixed_cost_df['Unnamed: 0'].astype(str).str.strip().tolist()
+supplier_set = set(suppliers)
+fixed_cost_dict = {}
+for idx, row in fixed_cost_df.iterrows():
+    supplier = str(row['Unnamed: 0']).strip()
+    try:
+        fixed_cost = float(row['fixed_costs'])
+    except Exception:
+        raise ValueError(f"Invalid fixed_costs value for supplier {supplier}: {row['fixed_costs']}")
+    fixed_cost_dict[supplier] = fixed_cost
+
+# Transportation costs: rows are suppliers, columns are branches
+if 'Unnamed: 0' not in transport_cost_df.columns:
+    raise KeyError("transportation_costs.csv must have column 'Unnamed: 0' for supplier IDs")
+transport_cost_df = transport_cost_df.set_index(transport_cost_df['Unnamed: 0'].astype(str).str.strip())
+# Validate that all suppliers and branches are present
+missing_suppliers = supplier_set - set(transport_cost_df.index)
+if missing_suppliers:
+    raise KeyError(f"Suppliers {missing_suppliers} in fixed_cost.csv missing from transportation_costs.csv")
+missing_branches = branch_set - set([c for c in transport_cost_df.columns if c != 'Unnamed: 0'])
+if missing_branches:
+    raise KeyError(f"Branches {missing_branches} in demand.csv missing from transportation_costs.csv")
+# Build cost dictionary
+transport_cost_dict = {}
+for supplier in suppliers:
+    for branch in branches:
+        try:
+            cost = float(transport_cost_df.loc[supplier, branch])
+        except Exception:
+            raise ValueError(f"Invalid transportation cost for supplier {supplier}, branch {branch}: {transport_cost_df.loc[supplier, branch]}")
+        transport_cost_dict[(supplier, branch)] = cost
+
+# 3. Model indices
+I = suppliers  # supplier IDs
+J = branches   # branch IDs
+
+# 4. Big-M for linking constraints: total demand across all branches
+M = sum(demand_dict[j] for j in J)
+
+# 5. Build Gurobi model
+m = gp.Model("UFLP_Superstore")
+
+# 6. Decision variables
+# x_vars[(i,j)]: quantity supplied from supplier i to branch j (continuous >= 0)
+x_vars = m.addVars(I, J, lb=0.0, vtype=gp.GRB.CONTINUOUS, name='x')
+# y_vars[i]: 1 if supplier i is activated, 0 otherwise (binary)
+y_vars = m.addVars(I, vtype=gp.GRB.BINARY, name='y')
+
+# 7. Objective: Minimize total cost (fixed + transportation)
+total_fixed_cost = gp.quicksum(fixed_cost_dict[i] * y_vars[i] for i in I)
+total_transport_cost = gp.quicksum(transport_cost_dict[(i, j)] * x_vars[i, j] for i in I for j in J)
+m.setObjective(total_fixed_cost + total_transport_cost, gp.GRB.MINIMIZE)
+
+# 8. Constraints
+
+# Demand satisfaction: for each branch, sum of supply from all suppliers equals demand
+for j in J:
+    m.addConstr(gp.quicksum(x_vars[i, j] for i in I) == demand_dict[j], name=f'demand_{j}')
+
+# Linking: x_{ij} <= M * y_i for all i, j
+for i in I:
+    for j in J:
+        m.addConstr(x_vars[i, j] <= M * y_vars[i], name=f'link_{i}_{j}')
+
+# 9. Optimize
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 30 rows, 30 columns and 75 nonzeros
+Model fingerprint: 0x55329f15
+Variable types: 25 continuous, 5 integer (5 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+02]
+  Objective range  [2e-02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [3e+00, 1e+02]
+Presolve time: 0.00s
+Presolved: 30 rows, 30 columns, 75 nonzeros
+Variable types: 25 continuous, 5 integer (5 binary)
+Found heuristic solution: objective 10364.660000
+
+Root relaxation: objective 1.019996e+04, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    10199.960000 10199.9600  0.00%     -    0s
+
+Explored 1 nodes (3 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 2: 10200 10364.7 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.019996000000e+04, best bound 1.019996000000e+04, gap 0.0000%
+Optimal objective: 10199.960000000001
+Optimal solution: [('C0', 0.0), ('C1', 6.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 3.0), ('C10', 143.0), ('C11', 0.0), ('C12', 10.0), ('C13', 25.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 1.0), ('C26', 1.0), ('C27', 1.0), ('C28', -0.0), ('C29', -0.0)]

@@ -1,0 +1,72 @@
+{
+  "problem_id": "Variant9",
+  "query": "A paper mill cuts standard rolls into smaller item types. The demand for each item type is provided in item_demand.csv. A set of feasible cutting patterns is provided in cutting_patterns.csv, where each pattern specifies how many units of each item type are produced by cutting one standard roll according to that pattern.\n\nFormulate an integer cutting-stock pattern-selection model. For each cutting pattern p, define y_p as the integer number of standard rolls cut using pattern p. The objective is to minimize the total number of standard rolls used. The model should satisfy or exceed demand for every item type, impose nonnegativity on pattern-use variables, and require pattern-use variables to be integers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant9/inputs/item_demand.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant9/inputs/cutting_patterns.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 22.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the minimum number of standard rolls to cut, by selecting how many times to use each feasible cutting pattern, such that the demand for each item type is satisfied or exceeded. Each pattern specifies how many units of each item type are produced per roll.\n2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem, specifically an integer cutting-stock pattern-selection model.\n3.  **Define Index Sets:** The primary indices are:\n    - Patterns (from 'Pattern' in cutting_patterns.csv)\n    - Item types (from 'Item' in item_demand.csv and columns 'A', 'B', 'C', 'D' in cutting_patterns.csv)\n4.  **Define Decision Variables:**\n    - `y[p]` = Number of standard rolls cut using pattern p. Type: GRB.INTEGER (nonnegative integer).\n5.  **Identify Parameters (from Schema):**\n    - Pattern composition: For each pattern p and item i, the number of units of item i produced by pattern p comes from cutting_patterns.csv columns ['A', 'B', 'C', 'D'].\n    - Demand: For each item i, the required demand comes from item_demand.csv column 'Demand'.\n6.  **Formulate Objective:** Minimize the total number of standard rolls used, i.e., minimize the sum over all patterns p of y[p].\n7.  **Formulate Constraints:**\n    - Demand Satisfaction: For each item type i, the sum over all patterns p of (number of units of item i produced by pattern p) times y[p] must be greater than or equal to the demand for item i.\n    - Nonnegativity and Integrality: For each pattern p, y[p] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant9/inputs/item_demand.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 4\nColumns: ['Item', 'Demand']\nParsed column types: {'Item': 'object', 'Demand': 'int64'}\nPreview only (first 10 rows):\nItem Demand\n   A     24\n   B     18\n   C     12\n   D     10\nFull-file column statistics: {\"Item\": {\"missing\": 0, \"unique_nonempty\": 4}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 4, \"numeric_range\": [10.0, 24.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"a\", \"matching_columns\": [{\"column\": \"Item\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"A\"]}], \"exact_matching_columns\": 1}, {\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"item\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant9/inputs/cutting_patterns.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 9\nColumns: ['Pattern', 'A', 'B', 'C', 'D']\nParsed column types: {'Pattern': 'object', 'A': 'int64', 'B': 'int64', 'C': 'int64', 'D': 'int64'}\nPreview only (first 10 rows):\nPattern A B C D\n     P1 4 0 0 0\n     P2 0 3 0 0\n     P3 0 0 2 0\n     P4 0 0 0 2\n     P5 2 1 0 0\n     P6 1 0 1 0\n     P7 0 1 0 1\n     P8 1 1 1 0\n     P9 2 0 0 1\nFull-file column statistics: {\"Pattern\": {\"missing\": 0, \"unique_nonempty\": 9}, \"A\": {\"missing\": 0, \"unique_nonempty\": 4, \"numeric_range\": [0.0, 4.0]}, \"B\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [0.0, 3.0]}, \"C\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [0.0, 2.0]}, \"D\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [0.0, 2.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"a\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"pattern\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\nitem_demand_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant9/inputs/item_demand.csv'\ncutting_patterns_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant9/inputs/cutting_patterns.csv'\nitem_demand_df = pd.read_csv(item_demand_path, dtype=str, keep_default_na=False)\nitem_demand_df['Item'] = item_demand_df['Item'].str.strip()\nitem_demand_df['Demand'] = item_demand_df['Demand'].astype(int)\nitems = item_demand_df['Item'].tolist()\nitem_to_demand = dict(zip(item_demand_df['Item'], item_demand_df['Demand']))\ncutting_patterns_df = pd.read_csv(cutting_patterns_path, dtype=str, keep_default_na=False)\ncutting_patterns_df['Pattern'] = cutting_patterns_df['Pattern'].str.strip()\npatterns = cutting_patterns_df['Pattern'].tolist()\nfor item in items:\n    if item not in cutting_patterns_df.columns:\n        raise KeyError(f\"Item '{item}' not found as a column in cutting_patterns.csv\")\n    cutting_patterns_df[item] = cutting_patterns_df[item].astype(int)\npattern_item_qty = {pattern: {item: int(cutting_patterns_df.loc[cutting_patterns_df['Pattern'] == pattern, item].values[0]) for item in items} for pattern in patterns}\nm = gp.Model('CuttingStockPatternSelection')\ny_vars = m.addVars(patterns, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((y_vars[p] for p in patterns)), gp.GRB.MINIMIZE)\nfor item in items:\n    m.addConstr(gp.quicksum((pattern_item_qty[p][item] * y_vars[p] for p in patterns)) >= item_to_demand[item], name=f'demand_{item}')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total number of standard rolls used: {m.objVal:.0f}')\n    print('--- Pattern Usage ---')\n    for p in patterns:\n        qty = y_vars[p].X\n        if qty > 1e-06:\n            print(f'Pattern {p}: {qty:.0f} times')\n    print('--- Demand Satisfaction ---')\n    for item in items:\n        produced = sum((pattern_item_qty[p][item] * y_vars[p].X for p in patterns))\n        print(f'Item {item}: Demand = {item_to_demand[item]}, Produced = {int(round(produced))}')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 22.0,
+  "final_solution": [
+    [
+      "C0",
+      3.0
+    ],
+    [
+      "C1",
+      2.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      5.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      12.0
+    ],
+    [
+      "C8",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "variants",
+  "seconds": 12.39,
+  "evaluated_utc": "2026-10-06T05:29:11.498687+00:00",
+  "notebook_source_sha256": "8664c2eba4a40f00fc3d72ca2753d08b9ca8dd51d93631ddb6c956b8a025495f",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

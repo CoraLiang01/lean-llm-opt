@@ -1,0 +1,52 @@
+{
+  "problem_id": "OR-019",
+  "query": "The supermarket offers a variety of top-selling products, with revenue data provided in the ‘Revenue’ column. Each product has its own demand level. The retailer aims to maximize total revenue by focusing on the initial inventory of products classified under ‘27in’. Inventory levels are provided in the ‘Initial Inventory’ column. Demand quantities for ‘27in’ products are given in the ‘Demand’ column and are assumed to be deterministic and known in advance. The decision variables x_i represent the number of units of each ‘27in’ product i that the company plans to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM10/SalesDataAnalysis.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 7123134.69,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "RA",
+  "assigned_route": "RA",
+  "generated_model": "Let $I$ be the set of products classified as ‘27in’:\n\\[\nI = \\{\\text{27in 4K Gaming Monitor},\\ \\text{27in FHD Monitor}\\}\n\\]\n\nLet $x_i$ be the number of units of product $i \\in I$ to fulfill.\n\nParameters:\n\\[\n\\begin{align*}\n\\text{Revenue}_{\\text{27in 4K Gaming Monitor}} &= 389.99 \\\\\n\\text{Revenue}_{\\text{27in FHD Monitor}} &= 149.99 \\\\\n\\text{Demand}_{\\text{27in 4K Gaming Monitor}} &= 12474 \\\\\n\\text{Demand}_{\\text{27in FHD Monitor}} &= 15057 \\\\\n\\text{InitialInventory}_{\\text{27in 4K Gaming Monitor}} &= 62440 \\\\\n\\text{InitialInventory}_{\\text{27in FHD Monitor}} &= 75500 \\\\\n\\end{align*}\n\\]\n\nDecision variables:\n\\[\nx_i \\in \\mathbb{Z}_{\\geq 0},\\quad \\forall i \\in I\n\\]\n\nObjective:\n\\[\n\\max\\ 389.99\\, x_{\\text{27in 4K Gaming Monitor}} + 149.99\\, x_{\\text{27in FHD Monitor}}\n\\]\n\nSubject to:\n\\[\n\\begin{align*}\n& x_{\\text{27in 4K Gaming Monitor}} \\leq 12474 \\\\\n& x_{\\text{27in 4K Gaming Monitor}} \\leq 62440 \\\\\n& x_{\\text{27in FHD Monitor}} \\leq 15057 \\\\\n& x_{\\text{27in FHD Monitor}} \\leq 75500 \\\\\n& x_{\\text{27in 4K Gaming Monitor}},\\ x_{\\text{27in FHD Monitor}} \\geq 0,\\ \\text{integer}\n\\end{align*}\n\\]\n\nOr, equivalently (since demand is less than inventory for both products):\n\\[\n\\begin{align*}\n& 0 \\leq x_{\\text{27in 4K Gaming Monitor}} \\leq 12474 \\\\\n& 0 \\leq x_{\\text{27in FHD Monitor}} \\leq 15057 \\\\\n& x_{\\text{27in 4K Gaming Monitor}},\\ x_{\\text{27in FHD Monitor}} \\in \\mathbb{Z}\n\\end{align*}\n\\]",
+  "csvqa_observation": "{\"values\": {\"Product Name\": \"27in 4K Gaming Monitor\", \"Revenue\": \"389.99\", \"Demand\": \"12474\", \"Initial Inventory\": \"62440\"}}\n{\"values\": {\"Product Name\": \"27in FHD Monitor\", \"Revenue\": \"149.99\", \"Demand\": \"15057\", \"Initial Inventory\": \"75500\"}}",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_FULL_DATA",
+  "solve_code": "LEGACY_OBSERVATION = '{\"values\": {\"Product Name\": \"27in 4K Gaming Monitor\", \"Revenue\": \"389.99\", \"Demand\": \"12474\", \"Initial Inventory\": \"62440\"}}\\n{\"values\": {\"Product Name\": \"27in FHD Monitor\", \"Revenue\": \"149.99\", \"Demand\": \"15057\", \"Initial Inventory\": \"75500\"}}'\nLEGACY_RECORDS = [{'source': '', 'values': {'Product Name': '27in 4K Gaming Monitor', 'Revenue': '389.99', 'Demand': '12474', 'Initial Inventory': '62440'}}, {'source': '', 'values': {'Product Name': '27in FHD Monitor', 'Revenue': '149.99', 'Demand': '15057', 'Initial Inventory': '75500'}}]\nimport gurobipy as gp\nfrom gurobipy import GRB\nproducts = []\nrevenue = {}\ndemand = {}\ninitial_inventory = {}\nfor rec in LEGACY_RECORDS:\n    vals = rec['values']\n    pname = vals['Product Name']\n    products.append(pname)\n    try:\n        revenue[pname] = float(vals['Revenue'])\n        demand[pname] = int(vals['Demand'])\n        initial_inventory[pname] = int(vals['Initial Inventory'])\n    except KeyError as e:\n        raise ValueError(f'Missing required field {e} for product {pname}')\nfor pname in products:\n    if pname not in revenue or pname not in demand or pname not in initial_inventory:\n        raise ValueError(f'Missing data for product {pname}')\nm = gp.Model('27in_Product_Fulfillment')\nx = m.addVars(products, lb=0, ub={p: min(demand[p], initial_inventory[p]) for p in products}, vtype=GRB.INTEGER, name='')\nm.setObjective(gp.quicksum((revenue[p] * x[p] for p in products)), GRB.MAXIMIZE)\nfor p in products:\n    m.addConstr(x[p] <= demand[p], name=f'demand_{p}')\n    m.addConstr(x[p] <= initial_inventory[p], name=f'inv_{p}')\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for var in m.getVars():\n        print(f'{var.VarName}: {var.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "final_objective": 7123134.6899999995,
+  "final_solution": [
+    [
+      "C0",
+      12474.0
+    ],
+    [
+      "C1",
+      15057.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "loto_variant": "examples_and_route",
+  "held_out_type": "NRM",
+  "disabled_workflow_route": "NRM",
+  "allowed_labels": "TP,RA,FLP,AP,Mixture,Others",
+  "reference_sha256": "6b2987f96aeacece9f458d55aca072436922aec963be16223ac30a8890f79097",
+  "reference_count_after": 14,
+  "route_allowed": true,
+  "classification_correct": false,
+  "solution_correct": true,
+  "experiment_method": "examples_and_route",
+  "seconds": 20.805,
+  "classification_source": "fold_agent",
+  "classification_cache_sha256": "8b17fda06001ff4ebea07809838119bc81b6f49cb453b600aa87d5dc73881435",
+  "base_notebook_sha256": "a155d54c6df32abc8dfe263e03d00138848cfcca32422dff3c286f3b8c67f6b1",
+  "notebook_source_sha256": "dbc55bc1466b60c1dcea916f9ce32ac698ffd9ea4418e420312defa755319219",
+  "cache_fingerprint": "4eac1e4c99e2297fd2b8734091134be64965dfd3229239ad5cca9db39c65b68c",
+  "evaluated_utc": "2026-10-06T02:51:53.684447+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

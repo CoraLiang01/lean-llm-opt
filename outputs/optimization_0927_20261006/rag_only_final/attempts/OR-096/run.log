@@ -1,0 +1,198 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to assign white and nonwhite elementary students from each of 31 neighborhoods to two schools, minimizing total travel distance, while ensuring that (a) no school exceeds its capacity, (b) all students are assigned, and (c) each school’s white-student percentage is within 10 percentage points of the district-wide ratio (60% white, 40% nonwhite).
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) transportation/assignment problem with side constraints (racial balance and capacity).
+3.  **Define Index Sets:** The primary indices are:
+    -   Schools (S): from `school_capacity.csv` and `distance.csv` (School column)
+    -   Neighborhoods (N): from `neighborhoods_population.csv` and `distance.csv` (Neighborhood columns N01–N31)
+    -   Student Groups (G): {White, NonWhite}
+4.  **Define Decision Variables:**
+    -   `x[s, n, g]` = Number of students of group g (White or NonWhite) from neighborhood n assigned to school s. Type: GRB.CONTINUOUS (or GRB.INTEGER if students must be assigned as whole individuals).
+5.  **Identify Parameters (from Schema):**
+    -   `Capacity[s]`: School capacity from `school_capacity.csv` (Capacity column).
+    -   `Pop[n, g]`: Number of students of group g in neighborhood n from `neighborhoods_population.csv` (Population_White, Population_NonWhite).
+    -   `Dist[s, n]`: Distance from school s to neighborhood n from `distance.csv`.
+    -   District-wide white and nonwhite totals: sum over all n of `Pop[n, White]` and `Pop[n, NonWhite]` (computed from `neighborhoods_population.csv`).
+6.  **Formulate Objective:** Minimize the total travel distance for all students:  
+    sum over s, n, g of `Dist[s, n] * x[s, n, g]`.
+7.  **Formulate Constraints:**
+    -   Assignment Completeness: For each neighborhood n and group g,  
+        sum over s of `x[s, n, g]` = `Pop[n, g]` (all students assigned).
+    -   School Capacity: For each school s,  
+        sum over n, g of `x[s, n, g]` ≤ `Capacity[s]`.
+    -   Racial Balance: For each school s,  
+        Let `TotalWhite[s]` = sum over n of `x[s, n, White]`,  
+        Let `TotalAssigned[s]` = sum over n, g of `x[s, n, g]`,  
+        Enforce:  
+        0.50 × `TotalAssigned[s]` ≤ `TotalWhite[s]` ≤ 0.70 × `TotalAssigned[s]`  
+        (since district ratio is 60% white, ±10 percentage points).
+    -   Nonnegativity and Integrality: All `x[s, n, g]` ≥ 0 and integer (if required).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+from gurobipy import Model, GRB, quicksum
+
+# --- Read Data ---
+
+# Read school capacities
+school_capacity_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture15/school_capacity.csv',
+    dtype=str, keep_default_na=False
+)
+school_capacity_df['Capacity'] = school_capacity_df['Capacity'].astype(int)
+schools = list(school_capacity_df['School'].str.strip())
+capacity = {row['School'].strip(): int(row['Capacity']) for _, row in school_capacity_df.iterrows()}
+
+# Read neighborhood populations
+neigh_pop_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture15/neighborhoods_population.csv',
+    dtype=str, keep_default_na=False
+)
+neigh_pop_df['Population_White'] = neigh_pop_df['Population_White'].astype(int)
+neigh_pop_df['Population_NonWhite'] = neigh_pop_df['Population_NonWhite'].astype(int)
+neighborhoods = list(neigh_pop_df['Neighborhood'].str.strip())
+groups = ['White', 'NonWhite']
+# Pop[n, g]
+pop = {}
+for _, row in neigh_pop_df.iterrows():
+    n = row['Neighborhood'].strip()
+    pop[(n, 'White')] = int(row['Population_White'])
+    pop[(n, 'NonWhite')] = int(row['Population_NonWhite'])
+
+# Read distances
+distance_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture15/distance.csv',
+    dtype=str, keep_default_na=False
+)
+# Ensure all columns are present and identifiers match
+distance_df['School'] = distance_df['School'].str.strip()
+distance_df = distance_df.set_index('School')
+# Convert all distance columns to float
+for n in neighborhoods:
+    distance_df[n] = distance_df[n].astype(float)
+# Dist[s, n]
+dist = {}
+for s in schools:
+    for n in neighborhoods:
+        dist[(s, n)] = float(distance_df.loc[s, n])
+
+# --- Validate Data Coverage ---
+# Ensure all required keys are present
+for s in schools:
+    if s not in capacity:
+        raise ValueError(f"Missing capacity for school {s}")
+    for n in neighborhoods:
+        if (s, n) not in dist:
+            raise ValueError(f"Missing distance for school {s}, neighborhood {n}")
+for n in neighborhoods:
+    for g in groups:
+        if (n, g) not in pop:
+            raise ValueError(f"Missing population for neighborhood {n}, group {g}")
+
+# --- Compute District-wide Totals and Ratios ---
+total_white = sum(pop[(n, 'White')] for n in neighborhoods)
+total_nonwhite = sum(pop[(n, 'NonWhite')] for n in neighborhoods)
+total_students = total_white + total_nonwhite
+district_white_ratio = total_white / total_students if total_students > 0 else 0.0
+
+# Racial balance bounds: 60% ± 10% => [0.5, 0.7]
+lower_ratio = 0.5
+upper_ratio = 0.7
+
+# --- Model ---
+m = Model("SchoolAssignment")
+
+# Decision variables: x[s, n, g] = number of students of group g from neighborhood n assigned to school s
+x_vars = m.addVars(
+    schools, neighborhoods, groups,
+    vtype=GRB.INTEGER,
+    lb=0,
+    name=''
+)
+
+# --- Constraints ---
+
+# 1. Assignment Completeness: All students from each neighborhood and group must be assigned
+for n in neighborhoods:
+    for g in groups:
+        m.addConstr(
+            quicksum(x_vars[s, n, g] for s in schools) == pop[(n, g)],
+            name=''
+        )
+
+# 2. School Capacity: No school exceeds its capacity
+for s in schools:
+    m.addConstr(
+        quicksum(x_vars[s, n, g] for n in neighborhoods for g in groups) <= capacity[s],
+        name=''
+    )
+
+# 3. Racial Balance: For each school, white percentage within [0.5, 0.7]
+for s in schools:
+    total_white_s = quicksum(x_vars[s, n, 'White'] for n in neighborhoods)
+    total_assigned_s = quicksum(x_vars[s, n, g] for n in neighborhoods for g in groups)
+    # Only enforce if school has any students assigned (avoid 0/0)
+    # But since all students must be assigned, and capacities are sufficient, total_assigned_s > 0
+    m.addConstr(
+        total_white_s >= lower_ratio * total_assigned_s,
+        name=''
+    )
+    m.addConstr(
+        total_white_s <= upper_ratio * total_assigned_s,
+        name=''
+    )
+
+# --- Objective: Minimize total travel distance ---
+m.setObjective(
+    quicksum(dist[(s, n)] * x_vars[s, n, g] for s in schools for n in neighborhoods for g in groups),
+    GRB.MINIMIZE
+)
+
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 68 rows, 124 columns and 496 nonzeros
+Model fingerprint: 0x2283753b
+Variable types: 0 continuous, 124 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [3e-01, 1e+00]
+  Objective range  [1e+00, 4e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+01, 2e+03]
+Found heuristic solution: objective 8673.1600000
+Presolve removed 60 rows and 68 columns
+Presolve time: 0.00s
+Presolved: 8 rows, 56 columns, 68 nonzeros
+Found heuristic solution: objective 8380.2100000
+Variable types: 0 continuous, 56 integer (0 binary)
+
+Root relaxation: objective 5.044000e+03, 3 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    5044.0000000 5044.00000  0.00%     -    0s
+
+Explored 1 nodes (3 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 3: 5044 8380.21 8673.16 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.044000000000e+03, best bound 5.044000000000e+03, gap 0.0000%
+Optimal objective: 5044.0
+Optimal solution: [('C0', 78.0), ('C1', 22.0), ('C2', 57.0), ('C3', 33.0), ('C4', 47.0), ('C5', 63.0), ('C6', 78.0), ('C7', 22.0), ('C8', 57.0), ('C9', 33.0), ('C10', 47.0), ('C11', 63.0), ('C12', 78.0), ('C13', 22.0), ('C14', 57.0), ('C15', 33.0), ('C16', 46.0), ('C17', 64.0), ('C18', 77.0), ('C19', 23.0), ('C20', 56.0), ('C21', 34.0), ('C22', 46.0), ('C23', 64.0), ('C24', 77.0), ('C25', 23.0), ('C26', 56.0), ('C27', 34.0), ('C28', 46.0), ('C29', 64.0), ('C30', 77.0), ('C31', 23.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 56.0), ('C95', 34.0), ('C96', 46.0), ('C97', 64.0), ('C98', 77.0), ('C99', 23.0), ('C100', 56.0), ('C101', 34.0), ('C102', 46.0), ('C103', 64.0), ('C104', 77.0), ('C105', 23.0), ('C106', 56.0), ('C107', 34.0), ('C108', 46.0), ('C109', 64.0), ('C110', 77.0), ('C111', 23.0), ('C112', 56.0), ('C113', 34.0), ('C114', 46.0), ('C115', 64.0), ('C116', 77.0), ('C117', 23.0), ('C118', 56.0), ('C119', 34.0), ('C120', 46.0), ('C121', 64.0), ('C122', 74.0), ('C123', 46.0)]

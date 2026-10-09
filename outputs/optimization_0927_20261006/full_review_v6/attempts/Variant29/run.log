@@ -1,0 +1,577 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mQuestion: The bakery needs an order for its next production run. How many units of each bread option should it order to earn the highest net benefit within the available storage, staff time and energy? The supplied tables describe the current plan; use their rows directly. The item rows give unit_benefit_cents and item_fee_cents: earn the former per unit and pay the latter once for any positive quantity. Use 1000 ml per liter, 60 minutes per hour and 1000 wh per kwh when comparing resource use with capacity. Only authorized=1 options can be ordered. Quantities are nonnegative integers: zero, or minimum_lot through maximum_order. For each resource, total per-unit usage times quantities must fit the signed sum of capacity_ledger entries. Meet every category minimum_quantity and maximum_quantity, and pay its activation_fee_cents once if any option is ordered. Do not select both members of an incompatible pair. An ordered item must have its requires prerequisite ordered as well; no quantity ratio applies. A bundle earns bonus_cents once only when both options have positive quantities; an unauthorized option cannot trigger a bonus. Report the maximum net benefit in USD cents. All fixed fees and bonuses are in the same unit.
+
+Thought: I need to identify the mathematical structure: the objective is to maximize net benefit (unit benefits per item, minus item-level fixed fees, category activation fees, and plus bundle bonuses), subject to resource capacities (storage, staff time, energy), item-level integer quantity bounds, category-level minimum and maximum quantities, incompatibility constraints (cannot select both of some pairs), prerequisite constraints (if one item is ordered, another must be as well), and bundle bonuses (bonus if both items in a bundle are ordered). There are also authorization constraints (only authorized items can be ordered). The decision variables are integer order quantities for each item, with associated binary activation variables for items and categories, and bundle bonus triggers. There are logical dependencies (incompatibility, prerequisites), fixed-charge mechanisms (item and category fees), and bundle bonuses that depend on combinations of decisions.
+
+Action: FileQA
+
+Action Input: integer order quantities for multiple items with per-unit benefits, item-level fixed fees, category-level activation fees, resource capacity constraints, item and category quantity bounds, incompatibility and prerequisite logical constraints, bundle bonuses triggered by joint selection, and authorization constraints
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 2]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP
+
+[Retrieved example 4]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others
+
+[Retrieved example 5]
+prompt: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Type: Mixture[0m
+Thought:[32;1m[1;3mThought: The problem involves integer order quantities for multiple items, with per-unit benefits, item-level fixed fees, category-level activation fees, resource capacity constraints, item and category quantity bounds, incompatibility and prerequisite logical constraints, bundle bonuses triggered by joint selection, and authorization constraints. The retrieved examples include models with fixed activation costs, batch-size restrictions, logical dependencies, and multi-component coupling, all labeled Mixture or similar. The presence of logical constraints (incompatibility, prerequisites), fixed-charge mechanisms, and bundle bonuses means this is not a clean resource allocation or assignment problem, nor does it fit TP, FLP, or NRM. The interacting mechanisms (logical dependencies, fixed charges, bonuses) materially change the formulation from a canonical class.
+
+Final Answer: Mixture[0m
+
+[1m> Finished chain.[0m
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+Maximize
+39.62 x_1 - 178539 y_1 + 35.98 x_2 - 157708 y_2 + 37.96 x_3 - 85192 y_3
+
+Subject to
+x_1 <= 5732 (demand)
+x_1 <= 12892 (22-day individual production quota)
+x_1 >= 18 y_1 (minimum batch)
+x_1 <= 5732 y_1 (activation)
+x_2 <= 5607 (demand)
+x_2 <= 7238 (22-day individual production quota)
+x_2 >= 25 y_2 (minimum batch)
+x_2 <= 5607 y_2 (activation)
+x_3 <= 4653 (demand)
+x_3 <= 11902 (22-day individual production quota)
+x_3 >= 23 y_3 (minimum batch)
+x_3 <= 4653 y_3 (activation)
+x_1/586 + x_2/329 + x_3/541 <= 22 (shared production days)
+x_1, x_2, x_3 >= 0 integer; y_1, y_2, y_3 binary.
+
+###### Retrieved Information
+
+{
+  "daily_quota": {
+    "1": 586,
+    "2": 329,
+    "3": 541
+  },
+  "demand": {
+    "1": 5732,
+    "2": 5607,
+    "3": 4653
+  },
+  "fixed_cost": {
+    "1": 178539,
+    "2": 157708,
+    "3": 85192
+  },
+  "min_batch": {
+    "1": 18,
+    "2": 25,
+    "3": 23
+  },
+  "products": [
+    "A1",
+    "A2",
+    "A3"
+  ],
+  "profit": {
+    "1": 39.62,
+    "2": 35.98,
+    "3": 37.96
+  },
+  "quota": {
+    "1": 12892,
+    "2": 7238,
+    "3": 11902
+  }
+}
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+**Objective Function:**
+$$
+\min Z = 200\,x_{1} + 250\,x_{2} + 380\,x_{3} + 350\,x_{4} + 50\,y_{3} + 50\,y_{4}
+$$
+
+**Constraints:**
+
+Flour demand constraint:
+$$
+30\,x_{1} + 20\,x_{2} + 40\,x_{3} + 10\,x_{4} = 100
+$$
+
+Rice demand constraint:
+$$
+20\,x_{1} + 30\,x_{2} + 10\,x_{3} + 40\,x_{4} = 80
+$$
+
+Supplier usage constraints for new suppliers:
+$$
+x_{3} \leq M\,y_{3}
+$$
+$$
+x_{4} \leq M\,y_{4}
+$$
+
+Existing-supplier order bounds (zero orders are allowed):
+$$
+x_{1} \geq 0
+$$
+$$
+x_{2} \geq 0
+$$
+
+Non-negativity for new suppliers:
+$$
+x_{3} \geq 0
+$$
+$$
+x_{4} \geq 0
+$$
+
+Binary variables for new supplier selection:
+$$
+y_{3} \in \{0,1\}
+$$
+$$
+y_{4} \in \{0,1\}
+$$
+
+Where $M$ is a sufficiently large constant (e.g., $M = 100$).
+
+**Decision Variables:**
+$$
+x_{i} \geq 0, \quad i = 1,2,3,4
+$$
+$$
+y_{j} \in \{0,1\}, \quad j = 3,4
+$$
+
+**Retrieved Information**
+
+- Supplier 1: Existing Supplier, Flour per batch = 30, Rice per batch = 20, Price per batch = 200, No new-supplier activation fee
+- Supplier 2: Existing Supplier, Flour per batch = 20, Rice per batch = 30, Price per batch = 250, No new-supplier activation fee
+- Supplier 3: New Supplier, Flour per batch = 40, Rice per batch = 10, Price per batch = 380, Administrative fee = 50
+- Supplier 4: New Supplier, Flour per batch = 10, Rice per batch = 40, Price per batch = 350, Administrative fee = 50
+
+- Demand: Flour = 100 kg, Rice = 80 kg
+
+- $x_{i}$: Continuous batch equivalents ordered from supplier $i$ ($i=1,2,3,4$)
+- $y_{j}$: Binary variable indicating if new supplier $j$ ($j=3,4$) is selected (1 if selected, 0 otherwise)
+
+Secondary objective, with strictly lower lexicographic priority than total cost: minimize y_3 + y_4. Existing suppliers are available with nonnegative continuous orders, including zero. Fractional batches are allowed for all suppliers. Supplier type and If new supplier consistently identify 1/2 as existing and 3/4 as new. The New supplier administrative fee field applies only where If new supplier is Yes; the stored values for suppliers 1/2 are inactive in this model.
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal integer order quantities for each authorized bread option to maximize net benefit (in USD cents), subject to storage, staff time, and energy limits, as well as category, incompatibility, prerequisite, and bundle bonus rules. The plan must account for per-unit benefits, fixed item and category activation fees, resource usage, and all logical constraints described in the query.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with fixed-charge (activation) costs, resource constraints, logical (incompatibility, prerequisite, bundle) constraints, and integer variables.
+3.  **Define Index Sets:** The primary indices are:
+    - Items: All rows in the 'item' table with authorized=1.
+    - Categories: All rows in the 'category' table.
+    - Resources: All unique resources in the 'usage' and 'capacity_ledger' tables.
+    - Incompatible pairs: All rows in the 'incompatible' table.
+    - Prerequisite pairs: All rows in the 'requires' table.
+    - Bundles: All rows in the 'bundle' table.
+4.  **Define Decision Variables:**
+    - `q[i]` = Order quantity of item i (authorized items only). Type: GRB.INTEGER, domain: {0} ∪ [minimum_lot[i], maximum_order[i]].
+    - `z[i]` = 1 if item i is ordered (q[i] > 0), 0 otherwise. Type: GRB.BINARY.
+    - `y[c]` = 1 if any item in category c is ordered, 0 otherwise. Type: GRB.BINARY.
+    - `b[p]` = 1 if both items in bundle pair p are ordered (i.e., both q[i]>0 for the pair), 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    - Objective coefficients:
+        - Per-unit benefit: 'unit_benefit_cents' from 'item' table.
+        - Fixed item fee: 'item_fee_cents' from 'item' table.
+        - Category activation fee: 'activation_fee_cents' from 'category' table.
+        - Bundle bonus: 'bonus_cents' from 'bundle' table.
+    - Constraint coefficients:
+        - Per-unit resource usage: 'amount' from 'usage' table, joined by item_ref and resource.
+        - Resource capacity: sum of 'amount' from 'capacity_ledger' table for each resource (convert all units to base units: ml, minute, wh).
+    - Constraint RHS:
+        - Category minimum/maximum: 'minimum_quantity', 'maximum_quantity' from 'category' table.
+        - Item minimum/maximum: 'minimum_lot', 'maximum_order' from 'item' table.
+6.  **Formulate Objective:** Maximize total net benefit in USD cents:
+        - Sum over items: (unit_benefit_cents[i] * q[i] - item_fee_cents[i] * z[i])
+        - Minus sum over categories: activation_fee_cents[c] * y[c]
+        - Plus sum over bundles: bonus_cents[p] * b[p]
+7.  **Formulate Constraints:**
+    - **Item selection and bounds:** For each authorized item i:
+        - q[i] = 0 or minimum_lot[i] ≤ q[i] ≤ maximum_order[i]
+        - z[i] = 1 if q[i] > 0, z[i] = 0 if q[i] = 0 (enforced by: q[i] ≥ minimum_lot[i] * z[i], q[i] ≤ maximum_order[i] * z[i])
+    - **Category activation:** For each category c:
+        - y[c] = 1 if any item in c is ordered (z[i] ≤ y[c] for all i in c; y[c] ≤ sum(z[i] for i in c))
+    - **Category quantity bounds:** For each category c:
+        - minimum_quantity[c] ≤ sum(q[i] for i in c) ≤ maximum_quantity[c]
+    - **Resource constraints:** For each resource r:
+        - sum(usage_amount[i,r] * q[i] for all i with usage of r) ≤ total_capacity[r] (convert all units to base units before summing)
+    - **Incompatibility:** For each incompatible pair (i, j):
+        - z[i] + z[j] ≤ 1
+    - **Prerequisite:** For each (i requires j):
+        - z[i] ≤ z[j]
+    - **Bundle bonuses:** For each bundle pair (i, j):
+        - b[p] ≤ z[i], b[p] ≤ z[j], b[p] ≥ z[i] + z[j] - 1 (b[p]=1 iff both z[i]=1 and z[j]=1)
+    - **Variable domains:** All q[i] are integer, z[i], y[c], b[p] are binary.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+import math
+
+# File paths
+f_requires = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant29/inputs/batch_01/export_01.csv'
+f_market = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant29/inputs/batch_02/export_02.csv'
+f_item = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant29/inputs/batch_03/export_03.csv'
+f_usage = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant29/inputs/batch_04/export_04.csv'
+f_category = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant29/inputs/batch_05/export_05.csv'
+f_incompat = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant29/inputs/batch_06/export_06.csv'
+f_identity = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant29/inputs/batch_01/export_07.csv'
+f_bundle = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant29/inputs/batch_02/export_08.csv'
+f_capacity = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant29/inputs/batch_03/export_09.csv'
+
+# Read all CSVs as str, then convert as needed
+requires_df = pd.read_csv(f_requires, dtype=str, keep_default_na=False)
+market_df = pd.read_csv(f_market, dtype=str, keep_default_na=False)
+item_df = pd.read_csv(f_item, dtype=str, keep_default_na=False)
+usage_df = pd.read_csv(f_usage, dtype=str, keep_default_na=False)
+category_df = pd.read_csv(f_category, dtype=str, keep_default_na=False)
+incompat_df = pd.read_csv(f_incompat, dtype=str, keep_default_na=False)
+identity_df = pd.read_csv(f_identity, dtype=str, keep_default_na=False)
+bundle_df = pd.read_csv(f_bundle, dtype=str, keep_default_na=False)
+capacity_df = pd.read_csv(f_capacity, dtype=str, keep_default_na=False)
+
+# --- 1. Index sets and parameters ---
+
+# Items: all authorized=1 in item table
+item_df['authorized'] = item_df['authorized'].astype(int)
+authorized_items_df = item_df[item_df['authorized'] == 1].copy()
+authorized_items = list(authorized_items_df['item_ref'])
+
+# Categories: all rows in category table
+categories = list(category_df['category'])
+
+# Resources: all unique resources in usage and capacity_ledger
+usage_resources = set(usage_df['resource'].unique())
+capacity_resources = set(capacity_df['resource'].unique())
+resources = sorted(usage_resources.union(capacity_resources))
+
+# Incompatible pairs: all rows in incompatible table
+incompat_pairs = []
+for _, row in incompat_df.iterrows():
+    incompat_pairs.append( (row['item_a'], row['item_b']) )
+
+# Prerequisite pairs: all rows in requires table
+prereq_pairs = []
+for _, row in requires_df.iterrows():
+    prereq_pairs.append( (row['item_ref'], row['prerequisite_ref']) )
+
+# Bundles: all rows in bundle table
+bundle_pairs = []
+bundle_bonus = {}
+for idx, row in bundle_df.iterrows():
+    bundle_pairs.append( (row['item_a'], row['item_b']) )
+    bundle_bonus[(row['item_a'], row['item_b'])] = int(row['bonus_cents'])
+
+# --- 2. Parameters for items ---
+
+# For each authorized item, get category, min/max, benefit, fee
+item_params = {}
+for _, row in authorized_items_df.iterrows():
+    i = row['item_ref']
+    item_params[i] = {
+        'category': row['category'],
+        'minimum_lot': int(row['minimum_lot']),
+        'maximum_order': int(row['maximum_order']),
+        'unit_benefit_cents': int(row['unit_benefit_cents']),
+        'item_fee_cents': int(row['item_fee_cents'])
+    }
+
+# For each category: min/max/activation_fee
+category_params = {}
+for _, row in category_df.iterrows():
+    c = row['category']
+    category_params[c] = {
+        'minimum_quantity': int(row['minimum_quantity']),
+        'maximum_quantity': int(row['maximum_quantity']),
+        'activation_fee_cents': int(row['activation_fee_cents'])
+    }
+
+# --- 3. Resource usage per item ---
+# usage_df: item_ref, resource, amount, unit
+# Convert all usage to base units: ml, minute, wh
+unit_to_base = {
+    'liter': ('ml', 1000),
+    'ml': ('ml', 1),
+    'hour': ('minute', 60),
+    'minute': ('minute', 1),
+    'kwh': ('wh', 1000),
+    'wh': ('wh', 1)
+}
+# Build: usage_amounts[(item, resource)] = amount in base units
+usage_amounts = {}
+for _, row in usage_df.iterrows():
+    i = row['item_ref']
+    r = row['resource']
+    amount = int(row['amount'])
+    unit = row['unit'].strip().casefold()
+    if unit not in unit_to_base:
+        raise ValueError(f"Unknown unit in usage: {unit}")
+    base_unit, factor = unit_to_base[unit]
+    amount_base = amount * factor
+    # Only keep usage for authorized items
+    if i in authorized_items:
+        usage_amounts[(i, r)] = amount_base
+
+# --- 4. Resource capacities ---
+# capacity_df: resource, amount, unit
+# Sum all entries for each resource, convert to base units
+capacity_amounts = {}
+for r in resources:
+    total = 0
+    for _, row in capacity_df[capacity_df['resource'] == r].iterrows():
+        amount = int(row['amount'])
+        unit = row['unit'].strip().casefold()
+        if unit not in unit_to_base:
+            raise ValueError(f"Unknown unit in capacity_ledger: {unit}")
+        base_unit, factor = unit_to_base[unit]
+        amount_base = amount * factor
+        total += amount_base
+    capacity_amounts[r] = total
+
+# --- 5. Items by category ---
+items_by_category = {c: [] for c in categories}
+for i in authorized_items:
+    c = item_params[i]['category']
+    items_by_category[c].append(i)
+
+# --- 6. Prepare model ---
+
+m = gp.Model("BakeryOrderNetBenefit")
+
+# Decision variables
+# q_vars: integer order quantity for each authorized item
+q_vars = m.addVars(authorized_items, vtype=gp.GRB.INTEGER, lb=0, name='q')
+
+# z_vars: binary, 1 if item is ordered (q>0)
+z_vars = m.addVars(authorized_items, vtype=gp.GRB.BINARY, name='z')
+
+# y_vars: binary, 1 if any item in category is ordered
+y_vars = m.addVars(categories, vtype=gp.GRB.BINARY, name='y')
+
+# b_vars: binary, 1 if both items in bundle are ordered
+b_vars = m.addVars(bundle_pairs, vtype=gp.GRB.BINARY, name='b')
+
+# --- 7. Constraints ---
+
+# Item selection and bounds
+for i in authorized_items:
+    min_lot = item_params[i]['minimum_lot']
+    max_order = item_params[i]['maximum_order']
+    # q[i] = 0 or min_lot <= q[i] <= max_order
+    m.addConstr(q_vars[i] >= min_lot * z_vars[i])
+    m.addConstr(q_vars[i] <= max_order * z_vars[i])
+
+# Category activation: y[c] = 1 if any item in c is ordered
+for c in categories:
+    for i in items_by_category[c]:
+        m.addConstr(z_vars[i] <= y_vars[c])
+    # y[c] <= sum(z[i] for i in c)
+    m.addConstr(y_vars[c] <= gp.quicksum(z_vars[i] for i in items_by_category[c]))
+
+# Category quantity bounds
+for c in categories:
+    minq = category_params[c]['minimum_quantity']
+    maxq = category_params[c]['maximum_quantity']
+    m.addConstr(gp.quicksum(q_vars[i] for i in items_by_category[c]) >= minq)
+    m.addConstr(gp.quicksum(q_vars[i] for i in items_by_category[c]) <= maxq)
+
+# Resource constraints
+for r in resources:
+    # sum over items: usage_amounts[(i,r)] * q[i] <= capacity_amounts[r]
+    m.addConstr(
+        gp.quicksum(
+            usage_amounts.get((i, r), 0) * q_vars[i] for i in authorized_items
+        ) <= capacity_amounts[r]
+    )
+
+# Incompatibility: z[i] + z[j] <= 1
+for (i, j) in incompat_pairs:
+    if i in authorized_items and j in authorized_items:
+        m.addConstr(z_vars[i] + z_vars[j] <= 1)
+
+# Prerequisite: z[i] <= z[j]
+for (i, j) in prereq_pairs:
+    if i in authorized_items and j in authorized_items:
+        m.addConstr(z_vars[i] <= z_vars[j])
+
+# Bundle bonuses: b[p] = 1 iff both z[i]=1 and z[j]=1
+for (i, j) in bundle_pairs:
+    if i in authorized_items and j in authorized_items:
+        m.addConstr(b_vars[(i, j)] <= z_vars[i])
+        m.addConstr(b_vars[(i, j)] <= z_vars[j])
+        m.addConstr(b_vars[(i, j)] >= z_vars[i] + z_vars[j] - 1)
+    else:
+        # If either is unauthorized, force b=0
+        m.addConstr(b_vars[(i, j)] == 0)
+
+# --- 8. Objective function ---
+
+# Sum over items: (unit_benefit_cents[i] * q[i] - item_fee_cents[i] * z[i])
+item_obj = gp.quicksum(
+    item_params[i]['unit_benefit_cents'] * q_vars[i] - item_params[i]['item_fee_cents'] * z_vars[i]
+    for i in authorized_items
+)
+
+# Minus sum over categories: activation_fee_cents[c] * y[c]
+cat_obj = gp.quicksum(
+    category_params[c]['activation_fee_cents'] * y_vars[c]
+    for c in categories
+)
+
+# Plus sum over bundles: bonus_cents[p] * b[p]
+bundle_obj = gp.quicksum(
+    bundle_bonus[(i, j)] * b_vars[(i, j)]
+    for (i, j) in bundle_pairs
+)
+
+m.setObjective(item_obj - cat_obj + bundle_obj, gp.GRB.MAXIMIZE)
+
+# --- 9. Optimize ---
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 125 rows, 60 columns and 374 nonzeros
+Model fingerprint: 0x3f5f1662
+Variable types: 0 continuous, 60 integer (36 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 9e+03]
+  Objective range  [1e+02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 3e+05]
+Found heuristic solution: objective 28038.000000
+Presolve removed 48 rows and 9 columns
+Presolve time: 0.00s
+Presolved: 77 rows, 51 columns, 248 nonzeros
+Variable types: 0 continuous, 51 integer (28 binary)
+
+Root relaxation: objective 7.601836e+04, 15 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 76018.3615    0    4 28038.0000 76018.3615   171%     -    0s
+H    0     0                    74583.000000 76018.3615  1.92%     -    0s
+H    0     0                    74865.000000 76018.3615  1.54%     -    0s
+H    0     0                    75014.000000 76018.3615  1.34%     -    0s
+H    0     0                    75435.000000 76018.3615  0.77%     -    0s
+H    0     0                    75637.000000 76018.3615  0.50%     -    0s
+     0     0 75726.9000    0    3 75637.0000 75726.9000  0.12%     -    0s
+
+Cutting planes:
+  Gomory: 1
+  Implied bound: 1
+
+Explored 1 nodes (20 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 6: 75637 75435 75014 ... 28038
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.563700000000e+04, best bound 7.563700000000e+04, gap 0.0000%
+Optimal objective: 75637.0
+Optimal solution: [('C0', -0.0), ('C1', 13.0), ('C2', 0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', 9.0), ('C8', 0.0), ('C9', -0.0), ('C10', -0.0), ('C11', 8.0), ('C12', 12.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', 11.0), ('C23', -0.0), ('C24', -0.0), ('C25', 1.0), ('C26', 0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', 1.0), ('C32', 0.0), ('C33', -0.0), ('C34', -0.0), ('C35', 1.0), ('C36', 1.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', -0.0), ('C45', -0.0), ('C46', 1.0), ('C47', -0.0), ('C48', 1.0), ('C49', 1.0), ('C50', 1.0), ('C51', 1.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', 0.0), ('C56', -0.0), ('C57', 0.0), ('C58', -0.0), ('C59', 0.0)]

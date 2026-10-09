@@ -1,0 +1,390 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mQuestion: A logistics company has 10 candidate trucks available to transport goods over four consecutive time periods. The customer demands in periods 1 through 4 are 1,500 kg, 2,000 kg, 1,800 kg, and 1,000 kg. Each truck's maximum capacity, startup cost, and unit transportation cost are provided in parameters.csv. All trucks are initially off immediately before period 1, and activating a truck in period 1 or any later period incurs its startup cost.
+
+Once a truck is started, it must remain active for at least two consecutive periods, so a truck may not be started in period 4. If a truck is shut down in period t after being active in period t-1, it must remain inactive in both period t and period t+1 and cannot be restarted before period t+2. An inactive truck must transport zero weight, while the weight transported by an active truck cannot exceed its maximum capacity.
+
+For each truck, the change in transported weight between two adjacent periods, including transitions to or from zero load, cannot exceed 300 kg. In every period, the total transported weight must be at least the customer demand. A 10% spare-capacity buffer must also be maintained, so the total transported weight in each period cannot exceed 90% of the combined maximum capacity of the trucks active in that period.
+
+Determine the truck activation, startup, and transported-weight schedule that minimizes total startup and transportation costs.
+
+Thought: I need to retrieve all truck parameters from parameters.csv, including truck IDs, maximum capacities, startup costs, and unit transportation costs, preserving their order and identifiers. I will use these as coefficients and indices in the model. All trucks, periods, and parameters must be included. 
+
+Action: CSVQA
+
+Action Input: Retrieve all data from parameters.csv, preserving source order and all identifiers and values.
+[0m
+Observation: [36;1m[1;3m[{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"1","Q":"1000","S":"500","C":"2.0","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"2","Q":"800","S":"300","C":"3.0","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"3","Q":"1200","S":"400","C":"2.5","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"4","Q":"600","S":"250","C":"3.0","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"5","Q":"900","S":"450","C":"2.2","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"6","Q":"700","S":"280","C":"2.8","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"7","Q":"1100","S":"420","C":"2.4","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"8","Q":"500","S":"200","C":"3.2","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"9","Q":"1000","S":"480","C":"2.1","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"10","Q":"650","S":"260","C":"2.9","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}}][0m
+Thought:[32;1m[1;3mFinal Answer:
+
+Let:
+
+- $T = \{1,2,3,4\}$ (time periods)
+- $K = \{1,2,3,4,5,6,7,8,9,10\}$ (truck_id, as in parameters.csv)
+- $Q_k$ = maximum capacity of truck $k$
+- $S_k$ = startup cost of truck $k$
+- $C_k$ = unit transportation cost of truck $k$
+- $d_t$ = customer demand in period $t$
+
+Parameters (from parameters.csv, in source order):
+
+| truck_id | $Q_k$ | $S_k$ | $C_k$ |
+|----------|-------|-------|-------|
+| 1        | 1000  | 500   | 2.0   |
+| 2        | 800   | 300   | 3.0   |
+| 3        | 1200  | 400   | 2.5   |
+| 4        | 600   | 250   | 3.0   |
+| 5        | 900   | 450   | 2.2   |
+| 6        | 700   | 280   | 2.8   |
+| 7        | 1100  | 420   | 2.4   |
+| 8        | 500   | 200   | 3.2   |
+| 9        | 1000  | 480   | 2.1   |
+| 10       | 650   | 260   | 2.9   |
+
+Demands:
+
+- $d_1 = 1500$
+- $d_2 = 2000$
+- $d_3 = 1800$
+- $d_4 = 1000$
+
+Decision variables:
+
+- $y_{k,t} \in \{0,1\}$: 1 if truck $k$ is active in period $t$, 0 otherwise
+- $z_{k,t} \in \{0,1\}$: 1 if truck $k$ is started up in period $t$, 0 otherwise
+- $x_{k,t} \geq 0$: weight transported by truck $k$ in period $t$ (kg)
+
+Model:
+
+Minimize total cost:
+$$
+\min \sum_{k \in K} \sum_{t \in T} \left( S_k z_{k,t} + C_k x_{k,t} \right)
+$$
+
+Subject to:
+
+**1. Startup logic and initial state:**
+
+- All trucks are initially off:
+  $$
+  y_{k,0} = 0 \quad \forall k \in K
+  $$
+  (We do not need to define $y_{k,0}$ as a variable; just use it as 0 in constraints.)
+
+- Startup definition:
+  $$
+  z_{k,t} \geq y_{k,t} - y_{k,t-1} \quad \forall k \in K, \; t \in T
+  $$
+  $$
+  z_{k,t} \leq 1 - y_{k,t-1} \quad \forall k \in K, \; t \in T
+  $$
+  $$
+  z_{k,t} \leq y_{k,t} \quad \forall k \in K, \; t \in T
+  $$
+  (Alternatively, $z_{k,t} = 1$ iff $y_{k,t}=1$ and $y_{k,t-1}=0$.)
+
+- No startup allowed in period 4:
+  $$
+  z_{k,4} = 0 \quad \forall k \in K
+  $$
+
+**2. Minimum up-time (if started, must stay on at least 2 periods):**
+
+For $t=1,2,3$:
+$$
+y_{k,t+1} \geq z_{k,t} \quad \forall k \in K, \; t=1,2,3
+$$
+
+**3. Minimum down-time (if shut down, must stay off for 2 periods):**
+
+For $t=1,2$:
+$$
+y_{k,t} - y_{k,t+1} \leq 1 - y_{k,t+2} \quad \forall k \in K
+$$
+(If $y_{k,t}=1$ and $y_{k,t+1}=0$, then $y_{k,t+2}=0$.)
+
+**4. Truck activity and load bounds:**
+
+- Inactive trucks transport zero:
+  $$
+  x_{k,t} \leq Q_k y_{k,t} \quad \forall k \in K, \; t \in T
+  $$
+  $$
+  x_{k,t} \geq 0 \quad \forall k \in K, \; t \in T
+  $$
+
+**5. Load ramping constraints (change in load per truck per period ≤ 300 kg):**
+
+For $t=1$:
+$$
+|x_{k,1} - 0| \leq 300 \quad \forall k \in K
+$$
+
+For $t=2,3,4$:
+$$
+|x_{k,t} - x_{k,t-1}| \leq 300 \quad \forall k \in K
+$$
+
+(Linearize with two inequalities for each $k,t$:
+$$
+x_{k,t} - x_{k,t-1} \leq 300
+$$
+$$
+x_{k,t-1} - x_{k,t} \leq 300
+$$
+with $x_{k,0} = 0$.)
+
+**6. Demand satisfaction and spare capacity:**
+
+For each $t \in T$:
+$$
+\sum_{k \in K} x_{k,t} \geq d_t
+$$
+$$
+\sum_{k \in K} x_{k,t} \leq 0.9 \sum_{k \in K} Q_k y_{k,t}
+$$
+
+**7. Variable domains:**
+
+$$
+y_{k,t} \in \{0,1\} \quad \forall k \in K, \; t \in T
+$$
+$$
+z_{k,t} \in \{0,1\} \quad \forall k \in K, \; t \in T
+$$
+$$
+x_{k,t} \geq 0 \quad \forall k \in K, \; t \in T
+$$
+
+**Parameter values (from parameters.csv, in source order):**
+
+- $K = \{1,2,3,4,5,6,7,8,9,10\}$
+- $Q_1=1000$, $Q_2=800$, $Q_3=1200$, $Q_4=600$, $Q_5=900$, $Q_6=700$, $Q_7=1100$, $Q_8=500$, $Q_9=1000$, $Q_{10}=650$
+- $S_1=500$, $S_2=300$, $S_3=400$, $S_4=250$, $S_5=450$, $S_6=280$, $S_7=420$, $S_8=200$, $S_9=480$, $S_{10}=260$
+- $C_1=2.0$, $C_2=3.0$, $C_3=2.5$, $C_4=3.0$, $C_5=2.2$, $C_6=2.8$, $C_7=2.4$, $C_8=3.2$, $C_9=2.1$, $C_{10}=2.9$
+- $d_1=1500$, $d_2=2000$, $d_3=1800$, $d_4=1000$
+
+**All indices, coefficients, and constraints are as above, using the truck_id and parameter values in the order and with the identifiers as retrieved.**[0m
+
+[1m> Finished chain.[0m
+LEGACY_OBSERVATION = '[{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"1","Q":"1000","S":"500","C":"2.0","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"2","Q":"800","S":"300","C":"3.0","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"3","Q":"1200","S":"400","C":"2.5","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"4","Q":"600","S":"250","C":"3.0","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"5","Q":"900","S":"450","C":"2.2","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"6","Q":"700","S":"280","C":"2.8","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"7","Q":"1100","S":"420","C":"2.4","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"8","Q":"500","S":"200","C":"3.2","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"9","Q":"1000","S":"480","C":"2.1","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"10","Q":"650","S":"260","C":"2.9","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}}]'
+LEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '1', 'Q': '1000', 'S': '500', 'C': '2.0', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '2', 'Q': '800', 'S': '300', 'C': '3.0', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '3', 'Q': '1200', 'S': '400', 'C': '2.5', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '4', 'Q': '600', 'S': '250', 'C': '3.0', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '5', 'Q': '900', 'S': '450', 'C': '2.2', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '6', 'Q': '700', 'S': '280', 'C': '2.8', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '7', 'Q': '1100', 'S': '420', 'C': '2.4', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '8', 'Q': '500', 'S': '200', 'C': '3.2', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '9', 'Q': '1000', 'S': '480', 'C': '2.1', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv', 'values': {'truck_id': '10', 'Q': '650', 'S': '260', 'C': '2.9', 'd1': '1500', 'd2': '2000', 'd3': '1800', 'd4': '1000'}}]
+import gurobipy as gp
+from gurobipy import GRB
+records = [r for r in LEGACY_RECORDS if r['source'] == '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv']
+if not records or len(records) != 10:
+    raise ValueError('Expected 10 truck records in LEGACY_RECORDS.')
+K = [r['values']['truck_id'] for r in records]
+T = ['1', '2', '3', '4']
+Q = {r['values']['truck_id']: float(r['values']['Q']) for r in records}
+S = {r['values']['truck_id']: float(r['values']['S']) for r in records}
+C = {r['values']['truck_id']: float(r['values']['C']) for r in records}
+d = {'1': float(records[0]['values']['d1']), '2': float(records[0]['values']['d2']), '3': float(records[0]['values']['d3']), '4': float(records[0]['values']['d4'])}
+m = gp.Model('Truck_Scheduling')
+y_vars = m.addVars(K, T, vtype=GRB.BINARY, name='')
+z_vars = m.addVars(K, T, vtype=GRB.BINARY, name='')
+x_vars = m.addVars(K, T, lb=0, vtype=GRB.CONTINUOUS, name='')
+m.setObjective(gp.quicksum((S[k] * z_vars[k, t] + C[k] * x_vars[k, t] for k in K for t in T)), GRB.MINIMIZE)
+for k in K:
+    for (t_idx, t) in enumerate(T):
+        t_int = int(t)
+        y_prev = 0
+        if t_idx > 0:
+            y_prev = y_vars[k, T[t_idx - 1]]
+        m.addConstr(z_vars[k, t] >= y_vars[k, t] - y_prev, name=f'startup_lb_{k}_{t}')
+        m.addConstr(z_vars[k, t] <= 1 - y_prev, name=f'startup_ub1_{k}_{t}')
+        m.addConstr(z_vars[k, t] <= y_vars[k, t], name=f'startup_ub2_{k}_{t}')
+    m.addConstr(z_vars[k, '4'] == 0, name=f'no_startup_4_{k}')
+for k in K:
+    for (t_idx, t) in enumerate(T[:-1]):
+        t_next = T[t_idx + 1]
+        m.addConstr(y_vars[k, t_next] >= z_vars[k, t], name=f'min_up_{k}_{t}')
+for k in K:
+    for (t_idx, t) in enumerate(T[:-2]):
+        t_next = T[t_idx + 1]
+        t_next2 = T[t_idx + 2]
+        m.addConstr(y_vars[k, t] - y_vars[k, t_next] <= 1 - y_vars[k, t_next2], name=f'min_down_{k}_{t}')
+for k in K:
+    for t in T:
+        m.addConstr(x_vars[k, t] <= Q[k] * y_vars[k, t], name=f'cap_{k}_{t}')
+        m.addConstr(x_vars[k, t] >= 0, name=f'nonneg_{k}_{t}')
+for k in K:
+    m.addConstr(x_vars[k, '1'] <= 300, name=f'ramp_up_{k}_1')
+    m.addConstr(x_vars[k, '1'] >= 0, name=f'ramp_down_{k}_1')
+    for (t_idx, t) in enumerate(T[1:], start=1):
+        t_prev = T[t_idx - 1]
+        m.addConstr(x_vars[k, t] - x_vars[k, t_prev] <= 300, name=f'ramp_up_{k}_{t}')
+        m.addConstr(x_vars[k, t_prev] - x_vars[k, t] <= 300, name=f'ramp_down_{k}_{t}')
+for t in T:
+    m.addConstr(gp.quicksum((x_vars[k, t] for k in K)) >= d[t], name=f'demand_{t}')
+    m.addConstr(gp.quicksum((x_vars[k, t] for k in K)) <= 0.9 * gp.quicksum((Q[k] * y_vars[k, t] for k in K)), name=f'spare_cap_{t}')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 348 rows, 120 columns and 770 nonzeros
+Model fingerprint: 0x39bcff19
+Variable types: 40 continuous, 80 integer (80 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+03]
+  Objective range  [2e+00, 5e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 2e+03]
+Found heuristic solution: objective 18985.000000
+Presolve removed 251 rows and 70 columns
+Presolve time: 0.00s
+Presolved: 97 rows, 50 columns, 330 nonzeros
+Found heuristic solution: objective 18785.000000
+Variable types: 40 continuous, 10 integer (10 binary)
+Found heuristic solution: objective 18285.000000
+
+Root relaxation: objective 1.558667e+04, 26 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 15586.6667    0    2 18285.0000 15586.6667  14.8%     -    0s
+H    0     0                    15900.000000 15586.6667  1.97%     -    0s
+H    0     0                    15590.000000 15586.6667  0.02%     -    0s
+
+Explored 1 nodes (26 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 5: 15590 15900 18285 ... 18985
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.559000000000e+04, best bound 1.559000000000e+04, gap 0.0000%
+ObjVal: 15590.0
+C0: 1.0
+C1: 1.0
+C2: 1.0
+C3: 1.0
+C4: 0.0
+C5: -0.0
+C6: -0.0
+C7: 0.0
+C8: 0.0
+C9: -0.0
+C10: -0.0
+C11: 0.0
+C12: 0.0
+C13: -0.0
+C14: -0.0
+C15: 0.0
+C16: 1.0
+C17: 1.0
+C18: 1.0
+C19: 1.0
+C20: 1.0
+C21: 1.0
+C22: 1.0
+C23: 1.0
+C24: 1.0
+C25: 1.0
+C26: 1.0
+C27: 1.0
+C28: 0.0
+C29: -0.0
+C30: -0.0
+C31: 0.0
+C32: 1.0
+C33: 1.0
+C34: 1.0
+C35: 1.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 1.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 1.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 1.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 1.0
+C65: 0.0
+C66: 0.0
+C67: 0.0
+C68: 0.0
+C69: 0.0
+C70: 0.0
+C71: 0.0
+C72: 1.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 300.0
+C81: 600.0
+C82: 900.0
+C83: 700.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 0.0
+C96: 300.0
+C97: 600.0
+C98: 300.0
+C99: 0.0
+C100: 300.0
+C101: 0.0
+C102: 0.0
+C103: 0.0
+C104: 300.0
+C105: 200.0
+C106: 0.0
+C107: 0.0
+C108: 0.0
+C109: 0.0
+C110: 0.0
+C111: 0.0
+C112: 300.0
+C113: 600.0
+C114: 600.0
+C115: 300.0
+C116: 0.0
+C117: 0.0
+C118: 0.0
+C119: 0.0
+Optimal objective: 15590.0
+Optimal solution: [('C0', 1.0), ('C1', 1.0), ('C2', 1.0), ('C3', 1.0), ('C4', 0.0), ('C5', -0.0), ('C6', -0.0), ('C7', 0.0), ('C8', 0.0), ('C9', -0.0), ('C10', -0.0), ('C11', 0.0), ('C12', 0.0), ('C13', -0.0), ('C14', -0.0), ('C15', 0.0), ('C16', 1.0), ('C17', 1.0), ('C18', 1.0), ('C19', 1.0), ('C20', 1.0), ('C21', 1.0), ('C22', 1.0), ('C23', 1.0), ('C24', 1.0), ('C25', 1.0), ('C26', 1.0), ('C27', 1.0), ('C28', 0.0), ('C29', -0.0), ('C30', -0.0), ('C31', 0.0), ('C32', 1.0), ('C33', 1.0), ('C34', 1.0), ('C35', 1.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 1.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 1.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 1.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 1.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 1.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 300.0), ('C81', 600.0), ('C82', 900.0), ('C83', 700.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 300.0), ('C97', 600.0), ('C98', 300.0), ('C99', 0.0), ('C100', 300.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 300.0), ('C105', 200.0), ('C106', 0.0), ('C107', 0.0), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0), ('C111', 0.0), ('C112', 300.0), ('C113', 600.0), ('C114', 600.0), ('C115', 300.0), ('C116', 0.0), ('C117', 0.0), ('C118', 0.0), ('C119', 0.0)]

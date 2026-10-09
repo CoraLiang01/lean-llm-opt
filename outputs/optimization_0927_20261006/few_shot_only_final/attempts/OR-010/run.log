@@ -1,0 +1,231 @@
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/optimization_0927_20261006/few_shot_only_final/frozen_notebook.ipynb:cell15:22: LangChainDeprecationWarning: The class `LLMChain` was deprecated in LangChain 0.1.17 and will be removed in 1.0. Use `RunnableSequence, e.g., `prompt | llm`` instead.
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/optimization_0927_20261006/few_shot_only_final/frozen_notebook.ipynb:cell15:22: LangChainDeprecationWarning: LangChain agents will continue to be supported, but it is recommended for new use cases to be built with LangGraph. LangGraph offers a more flexible and full-featured framework for building agents, including support for tool-calling, persistence of state, and human-in-the-loop workflows. For details, refer to the [LangGraph documentation](https://langchain-ai.github.io/langgraph/) as well as guides for [Migrating from AgentExecutor](https://python.langchain.com/docs/how_to/migrate_agent/) and LangGraph's [Pre-built ReAct agent](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent/).
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: The model must maximize total revenue by choosing, for each product, the number of orders to fulfill, subject to (a) not exceeding initial inventory, (b) not exceeding demand, and (c) non-negative integer fulfillment. All data is from the specified columns of table_id file_0_view_0.
+
+Final Answer:
+
+#### Index Sets
+
+- $I$: Set of all products, indexed by $i$.
+
+#### Parameters
+
+- $A_i$: Revenue per unit for product $i$ (from column "Revenue" in table_id file_0_view_0).
+- $d_i$: Demand for product $i$ (from column "Demand" in table_id file_0_view_0).
+- $I_i$: Initial inventory for product $i$ (from column "Initial Inventory" in table_id file_0_view_0).
+
+#### Decision Variables
+
+- $x_i$: Number of orders fulfilled for product $i$; $x_i \in \mathbb{Z}_+, \forall i \in I$.
+
+#### Objective
+
+$$
+\max \sum_{i \in I} A_i \cdot x_i
+$$
+
+#### Constraints
+
+1. **Inventory Constraint:**  
+   $$
+   x_i \leq I_i, \quad \forall i \in I
+   $$
+
+2. **Demand Constraint:**  
+   $$
+   x_i \leq d_i, \quad \forall i \in I
+   $$
+
+3. **Non-negativity and Integrality:**  
+   $$
+   x_i \in \mathbb{Z}_+, \quad \forall i \in I
+   $$
+
+---
+
+**Data Mapping:**  
+- All parameters ($A_i$, $d_i$, $I_i$) are taken from table_id **file_0_view_0** with columns "Revenue", "Demand", and "Initial Inventory", respectively.  
+- The index set $I$ corresponds to all "Product Name" entries in table_id **file_0_view_0**.[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Parse CSVQA_DATA for table_id 'file_0_view_0'
+table_id = "file_0_view_0"
+table = None
+for t in CSVQA_DATA["tables"]:
+    if t["table_id"] == table_id:
+        table = t
+        break
+if table is None:
+    raise ValueError(f"Table {table_id} not found in CSVQA_DATA.")
+
+records = table["records"]
+required_columns = ["Product Name", "Revenue", "Demand", "Initial Inventory"]
+for col in required_columns:
+    if col not in table["columns"]:
+        raise ValueError(f"Required column '{col}' not found in table {table_id}.")
+
+# Extract data, preserving order and identifiers
+products = []
+revenue = {}
+demand = {}
+inventory = {}
+
+for rec in records:
+    values = rec["values"]
+    try:
+        product = values["Product Name"]
+        if product in products:
+            raise ValueError(f"Duplicate product identifier: {product}")
+        products.append(product)
+        # Parse numeric fields, preserving blanks
+        rev_str = values["Revenue"]
+        dem_str = values["Demand"]
+        inv_str = values["Initial Inventory"]
+        # Use regex to extract numbers (allowing for commas, decimals, negatives)
+        num_re = re.compile(r"^\s*-?\d+(?:\.\d+)?\s*$")
+        if not num_re.match(rev_str):
+            raise ValueError(f"Unmatched or invalid Revenue value: '{rev_str}' for product '{product}'")
+        if not num_re.match(dem_str):
+            raise ValueError(f"Unmatched or invalid Demand value: '{dem_str}' for product '{product}'")
+        if not num_re.match(inv_str):
+            raise ValueError(f"Unmatched or invalid Initial Inventory value: '{inv_str}' for product '{product}'")
+        revenue[product] = float(rev_str)
+        demand[product] = int(float(dem_str))
+        inventory[product] = int(float(inv_str))
+    except KeyError as e:
+        raise ValueError(f"Missing required field {e} in record for product '{rec}'.")
+
+# Validate dimensions
+if not (set(revenue) == set(demand) == set(inventory) == set(products)):
+    raise ValueError("Mismatch in product identifiers across parameters.")
+
+# Build Gurobi model
+m = gp.Model("MobileDeviceOrderFulfillment")
+x_vars = m.addVars(products, vtype=GRB.INTEGER, lb=0, name='x')
+
+# Objective: maximize total revenue
+m.setObjective(gp.quicksum(revenue[p] * x_vars[p] for p in products), GRB.MAXIMIZE)
+
+# Constraints
+m.addConstrs((x_vars[p] <= inventory[p] for p in products), name='inv')
+m.addConstrs((x_vars[p] <= demand[p] for p in products), name='dem')
+
+# Set MIPGap as required
+m.Params.MIPGap = 1e-4
+
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in x_vars.values():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 142 rows, 71 columns and 142 nonzeros
+Model fingerprint: 0xce667506
+Variable types: 0 continuous, 71 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+02, 1e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+00, 1e+03]
+Found heuristic solution: objective 4003445.2100
+Presolve removed 142 rows and 71 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 4.00345e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.003445210000e+06, best bound 4.003445210000e+06, gap 0.0000%
+ObjVal: 4003445.2099999995
+C0: 10.0
+C1: 6.0
+C2: 75.0
+C3: 121.0
+C4: 130.0
+C5: 112.0
+C6: 125.0
+C7: 54.0
+C8: 75.0
+C9: 102.0
+C10: 48.0
+C11: 4.0
+C12: 125.0
+C13: 9.0
+C14: 132.0
+C15: 29.0
+C16: 43.0
+C17: 5.0
+C18: 40.0
+C19: 48.0
+C20: 87.0
+C21: 79.0
+C22: 20.0
+C23: 33.0
+C24: 60.0
+C25: 25.0
+C26: 42.0
+C27: 52.0
+C28: 116.0
+C29: 95.0
+C30: 66.0
+C31: 25.0
+C32: 78.0
+C33: 138.0
+C34: 32.0
+C35: 28.0
+C36: 84.0
+C37: 102.0
+C38: 112.0
+C39: 7.0
+C40: 62.0
+C41: 109.0
+C42: 81.0
+C43: 131.0
+C44: 26.0
+C45: 109.0
+C46: 65.0
+C47: 121.0
+C48: 90.0
+C49: 31.0
+C50: 24.0
+C51: 122.0
+C52: 101.0
+C53: 76.0
+C54: 100.0
+C55: 125.0
+C56: 45.0
+C57: 80.0
+C58: 64.0
+C59: 98.0
+C60: 102.0
+C61: 40.0
+C62: 110.0
+C63: 59.0
+C64: 97.0
+C65: 90.0
+C66: 43.0
+C67: 96.0
+C68: 21.0
+C69: 55.0
+C70: 30.0
+Optimal objective: 4003445.2099999995
+Optimal solution: [('C0', 10.0), ('C1', 6.0), ('C2', 75.0), ('C3', 121.0), ('C4', 130.0), ('C5', 112.0), ('C6', 125.0), ('C7', 54.0), ('C8', 75.0), ('C9', 102.0), ('C10', 48.0), ('C11', 4.0), ('C12', 125.0), ('C13', 9.0), ('C14', 132.0), ('C15', 29.0), ('C16', 43.0), ('C17', 5.0), ('C18', 40.0), ('C19', 48.0), ('C20', 87.0), ('C21', 79.0), ('C22', 20.0), ('C23', 33.0), ('C24', 60.0), ('C25', 25.0), ('C26', 42.0), ('C27', 52.0), ('C28', 116.0), ('C29', 95.0), ('C30', 66.0), ('C31', 25.0), ('C32', 78.0), ('C33', 138.0), ('C34', 32.0), ('C35', 28.0), ('C36', 84.0), ('C37', 102.0), ('C38', 112.0), ('C39', 7.0), ('C40', 62.0), ('C41', 109.0), ('C42', 81.0), ('C43', 131.0), ('C44', 26.0), ('C45', 109.0), ('C46', 65.0), ('C47', 121.0), ('C48', 90.0), ('C49', 31.0), ('C50', 24.0), ('C51', 122.0), ('C52', 101.0), ('C53', 76.0), ('C54', 100.0), ('C55', 125.0), ('C56', 45.0), ('C57', 80.0), ('C58', 64.0), ('C59', 98.0), ('C60', 102.0), ('C61', 40.0), ('C62', 110.0), ('C63', 59.0), ('C64', 97.0), ('C65', 90.0), ('C66', 43.0), ('C67', 96.0), ('C68', 21.0), ('C69', 55.0), ('C70', 30.0)]

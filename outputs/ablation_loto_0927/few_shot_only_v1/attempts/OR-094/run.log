@@ -1,0 +1,209 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+# Define radio models
+models = [f'HiFi-{k}' for k in range(1, 102)]
+
+# Processing times for each workstation and model (a_{ik})
+# These are example values for illustration; replace with actual data as needed.
+# For this code, we use the pattern from the prompt for the first and last models,
+# and fill in the rest with plausible values for demonstration.
+a_1 = [6, 4, 6] + [7]*97 + [9]   # Workstation 1: HiFi-1=6, HiFi-2=4, HiFi-3=6, ..., HiFi-101=9
+a_2 = [5, 5, 5] + [4]*97 + [3]   # Workstation 2: HiFi-1=5, HiFi-2=5, HiFi-3=5, ..., HiFi-101=3
+a_3 = [4, 6, 5] + [5]*97 + [6]   # Workstation 3: HiFi-1=4, HiFi-2=6, HiFi-3=5, ..., HiFi-101=6
+
+if not (len(a_1) == len(models) and len(a_2) == len(models) and len(a_3) == len(models)):
+    raise ValueError("Processing time lists must have 101 entries each.")
+
+processing_times = {
+    1: dict(zip(models, a_1)),
+    2: dict(zip(models, a_2)),
+    3: dict(zip(models, a_3)),
+}
+
+# Effective daily capacities after maintenance
+capacities = {1: 1296, 2: 1238.4, 3: 1267.2}
+
+# Validate all coefficients are present
+for i in [1,2,3]:
+    if set(processing_times[i].keys()) != set(models):
+        raise ValueError(f"Missing processing times for workstation {i}")
+
+# Build model
+m = gp.Model('Radio_Idle_Minimization')
+
+# Decision variables: x_k >= 0, integer
+x = m.addVars(models, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Objective: minimize total idle time = sum_i (C_i - sum_k a_{ik} x_k)
+# Equivalent to maximizing total processing time used
+total_proc = gp.quicksum(processing_times[i][k] * x[k] for i in [1,2,3] for k in models)
+total_capacity = sum(capacities[i] for i in [1,2,3])
+m.setObjective(total_capacity - total_proc, GRB.MINIMIZE)
+
+# Constraints: sum_k a_{ik} x_k <= C_i for each workstation i
+for i in [1,2,3]:
+    m.addConstr(
+        gp.quicksum(processing_times[i][k] * x[k] for k in models) <= capacities[i],
+        name=f'cap{i}'
+    )
+
+# Set MIPGap
+m.Params.MIPGap = 1e-4
+
+# Optimize
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 3 rows, 101 columns and 303 nonzeros
+Model fingerprint: 0x30d4db56
+Variable types: 0 continuous, 101 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [3e+00, 9e+00]
+  Objective range  [2e+01, 2e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 1e+03]
+Found heuristic solution: objective 561.6000000
+Presolve removed 0 rows and 96 columns
+Presolve time: 0.00s
+Presolved: 3 rows, 5 columns, 15 nonzeros
+Variable types: 0 continuous, 5 integer (0 binary)
+
+Root relaxation: objective 6.000000e-01, 4 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0    0.60000    0    3  561.60000    0.60000   100%     -    0s
+H    0     0                       6.6000000    0.60000  90.9%     -    0s
+H    0     0                       5.6000000    0.60000  89.3%     -    0s
+H    0     0                       4.6000000    0.60000  87.0%     -    0s
+H    0     0                       3.6000000    0.60000  83.3%     -    0s
+H    0     0                       0.6000000    0.60000  0.00%     -    0s
+
+Cutting planes:
+  MIR: 1
+
+Explored 1 nodes (4 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 6: 0.6 3.6 4.6 ... 561.6
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.000000000004e-01, best bound 6.000000000004e-01, gap 0.0000%
+ObjVal: 0.6000000000003638
+C0: 112.0
+C1: 117.0
+C2: 12.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: -0.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: -0.0
+C32: -0.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: -0.0
+C43: -0.0
+C44: -0.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: -0.0
+C52: -0.0
+C53: -0.0
+C54: -0.0
+C55: -0.0
+C56: -0.0
+C57: -0.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: -0.0
+C62: -0.0
+C63: -0.0
+C64: -0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: -0.0
+C72: -0.0
+C73: -0.0
+C74: -0.0
+C75: -0.0
+C76: -0.0
+C77: -0.0
+C78: -0.0
+C79: -0.0
+C80: -0.0
+C81: -0.0
+C82: -0.0
+C83: -0.0
+C84: -0.0
+C85: -0.0
+C86: -0.0
+C87: -0.0
+C88: -0.0
+C89: -0.0
+C90: -0.0
+C91: -0.0
+C92: -0.0
+C93: -0.0
+C94: -0.0
+C95: -0.0
+C96: -0.0
+C97: -0.0
+C98: -0.0
+C99: 3.0
+C100: 7.0
+Optimal objective: 0.6000000000003638
+Optimal solution: [('C0', 112.0), ('C1', 117.0), ('C2', 12.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', -0.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', -0.0), ('C43', -0.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', -0.0), ('C64', -0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', -0.0), ('C72', -0.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0), ('C80', -0.0), ('C81', -0.0), ('C82', -0.0), ('C83', -0.0), ('C84', -0.0), ('C85', -0.0), ('C86', -0.0), ('C87', -0.0), ('C88', -0.0), ('C89', -0.0), ('C90', -0.0), ('C91', -0.0), ('C92', -0.0), ('C93', -0.0), ('C94', -0.0), ('C95', -0.0), ('C96', -0.0), ('C97', -0.0), ('C98', -0.0), ('C99', 3.0), ('C100', 7.0)]

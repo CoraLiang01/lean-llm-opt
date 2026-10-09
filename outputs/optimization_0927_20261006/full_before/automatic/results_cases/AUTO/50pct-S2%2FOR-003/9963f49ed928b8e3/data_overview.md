@@ -1,0 +1,11 @@
+Here is all the data from "manager_project_costs.csv", preserving all identifiers and values:
+
+| operations_region | team_support_staff_count | Manager    | Project 1 Cost | Project 2 Cost | annual_inspection_count | Project 3 Cost | Project 4 Cost | Project 5 Cost | Project 6 Cost | annual_training_hours | Project 7 Cost |
+|-------------------|-------------------------|------------|----------------|----------------|------------------------|----------------|----------------|----------------|----------------|----------------------|----------------|
+| South             | 6                       | Manager 1  | 2972           | 2727           | 3                      | 2795           | 2922           | 1302           | 2489           | 12                   | 1533           |
+| East              | 10                      | Manager 2  | 1094           | 2158           | 2                      | 2990           | 1844           | 2887           | 2021           | 36                   | 2288           |
+| North             | 2                       | Manager 3  | 2133           | 1675           | 6                      | 2422           | 2639           | 1033           | 2261           | 48                   | 1695           |
+| South             | 8                       | Manager 4  | 1951           | 2309           | 1                      | 2070           | 2802           | 2328           | 1313           | 48                   | 2434           |
+| North             | 4                       | Manager 5  | 1269           | 2153           | 3                      | 1296           | 2685           | 2627           | 1610           | 12                   | 1641           |
+| South             | 8                       | Manager 6  | 1220           | 1192           | 4                      | 2907           | 2622           | 2595           | 1261           | 12                   | 2384           |
+| East              | 10                      | Manager 7  | 1286           | 1659           | 1                      | 1179           | 1348           | 1420           | 2862           | 12                   | 1959           |

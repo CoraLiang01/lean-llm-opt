@@ -1,0 +1,64 @@
+Let $x_{ij}$ be the number of units of product $j$ placed on shelf $i$, where $x_{ij} \in \mathbb{Z}_{\geq 0}$ for all shelves $i$ and products $j$.
+
+Define:
+- $S$ = set of shelves, indexed by ShelfID: $\{1,2,3,4,5,6,7,8,9,10\}$
+- $P$ = set of products, indexed by ProductName (see below)
+- $c_i$ = capacity of shelf $i$ (from Capacity column)
+- $v_j$ = value of product $j$ (from Value column)
+- $w_j$ = weight of product $j$ (from Weight column)
+
+Product list and parameters (in source order):
+
+| ProductName            | Value | Weight |
+|------------------------|-------|--------|
+| Smartphone             | 200   | 1.0    |
+| Laptop                 | 1500  | 5.0    |
+| Headphones             | 100   | 0.5    |
+| Camera                 | 800   | 2.0    |
+| Smartwatch             | 250   | 0.3    |
+| Tablet                 | 600   | 1.5    |
+| Bluetooth Speaker      | 150   | 1.0    |
+| Keyboard               | 80    | 0.8    |
+| Mouse                  | 50    | 0.2    |
+| Monitor                | 300   | 3.0    |
+| Printer                | 400   | 4.0    |
+| External Hard Drive    | 120   | 0.5    |
+| Router                 | 60    | 0.3    |
+| Power Bank             | 40    | 0.4    |
+| Memory Card            | 30    | 0.05   |
+| USB Flash Drive        | 25    | 0.02   |
+| Smart Home Hub         | 100   | 0.6    |
+| Gaming Console         | 500   | 4.0    |
+| Fitness Tracker        | 90    | 0.2    |
+| E-Reader               | 180   | 0.5    |
+
+Shelf list and capacities (in source order):
+
+| ShelfID | Capacity |
+|---------|----------|
+| 1       | 5.0      |
+| 2       | 7.0      |
+| 3       | 6.0      |
+| 4       | 8.0      |
+| 5       | 5.5      |
+| 6       | 9.0      |
+| 7       | 6.5      |
+| 8       | 7.5      |
+| 9       | 8.2      |
+| 10      | 5.7      |
+
+The complete mathematical model is:
+
+$$
+\begin{align*}
+\text{Maximize} \quad & \sum_{i \in S} \sum_{j \in P} v_j x_{ij} \\[2ex]
+\text{subject to} \quad
+& \sum_{j \in P} w_j x_{ij} \leq c_i, \quad \forall i \in S \\[2ex]
+& x_{ij} \in \mathbb{Z}_{\geq 0}, \quad \forall i \in S,\, j \in P
+\end{align*}
+$$
+
+Where:
+- $v_j$, $w_j$ are as listed above for each product $j$,
+- $c_i$ is as listed above for each shelf $i$,
+- $x_{ij}$ is the integer number of units of product $j$ placed on shelf $i$.

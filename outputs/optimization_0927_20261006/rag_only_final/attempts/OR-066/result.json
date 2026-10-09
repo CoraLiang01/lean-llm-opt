@@ -1,0 +1,63 @@
+{
+  "problem_id": "OR-066",
+  "query": "Several supermarkets require inventory replenishment, and multiple suppliers located across various cities are capable of providing the needed goods. Each supplier incurs a one-time fixed cost when activated, with these costs detailed in “fixed_cost.csv.” Every supermarket must procure a unit of goods from the available suppliers. The per-unit transportation cost from each supplier to each supermarket is listed in “transportation_costs.csv,” while demand data is available in “demand.csv.” The goal is to identify which suppliers to activate in order to fulfill all supermarket demands at the lowest possible total cost. Binary decision variables y_i indicate whether supplier F_i is operational. Variables x_{ij} represent the share of supply that supermarket S_j receives from supplier F_i. These variables are used to determine the most cost-effective distribution strategy, minimizing the sum of fixed and transportation costs.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "FLP",
+  "true_route": "FLP",
+  "label_objective": 11396.51,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "FLP",
+  "assigned_route": "FLP",
+  "generated_model": "Sets:\n- Suppliers: \\( I = \\{S1, S2\\} \\)\n- Supermarkets: \\( J = \\{C1, C2\\} \\)\n\nParameters:\n- Fixed costs: \\( f_{S1} = 105.97 \\), \\( f_{S2} = 85.31 \\)\n- Demands: \\( d_{C1} = 144 \\), \\( d_{C2} = 216 \\)\n- Transportation costs:\n  - \\( c_{S1,C1} = 2358.39 \\)\n  - \\( c_{S1,C2} = 1492.08 \\)\n  - \\( c_{S2,C1} = 0.07 \\)\n  - \\( c_{S2,C2} = 52.32 \\)\n\nVariables:\n- \\( y_{S1}, y_{S2} \\in \\{0,1\\} \\)\n- \\( x_{S1,C1}, x_{S1,C2}, x_{S2,C1}, x_{S2,C2} \\geq 0 \\)\n\nModel:\n\\[\n\\begin{align*}\n\\text{Minimize} \\quad & 105.97\\,y_{S1} + 85.31\\,y_{S2} + 2358.39\\,x_{S1,C1} + 1492.08\\,x_{S1,C2} + 0.07\\,x_{S2,C1} + 52.32\\,x_{S2,C2} \\\\\n\\text{subject to} \\quad\n& x_{S1,C1} + x_{S2,C1} = 144 \\\\\n& x_{S1,C2} + x_{S2,C2} = 216 \\\\\n& x_{S1,C1} \\leq 144\\,y_{S1} \\\\\n& x_{S1,C2} \\leq 216\\,y_{S1} \\\\\n& x_{S2,C1} \\leq 144\\,y_{S2} \\\\\n& x_{S2,C2} \\leq 216\\,y_{S2} \\\\\n& y_{S1}, y_{S2} \\in \\{0,1\\} \\\\\n& x_{S1,C1}, x_{S1,C2}, x_{S2,C1}, x_{S2,C2} \\geq 0\n\\end{align*}\n\\]",
+  "csvqa_observation": "[\n  {\n    \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv\",\n    \"values\": {\n      \"Unnamed: 0\": \"S1\",\n      \"C1\": \"2358.39\",\n      \"C2\": \"1492.08\"\n    }\n  },\n  {\n    \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv\",\n    \"values\": {\n      \"Unnamed: 0\": \"S2\",\n      \"C1\": \"0.07000000000000001\",\n      \"C2\": \"52.32\"\n    }\n  }\n]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_FULL_DATA",
+  "solve_code": "from gurobipy import Model, GRB, quicksum\nsuppliers = ['S1', 'S2']\nsupermarkets = ['C1', 'C2']\nfixed_cost = {'S1': 105.97, 'S2': 85.31}\ndemand = {'C1': 144, 'C2': 216}\ntransport_cost = {('S1', 'C1'): 2358.39, ('S1', 'C2'): 1492.08, ('S2', 'C1'): 0.07, ('S2', 'C2'): 52.32}\nfor i in suppliers:\n    if i not in fixed_cost:\n        raise ValueError(f'Missing fixed cost for supplier {i}')\nfor j in supermarkets:\n    if j not in demand:\n        raise ValueError(f'Missing demand for supermarket {j}')\nfor i in suppliers:\n    for j in supermarkets:\n        if (i, j) not in transport_cost:\n            raise ValueError(f'Missing transport cost for supplier {i} to supermarket {j}')\nm = Model()\nm.Params.MIPGap = 0.0001\ny_vars = m.addVars(suppliers, vtype=GRB.BINARY, lb=0, ub=1, name='')\nx_vars = m.addVars(suppliers, supermarkets, vtype=GRB.CONTINUOUS, lb=0, name='')\nm.setObjective(quicksum((fixed_cost[i] * y_vars[i] for i in suppliers)) + quicksum((transport_cost[i, j] * x_vars[i, j] for i in suppliers for j in supermarkets)), GRB.MINIMIZE)\nfor j in supermarkets:\n    m.addConstr(quicksum((x_vars[i, j] for i in suppliers)) == demand[j], name=f'demand_{j}')\nfor i in suppliers:\n    m.addConstr(x_vars[i, 'C1'] <= demand['C1'] * y_vars[i], name=f'link_{i}_C1')\n    m.addConstr(x_vars[i, 'C2'] <= demand['C2'] * y_vars[i], name=f'link_{i}_C2')\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal {m.ObjVal}')\n    for v in m.getVars():\n        print(f'{v.VarName} {v.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 11396.51,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      1.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      0.0
+    ],
+    [
+      "C4",
+      144.0
+    ],
+    [
+      "C5",
+      216.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "rag_only",
+  "seconds": 21.987,
+  "classification_source": "final_full_v1_cache",
+  "classification_cache_sha256": "52ec80ea04cf1b59e48c6b602023d28f0778e866bf7e176463a1ce3f3db6e2ee",
+  "base_notebook_sha256": "abae7197f1ecd8e16bdc642756e08db68374aeda38c3e803b595c7e0573fc448",
+  "notebook_source_sha256": "60ff9f80818466bb8b529ede9472952bcafb8d6406ec6f5dd0dd90c4a808ff67",
+  "cache_fingerprint": "11aba5af8c3da7d43a7c4d9d5504781a81ea90457302a801faf8919b442ba95f",
+  "evaluated_utc": "2026-10-06T04:08:09.260306+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

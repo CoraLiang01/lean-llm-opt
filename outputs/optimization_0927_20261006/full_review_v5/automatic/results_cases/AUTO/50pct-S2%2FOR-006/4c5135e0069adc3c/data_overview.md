@@ -1,0 +1,259 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/capacity.csv",
+    "values": {
+      "annual_maintenance_visits": "3",
+      "Capacity": "1576"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "South Wing",
+      "ProductName": "Sedan",
+      "Value": "1752",
+      "warranty_months": "48",
+      "Weight": "15"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "Central Hall",
+      "ProductName": "SUV",
+      "Value": "1856",
+      "warranty_months": "60",
+      "Weight": "87"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "Central Hall",
+      "ProductName": "Truck",
+      "Value": "8372",
+      "warranty_months": "12",
+      "Weight": "36"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Convertible",
+      "Value": "6168",
+      "warranty_months": "24",
+      "Weight": "30"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "Central Hall",
+      "ProductName": "Minivan",
+      "Value": "9681",
+      "warranty_months": "24",
+      "Weight": "33"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "South Wing",
+      "ProductName": "Coupe",
+      "Value": "8062",
+      "warranty_months": "48",
+      "Weight": "72"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "Central Hall",
+      "ProductName": "Hatchback",
+      "Value": "3895",
+      "warranty_months": "12",
+      "Weight": "75"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Station Wagon",
+      "Value": "3254",
+      "warranty_months": "24",
+      "Weight": "71"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Electric Car",
+      "Value": "1701",
+      "warranty_months": "24",
+      "Weight": "51"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "South Wing",
+      "ProductName": "Hybrid Car",
+      "Value": "6799",
+      "warranty_months": "12",
+      "Weight": "21"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Luxury Sedan",
+      "Value": "2724",
+      "warranty_months": "24",
+      "Weight": "97"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Sports Car",
+      "Value": "6304",
+      "warranty_months": "36",
+      "Weight": "52"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Crossover",
+      "Value": "3255",
+      "warranty_months": "60",
+      "Weight": "25"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Diesel Truck",
+      "Value": "1923",
+      "warranty_months": "36",
+      "Weight": "15"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Compact SUV",
+      "Value": "4103",
+      "warranty_months": "24",
+      "Weight": "54"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "Central Hall",
+      "ProductName": "Luxury SUV",
+      "Value": "4429",
+      "warranty_months": "12",
+      "Weight": "57"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "South Wing",
+      "ProductName": "Cargo Van",
+      "Value": "2663",
+      "warranty_months": "36",
+      "Weight": "18"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "Central Hall",
+      "ProductName": "Pickup Truck",
+      "Value": "1691",
+      "warranty_months": "12",
+      "Weight": "69"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "Central Hall",
+      "ProductName": "Roadster",
+      "Value": "5632",
+      "warranty_months": "24",
+      "Weight": "26"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Muscle Car",
+      "Value": "4793",
+      "warranty_months": "24",
+      "Weight": "38"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Off-road Vehicle",
+      "Value": "1343",
+      "warranty_months": "36",
+      "Weight": "31"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "South Wing",
+      "ProductName": "Camper Van",
+      "Value": "9124",
+      "warranty_months": "60",
+      "Weight": "74"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "South Wing",
+      "ProductName": "Compact Car",
+      "Value": "3652",
+      "warranty_months": "36",
+      "Weight": "82"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Motorcycle",
+      "Value": "8842",
+      "warranty_months": "48",
+      "Weight": "49"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+    "values": {
+      "showroom_display_zone": "North Wing",
+      "ProductName": "Electric SUV",
+      "Value": "9176",
+      "warranty_months": "60",
+      "Weight": "64"
+    }
+  }
+]

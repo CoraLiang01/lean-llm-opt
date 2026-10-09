@@ -1,0 +1,111 @@
+{
+  "problem_id": "OR-013",
+  "query": "This supermarket offers a variety of best-selling products, and the specific revenue information is shown in the table, with relevant data provided in the “Revenue” column. Each product has its own demand level. The retailer’s objective is to maximize the total revenue by focusing on the sales volume of “4U” products. The initial inventory levels of these products are detailed in the “Initial Inventory” column. During the sales period, restocking is not allowed and there is no in-transit inventory.\n\nDemand for the “4U” products during the sales horizon is assumed to be deterministic and known in advance, with demand quantities specified in the “Demand” column. The decision variable x_i represents the number of units of each “4U” product i that the retailer plans to fulfill, where each x_i is a non-negative integer. Because the fulfillment quantity cannot exceed either the available inventory or the realized demand, the decision variables must satisfy both inventory and demand constraints.\n\nThe retailer therefore aims to determine the optimal fulfillment quantities in order to maximize total revenue while respecting both inventory availability and demand limits.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM4/OnlineSalesinUSA.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 532.3,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal fulfillment quantities for each “4U” product in order to maximize total revenue, given deterministic demand, initial inventory, and no restocking during the sales period. The fulfillment for each product cannot exceed either its available inventory or its demand.\n2.  **Identify Model Type:** Based on the query, this is a Linear Integer Programming (IP) problem (bounded knapsack with per-item upper limits).\n3.  **Define Index Sets:** The primary index is the set of “4U” products (i ∈ Products), where Products is the subset of rows in the CSV whose 'Product Name' contains the substring \"4U\".\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of “4U” product i to fulfill (i.e., to sell). Type: GRB.INTEGER (non-negative).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Revenue' column (per-unit revenue for each product i).\n    -   Constraint coefficients and RHS:\n        -   'Demand' column (maximum possible fulfillment for each product i).\n        -   'Initial Inventory' column (available stock for each product i).\n6.  **Formulate Objective:** Maximize total revenue from “4U” products, i.e., maximize the sum over all selected products of (schema['Revenue'][i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Inventory Limit): For each product i, x[i] ≤ schema['Initial Inventory'][i] (cannot fulfill more than available inventory).\n    -   Constraint 2 (Demand Limit): For each product i, x[i] ≤ schema['Demand'][i] (cannot fulfill more than realized demand).\n    -   Constraint 3 (Non-negativity and Integrality): For each product i, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM4/OnlineSalesinUSA.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 47932\nColumns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product Name': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'int64'}\nPreview only (first 10 rows):\n                   Product Name Revenue Demand Initial Inventory\n           jjp_15000006-100-NIL   328.5      3                20\n                  4U_Service_22    56.0      5                30\n                  4U_Service_36    21.6      3                20\n                   4U_Service_7    62.5      3                20\n               7CF5AFBC3B16A32A    35.9     14               110\nA4-Tech_Head-Phone-M-660-Bloody   444.4      2                10\n               ABR5AE2FBE29498D    85.0      6                40\n ABT_AUV140-32G-RBE-32GB-UV-140   139.9      3                20\n                      ABT_G100s   349.9      3                20\n                       ABT_K230   159.9      3                20\nFull-file column statistics: {\"Product Name\": {\"missing\": 0, \"unique_nonempty\": 47932}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 6403, \"numeric_range\": [0.0, 101262.59]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 755, \"numeric_range\": [2.0, 13473.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 605, \"numeric_range\": [10.0, 97620.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"4u\", \"matching_columns\": [{\"column\": \"Product Name\", \"exact\": 0, \"prefix\": 3, \"contains\": 18, \"examples\": [\"4U_Service_22\", \"4U_Service_36\", \"4U_Service_7\"]}], \"exact_matching_columns\": 0}, {\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"bf241c47a13a6f21f3508d4e6a0786ff86ec76300d5b6945a599161a02fac3df\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM4/OnlineSalesinUSA.csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\n\ndef contains_4u(val):\n    return '4u' in val.strip().casefold()\nis_4u = df['Product Name'].apply(contains_4u)\ndf_4u = df[is_4u].copy()\nrequired_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nfor col in required_cols:\n    if col not in df_4u.columns:\n        raise KeyError(f\"Required column '{col}' not found in filtered DataFrame.\")\ndf_4u.set_index('Product Name', inplace=True, drop=False)\nfor col in ['Revenue', 'Demand', 'Initial Inventory']:\n    try:\n        df_4u[col] = pd.to_numeric(df_4u[col], errors='raise')\n    except Exception as e:\n        raise ValueError(f\"Column '{col}' contains non-numeric values: {e}\")\nproducts = list(df_4u.index)\nrevenue = df_4u['Revenue'].to_dict()\ndemand = df_4u['Demand'].to_dict()\ninventory = df_4u['Initial Inventory'].to_dict()\nm = gp.Model('4U_Product_Fulfillment')\nx_vars = m.addVars(products, vtype=gp.GRB.INTEGER, lb=0, name='')\nfor i in products:\n    m.addConstr(x_vars[i] <= inventory[i], name=f'inventory_{i}')\n    m.addConstr(x_vars[i] <= demand[i], name=f'demand_{i}')\nm.setObjective(gp.quicksum((revenue[i] * x_vars[i] for i in products)), gp.GRB.MAXIMIZE)\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 8477.1,
+  "final_solution": [
+    [
+      "C0",
+      5.0
+    ],
+    [
+      "C1",
+      3.0
+    ],
+    [
+      "C2",
+      3.0
+    ],
+    [
+      "C3",
+      3.0
+    ],
+    [
+      "C4",
+      3.0
+    ],
+    [
+      "C5",
+      15.0
+    ],
+    [
+      "C6",
+      11.0
+    ],
+    [
+      "C7",
+      36.0
+    ],
+    [
+      "C8",
+      5.0
+    ],
+    [
+      "C9",
+      19.0
+    ],
+    [
+      "C10",
+      6.0
+    ],
+    [
+      "C11",
+      110.0
+    ],
+    [
+      "C12",
+      6.0
+    ],
+    [
+      "C13",
+      20.0
+    ],
+    [
+      "C14",
+      68.0
+    ],
+    [
+      "C15",
+      9.0
+    ],
+    [
+      "C16",
+      3.0
+    ],
+    [
+      "C17",
+      19.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": false,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 26.925,
+  "evaluated_utc": "2026-10-06T08:43:40.863813+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

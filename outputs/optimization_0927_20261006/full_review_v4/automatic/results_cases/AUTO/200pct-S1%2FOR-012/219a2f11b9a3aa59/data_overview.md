@@ -1,0 +1,322 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "6",
+      "resource_id": "1",
+      "archive_revision_number": "4",
+      "resource_capacity": "1336",
+      "archive_audit_note_count": "5",
+      "archived_attachment_count": "4"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "6",
+      "resource_id": "2",
+      "archive_revision_number": "4",
+      "resource_capacity": "1754",
+      "archive_audit_note_count": "5",
+      "archived_attachment_count": "3"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "4",
+      "resource_id": "3",
+      "archive_revision_number": "6",
+      "resource_capacity": "1617",
+      "archive_audit_note_count": "4",
+      "archived_attachment_count": "4"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "4",
+      "resource_id": "4",
+      "archive_revision_number": "1",
+      "resource_capacity": "1119",
+      "archive_audit_note_count": "4",
+      "archived_attachment_count": "6"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "4",
+      "resource_id": "5",
+      "archive_revision_number": "3",
+      "resource_capacity": "1410",
+      "archive_audit_note_count": "5",
+      "archived_attachment_count": "2"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "4",
+      "resource_id": "6",
+      "archive_revision_number": "7",
+      "resource_capacity": "627",
+      "archive_audit_note_count": "5",
+      "archived_attachment_count": "1"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "6",
+      "resource_id": "7",
+      "archive_revision_number": "5",
+      "resource_capacity": "748",
+      "archive_audit_note_count": "3",
+      "archived_attachment_count": "1"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "8",
+      "resource_id": "8",
+      "archive_revision_number": "7",
+      "resource_capacity": "1540",
+      "archive_audit_note_count": "2",
+      "archived_attachment_count": "1"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "12",
+      "resource_id": "9",
+      "archive_revision_number": "3",
+      "resource_capacity": "1292",
+      "archive_audit_note_count": "3",
+      "archived_attachment_count": "3"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/capacity.csv",
+    "values": {
+      "reference_document_page_count": "6",
+      "resource_id": "10",
+      "archive_revision_number": "6",
+      "resource_capacity": "1138",
+      "archive_audit_note_count": "5",
+      "archived_attachment_count": "2"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Racing",
+      "archive_revision_number": "4",
+      "archive_storage_medium": "Digital",
+      "record_index_style": "Chronological",
+      "reference_document_page_count": "2",
+      "record_keeper_group": "Team A",
+      "item_value": "28",
+      "archived_attachment_count": "1",
+      "resource_requirement": "393"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Sports",
+      "archive_revision_number": "6",
+      "archive_storage_medium": "Hybrid",
+      "record_index_style": "Numeric",
+      "reference_document_page_count": "4",
+      "record_keeper_group": "Team B",
+      "item_value": "69",
+      "archived_attachment_count": "2",
+      "resource_requirement": "195"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Action",
+      "archive_revision_number": "5",
+      "archive_storage_medium": "Paper",
+      "record_index_style": "Numeric",
+      "reference_document_page_count": "4",
+      "record_keeper_group": "Team A",
+      "item_value": "20",
+      "archived_attachment_count": "2",
+      "resource_requirement": "192"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Adventure",
+      "archive_revision_number": "8",
+      "archive_storage_medium": "Paper",
+      "record_index_style": "Alphabetic",
+      "reference_document_page_count": "4",
+      "record_keeper_group": "Team A",
+      "item_value": "62",
+      "archived_attachment_count": "1",
+      "resource_requirement": "155"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "RPG",
+      "archive_revision_number": "9",
+      "archive_storage_medium": "Digital",
+      "record_index_style": "Alphabetic",
+      "reference_document_page_count": "6",
+      "record_keeper_group": "Team B",
+      "item_value": "58",
+      "archived_attachment_count": "2",
+      "resource_requirement": "500"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Shooter",
+      "archive_revision_number": "2",
+      "archive_storage_medium": "Hybrid",
+      "record_index_style": "Alphabetic",
+      "reference_document_page_count": "4",
+      "record_keeper_group": "Team A",
+      "item_value": "11",
+      "archived_attachment_count": "3",
+      "resource_requirement": "156"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Strategy",
+      "archive_revision_number": "5",
+      "archive_storage_medium": "Hybrid",
+      "record_index_style": "Numeric",
+      "reference_document_page_count": "2",
+      "record_keeper_group": "Team C",
+      "item_value": "73",
+      "archived_attachment_count": "3",
+      "resource_requirement": "317"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Simulation",
+      "archive_revision_number": "7",
+      "archive_storage_medium": "Hybrid",
+      "record_index_style": "Alphabetic",
+      "reference_document_page_count": "12",
+      "record_keeper_group": "Team C",
+      "item_value": "43",
+      "archived_attachment_count": "4",
+      "resource_requirement": "694"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Puzzle",
+      "archive_revision_number": "6",
+      "archive_storage_medium": "Paper",
+      "record_index_style": "Chronological",
+      "reference_document_page_count": "2",
+      "record_keeper_group": "Team A",
+      "item_value": "28",
+      "archived_attachment_count": "2",
+      "resource_requirement": "751"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Fighting",
+      "archive_revision_number": "3",
+      "archive_storage_medium": "Paper",
+      "record_index_style": "Numeric",
+      "reference_document_page_count": "8",
+      "record_keeper_group": "Team A",
+      "item_value": "57",
+      "archived_attachment_count": "2",
+      "resource_requirement": "467"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Platformer",
+      "archive_revision_number": "2",
+      "archive_storage_medium": "Hybrid",
+      "record_index_style": "Numeric",
+      "reference_document_page_count": "4",
+      "record_keeper_group": "Team A",
+      "item_value": "92",
+      "archived_attachment_count": "3",
+      "resource_requirement": "796"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Survival",
+      "archive_revision_number": "3",
+      "archive_storage_medium": "Paper",
+      "record_index_style": "Chronological",
+      "reference_document_page_count": "6",
+      "record_keeper_group": "Team B",
+      "item_value": "66",
+      "archived_attachment_count": "6",
+      "resource_requirement": "146"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Horror",
+      "archive_revision_number": "8",
+      "archive_storage_medium": "Hybrid",
+      "record_index_style": "Numeric",
+      "reference_document_page_count": "12",
+      "record_keeper_group": "Team C",
+      "item_value": "14",
+      "archived_attachment_count": "4",
+      "resource_requirement": "269"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "Sandbox",
+      "archive_revision_number": "4",
+      "archive_storage_medium": "Paper",
+      "record_index_style": "Alphabetic",
+      "reference_document_page_count": "8",
+      "record_keeper_group": "Team A",
+      "item_value": "49",
+      "archived_attachment_count": "6",
+      "resource_requirement": "246"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/RA_testing/RA13/VideoGameSales1/products.csv",
+    "values": {
+      "item_name": "MMO",
+      "archive_revision_number": "8",
+      "archive_storage_medium": "Hybrid",
+      "record_index_style": "Chronological",
+      "reference_document_page_count": "4",
+      "record_keeper_group": "Team A",
+      "item_value": "12",
+      "archived_attachment_count": "3",
+      "resource_requirement": "652"
+    }
+  }
+]

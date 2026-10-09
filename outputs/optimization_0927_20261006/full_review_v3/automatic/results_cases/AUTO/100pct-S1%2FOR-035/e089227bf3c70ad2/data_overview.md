@@ -1,0 +1,21 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/100pct/S1/Large-scale-or/Others_example/Others4/cost.csv
+CSV delimiter: comma; first line consumed as header.
+Total rows: 120
+Columns: ['Food', 'Calories', 'ScannedPageCount', 'ArchiveRevisionCount', 'Protein(g)', 'Fat(g)', 'ArchiveAccessRoute', 'ArchiveAttachmentCount', 'ArchiveFolder', 'VitaminC(mg)', 'Cost', 'ArchiveViewCount']
+Parsed column types: {'Food': 'object', 'Calories': 'int64', 'ScannedPageCount': 'int64', 'ArchiveRevisionCount': 'int64', 'Protein(g)': 'float64', 'Fat(g)': 'float64', 'ArchiveAccessRoute': 'object', 'ArchiveAttachmentCount': 'int64', 'ArchiveFolder': 'object', 'VitaminC(mg)': 'float64', 'Cost': 'float64', 'ArchiveViewCount': 'int64'}
+Preview only (first 10 rows):
+     Food Calories ScannedPageCount ArchiveRevisionCount Protein(g) Fat(g) ArchiveAccessRoute ArchiveAttachmentCount ArchiveFolder VitaminC(mg) Cost ArchiveViewCount
+  Oatmeal      150               25                    8          5    2.5             Portal                     14      Folder_B            0  0.4               28
+     Milk      120               26                   20          8      5       CatalogIndex                      6      Folder_C            0  0.5               11
+      Egg       78                8                   20          6      5       CatalogIndex                     30      Folder_C            0  0.3               19
+   Banana      105               13                   27          1    0.4       CatalogIndex                     30      Folder_A           10 0.25               17
+Grain_001      201                2                   25        3.6      4         LocalIndex                     25      Folder_A          0.5 0.38               25
+Grain_002      133                2                    9        6.4    4.6         LocalIndex                     22      Folder_C          0.2 0.75                7
+Grain_003      123                9                   12        3.5    1.9       CatalogIndex                     19      Folder_C          1.2 0.93               20
+Grain_004      211                3                   14        6.2    3.2       CatalogIndex                     28      Folder_B          0.4 0.97               10
+Grain_005      120               23                   30        6.8    1.6             Portal                     23      Folder_A          0.8 0.56               27
+Grain_006      147               12                    1        7.8    2.3         LocalIndex                     20      Folder_C          0.2 0.33               22
+Full-file column statistics: {"Food": {"missing": 0, "unique_nonempty": 120}, "Calories": {"missing": 0, "unique_nonempty": 89, "numeric_range": [21.0, 244.0]}, "ScannedPageCount": {"missing": 0, "unique_nonempty": 28, "numeric_range": [1.0, 29.0]}, "ArchiveRevisionCount": {"missing": 0, "unique_nonempty": 30, "numeric_range": [1.0, 30.0]}, "Protein(g)": {"missing": 0, "unique_nonempty": 84, "numeric_range": [0.1, 24.9]}, "Fat(g)": {"missing": 0, "unique_nonempty": 68, "numeric_range": [0.0, 14.8]}, "ArchiveAccessRoute": {"missing": 0, "unique_nonempty": 3}, "ArchiveAttachmentCount": {"missing": 0, "unique_nonempty": 29, "numeric_range": [1.0, 30.0]}, "ArchiveFolder": {"missing": 0, "unique_nonempty": 3}, "VitaminC(mg)": {"missing": 0, "unique_nonempty": 59, "numeric_range": [0.0, 114.5]}, "Cost": {"missing": 0, "unique_nonempty": 80, "numeric_range": [0.14, 2.37]}, "ArchiveViewCount": {"missing": 0, "unique_nonempty": 30, "numeric_range": [1.0, 30.0]}}
+Matching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.
+Counts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.
+Query-name evidence: [{"term": "calories", "matching_columns": [], "exact_matching_columns": 0}, {"term": "cost", "matching_columns": [], "exact_matching_columns": 0}, {"term": "food", "matching_columns": [], "exact_matching_columns": 0}]

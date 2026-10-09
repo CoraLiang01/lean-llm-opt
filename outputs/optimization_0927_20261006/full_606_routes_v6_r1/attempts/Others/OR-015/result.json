@@ -1,0 +1,43 @@
+{
+  "problem_id": "OR-015",
+  "query": "A restaurant offers a variety of popular products, including fast food and beverages. The profit data for these products is provided in the ‘Revenue’ column. Each product has its own demand level. The restaurant aims to maximize total revenue by focusing on the initial inventory of products classified under ‘Aalop’, which are detailed in the ‘Initial Inventory’ column. During the sales period, restocking is not permitted, and there are no in-transit inventories. Demand for ‘Aalop’ products during the sales horizon is assumed to be deterministic and known in advance, with demand information specified in the ‘Demand’ column. The variables x_i represent the number of units of each ‘Aalop’ product i that the restaurant intends to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM6/RestaurantSalesreport.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 29660.0,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal number of units to fulfill for each product classified under ‘Aalop’ (i.e., products whose names begin with \"Aalop\") in order to maximize total revenue, given initial inventory and deterministic demand, with no restocking or in-transit inventory during the sales period.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem (integer if partial units are not allowed).\n3.  **Define Index Sets:** The primary index is the set of products where 'Product Name' starts with \"Aalop\" (i.e., the 'Aalop' products).\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of 'Aalop' product i to fulfill (i.e., to sell). Type: GRB.INTEGER.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Revenue' column (per-unit revenue for each product).\n    -   Constraint coefficients and RHS:\n        -   'Initial Inventory' column (maximum available units for each product).\n        -   'Demand' column (maximum customer demand for each product).\n6.  **Formulate Objective:** Maximize total revenue from 'Aalop' products: sum over i of ('Revenue'[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Inventory Constraint: For each 'Aalop' product i, x[i] ≤ 'Initial Inventory'[i] (cannot sell more than available inventory).\n    -   Demand Constraint: For each 'Aalop' product i, x[i] ≤ 'Demand'[i] (cannot sell more than customer demand).\n    -   Non-negativity and Integrality: For each 'Aalop' product i, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM6/RestaurantSalesreport.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 7\nColumns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product Name': 'object', 'Revenue': 'int64', 'Demand': 'int64', 'Initial Inventory': 'float64'}\nPreview only (first 10 rows):\n   Product Name Revenue Demand Initial Inventory\n       Aalopuri      20   1483           10440.0\n    Cold coffee      40   1918           13610.0\n        Frankie      50   1623           11500.0\n       Panipuri      20   1720           12260.0\n       Sandwich      60   1558           10970.0\nSugarcane juice      25   1791           12780.0\n        Vadapav      20   1426           10060.0\nFull-file column statistics: {\"Product Name\": {\"missing\": 0, \"unique_nonempty\": 7}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 5, \"numeric_range\": [20.0, 60.0]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 7, \"numeric_range\": [1426.0, 1918.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 7, \"numeric_range\": [10060.0, 13610.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"aalop\", \"matching_columns\": [{\"column\": \"Product Name\", \"exact\": 0, \"prefix\": 1, \"contains\": 1, \"examples\": [\"Aalopuri\"]}], \"exact_matching_columns\": 0}, {\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"c64f931a501a61cf3e20ba1cd9970ad09ebc72c9f34955f1b73c768ac6b208a8\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM6/RestaurantSalesreport.csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\n\ndef is_aalop(name):\n    return name.strip().casefold().startswith('aalop')\naalop_mask = df['Product Name'].apply(is_aalop)\naalop_df = df[aalop_mask].copy()\nif aalop_df.empty:\n    raise ValueError(\"No products found with 'Product Name' starting with 'Aalop'.\")\naalop_products = aalop_df['Product Name'].tolist()\nrevenue_dict = {}\ndemand_dict = {}\ninventory_dict = {}\nfor (idx, row) in aalop_df.iterrows():\n    pname = row['Product Name']\n    try:\n        revenue = int(row['Revenue'])\n        demand = int(row['Demand'])\n        inventory = float(row['Initial Inventory'])\n    except Exception as e:\n        raise ValueError(f\"Invalid numeric value for product '{pname}': {e}\")\n    revenue_dict[pname] = revenue\n    demand_dict[pname] = demand\n    inventory_dict[pname] = inventory\nm = gp.Model('AalopProductRevenueMaximization')\nx_vars = m.addVars(aalop_products, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((revenue_dict[i] * x_vars[i] for i in aalop_products)), gp.GRB.MAXIMIZE)\nfor i in aalop_products:\n    m.addConstr(x_vars[i] <= inventory_dict[i], name=f'inv_{i}')\n    m.addConstr(x_vars[i] <= demand_dict[i], name=f'demand_{i}')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    total_revenue = m.objVal\n    print(f'Optimal total revenue: {total_revenue:.2f}')\n    print(\"--- Optimal Fulfillment Plan for 'Aalop' Products ---\")\n    for i in aalop_products:\n        print(f'Product: {i}')\n        print(f'  Units fulfilled (x): {x_vars[i].X:.0f}')\n        print(f'  Revenue per unit: {revenue_dict[i]}')\n        print(f'  Demand: {demand_dict[i]}')\n        print(f'  Initial Inventory: {inventory_dict[i]:.0f}')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 29660.0,
+  "final_solution": [
+    [
+      "C0",
+      1483.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 10.993,
+  "evaluated_utc": "2026-10-06T08:44:27.021348+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

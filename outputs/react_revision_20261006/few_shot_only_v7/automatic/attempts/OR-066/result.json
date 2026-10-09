@@ -1,0 +1,67 @@
+{
+  "problem_id": "OR-066",
+  "query": "Several supermarkets require inventory replenishment, and multiple suppliers located across various cities are capable of providing the needed goods. Each supplier incurs a one-time fixed cost when activated, with these costs detailed in \u201cfixed_cost.csv.\u201d Every supermarket must procure a unit of goods from the available suppliers. The per-unit transportation cost from each supplier to each supermarket is listed in \u201ctransportation_costs.csv,\u201d while demand data is available in \u201cdemand.csv.\u201d The goal is to identify which suppliers to activate in order to fulfill all supermarket demands at the lowest possible total cost. Binary decision variables y_i indicate whether supplier F_i is operational. Variables x_{ij} represent the share of supply that supermarket S_j receives from supplier F_i. These variables are used to determine the most cost-effective distribution strategy, minimizing the sum of fixed and transportation costs.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "FLP",
+  "true_route": "FLP",
+  "label_objective": 11396.51,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "FLP",
+  "assigned_route": "FLP",
+  "generated_model": "##### Decision Variables\n\n$x_{ij} \\geq 0$: quantity shipped from supplier $i \\in I$ to supermarket $j \\in J$ (continuous).  \n$y_i \\in \\{0,1\\}$: whether supplier $i$ is activated.\n\n##### Objective Function\n\n$\\min \\sum_{i\\in I}\\sum_{j\\in J} c_{ij}x_{ij} + \\sum_{i\\in I} f_i y_i$\n\n##### Constraints\n\n1. Supermarket demand: $\\sum_{i\\in I} x_{ij} = d_j,\\quad \\forall j \\in J$\n2. Domains: $x_{ij} \\geq 0$ (continuous), $y_i \\in \\{0,1\\}$\n\n##### Data Mapping\n\n- $I = \\{\\text{S1}, \\text{S2}\\}$ (suppliers, from fixed_cost.csv and transportation_costs.csv, column \"Unnamed: 0\")\n- $J = \\{\\text{C1}, \\text{C2}\\}$ (supermarkets, from demand.csv and transportation_costs.csv, columns \"C1\", \"C2\")\n- $d_j$: demand for supermarket $j$ (from demand.csv, column \"demand\")\n  - $d_{\\text{C1}} = 144$\n  - $d_{\\text{C2}} = 216$\n- $f_i$: fixed cost for supplier $i$ (from fixed_cost.csv, column \"fixed_costs\")\n  - $f_{\\text{S1}} = 105.97$\n  - $f_{\\text{S2}} = 85.31$\n- $c_{ij}$: per-unit transportation cost from supplier $i$ to supermarket $j$ (from transportation_costs.csv)\n  - $c_{\\text{S1},\\text{C1}} = 2358.39$\n  - $c_{\\text{S1},\\text{C2}} = 1492.08$\n  - $c_{\\text{S2},\\text{C1}} = 0.07$\n  - $c_{\\text{S2},\\text{C2}} = 52.32$\n\n##### Source-Column Data Mapping\n\n- demand.csv: \"customer\" $\\rightarrow$ $J$, \"demand\" $\\rightarrow$ $d_j$\n- fixed_cost.csv: \"Unnamed: 0\" $\\rightarrow$ $I$, \"fixed_costs\" $\\rightarrow$ $f_i$\n- transportation_costs.csv: \"Unnamed: 0\" $\\rightarrow$ $I$, \"C1\", \"C2\" $\\rightarrow$ $c_{ij}$\n\nAll parameters are directly mapped from the provided CSV columns. No additional constraints or conditional bounds are imposed beyond those specified above.",
+  "csvqa_observation": "{\"tables\": [{\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv\", \"columns\": [\"customer\", \"demand\"], \"records\": [{\"customer\": \"C1\", \"demand\": \"144\"}, {\"customer\": \"C2\", \"demand\": \"216\"}]}, {\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv\", \"columns\": [\"Unnamed: 0\", \"fixed_costs\"], \"records\": [{\"Unnamed: 0\": \"S1\", \"fixed_costs\": \"105.97\"}, {\"Unnamed: 0\": \"S2\", \"fixed_costs\": \"85.31\"}]}, {\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv\", \"columns\": [\"Unnamed: 0\", \"C1\", \"C2\"], \"records\": [{\"Unnamed: 0\": \"S1\", \"C1\": \"2358.39\", \"C2\": \"1492.08\"}, {\"Unnamed: 0\": \"S2\", \"C1\": \"0.07000000000000001\", \"C2\": \"52.32\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "DIRECT_FULL_SOURCE",
+  "csvqa_trace": "{\"status\": \"DIRECT_FULL_SOURCE\", \"formulation_protocol\": \"ReAct\", \"csvqa_call_count\": 0, \"planner_attempt_count\": 0, \"repair_count\": 0, \"fallback_count\": 0, \"retry_count\": 0, \"protocol_retry_count\": 0, \"protocol_retry_events\": \"[]\"}",
+  "solve_code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_problem():\n\n    def read_csv_robust(path):\n        for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:\n            try:\n                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)\n            except Exception:\n                continue\n        raise RuntimeError(f'Could not read {path} with supported encodings.')\n    demand_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv'\n    fixed_cost_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv'\n    transportation_costs_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv'\n    demand_df = read_csv_robust(demand_path)\n    fixed_cost_df = read_csv_robust(fixed_cost_path)\n    trans_cost_df = read_csv_robust(transportation_costs_path)\n    if 'customer' not in demand_df.columns or 'demand' not in demand_df.columns:\n        raise ValueError(\"demand.csv must have columns 'customer' and 'demand'\")\n    customers = demand_df['customer'].tolist()\n    demand = {}\n    for (_, row) in demand_df.iterrows():\n        cust = row['customer']\n        try:\n            val = float(row['demand'])\n        except Exception:\n            raise ValueError(f\"Non-numeric demand for customer {cust}: {row['demand']}\")\n        demand[cust] = val\n    if 'Unnamed: 0' in fixed_cost_df.columns:\n        supplier_col = 'Unnamed: 0'\n    elif 'supplier' in fixed_cost_df.columns:\n        supplier_col = 'supplier'\n    else:\n        raise ValueError('fixed_cost.csv must have a supplier index column')\n    if 'fixed_costs' not in fixed_cost_df.columns:\n        raise ValueError(\"fixed_cost.csv must have column 'fixed_costs'\")\n    suppliers = fixed_cost_df[supplier_col].tolist()\n    fixed_cost = {}\n    for (_, row) in fixed_cost_df.iterrows():\n        sup = row[supplier_col]\n        try:\n            val = float(row['fixed_costs'])\n        except Exception:\n            raise ValueError(f\"Non-numeric fixed cost for supplier {sup}: {row['fixed_costs']}\")\n        fixed_cost[sup] = val\n    if 'Unnamed: 0' in trans_cost_df.columns:\n        trans_supplier_col = 'Unnamed: 0'\n    elif 'supplier' in trans_cost_df.columns:\n        trans_supplier_col = 'supplier'\n    else:\n        raise ValueError('transportation_costs.csv must have a supplier index column')\n    cost = {}\n    for (_, row) in trans_cost_df.iterrows():\n        sup = row[trans_supplier_col]\n        if sup not in suppliers:\n            continue\n        cost[sup] = {}\n        for cust in customers:\n            if cust not in row:\n                raise ValueError(f'Missing transportation cost for supplier {sup}, customer {cust}')\n            try:\n                val = float(row[cust])\n            except Exception:\n                raise ValueError(f'Non-numeric transportation cost for supplier {sup}, customer {cust}: {row[cust]}')\n            cost[sup][cust] = val\n    for sup in suppliers:\n        if sup not in cost:\n            raise ValueError(f'Supplier {sup} missing in transportation_costs.csv')\n        for cust in customers:\n            if cust not in cost[sup]:\n                raise ValueError(f'Customer {cust} missing for supplier {sup} in transportation_costs.csv')\n    for cust in customers:\n        if cust not in demand:\n            raise ValueError(f'Customer {cust} missing in demand.csv')\n    for sup in suppliers:\n        if sup not in fixed_cost:\n            raise ValueError(f'Supplier {sup} missing in fixed_cost.csv')\n    x_keys = [(sup, cust) for sup in suppliers for cust in customers]\n    y_keys = suppliers\n    m = gp.Model('UFLP')\n    quantity_vars = m.addVars(x_keys, lb=0, vtype=GRB.CONTINUOUS, name='')\n    activate_vars = m.addVars(y_keys, vtype=GRB.BINARY, name='')\n    m.setObjective(gp.quicksum((cost[sup][cust] * quantity_vars[sup, cust] for (sup, cust) in x_keys)) + gp.quicksum((fixed_cost[sup] * activate_vars[sup] for sup in y_keys)), GRB.MINIMIZE)\n    for cust in customers:\n        m.addConstr(gp.quicksum((quantity_vars[sup, cust] for sup in suppliers)) == demand[cust], name=f'demand_{cust}')\n    m.Params.MIPGap = 0.0001\n    m.optimize()\n    return m\nm = solve_problem()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for var in m.getVars():\n        print(f'{var.VarName}: {var.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 11311.2,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      0.0
+    ],
+    [
+      "C2",
+      144.0
+    ],
+    [
+      "C3",
+      216.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": false,
+  "seconds": 14.196,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "81cb4ef9b2224a9f9d2240bd0310b1a117237453f774d9c7fd0d556f3a283d61",
+  "cache_fingerprint": "f28208e034cdc9488a4a2a78683a461d32f10a10fa9436964c554479b4901fe1",
+  "evaluated_utc": "2026-10-06T06:31:36.636355+00:00"
+}

@@ -1,0 +1,45 @@
+LEGACY_OBSERVATION = '[{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv","values":{"SectionID":"1","Capacity":"100"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv","values":{"SectionID":"2","Capacity":"150"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv","values":{"SectionID":"3","Capacity":"120"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv","values":{"SectionID":"4","Capacity":"130"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv","values":{"SectionID":"5","Capacity":"90"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv","values":{"SectionID":"6","Capacity":"110"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv","values":{"SectionID":"7","Capacity":"160"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv","values":{"SectionID":"8","Capacity":"140"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"1","Value":"10","Weight":"2"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"2","Value":"15","Weight":"3"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"3","Value":"8","Weight":"1"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"4","Value":"12","Weight":"2"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"5","Value":"20","Weight":"4"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"6","Value":"25","Weight":"5"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"7","Value":"5","Weight":"1"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"8","Value":"30","Weight":"6"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"9","Value":"18","Weight":"3"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv","values":{"ProductName":"10","Value":"22","Weight":"4"}}]'
+LEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv', 'values': {'SectionID': '1', 'Capacity': '100'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv', 'values': {'SectionID': '2', 'Capacity': '150'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv', 'values': {'SectionID': '3', 'Capacity': '120'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv', 'values': {'SectionID': '4', 'Capacity': '130'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv', 'values': {'SectionID': '5', 'Capacity': '90'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv', 'values': {'SectionID': '6', 'Capacity': '110'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv', 'values': {'SectionID': '7', 'Capacity': '160'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv', 'values': {'SectionID': '8', 'Capacity': '140'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '1', 'Value': '10', 'Weight': '2'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '2', 'Value': '15', 'Weight': '3'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '3', 'Value': '8', 'Weight': '1'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '4', 'Value': '12', 'Weight': '2'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '5', 'Value': '20', 'Weight': '4'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '6', 'Value': '25', 'Weight': '5'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '7', 'Value': '5', 'Weight': '1'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '8', 'Value': '30', 'Weight': '6'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '9', 'Value': '18', 'Weight': '3'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv', 'values': {'ProductName': '10', 'Value': '22', 'Weight': '4'}}]
+from gurobipy import Model, GRB, quicksum
+capacity_records = [r for r in LEGACY_RECORDS if r['source'].endswith('capacity.csv')]
+product_records = [r for r in LEGACY_RECORDS if r['source'].endswith('products.csv')]
+section_ids = []
+section_capacities = {}
+for rec in capacity_records:
+    sid = rec['values']['SectionID']
+    cap = rec['values']['Capacity']
+    if sid in section_capacities:
+        raise ValueError(f'Duplicate SectionID {sid} in capacity.csv')
+    section_ids.append(sid)
+    section_capacities[sid] = int(cap)
+product_ids = []
+product_values = {}
+product_weights = {}
+for rec in product_records:
+    pid = rec['values']['ProductName']
+    val = rec['values']['Value']
+    wt = rec['values']['Weight']
+    if pid in product_values or pid in product_weights:
+        raise ValueError(f'Duplicate ProductName {pid} in products.csv')
+    product_ids.append(pid)
+    product_values[pid] = int(val)
+    product_weights[pid] = int(wt)
+if len(section_ids) != len(section_capacities):
+    raise ValueError('SectionID count mismatch in capacity.csv')
+if len(product_ids) != len(product_values) or len(product_ids) != len(product_weights):
+    raise ValueError('ProductName count mismatch in products.csv')
+m = Model()
+m.Params.MIPGap = 0.0001
+x_vars = m.addVars(section_ids, product_ids, vtype=GRB.INTEGER, lb=0, name='')
+m.setObjective(quicksum((product_values[j] * x_vars[i, j] for i in section_ids for j in product_ids)), GRB.MAXIMIZE)
+for i in section_ids:
+    m.addConstr(quicksum((product_weights[j] * x_vars[i, j] for j in product_ids)) <= section_capacities[i], name=f'cap_{i}')
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for i in section_ids:
+        for j in product_ids:
+            v = x_vars[i, j]
+            print(f'{v.VarName} {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

@@ -1,0 +1,30 @@
+LEGACY_OBSERVATION = '[{"source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM2/OnlineRetailSalesDataset.csv", "values": {"id_number": "id999", "Revenue": "434.74", "Demand": "8171", "Initial Inventory": "56450"}}]'
+LEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM2/OnlineRetailSalesDataset.csv', 'values': {'id_number': 'id999', 'Revenue': '434.74', 'Demand': '8171', 'Initial Inventory': '56450'}}]
+import gurobipy as gp
+from gurobipy import GRB
+records = LEGACY_RECORDS
+id999_records = [r for r in records if r['values'].get('id_number') == 'id999']
+if not id999_records:
+    raise ValueError('No records found for id999.')
+rec = id999_records[0]
+try:
+    revenue = float(rec['values']['Revenue'])
+    demand = int(float(rec['values']['Demand']))
+    inventory = int(float(rec['values']['Initial Inventory']))
+except KeyError as e:
+    raise ValueError(f'Missing required field: {e}')
+except Exception as e:
+    raise ValueError(f'Error parsing numeric fields: {e}')
+m = gp.Model('id999_fulfillment')
+x_vars = m.addVar(lb=0, ub=min(inventory, demand), vtype=GRB.INTEGER, name='x')
+m.setObjective(revenue * x_vars, GRB.MAXIMIZE)
+m.addConstr(x_vars <= inventory, name='inv')
+m.addConstr(x_vars <= demand, name='dem')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')

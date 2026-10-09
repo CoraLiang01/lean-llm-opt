@@ -1,0 +1,123 @@
+{
+  "problem_id": "OR-043",
+  "query": "A pharmacy chain needs to replenish its drug inventory. The \u2018products.csv\u2019 file provides a table of benefits associated with each drug product. There are overall stock capacity limits for pharmacy chains detailed in the \u2018capacity.csv\u2019 file.Our objective is to decide which drugs to order each day and in what quantities to maximise the overall benefit while adhering to the overall stock capacity. The decision variable x_i represents the number of units of the ith drug to be ordered each day.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA9/PharmaSalesData2/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA9/PharmaSalesData2/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 13570.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "RA",
+  "assigned_route": "RA",
+  "generated_model": "##### Abstract Mathematical Model\n\nLet:\n- $I$ = set of drug products (indexed by $i$), from products.csv, column ProductName\n- $x_i$ = number of units of drug $i$ to order each day (decision variable), $x_i \\in \\mathbb{Z}_{\\geq 0}$\n- $b_i$ = benefit per unit of drug $i$ (from products.csv, column Value)\n- $w_i$ = weight (stock space requirement) per unit of drug $i$ (from products.csv, column Weight)\n- $C$ = total stock capacity (from capacity.csv, column Capacity)\n\n**Objective:**\n$$\n\\max \\sum_{i \\in I} b_i x_i\n$$\n\n**Subject to:**\n$$\n\\sum_{i \\in I} w_i x_i \\leq C\n$$\n\n$$\nx_i \\in \\mathbb{Z}_{\\geq 0} \\quad \\forall i \\in I\n$$\n\n---\n\n##### Data Mapping\n\n- $I$: products.csv, column ProductName\n- $b_i$: products.csv, column Value, keyed by ProductName\n- $w_i$: products.csv, column Weight, keyed by ProductName\n- $C$: capacity.csv, column Capacity\n- $x_i$: decision variable, number of units to order for each $i \\in I$",
+  "csvqa_observation": "{\"tables\": [{\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA9/PharmaSalesData2/capacity.csv\", \"columns\": [\"Capacity\"], \"records\": [{\"Capacity\": \"520\"}]}, {\"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA9/PharmaSalesData2/products.csv\", \"columns\": [\"ProductName\", \"Value\", \"Weight\"], \"records\": [{\"ProductName\": \"NSAIDs\", \"Value\": \"250\", \"Weight\": \"913\"}, {\"ProductName\": \"Antirheumatic Drugs\", \"Value\": \"178\", \"Weight\": \"754\"}, {\"ProductName\": \"Acetic Acid Derivatives\", \"Value\": \"313\", \"Weight\": \"428\"}, {\"ProductName\": \"Antibiotics\", \"Value\": \"301\", \"Weight\": \"711\"}, {\"ProductName\": \"Antiviral Drugs\", \"Value\": \"425\", \"Weight\": \"350\"}, {\"ProductName\": \"Antifungal Agents\", \"Value\": \"260\", \"Weight\": \"159\"}, {\"ProductName\": \"Antidepressants\", \"Value\": \"848\", \"Weight\": \"353\"}, {\"ProductName\": \"Antipsychotics\", \"Value\": \"934\", \"Weight\": \"291\"}, {\"ProductName\": \"Antihistamines\", \"Value\": \"114\", \"Weight\": \"302\"}, {\"ProductName\": \"Corticosteroids\", \"Value\": \"1357\", \"Weight\": \"50\"}, {\"ProductName\": \"Beta Blockers\", \"Value\": \"156\", \"Weight\": \"250\"}, {\"ProductName\": \"Calcium Channel Blockers\", \"Value\": \"1780\", \"Weight\": \"178\"}, {\"ProductName\": \"ACE Inhibitors\", \"Value\": \"695\", \"Weight\": \"313\"}, {\"ProductName\": \"Angiotensin II Receptor Blockers\", \"Value\": \"405\", \"Weight\": \"378\"}, {\"ProductName\": \"Diuretics\", \"Value\": \"320\", \"Weight\": \"94\"}, {\"ProductName\": \"Statins\", \"Value\": \"320\", \"Weight\": \"97\"}, {\"ProductName\": \"Insulin\", \"Value\": \"1357\", \"Weight\": \"470\"}, {\"ProductName\": \"Anticoagulants\", \"Value\": \"1357\", \"Weight\": \"341\"}, {\"ProductName\": \"Antiepileptic Drugs\", \"Value\": \"405\", \"Weight\": \"121\"}, {\"ProductName\": \"Antiemetics\", \"Value\": \"998\", \"Weight\": \"61\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "DIRECT_FULL_SOURCE",
+  "csvqa_trace": "{\"status\": \"DIRECT_FULL_SOURCE\", \"formulation_protocol\": \"ReAct\", \"csvqa_call_count\": 0, \"planner_attempt_count\": 0, \"repair_count\": 0, \"fallback_count\": 0, \"retry_count\": 0, \"protocol_retry_count\": 0, \"protocol_retry_events\": \"[]\"}",
+  "solve_code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_problem():\n    csv_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']\n\n    def read_csv_with_encodings(path):\n        for enc in csv_encodings:\n            try:\n                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)\n            except UnicodeDecodeError:\n                continue\n        raise RuntimeError(f'Could not decode {path} with tried encodings.')\n    products_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA9/PharmaSalesData2/products.csv'\n    capacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA9/PharmaSalesData2/capacity.csv'\n    products_df = read_csv_with_encodings(products_path)\n    capacity_df = read_csv_with_encodings(capacity_path)\n    for col in ['ProductName', 'Value', 'Weight']:\n        if col not in products_df.columns:\n            raise ValueError(f'Missing column {col} in products.csv')\n    if 'Capacity' not in capacity_df.columns:\n        raise ValueError('Missing column Capacity in capacity.csv')\n    products_df = products_df.copy()\n    products_df['Value'] = pd.to_numeric(products_df['Value'], errors='raise')\n    products_df['Weight'] = pd.to_numeric(products_df['Weight'], errors='raise')\n    product_keys = list(products_df['ProductName'])\n    value_dict = dict(zip(products_df['ProductName'], products_df['Value']))\n    weight_dict = dict(zip(products_df['ProductName'], products_df['Weight']))\n    if len(capacity_df) != 1:\n        raise ValueError('capacity.csv must contain exactly one row for total capacity.')\n    try:\n        total_capacity = float(capacity_df.iloc[0]['Capacity'])\n    except Exception:\n        raise ValueError('Capacity value in capacity.csv is not a valid number.')\n    for k in product_keys:\n        if k not in value_dict or k not in weight_dict:\n            raise ValueError(f'Missing value or weight for product {k}')\n    m = gp.Model('Pharmacy_Replenishment')\n    m.Params.MIPGap = 0.0001\n    quantity_vars = m.addVars(product_keys, lb=0, vtype=GRB.INTEGER, name='')\n    m.setObjective(gp.quicksum((value_dict[i] * quantity_vars[i] for i in product_keys)), GRB.MAXIMIZE)\n    m.addConstr(gp.quicksum((weight_dict[i] * quantity_vars[i] for i in product_keys)) <= total_capacity, name='capacity')\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal: {m.ObjVal}')\n        for v in m.getVars():\n            print(f'{v.VarName}: {v.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_problem()",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 13570.0,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      10.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 7.217,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "81cb4ef9b2224a9f9d2240bd0310b1a117237453f774d9c7fd0d556f3a283d61",
+  "cache_fingerprint": "8a7e4c7761d6a20384017ce9696cafed1af3f6e9e5a3b15e9064f7585ca6be9f",
+  "evaluated_utc": "2026-10-06T06:29:44.637761+00:00"
+}

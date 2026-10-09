@@ -1,0 +1,210 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal continuous production quantities of three products (I, II, III) in a factory, considering that each product must be processed through two procedures (A and B), with each procedure having specific eligible equipment types. The goal is to maximize profit, accounting for raw material costs, equipment operating costs, processing times, equipment capacities, and product selling prices, as provided in the CSV.
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) production planning and assignment problem with assignment restrictions.
+3.  **Define Index Sets:** The primary indices are:
+    - Products: {I, II, III}
+    - Equipment: {A1, A2} for Procedure A; {B1, B2, B3} for Procedure B (as per query, only these are relevant)
+    - Procedures: {A, B}
+4.  **Define Decision Variables:**
+    - `x[p]` = Quantity of product p produced (for p in {I, II, III}). Type: GRB.CONTINUOUS.
+    - `y[e,p]` = Amount of product p processed on equipment e (for eligible (e,p) pairs, as per assignment rules). Type: GRB.CONTINUOUS.
+5.  **Identify Parameters (from Schema):**
+    - Processing time per unit: from columns 'Product I', 'Product II', 'Product III' for each equipment row.
+    - Raw material cost per unit: from row 'Raw Material Cost (yuan/unit)'.
+    - Unit selling price: from row 'Unit Price (yuan/unit)'.
+    - Available equipment operating time: from column 'Available Equipment Operating Time'.
+    - Equipment cost at full load: from column 'Equipment Cost at Full Load (yuan)' (to be allocated proportionally to usage).
+6.  **Formulate Objective:** Maximize total profit, defined as:
+    - Total revenue: sum over products of (unit price * quantity produced)
+    - Minus total raw material cost: sum over products of (raw material cost * quantity produced)
+    - Minus total equipment operating cost: sum over all equipment of (equipment cost at full load * (total time used on equipment / available equipment operating time))
+    - Objective: Maximize [sum_p (unit price_p - raw material cost_p) * x[p]] - sum_e (equipment cost at full load_e * (total time used_e / available time_e))
+7.  **Formulate Constraints:**
+    - **Procedure Assignment Constraints:** For each product and procedure, ensure that the product is only processed on eligible equipment:
+        - Product I: Procedure A on A1 or A2; Procedure B on B1, B2, or B3.
+        - Product II: Procedure A on A1 or A2; Procedure B only on B1.
+        - Product III: Procedure A only on A2; Procedure B only on B2.
+    - **Production-Processing Consistency:** For each product and procedure, the total amount processed across eligible equipment must equal the production quantity:
+        - For each product p and procedure s: sum over eligible equipment e of y[e,p] = x[p]
+    - **Equipment Capacity Constraints:** For each equipment, the total processing time used cannot exceed its available operating time:
+        - For each equipment e: sum over products p of (processing time per unit for (e,p) * y[e,p]) ≤ available equipment operating time for e
+    - **Non-negativity:** All decision variables must be ≥ 0.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+from gurobipy import Model, GRB
+
+# Read CSV
+csv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv'
+df = pd.read_csv(csv_path, sep=',')
+
+# --- Entity and Parameter Extraction ---
+
+# Products and Procedures (from query)
+products = ['Product I', 'Product II', 'Product III']
+procedures = ['A', 'B']
+
+# Equipment sets for each procedure (from query)
+equip_A = ['A1', 'A2']
+equip_B = ['B1', 'B2', 'B3']
+
+# Map equipment to procedures
+equip_procedure = {}
+for e in equip_A:
+    equip_procedure[e] = 'A'
+for e in equip_B:
+    equip_procedure[e] = 'B'
+
+# Extract equipment rows (exclude parameter rows)
+equipment_rows = df[~df['Equipment / Cost'].str.contains('Raw Material Cost|Unit Price', na=False)]
+
+# Normalize equipment IDs
+equipment_ids = equipment_rows['Equipment / Cost'].str.strip().tolist()
+
+# Build equipment parameter dicts
+equip_available_time = {}
+equip_full_load_cost = {}
+for idx, row in equipment_rows.iterrows():
+    e = str(row['Equipment / Cost']).strip()
+    # Only consider equipment in our model
+    if e in equip_A or e in equip_B:
+        # Available time and cost may be missing (NaN) for some equipment, handle accordingly
+        if not pd.isna(row['Available Equipment Operating Time']):
+            equip_available_time[e] = float(row['Available Equipment Operating Time'])
+        else:
+            raise ValueError(f"Missing available time for equipment {e}")
+        if not pd.isna(row['Equipment Cost at Full Load (yuan)']):
+            equip_full_load_cost[e] = float(row['Equipment Cost at Full Load (yuan)'])
+        else:
+            raise ValueError(f"Missing full load cost for equipment {e}")
+
+# Processing time per unit: (equipment, product) -> time
+proc_time = {}
+for idx, row in equipment_rows.iterrows():
+    e = str(row['Equipment / Cost']).strip()
+    if e in equip_A or e in equip_B:
+        for p in products:
+            val = row[p]
+            if not pd.isna(val):
+                proc_time[(e, p)] = float(val)
+            # If missing, do not add (means not eligible)
+
+# Extract raw material cost and unit price per product
+def get_param_row(param_name):
+    row = df[df['Equipment / Cost'].str.strip() == param_name]
+    if row.empty:
+        raise ValueError(f"Parameter row '{param_name}' not found in CSV")
+    return row.iloc[0]
+
+raw_material_cost = {}
+unit_price = {}
+rmc_row = get_param_row('Raw Material Cost (yuan/unit)')
+up_row = get_param_row('Unit Price (yuan/unit)')
+for p in products:
+    if not pd.isna(rmc_row[p]):
+        raw_material_cost[p] = float(rmc_row[p])
+    else:
+        raise ValueError(f"Missing raw material cost for {p}")
+    if not pd.isna(up_row[p]):
+        unit_price[p] = float(up_row[p])
+    else:
+        raise ValueError(f"Missing unit price for {p}")
+
+# --- Assignment eligibility (from query) ---
+# For each product and procedure, list eligible equipment
+eligible_equip = {}
+# Procedure A
+eligible_equip[('Product I', 'A')] = ['A1', 'A2']
+eligible_equip[('Product II', 'A')] = ['A1', 'A2']
+eligible_equip[('Product III', 'A')] = ['A2']
+# Procedure B
+eligible_equip[('Product I', 'B')] = ['B1', 'B2', 'B3']
+eligible_equip[('Product II', 'B')] = ['B1']
+eligible_equip[('Product III', 'B')] = ['B2']
+
+# For each equipment, get eligible (product, procedure) pairs
+eligible_pairs = []
+for p in products:
+    for s in procedures:
+        for e in eligible_equip[(p, s)]:
+            # Only add if processing time is present (i.e., eligible in data)
+            if (e, p) in proc_time:
+                eligible_pairs.append((e, p, s))
+
+# --- Model ---
+
+m = Model('factory_production')
+m.Params.OutputFlag = 0  # Suppress solver output
+
+# Decision variables
+# x[p]: production quantity of product p
+x = m.addVars(products, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+# y[e,p,s]: amount of product p processed on equipment e in procedure s (only for eligible (e,p,s))
+y = {}
+for (e, p, s) in eligible_pairs:
+    y[(e, p, s)] = m.addVar(lb=0, vtype=GRB.CONTINUOUS, name=f'y_{e}_{p}_{s}')
+
+m.update()
+
+# --- Constraints ---
+
+# 1. Production-Processing Consistency: For each product and procedure, sum over eligible equipment = x[p]
+for p in products:
+    for s in procedures:
+        eq_equip = eligible_equip[(p, s)]
+        # Only include equipment with processing time data
+        eq_equip_valid = [e for e in eq_equip if (e, p) in proc_time]
+        m.addConstr(
+            sum(y[(e, p, s)] for e in eq_equip_valid) == x[p],
+            name=f'proc_consistency_{p}_{s}'
+        )
+
+# 2. Equipment Capacity: For each equipment, total processing time used ≤ available time
+for e in equip_A + equip_B:
+    # For this equipment, find all (p,s) it is eligible for
+    relevant_pairs = [(p, s) for p in products for s in procedures if (e, p, s) in y]
+    m.addConstr(
+        sum(proc_time[(e, p)] * y[(e, p, s)] for (p, s) in relevant_pairs) <= equip_available_time[e],
+        name=f'equip_capacity_{e}'
+    )
+
+# --- Objective Function ---
+
+# Revenue and raw material cost
+profit_expr = sum(
+    (unit_price[p] - raw_material_cost[p]) * x[p]
+    for p in products
+)
+
+# Equipment operating cost: sum over equipment of (full load cost * (total time used / available time))
+equip_cost_expr = 0
+for e in equip_A + equip_B:
+    # For this equipment, sum over all eligible (p,s)
+    relevant_pairs = [(p, s) for p in products for s in procedures if (e, p, s) in y]
+    total_time_used = sum(proc_time[(e, p)] * y[(e, p, s)] for (p, s) in relevant_pairs)
+    equip_cost_expr += equip_full_load_cost[e] * (total_time_used / equip_available_time[e])
+
+# Set objective: maximize profit
+m.setObjective(profit_expr - equip_cost_expr, GRB.MAXIMIZE)
+
+# --- Optimize ---
+m.optimize()
+
+# --- Output (optional, not required by prompt) ---
+# for p in products:
+#     print(f"Produce {x[p].X:.4f} units of {p}")
+```
+Optimal objective: 1146.5665024630537
+Optimal solution: [('C0', 1430.0492610837439), ('C1', 500.0), ('C2', 324.13793103448273), ('y_A1_Product I_A', 1200.0), ('y_A2_Product I_A', 230.0492610837439), ('y_B1_Product I_B', 0.0), ('y_B2_Product I_B', 858.6206896551724), ('y_B3_Product I_B', 571.4285714285714), ('y_A1_Product II_A', 0.0), ('y_A2_Product II_A', 500.0), ('y_B1_Product II_B', 500.0), ('y_A2_Product III_A', 324.13793103448273), ('y_B2_Product III_B', 324.13793103448273)]

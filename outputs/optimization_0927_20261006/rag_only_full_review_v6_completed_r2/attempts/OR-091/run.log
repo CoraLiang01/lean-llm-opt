@@ -1,0 +1,108 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to select a subset of university courses from the "Operations Research" discipline such that the total number of credits does not exceed 20, and the sum of their "interest points" is maximized.
+2.  **Identify Model Type:** Based on the query, this is a 0-1 Knapsack Problem (a type of Mixed Integer Programming, MIP).
+3.  **Define Index Sets:** The primary index is the set of all courses in the "Operations Research" discipline, denoted as set \( C \).
+4.  **Define Decision Variables:**
+    -   `x[c]` = 1 if course \( c \) in "Operations Research" is selected, 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'interest_points' column for each course \( c \) in "Operations Research".
+    -   Constraint coefficients: 'credits' column for each course \( c \) in "Operations Research".
+    -   Constraint RHS: The total credit limit is 20 (fixed constant from the query).
+6.  **Formulate Objective:** Maximize the sum of 'interest_points' for selected "Operations Research" courses: maximize \(\sum_{c \in C} \text{interest_points}[c] \cdot x[c]\).
+7.  **Formulate Constraints:**
+    -   Credit Limit: The total credits of selected "Operations Research" courses must not exceed 20: \(\sum_{c \in C} \text{credits}[c] \cdot x[c] \leq 20\).
+    -   Binary Selection: For each course \( c \) in "Operations Research", \( x[c] \in \{0,1\} \).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+from gurobipy import Model, GRB, quicksum
+
+# Read the CSV file with dtype=str and keep_default_na=False
+courses_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture11/courses_42.csv',
+    dtype=str,
+    keep_default_na=False
+)
+
+# Normalize 'discipline' for matching: strip and casefold
+discipline_norm = courses_df['discipline'].str.strip().str.casefold()
+# Select only "Operations Research" courses
+or_mask = discipline_norm == 'operations research'
+or_courses_df = courses_df[or_mask].copy()
+
+# Validate that at least one course is selected
+if or_courses_df.empty:
+    raise ValueError("No courses found in 'Operations Research' discipline.")
+
+# Set index to 'course_id' for easy lookup
+or_courses_df.set_index('course_id', inplace=True)
+
+# Prepare index set C: all course_ids in Operations Research
+C = list(or_courses_df.index)
+
+# Extract parameters: credits and interest_points, as integers
+credits = or_courses_df['credits'].astype(int).to_dict()
+interest_points = or_courses_df['interest_points'].astype(int).to_dict()
+
+# Validate parameter coverage
+if set(credits.keys()) != set(C) or set(interest_points.keys()) != set(C):
+    raise ValueError("Parameter keys do not match course index set.")
+
+# Create Gurobi model
+m = Model("or_course_selection")
+
+# Decision variables: x[c] = 1 if course c is selected, 0 otherwise
+x_vars = m.addVars(C, vtype=GRB.BINARY, name='', lb=0, ub=1)
+
+# Objective: maximize total interest points
+m.setObjective(
+    quicksum(interest_points[c] * x_vars[c] for c in C),
+    GRB.MAXIMIZE
+)
+
+# Constraint: total credits of selected courses <= 20
+m.addConstr(
+    quicksum(credits[c] * x_vars[c] for c in C) <= 20,
+    name='credit_limit'
+)
+
+# Optimize the model
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 1 rows, 7 columns and 7 nonzeros
+Model fingerprint: 0x0c31a556
+Variable types: 0 continuous, 7 integer (7 binary)
+Coefficient statistics:
+  Matrix range     [4e+00, 5e+00]
+  Objective range  [8e+01, 1e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [2e+01, 2e+01]
+Found heuristic solution: objective 355.0000000
+Presolve removed 1 rows and 7 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 421 355 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.210000000000e+02, best bound 4.210000000000e+02, gap 0.0000%
+Optimal objective: 421.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 1.0), ('C3', 1.0), ('C4', 1.0), ('C5', 1.0), ('C6', 1.0)]

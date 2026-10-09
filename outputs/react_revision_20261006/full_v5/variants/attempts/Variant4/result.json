@@ -1,0 +1,75 @@
+{
+  "problem_id": "Variant4",
+  "query": "A city wants to choose emergency service centers so that all demand districts are covered. Candidate center data are provided in service_centers.csv, including each center's opening cost and the districts that can be covered from that center. The full set of districts that must be covered is listed in districts.csv.\n\nFormulate a binary set-covering model. For each candidate center i, define y_i as a binary variable equal to 1 if center i is opened and 0 otherwise. The objective is to minimize total opening cost. The model should include coverage constraints requiring every district to be covered by at least one opened center and binary restrictions on all opening variables.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 52.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to select a subset of emergency service centers to open, so that every required district is covered by at least one open center, while minimizing the total opening cost. Each center can cover a specific set of districts, and each district must be covered.\n2.  **Identify Model Type:** Based on the query, this is a Binary Set Covering (Mixed Integer Programming, MIP) problem.\n3.  **Define Index Sets:** The primary indices are:\n    - Centers (from service_centers.csv, column 'Center')\n    - Districts (from districts.csv, column 'District')\n4.  **Define Decision Variables:**\n    -   `y[i]` = 1 if center i is opened, 0 otherwise. Type: GRB.BINARY.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'OpeningCost' column in service_centers.csv (cost to open each center).\n    -   Coverage mapping: 'CoveredDistricts' column in service_centers.csv (semicolon-separated list of districts each center can cover).\n    -   Required coverage set: 'District' column in districts.csv (list of all districts that must be covered).\n6.  **Formulate Objective:** Minimize the total opening cost, i.e., minimize the sum over all centers of (OpeningCost[i] * y[i]).\n7.  **Formulate Constraints:**\n    -   Coverage Constraint: For each district j in the required set, the sum over all centers i that can cover district j of y[i] must be at least 1. (Every district must be covered by at least one open center.)\n    -   Binary Restriction: For each center i, y[i] \u2208 {0,1}.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 8\nColumns: ['Center', 'OpeningCost', 'CoveredDistricts']\nParsed column types: {'Center': 'object', 'OpeningCost': 'int64', 'CoveredDistricts': 'object'}\nPreview only (first 10 rows):\nCenter OpeningCost CoveredDistricts\n   SC1          12         D1;D2;D4\n   SC2          15         D2;D3;D5\n   SC3          18         D4;D5;D6\n   SC4          10            D6;D7\n   SC5          14        D7;D8;D10\n   SC6          13            D8;D9\n   SC7          16        D1;D9;D10\n   SC8          11         D3;D4;D8\nFull-file column statistics: {\"Center\": {\"missing\": 0, \"unique_nonempty\": 8}, \"OpeningCost\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [10.0, 18.0]}, \"CoveredDistricts\": {\"missing\": 0, \"unique_nonempty\": 8}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"center\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 10\nColumns: ['District']\nParsed column types: {'District': 'object'}\nPreview only (first 10 rows):\nDistrict\n      D1\n      D2\n      D3\n      D4\n      D5\n      D6\n      D7\n      D8\n      D9\n     D10\nFull-file column statistics: {\"District\": {\"missing\": 0, \"unique_nonempty\": 10}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"district\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"f9ca9e4693fcca7385498ed16245e45150c7c53a9185aa5355388540b19c1bef\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\nservice_centers_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv'\ndistricts_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv'\ndf_centers = pd.read_csv(service_centers_path, sep=',')\ndf_districts = pd.read_csv(districts_path, sep=',')\ndf_centers['Center'] = df_centers['Center'].astype(str).str.strip()\ndf_districts['District'] = df_districts['District'].astype(str).str.strip()\ncenters = df_centers['Center'].tolist()\ndistricts = df_districts['District'].tolist()\nif len(set(centers)) != len(centers):\n    raise ValueError('Duplicate Center identifiers found in service_centers.csv')\nif len(set(districts)) != len(districts):\n    raise ValueError('Duplicate District identifiers found in districts.csv')\nopening_cost = dict(zip(df_centers['Center'], df_centers['OpeningCost']))\ncenter_covers = {}\nfor (idx, row) in df_centers.iterrows():\n    center = row['Center']\n    covered_str = str(row['CoveredDistricts']).strip()\n    if covered_str == '' or pd.isnull(covered_str):\n        covered = []\n    else:\n        covered = [d.strip() for d in covered_str.split(';') if d.strip() != '']\n    center_covers[center] = set(covered)\ndistrict_covered_by = {d: set() for d in districts}\nfor c in centers:\n    for d in center_covers[c]:\n        if d in district_covered_by:\n            district_covered_by[d].add(c)\nfor d in districts:\n    if len(district_covered_by[d]) == 0:\n        raise ValueError(f\"District '{d}' is not covered by any center.\")\nm = gp.Model('SetCoveringEmergencyCenters')\ny = m.addVars(centers, vtype=gp.GRB.BINARY, name='')\nm.setObjective(gp.quicksum((opening_cost[i] * y[i] for i in centers)), gp.GRB.MINIMIZE)\nfor d in districts:\n    m.addConstr(gp.quicksum((y[c] for c in district_covered_by[d])) >= 1, name=f'cover_{d}')\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'ObjVal: {m.objVal}')\n    for v in m.getVars():\n        print(f'{v.VarName} {v.X}')\nelse:\n    print(f'Solver status: {m.status}')",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 52.0,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      1.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      1.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      0.0
+    ],
+    [
+      "C6",
+      1.0
+    ],
+    [
+      "C7",
+      1.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 14.264,
+  "classification_source": "computed",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "29acd328cfa975d28a9ac7d938f655d3a6c68982de71993d1cd72493b6256045",
+  "notebook_source_sha256": "29acd328cfa975d28a9ac7d938f655d3a6c68982de71993d1cd72493b6256045",
+  "cache_fingerprint": "85e08a3089a00d313a65f8afaddb8ebab99704c3f90b897e6b4bc88f5f4e2fb3",
+  "evaluated_utc": "2026-10-06T02:41:23.648050+00:00"
+}

@@ -1,0 +1,159 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+# Define sets
+warehouses = ['S1', 'S2', 'S3', 'S4', 'S5']
+stores = ['D1', 'D2', 'D3', 'D4', 'D5']
+
+# Demand for each store
+demand = {
+    'D1': 428,
+    'D2': 217,
+    'D3': 214,
+    'D4': 380,
+    'D5': 254
+}
+
+# Supply capacity for each warehouse
+supply_capacity = {
+    'S1': 428,
+    'S2': 217,
+    'S3': 214,
+    'S4': 380,
+    'S5': 254
+}
+
+# Transportation costs c_{ij}
+cost = {
+    'S1': {
+        'D1': 269.3910588020795,
+        'D2': 1.4537335390933939,
+        'D3': 99.60345345756605,
+        'D4': 26.64078166309837,
+        'D5': 9.537688956880922
+    },
+    'S2': {
+        'D1': 9.291846876785183,
+        'D2': 10.874778437070223,
+        'D3': 144.52609291614627,
+        'D4': 11.420133077898234,
+        'D5': 153.1756819927813
+    },
+    'S3': {
+        'D1': 9.674584301671008,
+        'D2': 2.6191650959687944,
+        'D3': 100.8242249168735,
+        'D4': 3.2121910887916876,
+        'D5': 133.8493396124168
+    },
+    'S4': {
+        'D1': 270.57498480010247,
+        'D2': 32.50253586,
+        'D3': 4.6842098096469815,
+        'D4': 1.5682269686546804,
+        'D5': 9.58927599
+    },
+    'S5': {
+        'D1': 226.0331910675782,
+        'D2': 8.669161980826471,
+        'D3': 65.47681316968448,
+        'D4': 9.068765258459958,
+        'D5': 202.65015316425533
+    }
+}
+
+# Validate coefficient dimensions and identifier coverage
+for i in warehouses:
+    if i not in cost:
+        raise ValueError(f"Missing cost data for warehouse {i}")
+    for j in stores:
+        if j not in cost[i]:
+            raise ValueError(f"Missing cost data for warehouse {i}, store {j}")
+for j in stores:
+    if j not in demand:
+        raise ValueError(f"Missing demand data for store {j}")
+for i in warehouses:
+    if i not in supply_capacity:
+        raise ValueError(f"Missing supply capacity data for warehouse {i}")
+
+# Build model
+m = gp.Model('GreenMart_Transportation')
+x = m.addVars(warehouses, stores, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+# Objective
+m.setObjective(
+    gp.quicksum(cost[i][j] * x[i, j] for i in warehouses for j in stores),
+    GRB.MINIMIZE
+)
+
+# Demand satisfaction constraints
+m.addConstrs(
+    (gp.quicksum(x[i, j] for i in warehouses) >= demand[j] for j in stores),
+    name='demand'
+)
+
+# Supply capacity constraints
+m.addConstrs(
+    (gp.quicksum(x[i, j] for j in stores) <= supply_capacity[i] for i in warehouses),
+    name='supply'
+)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for variable in m.getVars():
+        print(f'{variable.VarName}: {variable.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 10 rows, 25 columns and 50 nonzeros
+Model fingerprint: 0xf8fd285a
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+02, 4e+02]
+Presolve time: 0.00s
+Presolved: 10 rows, 25 columns, 50 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   1.493000e+03   0.000000e+00      0s
+      10    1.0291277e+04   0.000000e+00   0.000000e+00      0s
+
+Solved in 10 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  1.029127701e+04
+ObjVal: 10291.2770066575
+C0: 0.0
+C1: 174.0
+C2: 0.0
+C3: 0.0
+C4: 254.0
+C5: 217.0
+C6: 0.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 211.0
+C11: 3.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 214.0
+C18: 166.0
+C19: 0.0
+C20: 0.0
+C21: 40.0
+C22: 0.0
+C23: 214.0
+C24: 0.0
+Optimal objective: 10291.2770066575
+Optimal solution: [('C0', 0.0), ('C1', 174.0), ('C2', 0.0), ('C3', 0.0), ('C4', 254.0), ('C5', 217.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 211.0), ('C11', 3.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 214.0), ('C18', 166.0), ('C19', 0.0), ('C20', 0.0), ('C21', 40.0), ('C22', 0.0), ('C23', 214.0), ('C24', 0.0)]

@@ -1,0 +1,132 @@
+{
+  "problem_id": "Variant6",
+  "query": "A retailer is designing a promotional bundle composed of one option from each product family. The value, shelf weight, and budget usage of each option are given in option_catalog.csv. The overall shelf-weight and budget limits are given in resource_limits.csv.\n\nFormulate a binary multi-choice knapsack model. For each family f and option o, define x_fo as a binary variable equal to 1 if option o is selected for family f and 0 otherwise. The objective is to maximize total bundle value. The model should select exactly one option from each family, satisfy the total weight and budget limits, and impose binary restrictions on all selection variables.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant6/inputs/option_catalog.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant6/inputs/resource_limits.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 186.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to select exactly one option from each product family to form a promotional bundle, maximizing total value, while ensuring that the total shelf weight and budget usage of the selected options do not exceed specified limits. Each option has associated value, weight, and budget usage.\n2.  **Identify Model Type:** Based on the query, this is a Binary Multi-Choice Knapsack Problem (a special case of Mixed-Integer Programming with binary variables).\n3.  **Define Index Sets:** The primary indices are:\n    - Families (f), as given by the 'Family' column in option_catalog.csv.\n    - Options (o), as given by the 'Option' column in option_catalog.csv, with each option belonging to a family.\n4.  **Define Decision Variables:**\n    -   `x[f,o]` = 1 if option o is selected for family f, 0 otherwise. Type: GRB.BINARY.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Value' column from option_catalog.csv (value of each option).\n    -   Constraint coefficients: 'Weight' and 'BudgetUse' columns from option_catalog.csv (resource usage per option).\n    -   Constraint RHS (limits): 'Limit' column from resource_limits.csv, for resources 'Weight' and 'BudgetUse'.\n6.  **Formulate Objective:** Maximize the total value of the bundle, i.e., maximize the sum over all families and options of (Value[f,o] * x[f,o]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Family Selection): For each family f, sum over all options o in family f of x[f,o] = 1 (exactly one option selected per family).\n    -   Constraint 2 (Shelf Weight Limit): The sum over all families and options of (Weight[f,o] * x[f,o]) ≤ Weight limit from resource_limits.csv.\n    -   Constraint 3 (Budget Usage Limit): The sum over all families and options of (BudgetUse[f,o] * x[f,o]) ≤ BudgetUse limit from resource_limits.csv.\n    -   Constraint 4 (Binary Restriction): All x[f,o] are binary variables (0 or 1).\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant6/inputs/option_catalog.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 24\nColumns: ['Family', 'Option', 'Value', 'Weight', 'BudgetUse']\nParsed column types: {'Family': 'object', 'Option': 'object', 'Value': 'int64', 'Weight': 'int64', 'BudgetUse': 'int64'}\nPreview only (first 10 rows):\nFamily Option Value Weight BudgetUse\n    F1     O1    28      8        10\n    F1     O2    34     11        13\n    F1     O3    30      9        12\n    F1     O4    24      7         9\n    F2     O1    25      7         9\n    F2     O2    31     10        12\n    F2     O3    36     12        14\n    F2     O4    29      9        11\n    F3     O1    33     10        12\n    F3     O2    27      8        10\nFull-file column statistics: {\"Family\": {\"missing\": 0, \"unique_nonempty\": 6}, \"Option\": {\"missing\": 0, \"unique_nonempty\": 4}, \"Value\": {\"missing\": 0, \"unique_nonempty\": 15, \"numeric_range\": [24.0, 38.0]}, \"Weight\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [6.0, 13.0]}, \"BudgetUse\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [8.0, 15.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"family\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"option\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"value\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"weight\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant6/inputs/resource_limits.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 2\nColumns: ['Resource', 'Limit']\nParsed column types: {'Resource': 'object', 'Limit': 'int64'}\nPreview only (first 10 rows):\n Resource Limit\n   Weight    55\nBudgetUse    70\nFull-file column statistics: {\"Resource\": {\"missing\": 0, \"unique_nonempty\": 2}, \"Limit\": {\"missing\": 0, \"unique_nonempty\": 2, \"numeric_range\": [55.0, 70.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"weight\", \"matching_columns\": [{\"column\": \"Resource\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"Weight\"]}], \"exact_matching_columns\": 1}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\noption_catalog_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant6/inputs/option_catalog.csv'\noption_df = pd.read_csv(option_catalog_path, sep=',', dtype=str, keep_default_na=False)\nfor col in ['Value', 'Weight', 'BudgetUse']:\n    option_df[col] = option_df[col].astype(int)\nresource_limits_path = '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant6/inputs/resource_limits.csv'\nlimits_df = pd.read_csv(resource_limits_path, sep=',', dtype=str, keep_default_na=False)\nlimits_df['Limit'] = limits_df['Limit'].astype(int)\nfamilies = sorted(option_df['Family'].unique())\nfamily_options = {f: sorted(option_df[option_df['Family'] == f]['Option'].unique()) for f in families}\nvalue = {}\nweight = {}\nbudget_use = {}\nfor (idx, row) in option_df.iterrows():\n    f = row['Family']\n    o = row['Option']\n    value[f, o] = row['Value']\n    weight[f, o] = row['Weight']\n    budget_use[f, o] = row['BudgetUse']\nlimits_dict = {row['Resource'].strip(): row['Limit'] for (idx, row) in limits_df.iterrows()}\nif 'Weight' not in limits_dict or 'BudgetUse' not in limits_dict:\n    raise ValueError(\"Missing required resource limits for 'Weight' or 'BudgetUse'.\")\nweight_limit = limits_dict['Weight']\nbudget_limit = limits_dict['BudgetUse']\nm = gp.Model('MultiChoiceKnapsack')\nx_vars = m.addVars([(f, o) for f in families for o in family_options[f]], vtype=gp.GRB.BINARY, name='')\nm.setObjective(gp.quicksum((value[f, o] * x_vars[f, o] for f in families for o in family_options[f])), gp.GRB.MAXIMIZE)\nfor f in families:\n    m.addConstr(gp.quicksum((x_vars[f, o] for o in family_options[f])) == 1, name=f'SelectOne_{f}')\nm.addConstr(gp.quicksum((weight[f, o] * x_vars[f, o] for f in families for o in family_options[f])) <= weight_limit, name='WeightLimit')\nm.addConstr(gp.quicksum((budget_use[f, o] * x_vars[f, o] for f in families for o in family_options[f])) <= budget_limit, name='BudgetLimit')\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 186.0,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      1.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      1.0
+    ],
+    [
+      "C5",
+      0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      0.0
+    ],
+    [
+      "C8",
+      1.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      1.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      1.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ],
+    [
+      "C20",
+      -0.0
+    ],
+    [
+      "C21",
+      -0.0
+    ],
+    [
+      "C22",
+      -0.0
+    ],
+    [
+      "C23",
+      1.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "variants",
+  "seconds": 11.577,
+  "evaluated_utc": "2026-10-06T05:29:06.961124+00:00",
+  "notebook_source_sha256": "8664c2eba4a40f00fc3d72ca2753d08b9ca8dd51d93631ddb6c956b8a025495f",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

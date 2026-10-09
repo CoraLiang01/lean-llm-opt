@@ -1,0 +1,151 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I have the required current data and can formulate the model.
+Final Answer:
+##### Abstract Mathematical Model
+
+**Index Set:**  
+Let $I$ be the set of all products whose "Product Name" contains '27in' in the source data.
+
+**Parameters:**  
+For each $i \in I$:
+- $A_i$: Revenue per unit of product $i$ (from column "Revenue")
+- $d_i$: Demand for product $i$ (from column "Demand")
+- $I_i$: Initial inventory for product $i$ (from column "Initial Inventory")
+
+**Decision Variables:**  
+For each $i \in I$:
+- $x_i$: Number of units of product $i$ to fulfill, $x_i \in \mathbb{Z}_+$
+
+**Objective:**  
+$\max \sum_{i \in I} A_i x_i$
+
+**Constraints:**
+- $x_i \leq d_i \quad \forall i \in I$  (Demand cannot be exceeded)
+- $x_i \leq I_i \quad \forall i \in I$  (Cannot sell more than initial inventory)
+- $x_i \geq 0$ and integer $\forall i \in I$
+
+---
+
+##### Data Mapping
+
+- **Index Set $I$:** All records in table_id `file_0_view_0` where column "Product Name" contains '27in'
+- **Parameter $A_i$:** table_id `file_0_view_0`, column "Revenue"
+- **Parameter $d_i$:** table_id `file_0_view_0`, column "Demand"
+- **Parameter $I_i$:** table_id `file_0_view_0`, column "Initial Inventory"[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with fallback encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM13/Salesorders.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read CSV at {csv_path} with tried encodings.")
+
+    # Filter products whose "Product Name" contains '27in' (case-insensitive)
+    mask = df['Product Name'].str.casefold().str.contains('27in')
+    df_27in = df[mask].copy()
+
+    # Check required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df_27in.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Build index set I: unique product names with '27in'
+    items = df_27in['Product Name'].tolist()
+    if len(items) == 0:
+        raise ValueError("No products with '27in' found in 'Product Name'.")
+
+    # Map parameters: Revenue, Demand, Initial Inventory
+    # If multiple rows per product, sum numeric fields by product name
+    df_27in['Revenue'] = pd.to_numeric(df_27in['Revenue'], errors='raise')
+    df_27in['Demand'] = pd.to_numeric(df_27in['Demand'], errors='raise')
+    df_27in['Initial Inventory'] = pd.to_numeric(df_27in['Initial Inventory'], errors='raise')
+
+    grouped = df_27in.groupby('Product Name', sort=False, as_index=False).agg({
+        'Revenue': 'sum',
+        'Demand': 'sum',
+        'Initial Inventory': 'sum'
+    })
+
+    items = grouped['Product Name'].tolist()
+    revenue = dict(zip(items, grouped['Revenue']))
+    demand = dict(zip(items, grouped['Demand']))
+    inventory = dict(zip(items, grouped['Initial Inventory']))
+
+    # Validate all parameters are present for each item
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f"Missing parameter for product: {i}")
+
+    m = gp.Model('NRM_27in')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    quantity_vars = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * quantity_vars[i] for i in items), GRB.MAXIMIZE)
+
+    # Constraints: x_i <= demand, x_i <= inventory
+    m.addConstrs((quantity_vars[i] <= demand[i] for i in items), name='')
+    m.addConstrs((quantity_vars[i] <= inventory[i] for i in items), name='')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for v in m.getVars():
+            print(f'{v.VarName}: {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 4 rows, 2 columns and 4 nonzeros
+Model fingerprint: 0xa1935c1a
+Variable types: 0 continuous, 2 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [5e+01, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+04, 8e+04]
+Found heuristic solution: objective 4049812.4247
+Presolve removed 4 rows and 2 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 4.04981e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.049812424700e+06, best bound 4.049812424700e+06, gap 0.0000%
+ObjVal: 4049812.4247
+C0: 12474.0
+C1: 15057.0
+Optimal objective: 4049812.4247
+Optimal solution: [('C0', 12474.0), ('C1', 15057.0)]

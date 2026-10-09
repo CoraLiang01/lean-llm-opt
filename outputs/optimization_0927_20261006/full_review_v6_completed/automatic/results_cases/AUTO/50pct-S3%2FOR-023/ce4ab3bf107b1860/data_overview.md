@@ -1,0 +1,152 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/demand.csv",
+    "values": {
+      "demand_previous_period": "2025",
+      "Customer": "Customer_1",
+      "demand": "2397"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/demand.csv",
+    "values": {
+      "demand_previous_period": "1729",
+      "Customer": "Customer_2",
+      "demand": "1889"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/demand.csv",
+    "values": {
+      "demand_previous_period": "2280",
+      "Customer": "Customer_3",
+      "demand": "2518"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/demand.csv",
+    "values": {
+      "demand_previous_period": "3008",
+      "Customer": "Customer_4",
+      "demand": "3218"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/demand.csv",
+    "values": {
+      "demand_previous_period": "1814",
+      "Customer": "Customer_5",
+      "demand": "1813"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/fixed_cost.csv",
+    "values": {
+      "fixed_opening_cost_previous_period": "101.457290",
+      "Unnamed: 1": "MOUNT AYR",
+      "fixed_costs": "96.58"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/fixed_cost.csv",
+    "values": {
+      "fixed_opening_cost_previous_period": "112.034866",
+      "Unnamed: 1": "WAUKEE",
+      "fixed_costs": "94.06"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/fixed_cost.csv",
+    "values": {
+      "fixed_opening_cost_previous_period": "86.06544",
+      "Unnamed: 1": "WAVERLY",
+      "fixed_costs": "94.37"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/fixed_cost.csv",
+    "values": {
+      "fixed_opening_cost_previous_period": "89.526976",
+      "Unnamed: 1": "PELLA",
+      "fixed_costs": "82.88"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/fixed_cost.csv",
+    "values": {
+      "fixed_opening_cost_previous_period": "110.894288000",
+      "Unnamed: 1": "DES MOINES",
+      "fixed_costs": "94.95999999999999"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/transportation_costs.csv",
+    "values": {
+      "Unnamed: 0": "MOUNT AYR",
+      "CLARINDA": "694.6799999999999",
+      "previous_period_FORT_MADISON": "19.009500",
+      "previous_period_service_status": "Seasonal",
+      "FORT MADISON": "17.48",
+      "previous_period_CLARINDA": "832.712916000",
+      "SIOUX CITY": "20.07",
+      "TOLEDO": "199.02",
+      "BANCROFT": "1685.53"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/transportation_costs.csv",
+    "values": {
+      "Unnamed: 0": "WAUKEE",
+      "CLARINDA": "15.13",
+      "previous_period_FORT_MADISON": "1.75905",
+      "previous_period_service_status": "Trial",
+      "FORT MADISON": "1.5",
+      "previous_period_CLARINDA": "13.736527",
+      "SIOUX CITY": "1.43",
+      "TOLEDO": "27.88",
+      "BANCROFT": "90.69"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/transportation_costs.csv",
+    "values": {
+      "Unnamed: 0": "WAVERLY",
+      "CLARINDA": "2.34",
+      "previous_period_FORT_MADISON": "342.038794",
+      "previous_period_service_status": "Regular",
+      "FORT MADISON": "349.34",
+      "previous_period_CLARINDA": "1.975662",
+      "SIOUX CITY": "246.6",
+      "TOLEDO": "41.3",
+      "BANCROFT": "78.73"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/transportation_costs.csv",
+    "values": {
+      "Unnamed: 0": "PELLA",
+      "CLARINDA": "1181.6",
+      "previous_period_FORT_MADISON": "1520.663378",
+      "previous_period_service_status": "Regular",
+      "FORT MADISON": "1458.53",
+      "previous_period_CLARINDA": "960.05000",
+      "SIOUX CITY": "1646.36",
+      "TOLEDO": "1924.55",
+      "BANCROFT": "38.93"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S3/Large-scale-or/UFLP_testing/UFLP6/transportation_costs.csv",
+    "values": {
+      "Unnamed: 0": "DES MOINES",
+      "CLARINDA": "1030.8",
+      "previous_period_FORT_MADISON": "43.727836",
+      "previous_period_service_status": "Regular",
+      "FORT MADISON": "43.48",
+      "previous_period_CLARINDA": "1093.98804",
+      "SIOUX CITY": "932.4299999999999",
+      "TOLEDO": "55.39",
+      "BANCROFT": "103.84"
+    }
+  }
+]

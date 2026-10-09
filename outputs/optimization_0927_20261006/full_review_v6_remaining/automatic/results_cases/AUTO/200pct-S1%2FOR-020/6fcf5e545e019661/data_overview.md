@@ -1,0 +1,227 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/customer_demand.csv",
+    "values": {
+      "customer_id": "D1",
+      "document_page_count": "2",
+      "archive_revision_number": "6",
+      "record_view_count": "43",
+      "demand_units": "428",
+      "archive_batch_number": "301"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/customer_demand.csv",
+    "values": {
+      "customer_id": "D2",
+      "document_page_count": "12",
+      "archive_revision_number": "6",
+      "record_view_count": "43",
+      "demand_units": "217",
+      "archive_batch_number": "302"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/customer_demand.csv",
+    "values": {
+      "customer_id": "D3",
+      "document_page_count": "6",
+      "archive_revision_number": "3",
+      "record_view_count": "76",
+      "demand_units": "214",
+      "archive_batch_number": "304"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/customer_demand.csv",
+    "values": {
+      "customer_id": "D4",
+      "document_page_count": "6",
+      "archive_revision_number": "4",
+      "record_view_count": "12",
+      "demand_units": "380",
+      "archive_batch_number": "305"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/customer_demand.csv",
+    "values": {
+      "customer_id": "D5",
+      "document_page_count": "8",
+      "archive_revision_number": "1",
+      "record_view_count": "58",
+      "demand_units": "254",
+      "archive_batch_number": "305"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/supply_capacity.csv",
+    "values": {
+      "record_view_count": "58",
+      "archive_revision_number": "6",
+      "supplier_id": "S1",
+      "document_page_count": "8",
+      "archive_batch_number": "304",
+      "supply_capacity_units": "428"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/supply_capacity.csv",
+    "values": {
+      "record_view_count": "76",
+      "archive_revision_number": "2",
+      "supplier_id": "S2",
+      "document_page_count": "6",
+      "archive_batch_number": "304",
+      "supply_capacity_units": "217"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/supply_capacity.csv",
+    "values": {
+      "record_view_count": "76",
+      "archive_revision_number": "1",
+      "supplier_id": "S3",
+      "document_page_count": "2",
+      "archive_batch_number": "303",
+      "supply_capacity_units": "214"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/supply_capacity.csv",
+    "values": {
+      "record_view_count": "58",
+      "archive_revision_number": "6",
+      "supplier_id": "S4",
+      "document_page_count": "8",
+      "archive_batch_number": "302",
+      "supply_capacity_units": "380"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/supply_capacity.csv",
+    "values": {
+      "record_view_count": "58",
+      "archive_revision_number": "2",
+      "supplier_id": "S5",
+      "document_page_count": "4",
+      "archive_batch_number": "302",
+      "supply_capacity_units": "254"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/transportation_costs.csv",
+    "values": {
+      "record_label_font": "Calibri",
+      "supplier_id": "S1",
+      "document_page_count": "2",
+      "document_template_family": "Standard",
+      "transportation_cost_to_D1": "269.3910588020795",
+      "transportation_cost_to_D2": "1.453733539093394",
+      "label_print_count": "2",
+      "archive_batch_number": "305",
+      "record_retention_months": "12",
+      "archive_storage_medium": "Digital",
+      "transportation_cost_to_D3": "99.60345345756603",
+      "attachment_count": "5",
+      "record_display_theme": "Slate",
+      "transportation_cost_to_D4": "26.64078166309837",
+      "audit_reference_number": "1024",
+      "transportation_cost_to_D5": "9.537688956880922",
+      "record_view_count": "58",
+      "archive_revision_number": "6"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/transportation_costs.csv",
+    "values": {
+      "record_label_font": "Arial",
+      "supplier_id": "S2",
+      "document_page_count": "16",
+      "document_template_family": "Compact",
+      "transportation_cost_to_D1": "9.291846876785185",
+      "transportation_cost_to_D2": "10.874778437070225",
+      "label_print_count": "2",
+      "archive_batch_number": "303",
+      "record_retention_months": "48",
+      "archive_storage_medium": "Paper",
+      "transportation_cost_to_D3": "144.52609291614627",
+      "attachment_count": "3",
+      "record_display_theme": "Amber",
+      "transportation_cost_to_D4": "11.420133077898234",
+      "audit_reference_number": "1012",
+      "transportation_cost_to_D5": "153.1756819927813",
+      "record_view_count": "27",
+      "archive_revision_number": "1"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/transportation_costs.csv",
+    "values": {
+      "record_label_font": "Calibri",
+      "supplier_id": "S3",
+      "document_page_count": "6",
+      "document_template_family": "Landscape",
+      "transportation_cost_to_D1": "9.674584301671008",
+      "transportation_cost_to_D2": "2.6191650959687944",
+      "label_print_count": "6",
+      "archive_batch_number": "305",
+      "record_retention_months": "36",
+      "archive_storage_medium": "Paper",
+      "transportation_cost_to_D3": "100.8242249168735",
+      "attachment_count": "4",
+      "record_display_theme": "Slate",
+      "transportation_cost_to_D4": "3.212191088791688",
+      "audit_reference_number": "1060",
+      "transportation_cost_to_D5": "133.8493396124168",
+      "record_view_count": "12",
+      "archive_revision_number": "3"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/transportation_costs.csv",
+    "values": {
+      "record_label_font": "Helvetica",
+      "supplier_id": "S4",
+      "document_page_count": "16",
+      "document_template_family": "Compact",
+      "transportation_cost_to_D1": "270.57498480010247",
+      "transportation_cost_to_D2": "32.50253586",
+      "label_print_count": "4",
+      "archive_batch_number": "304",
+      "record_retention_months": "36",
+      "archive_storage_medium": "Digital",
+      "transportation_cost_to_D3": "4.6842098096469815",
+      "attachment_count": "3",
+      "record_display_theme": "Azure",
+      "transportation_cost_to_D4": "1.5682269686546804",
+      "audit_reference_number": "1060",
+      "transportation_cost_to_D5": "9.58927599",
+      "record_view_count": "76",
+      "archive_revision_number": "2"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/TP_testing/TP7/transportation_costs.csv",
+    "values": {
+      "record_label_font": "Helvetica",
+      "supplier_id": "S5",
+      "document_page_count": "4",
+      "document_template_family": "Compact",
+      "transportation_cost_to_D1": "226.0331910675782",
+      "transportation_cost_to_D2": "8.669161980826471",
+      "label_print_count": "2",
+      "archive_batch_number": "304",
+      "record_retention_months": "36",
+      "archive_storage_medium": "Hybrid",
+      "transportation_cost_to_D3": "65.47681316968448",
+      "attachment_count": "4",
+      "record_display_theme": "Azure",
+      "transportation_cost_to_D4": "9.068765258459958",
+      "audit_reference_number": "1036",
+      "transportation_cost_to_D5": "202.65015316425533",
+      "record_view_count": "43",
+      "archive_revision_number": "6"
+    }
+  }
+]

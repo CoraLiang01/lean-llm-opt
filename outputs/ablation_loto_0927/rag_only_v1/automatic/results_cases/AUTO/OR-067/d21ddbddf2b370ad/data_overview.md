@@ -1,0 +1,7 @@
+Here is the full cost matrix from "manager_project_costs.csv", showing all managers (rows) and projects (columns) with their corresponding costs:
+
+| Manager | P1   | P2   | P3   |
+|---------|------|------|------|
+| MA      | 3000 | 3200 | 3100 |
+| MB      | 2800 | 3300 | 2900 |
+| MC      | 2900 | 3100 | 3000 |

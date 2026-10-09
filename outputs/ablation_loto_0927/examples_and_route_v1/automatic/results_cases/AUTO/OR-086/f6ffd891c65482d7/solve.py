@@ -1,0 +1,84 @@
+LEGACY_OBSERVATION = '30-1.csv\n\nGrade,Daily Supply (kg),Cost (CNY/kg)\nI,1500,6\nII,2000,4.5\nIII,1000,3\n\n30-2.csv\n\nBrand,Blending Requirements,Selling Price (CNY/kg)\nRed,I less than 10%  II more than 50%,5.5\nYellow,III less than 70%  I more than 20%,5\nBlue,I less than 50%  II more than 10%,4.8'
+LEGACY_RECORDS = [{'source': '30-1.csv', 'values': {'Grade': 'I', 'Daily Supply (kg)': '1500', 'Cost (CNY/kg)': '6'}}, {'source': '30-1.csv', 'values': {'Grade': 'II', 'Daily Supply (kg)': '2000', 'Cost (CNY/kg)': '4.5'}}, {'source': '30-1.csv', 'values': {'Grade': 'III', 'Daily Supply (kg)': '1000', 'Cost (CNY/kg)': '3'}}, {'source': '30-2.csv', 'values': {'Brand': 'Red', 'Blending Requirements': 'I less than 10%  II more than 50%', 'Selling Price (CNY/kg)': '5.5'}}, {'source': '30-2.csv', 'values': {'Brand': 'Yellow', 'Blending Requirements': 'III less than 70%  I more than 20%', 'Selling Price (CNY/kg)': '5'}}, {'source': '30-2.csv', 'values': {'Brand': 'Blue', 'Blending Requirements': 'I less than 50%  II more than 10%', 'Selling Price (CNY/kg)': '4.8'}}]
+import gurobipy as gp
+from gurobipy import GRB
+grades = []
+grade_supply = {}
+grade_cost = {}
+brands = []
+brand_price = {}
+blend_reqs = {}
+for rec in LEGACY_RECORDS:
+    if rec['source'] == '30-1.csv':
+        g = rec['values']['Grade']
+        grades.append(g)
+        grade_supply[g] = float(rec['values']['Daily Supply (kg)'])
+        grade_cost[g] = float(rec['values']['Cost (CNY/kg)'])
+    elif rec['source'] == '30-2.csv':
+        b = rec['values']['Brand']
+        brands.append(b)
+        brand_price[b] = float(rec['values']['Selling Price (CNY/kg)'])
+        blend_reqs[b] = rec['values']['Blending Requirements']
+blend_constraints = {b: {} for b in brands}
+for b in brands:
+    req = blend_reqs[b]
+    tokens = req.replace('%', '').split()
+    i = 0
+    while i < len(tokens):
+        if tokens[i] in grades:
+            g = tokens[i]
+            if tokens[i + 1] == 'less':
+                sense = '<'
+                val = float(tokens[i + 3]) / 100 if tokens[i + 3].endswith('%') else float(tokens[i + 3])
+                blend_constraints[b][g] = (sense, val)
+                i += 4
+            elif tokens[i + 1] == 'more':
+                sense = '>'
+                val = float(tokens[i + 3]) / 100 if tokens[i + 3].endswith('%') else float(tokens[i + 3])
+                blend_constraints[b][g] = (sense, val)
+                i += 4
+            elif tokens[i + 1] == 'less' and tokens[i + 2] == 'than':
+                sense = '<'
+                val = float(tokens[i + 3]) / 100 if tokens[i + 3].endswith('%') else float(tokens[i + 3])
+                blend_constraints[b][g] = (sense, val)
+                i += 4
+            elif tokens[i + 1] == 'more' and tokens[i + 2] == 'than':
+                sense = '>'
+                val = float(tokens[i + 3]) / 100 if tokens[i + 3].endswith('%') else float(tokens[i + 3])
+                blend_constraints[b][g] = (sense, val)
+                i += 4
+            else:
+                raise ValueError(f'Cannot parse blending requirement: {tokens[i:i + 5]}')
+        else:
+            i += 1
+m = gp.Model('WineBlending')
+x = m.addVars(grades, brands, lb=0, vtype=GRB.CONTINUOUS, name='')
+y = m.addVars(brands, lb=0, vtype=GRB.CONTINUOUS, name='')
+for b in brands:
+    m.addConstr(y[b] == gp.quicksum((x[g, b] for g in grades)), name=f'ydef_{b}')
+bigM = sum(grade_supply.values()) + 1
+epsilon = 1e-06
+for b in brands:
+    for g in blend_constraints[b]:
+        (sense, val) = blend_constraints[b][g]
+        if sense == '<':
+            m.addConstr(x[g, b] <= val * y[b] - epsilon, name=f'blend_{b}_{g}_lt')
+        elif sense == '>':
+            m.addConstr(x[g, b] >= val * y[b] + epsilon, name=f'blend_{b}_{g}_gt')
+        else:
+            raise ValueError(f'Unknown sense {sense} in blending requirements.')
+for g in grades:
+    m.addConstr(gp.quicksum((x[g, b] for b in brands)) <= grade_supply[g], name=f'supply_{g}')
+if 'Red' in brands:
+    m.addConstr(y['Red'] >= 2000, name='minprod_Red')
+revenue = gp.quicksum((brand_price[b] * y[b] for b in brands))
+cost = gp.quicksum((grade_cost[g] * gp.quicksum((x[g, b] for b in brands)) for g in grades))
+m.setObjective(revenue - cost, GRB.MAXIMIZE)
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

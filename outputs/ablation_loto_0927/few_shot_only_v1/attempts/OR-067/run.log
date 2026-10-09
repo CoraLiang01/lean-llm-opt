@@ -1,0 +1,90 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+managers = ['MA', 'MB', 'MC']
+projects = ['P1', 'P2', 'P3']
+cost = {
+    'MA': {'P1': 3000, 'P2': 3200, 'P3': 3100},
+    'MB': {'P1': 2800, 'P2': 3300, 'P3': 2900},
+    'MC': {'P1': 2900, 'P2': 3100, 'P3': 3000}
+}
+
+# Validate cost data coverage
+for i in managers:
+    if i not in cost:
+        raise ValueError(f"Missing cost data for manager {i}")
+    for j in projects:
+        if j not in cost[i]:
+            raise ValueError(f"Missing cost data for manager {i}, project {j}")
+
+m = gp.Model('manager_project_assignment')
+x = m.addVars(managers, projects, vtype=GRB.BINARY, name='x')
+
+m.setObjective(
+    gp.quicksum(cost[i][j] * x[i, j] for i in managers for j in projects),
+    GRB.MINIMIZE
+)
+
+m.addConstrs(
+    (gp.quicksum(x[i, j] for j in projects) == 1 for i in managers),
+    name='mgr'
+)
+m.addConstrs(
+    (gp.quicksum(x[i, j] for i in managers) == 1 for j in projects),
+    name='prj'
+)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 6 rows, 9 columns and 18 nonzeros
+Model fingerprint: 0x44d5e7f0
+Variable types: 0 continuous, 9 integer (9 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [3e+03, 3e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve time: 0.00s
+Presolved: 6 rows, 9 columns, 18 nonzeros
+Variable types: 0 continuous, 9 integer (9 binary)
+Found heuristic solution: objective 9000.0000000
+
+Root relaxation: infeasible, 4 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 infeasible    0      9000.00000 9000.00000  0.00%     -    0s
+
+Explored 1 nodes (4 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 1: 9000 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 9.000000000000e+03, best bound 9.000000000000e+03, gap 0.0000%
+ObjVal: 9000.0
+C0: 1.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: 1.0
+C6: -0.0
+C7: 1.0
+C8: -0.0
+Optimal objective: 9000.0
+Optimal solution: [('C0', 1.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', 1.0), ('C6', -0.0), ('C7', 1.0), ('C8', -0.0)]

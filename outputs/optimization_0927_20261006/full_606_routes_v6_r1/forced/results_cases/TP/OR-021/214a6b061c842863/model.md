@@ -1,0 +1,108 @@
+Let $I$ be the set of products, indexed by $i$, with the following data for each product $i$:
+
+- Product Name: as listed below
+- Revenue per unit: $r_i$
+- Demand: $d_i$
+- Initial Inventory: $s_i$
+
+Decision variables:
+
+$x_i \geq 0$ (integer or continuous): number of units of product $i$ to fulfill.
+
+Objective:
+
+$\max \sum_{i \in I} r_i x_i$
+
+Subject to:
+
+$0 \leq x_i \leq \min\{d_i, s_i\} \quad \forall i \in I$
+
+where:
+- $x_i$ cannot exceed demand $d_i$ or initial inventory $s_i$ for each product.
+
+Below is the full data for each product $i$ (in source order):
+
+| Index | Product Name | Revenue ($r_i$) | Demand ($d_i$) | Initial Inventory ($s_i$) |
+|-------|-------------|-----------------|----------------|---------------------------|
+| 1 | 3 Colors New Fashion Summer Ladies Casual Jumpsuit Long Suspender Overalls Bib Pants | 11 | 1357 | 5000 |
+| 2 | Men's Casual Workout Athletic Gym Jersey Shorts Elastic Waist Drawstring Summer Training Running Knee Length Shorts with Zipper Pocket | 8 | 1363 | 5000 |
+| 3 | New Fashion Autumn Summer Women's Long Sleeve V Neck Long Dress Floral Print Split Maxi Dress Holiday Party Beach Sundress Evening Dresses | 19 | 1269 | 5000 |
+| 4 | New The New Men's Stitching Design Jogging Sports Cropped Trousers | 9 | 6500 | 25000 |
+| 5 | Plus Size S-5XL Women Summer Tops Casual V-Neck Short Sleeve Shirts Ladies Cotton Loose T Shirt Candy Color Lady Pullovers Blouse | 5 | 6335 | 25000 |
+| 6 | Plus Size Women Halter Striped Wide Leg Pants Casual Jumpsuit Rompers Fashion Shorts | 8 | 1283 | 5000 |
+| 7 | Spring/Summer Fashion Women "honey"Letter Print Sleeveless Shirt Sexy Embroidered Bodycon Vest Knitted Cotton Vest Casual Tank Top | 5.65 | 27327 | 100000 |
+| 8 | Summer Students Style Bodycon Rompers Womens Slim Fit Jumpsuit Chest Zipper Contrast Color Short Sleeve V-neck Shorts Bodysuit | 11 | 25600 | 100000 |
+| 9 | Summer Women s Fashion Lace Up Tie Pants Plus Size Casual High Waist Short Pants(S-5XL) | 4.93 | 264 | 1000 |
+| 10 | Women's Fashion Graphic \Don't Flatter Yourself....\Tee for Women Summer Casual Tee T Shirts for Girls | 7 | 14 | 50 |
+| 11 | XS - XXL Fashion Women's Summer Casual T - Shirt Love Gesture Printed Short Sleeve Blouse XS - XXL | 7 | 1484 | 5000 |
+| 12 | 'Let That Shit Go' Women Graphic Tee Casual Cotton Short Sleeve T-shirts Bohemia Style Mandala Namaste Printed Top Blouse | 8 | 13124 | 50000 |
+| 13 | (S-5XL) Women Fashion Summer Double-Layer Sports Shorts Quick-Drying Yoga Sports Leggings Fitness Shorts Plus Size | 1.72 | 123 | 500 |
+| 14 | (S-7XL) Women Camisole Summer Printed Vest Floral Sleeveless Vest V-neck Shirt Plus Size | 2 | 1430 | 5000 |
+| 15 | (US Size) Cotton Graphic Tees for Women / Girls: 4 Colors, Spring Summer Tee, Cute Funny Short Sleeve T-Shirt, Loose Blouse Tops | 7 | 130 | 500 |
+| 16 | 1 Pcs Swimming Chair/Bed Swimming Pool Seat Inflatable Lazy Bed Lounge Chair Air Mattress Floating Bed/Chair with Net Foldable for Swimming Pool/Beach Water Relaxation | 8 | 14 | 50 |
+| 17 | 10 Color Women Summer Shorts Lace Up Elastic Waistband Loose Panties Plus Size S-6XL | 2 | 293 | 1000 |
+| 18 | 10/20/30ml Slimming Firming Anti-Cellulite Massage Cream Fat Burning Weight Losing Moisturizer Gel for Shaping Waist | 2 | 6770 | 25000 |
+| 19 | 10/30/50ml Hair Removal Spray Super Natural Painless Permanent Depilatory Cream | 1.7 | 1325 | 5000 |
+| 20 | 100%Cotton ZANZEA S-5XL NEW Vintage Women Strap Dungaree Jumpsuit Casual Loose Trousers Overalls Rompers Jumpsuit | 15 | 1377 | 5000 |
+| 21 | 100pcs Summer Disposable Sweat Pad Perspiration Absorbing Guard Underarm Armpit Sweat Pad Pure Antiperspirant Adhesive Underarm Pads | 9 | 139 | 500 |
+| 22 | 11 Colors V Neck Women Sleeveless Tops Halter Neck Plus Size Chiffon CropTops(S~5XL) | 8 | 1350 | 5000 |
+| 23 | 16 Color Fashion Women Casual Sleeveless Camisoles Loose T-shirts with Ziper Deep V-neck Blouses Ladies Chiffon Shirts Tank Tops | 7 | 138 | 500 |
+| 24 | 170cm Inflatable Spray Water Cushion Summer Kids Play Water Mat Lawn Games Pad Sprinkler Play Toys Outdoor Tub Swiming Pool | 11 | 122 | 500 |
+| 25 | 18 Styles Women Summer Sexy Printing Buttons Off Shoulder Sleeveless Dress Princess Dress Spaghetti Straps Dresses | 11 | 6577 | 25000 |
+| 26 | 1PCS Swimwear Monokini Swimsuit Backless Bodysuit Women Swimsuit | 11 | 1455 | 5000 |
+| 27 | 1Set Lace Bikini Diamond Swimsuit Crystal Women Swimwear Nude Bikinis Brazilian Rhinestone Beachwear Push Up Bikini | 16 | 72 | 250 |
+| 28 | 1pcs Men's Running Shorts 2 in 1 Sports Jogging Fitness Shorts Summer Training Quick Dry Short Gym Shorts Sport Pants | 16 | 135 | 500 |
+| 29 | 20 Pcs Fashion Comfortable Short Socks Candy Color Invisible Silicone Non-slip Socks Slippers Socks | 3.7 | 6531 | 25000 |
+| 30 | 20/10pcs Women Ankle Invisible No Show Nonslip Loafer Boat Liner Cotton Socks Comfortable Socks Women Shoes Accessories  (Application Size: 33-43) | 3.65 | 26650 | 100000 |
+| 31 | 2017 Women Ladies Summer Dress Sleeveless Casual Sexy Floral Print Beach Dress Fashion Spaghetti Strap Mini Short Dress | 8 | 27115 | 100000 |
+| 32 | 2018 6 Color Summer Womenâ__s New Fashion Sexy Cute Whiskey Print Lace Patchwork Spaghetti Strap T-Shirts Slim Bodycon Off The Shoulder Short Sleeve Blouse Casual Cotton Outdoor Tops Plus Size S-XXXXL | 6 | 12486 | 50000 |
+| 33 | 2018 Black Flora Flower Printed Short Dress Women | 11 | 12367 | 50000 |
+| 34 | 2018 Fashion Summer Dress Women Sexy Dresses V Neck Backless Lace Stitching Dress Beach Dresses White Dress | 15 | 6194 | 25000 |
+| 35 | 2018 Hot Selling Spring Summer Women Flared Causal Trousers Loose Pants Drawstring Elastic Waist Middle Waisted  Wide Leg Pants | 8 | 14307 | 50000 |
+| 36 | 2018 New Fashion Women Bikini Set Push-up Padded Bra Swimsuit -Swimwear | 11 | 6321 | 25000 |
+| 37 | 2018 New Fashion Women Casual Playsuit Ladies Jumpsuit Romper Summer Floral Playsuit Brand New (3 Colors) | 11 | 13833 | 50000 |
+| 38 | 2018 New Fashion Women's Tops Sexy Strappy Sleeveless Lace Crop Tops | 5 | 144944 | 500000 |
+| 39 | 2018 New Summer Women Sexy V-neck Bandage T-shirts Camouflage Printed Short Sleeve Plus size Tops Tee(S-4XL) | 5.78 | 6319 | 25000 |
+| 40 | 2018 New The new cross-strait national wind body bikini Swimsuit  Swimwear LBT | 11 | 13849 | 50000 |
+| 41 | 2018 New ZANZEA Beach Romper Women Jumpsuits Front Zipper Sleeveless Sexy Playsuits | 13 | 6875 | 25000 |
+| 42 | 2018 Plus Size Summer Women Fashion Sexy V-neck Lace Up Plaid Blouse Tops Irregular Short Sleeve Shirtï¼_S-5XLï¼_ | 3.79 | 29273 | 100000 |
+| 43 | 2018 Summer Fashion Women Casual Camouflage Tank Top Sleeveless O-neck Vest | 9 | 1207 | 5000 |
+| 44 | 2018 Summer Fashion Women Tank Tops Sexy Women Sleeveless Crop Tops Casual Style Women Cotton Print Lace Stitching Irregular Blouse Topsï¼_S-5XL) | 7 | 62890 | 250000 |
+| 45 | 2018 Summer New Women Fashion Sexy Sleeveless Tank Top Floral Print Casual Women Cotton T-shirts Plus Size Women Vestï¼_S-5XLï¼_ | 7 | 14465 | 50000 |
+| 46 | 2018 Summer New Women Long Skirts Solid Sexy Split Pencil Skirts | 9 | 25467 | 100000 |
+| 47 | 2018 Summer Women Print Top Fashion Women Casual Army Camo Camouflage Tank Top Sleeveless O-neck Slim T-Shirts Plus Size S-XXXXXL | 8 | 24105 | 100000 |
+| 48 | 2018 Summer Women Sexy Off Shoulder Shirt Casual Half Sleeve Top Ladies Fashion Printing Loose T-shirts Plus Size Cotton Blouse XS-5XL | 8 | 25594 | 100000 |
+| 49 | 2018 Summer Womenâ__s New Fashion Whiskey Print Lace Patchwork Spaghetti Strap T-Shirts Casual Sexy Cotton Tops | 11 | 1229 | 5000 |
+| 50 | 2018 T Shirts + Shorts Brand Clothing Tshirt Men Homme Letter Printed Basketball Running Sports Set T-shirt Suit Male | 12 | 1459 | 5000 |
+| 51 | 2018 Women Cool T-shirt Funny 3d Tshirt Print Two Cat Short Sleeve Summer Tops Tees Teen Graphic Tee Cute Shirt Funny Gifts | 8 | 13071 | 50000 |
+| 52 | 2018 Women Fashion Stretchy Camisole  Spaghetti Strap Long Tank Top Slip Summer Fashion Floral Mini Dress 7 Color SIZE XXL | 9 | 13056 | 50000 |
+| 53 | 2018 Women Fashion Summer Sleeveless Maxi Halter Dresses Solid Color Halter Maxi Dress with Halter Tie and Pockets | 14 | 6170 | 25000 |
+| 54 | 2018 Women Ladies Fashion Crocheted Lace Summer Dress Maxi Dress Long Dress | 9 | 24746 | 100000 |
+| 55 | 2018 Women Ladies Fashion Musical Note Asymmetric Tank Top | 8 | 27118 | 100000 |
+| 56 | 2018 Women Summer Casual Solid Color Loose Sleeveless Beach Tank Top A-line Pocket Dress Sexy Deep V-neck Short Club Party Mini Halter Midi Dresses Robe Ete Femme Knee Length Pleated Skirts Ladies Fashion Swing Cotton T-Shirt Dress Plus Size S-6XL | 5.87 | 29149 | 100000 |
+| 57 | 2018 Women fashion Summer Lace Patchwork Tank Tops Casual Sleeveless Tops Vest Blouse (S-5XL) Plus Size | 5.91 | 1459 | 5000 |
+| 58 | 2019 Fashion Family matching swimwear beachwear mommy and me swimsuit mother daughter father son clothes dresses high waist bikini look mum | 11 | 136 | 500 |
+| 59 | 2019 Fashion Women Summer V-Neck Sleeveless Collect Waist Boho Print Maxi Long Dress S-XXXXXL | 18 | 130 | 500 |
+| 60 | 2019 Men's Summer Cool Jogging Shorts | 9 | 6720 | 25000 |
+| 61 | 2019 NEW Men's Short Sleeve T-Shirt Fitness Round Neck Casual Men's Zippers Summer T-Shirt | 4 | 14932 | 50000 |
+| 62 | 2019 New Fashion Spring Summer Women's Long Pants Short Sleeves Off Shoulder Jumpsuit | 12 | 25913 | 100000 |
+| 63 | 2019 New Fashion Summer Women Casual Dress Round Neck Loose Big Swing Skirt Sleeveless Soild Color Beach dress | 5.74 | 27066 | 100000 |
+| 64 | 2019 New Fashion Women Blouse Tops Sleeveless Spaghetti Strap Criss Cross V-neck T Shirt Tops Summer Casual Blouse Shirts | 4 | 7453 | 25000 |
+| 65 | 2019 New Fashion Women Casual Shorts Suit Summer Tie-Dye Print Halter Bandage Sleeveless Backless Crop Top And Elastic Waist Shorts Pants Two Piece Set | 8 | 142 | 500 |
+| 66 | 2019 New Fashion Women Loose Round Neck Dress Short Sleeve Solid Color Casual Dress | 1.85 | 270 | 1000 |
+| 67 | 2019 New Fashion Women Summer Funny Penguin print T-Shirts Casual Short Sleeve O-Neck Tops Loose Cotton Cute Cool Tee Plus Size S-5XL 4 Colors | 6 | 1418 | 5000 |
+| 68 | 2019 New Fashion Women's Slim Plus Size Maxi Dress Ink Printing Spaghetti Strap Dress | 11 | 28189 | 100000 |
+
+Summary of the model:
+
+Maximize
+$$
+\sum_{i \in I} r_i x_i
+$$
+
+Subject to
+$$
+0 \leq x_i \leq \min\{d_i, s_i\} \quad \forall i \in I
+$$
+
+where $x_i$ is the number of units of product $i$ fulfilled, $r_i$ is the revenue per unit, $d_i$ is the demand, and $s_i$ is the initial inventory for product $i$ as listed above.

@@ -1,0 +1,26 @@
+{"values": {"previous_period_capacity": "1447", "Capacity": "1576"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "16", "ProductName": "Sedan", "Value": "1752", "previous_period_unit_value": "1884", "Weight": "15"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "93", "ProductName": "SUV", "Value": "1856", "previous_period_unit_value": "1575", "Weight": "87"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "39", "ProductName": "Truck", "Value": "8372", "previous_period_unit_value": "7962", "Weight": "36"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "33", "ProductName": "Convertible", "Value": "6168", "previous_period_unit_value": "7309", "Weight": "30"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "35", "ProductName": "Minivan", "Value": "9681", "previous_period_unit_value": "9383", "Weight": "33"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "76", "ProductName": "Coupe", "Value": "8062", "previous_period_unit_value": "6914", "Weight": "72"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "69", "ProductName": "Hatchback", "Value": "3895", "previous_period_unit_value": "4584", "Weight": "75"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "74", "ProductName": "Station Wagon", "Value": "3254", "previous_period_unit_value": "3151", "Weight": "71"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "49", "ProductName": "Electric Car", "Value": "1701", "previous_period_unit_value": "1667", "Weight": "51"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "18", "ProductName": "Hybrid Car", "Value": "6799", "previous_period_unit_value": "7004", "Weight": "21"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "108", "ProductName": "Luxury Sedan", "Value": "2724", "previous_period_unit_value": "2374", "Weight": "97"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "50", "ProductName": "Sports Car", "Value": "6304", "previous_period_unit_value": "6816", "Weight": "52"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "30", "ProductName": "Crossover", "Value": "3255", "previous_period_unit_value": "2843", "Weight": "25"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "16", "ProductName": "Diesel Truck", "Value": "1923", "previous_period_unit_value": "1542", "Weight": "15"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "48", "ProductName": "Compact SUV", "Value": "4103", "previous_period_unit_value": "4233", "Weight": "54"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "53", "ProductName": "Luxury SUV", "Value": "4429", "previous_period_unit_value": "3984", "Weight": "57"}}
+{"values": {"previous_period_stock_status": "Overstock", "previous_period_resource_requirement": "19", "ProductName": "Cargo Van", "Value": "2663", "previous_period_unit_value": "2192", "Weight": "18"}}
+{"values": {"previous_period_stock_status": "Balanced", "previous_period_resource_requirement": "57", "ProductName": "Pickup Truck", "Value": "1691", "previous_period_unit_value": "1460", "Weight": "69"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "22", "ProductName": "Roadster", "Value": "5632", "previous_period_unit_value": "6498", "Weight": "26"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "32", "ProductName": "Muscle Car", "Value": "4793", "previous_period_unit_value": "4266", "Weight": "38"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "28", "ProductName": "Off-road Vehicle", "Value": "1343", "previous_period_unit_value": "1499", "Weight": "31"}}
+{"values": {"previous_period_stock_status": "Balanced", "previous_period_resource_requirement": "69", "ProductName": "Camper Van", "Value": "9124", "previous_period_unit_value": "10165", "Weight": "74"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "85", "ProductName": "Compact Car", "Value": "3652", "previous_period_unit_value": "3190", "Weight": "82"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "56", "ProductName": "Motorcycle", "Value": "8842", "previous_period_unit_value": "10106", "Weight": "49"}}
+{"values": {"previous_period_stock_status": "Stockout", "previous_period_resource_requirement": "60", "ProductName": "Electric SUV", "Value": "9176", "previous_period_unit_value": "8255", "Weight": "64"}}

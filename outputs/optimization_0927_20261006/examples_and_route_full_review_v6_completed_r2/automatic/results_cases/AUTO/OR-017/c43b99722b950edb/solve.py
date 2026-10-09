@@ -1,0 +1,25 @@
+LEGACY_OBSERVATION = '[\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv",\n    "values": {\n      "SKU": "ZZ2AO",\n      "Revenue": "24.38",\n      "Demand": "2",\n      "Initial Inventory": "10.0"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv",\n    "values": {\n      "SKU": "ZZDW7",\n      "Revenue": "30.12",\n      "Demand": "4",\n      "Initial Inventory": "20.0"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv",\n    "values": {\n      "SKU": "ZZM1A",\n      "Revenue": "19.52",\n      "Demand": "82",\n      "Initial Inventory": "530.0"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv",\n    "values": {\n      "SKU": "ZZNC5",\n      "Revenue": "10.79",\n      "Demand": "2",\n      "Initial Inventory": "10.0"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv",\n    "values": {\n      "SKU": "ZZX6K",\n      "Revenue": "111.81",\n      "Demand": "2",\n      "Initial Inventory": "10.0"\n    }\n  }\n]'
+LEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv', 'values': {'SKU': 'ZZ2AO', 'Revenue': '24.38', 'Demand': '2', 'Initial Inventory': '10.0'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv', 'values': {'SKU': 'ZZDW7', 'Revenue': '30.12', 'Demand': '4', 'Initial Inventory': '20.0'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv', 'values': {'SKU': 'ZZM1A', 'Revenue': '19.52', 'Demand': '82', 'Initial Inventory': '530.0'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv', 'values': {'SKU': 'ZZNC5', 'Revenue': '10.79', 'Demand': '2', 'Initial Inventory': '10.0'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv', 'values': {'SKU': 'ZZX6K', 'Revenue': '111.81', 'Demand': '2', 'Initial Inventory': '10.0'}}]
+import gurobipy as gp
+from gurobipy import GRB
+sku_data = []
+for rec in LEGACY_RECORDS:
+    v = rec['values']
+    sku_data.append({'SKU': v['SKU'], 'Revenue': float(v['Revenue']), 'Demand': int(float(v['Demand'])), 'Initial Inventory': int(float(v['Initial Inventory']))})
+skus = [d['SKU'] for d in sku_data]
+revenue = {d['SKU']: d['Revenue'] for d in sku_data}
+demand = {d['SKU']: d['Demand'] for d in sku_data}
+inventory = {d['SKU']: d['Initial Inventory'] for d in sku_data}
+m = gp.Model('RetailStore_ZZ_Fulfillment')
+x_vars = m.addVars(skus, lb=0, vtype=GRB.INTEGER, name='')
+m.setObjective(gp.quicksum((revenue[i] * x_vars[i] for i in skus)), GRB.MAXIMIZE)
+m.addConstrs((x_vars[i] <= demand[i] for i in skus), name='')
+m.addConstrs((x_vars[i] <= inventory[i] for i in skus), name='')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

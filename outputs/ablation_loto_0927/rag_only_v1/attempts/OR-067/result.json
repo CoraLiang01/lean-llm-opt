@@ -1,0 +1,73 @@
+{
+  "problem_id": "OR-067",
+  "query": "In the construction industry, we have a set of managers and a set of construction projects. Each manager incurs different costs for each project, based on their experience and expertise. The cost information for each manager and project is saved in the CSV file \"manager_project_costs.csv\", where each row represents a manager, and each column represents the cost for that manager to complete a specific project. The objective is to find the optimal assignment that minimizes the total cost of completing all projects. Each manager must be assigned to exactly one project, and each project must be managed by exactly one manager. The goal is to minimize the total cost while satisfying these one-to-one assignment constraints.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP2/manager_project_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "AP",
+  "true_route": "AP",
+  "label_objective": 9000.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "AP",
+  "assigned_route": "AP",
+  "generated_model": "Let there be three managers: MA, MB, and MC, and three projects: P1, P2, and P3. Let the decision variable \\( x_{ij} \\) be defined as:\n\n\\[\nx_{ij} = \n\\begin{cases}\n1 & \\text{if manager } i \\text{ is assigned to project } j \\\\\n0 & \\text{otherwise}\n\\end{cases}\n\\]\n\nwhere \\( i \\in \\{\\text{MA}, \\text{MB}, \\text{MC}\\} \\) and \\( j \\in \\{\\text{P1}, \\text{P2}, \\text{P3}\\} \\).\n\nThe cost matrix \\( C \\) is:\n\n\\[\nC = \\begin{bmatrix}\n3000 & 3200 & 3100 \\\\\n2800 & 3300 & 2900 \\\\\n2900 & 3100 & 3000 \\\\\n\\end{bmatrix}\n\\]\n\nwhere the rows correspond to MA, MB, MC and the columns correspond to P1, P2, P3, respectively.\n\nThe mathematical model is:\n\n\\[\n\\begin{align*}\n\\text{Minimize} \\quad & Z = 3000x_{\\text{MA},\\text{P1}} + 3200x_{\\text{MA},\\text{P2}} + 3100x_{\\text{MA},\\text{P3}} \\\\\n&\\quad\\quad\\quad + 2800x_{\\text{MB},\\text{P1}} + 3300x_{\\text{MB},\\text{P2}} + 2900x_{\\text{MB},\\text{P3}} \\\\\n&\\quad\\quad\\quad + 2900x_{\\text{MC},\\text{P1}} + 3100x_{\\text{MC},\\text{P2}} + 3000x_{\\text{MC},\\text{P3}} \\\\\n\\text{subject to:} \\\\\n& x_{\\text{MA},\\text{P1}} + x_{\\text{MA},\\text{P2}} + x_{\\text{MA},\\text{P3}} = 1 \\quad \\text{(MA assigned to one project)} \\\\\n& x_{\\text{MB},\\text{P1}} + x_{\\text{MB},\\text{P2}} + x_{\\text{MB},\\text{P3}} = 1 \\quad \\text{(MB assigned to one project)} \\\\\n& x_{\\text{MC},\\text{P1}} + x_{\\text{MC},\\text{P2}} + x_{\\text{MC},\\text{P3}} = 1 \\quad \\text{(MC assigned to one project)} \\\\\n& x_{\\text{MA},\\text{P1}} + x_{\\text{MB},\\text{P1}} + x_{\\text{MC},\\text{P1}} = 1 \\quad \\text{(P1 assigned to one manager)} \\\\\n& x_{\\text{MA},\\text{P2}} + x_{\\text{MB},\\text{P2}} + x_{\\text{MC},\\text{P2}} = 1 \\quad \\text{(P2 assigned to one manager)} \\\\\n& x_{\\text{MA},\\text{P3}} + x_{\\text{MB},\\text{P3}} + x_{\\text{MC},\\text{P3}} = 1 \\quad \\text{(P3 assigned to one manager)} \\\\\n& x_{ij} \\in \\{0,1\\} \\quad \\forall i \\in \\{\\text{MA}, \\text{MB}, \\text{MC}\\},\\ j \\in \\{\\text{P1}, \\text{P2}, \\text{P3}\\}\n\\end{align*}\n\\]\n\nWhere:\n- The objective function minimizes the total cost of assigning managers to projects, using the actual costs from the CSV.\n- The first three constraints ensure each manager is assigned to exactly one project.\n- The next three constraints ensure each project is assigned to exactly one manager.\n- All variables are binary.\n\nThis is the complete mathematical model for the optimal assignment of managers to projects, using the provided cost data.",
+  "csvqa_observation": "Here is the full cost matrix from \"manager_project_costs.csv\", showing all managers (rows) and projects (columns) with their corresponding costs:\n\n| Manager | P1   | P2   | P3   |\n|---------|------|------|------|\n| MA      | 3000 | 3200 | 3100 |\n| MB      | 2800 | 3300 | 2900 |\n| MC      | 2900 | 3100 | 3000 |",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_FULL_DATA",
+  "solve_code": "import gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_assignment():\n    managers = ['MA', 'MB', 'MC']\n    projects = ['P1', 'P2', 'P3']\n    cost = {'MA': {'P1': 3000, 'P2': 3200, 'P3': 3100}, 'MB': {'P1': 2800, 'P2': 3300, 'P3': 2900}, 'MC': {'P1': 2900, 'P2': 3100, 'P3': 3000}}\n    for i in managers:\n        if i not in cost:\n            raise ValueError(f'Missing cost data for manager {i}')\n        for j in projects:\n            if j not in cost[i]:\n                raise ValueError(f'Missing cost data for manager {i}, project {j}')\n    m = gp.Model()\n    x = {}\n    for i in managers:\n        x[i] = {}\n        for j in projects:\n            x[i][j] = m.addVar(vtype=GRB.BINARY, name='x', lb=0, ub=1)\n    for i in managers:\n        m.addConstr(gp.quicksum((x[i][j] for j in projects)) == 1, name='cm')\n    for j in projects:\n        m.addConstr(gp.quicksum((x[i][j] for i in managers)) == 1, name='cp')\n    obj = gp.quicksum((cost[i][j] * x[i][j] for i in managers for j in projects))\n    m.setObjective(obj, GRB.MINIMIZE)\n    m.Params.MIPGap = 0.0001\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal {m.ObjVal}')\n        for i in managers:\n            for j in projects:\n                v = x[i][j]\n                print(f'{v.VarName} {v.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_assignment()",
+  "final_objective": 9000.0,
+  "final_solution": [
+    [
+      "x",
+      1.0
+    ],
+    [
+      "x",
+      -0.0
+    ],
+    [
+      "x",
+      -0.0
+    ],
+    [
+      "x",
+      -0.0
+    ],
+    [
+      "x",
+      -0.0
+    ],
+    [
+      "x",
+      1.0
+    ],
+    [
+      "x",
+      -0.0
+    ],
+    [
+      "x",
+      1.0
+    ],
+    [
+      "x",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "rag_only",
+  "seconds": 11.345,
+  "classification_source": "final_101_V2_cache",
+  "classification_cache_sha256": "8b17fda06001ff4ebea07809838119bc81b6f49cb453b600aa87d5dc73881435",
+  "base_notebook_sha256": "a155d54c6df32abc8dfe263e03d00138848cfcca32422dff3c286f3b8c67f6b1",
+  "notebook_source_sha256": "46fee06fc332e35e0be1dfa22ffcc26af19505ba077e31214fd8b688913561e8",
+  "cache_fingerprint": "1bb72003f0cd0f5c21e0162fcd8d3a5b010065b7b9b1bfbc00a966ca5b090413",
+  "evaluated_utc": "2026-10-06T02:58:07.937942+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

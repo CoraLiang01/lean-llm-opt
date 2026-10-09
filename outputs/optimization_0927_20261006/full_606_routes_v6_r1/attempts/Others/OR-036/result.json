@@ -1,0 +1,139 @@
+{
+  "problem_id": "OR-036",
+  "query": "An automobile sales company is planning its inventory replenishment strategy. For each type of vehicle, the company has a \"products.csv\" file that records the benefit coefficients for each vehicle type. The company also has an overall inventory capacity constraint, which is detailed in the \"capacity.csv\" file. The company's objective is to decide which vehicle types to order each day and in what quantities to maximize the overall benefit while adhering to the total inventory capacity. The decision variables x_i represent the number of units of vehicle type i to be ordered daily. The company needs to balance between maximizing benefits and complying with inventory constraints to develop the optimal ordering plan.The decision variables must be integers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 509925.0,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal daily ordering quantities for each vehicle type to maximize total benefit, subject to an overall inventory capacity constraint. The decision variables are the integer number of units to order for each vehicle type, and the objective is to maximize the sum of benefit coefficients across all ordered vehicles, without exceeding the total inventory capacity.\n2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem, specifically a multi-item knapsack problem.\n3.  **Define Index Sets:** The primary index is the set of vehicle types (Products), as listed in 'products.csv'.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of vehicle type `i` to order each day. Type: GRB.INTEGER.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients (benefit per unit) come from the 'Value' column in 'products.csv'.\n    -   Constraint coefficients (inventory space per unit) come from the 'Weight' column in 'products.csv'.\n    -   Constraint RHS (total inventory capacity) comes from the 'Capacity' column in 'capacity.csv'.\n6.  **Formulate Objective:** Maximize the total benefit, i.e., maximize the sum over all vehicle types of (Value[i] * x[i]), where Value[i] is the benefit coefficient for vehicle type i.\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Inventory Capacity): The sum over all vehicle types of (Weight[i] * x[i]) must be less than or equal to the total inventory capacity (Capacity), i.e., sum(Weight[i] * x[i]) ≤ Capacity.\n    -   Constraint 2 (Non-negativity and Integrality): For all vehicle types i, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/capacity.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 1\nColumns: ['Capacity']\nParsed column types: {'Capacity': 'int64'}\nPreview only (first 10 rows):\nCapacity\n    1576\nFull-file column statistics: {\"Capacity\": {\"missing\": 0, \"unique_nonempty\": 1, \"numeric_range\": [1576.0, 1576.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"capacity\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"capacity.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/products.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 25\nColumns: ['ProductName', 'Value', 'Weight']\nParsed column types: {'ProductName': 'object', 'Value': 'int64', 'Weight': 'int64'}\nPreview only (first 10 rows):\n  ProductName Value Weight\n        Sedan  1752     15\n          SUV  1856     87\n        Truck  8372     36\n  Convertible  6168     30\n      Minivan  9681     33\n        Coupe  8062     72\n    Hatchback  3895     75\nStation Wagon  3254     71\n Electric Car  1701     51\n   Hybrid Car  6799     21\nFull-file column statistics: {\"ProductName\": {\"missing\": 0, \"unique_nonempty\": 25}, \"Value\": {\"missing\": 0, \"unique_nonempty\": 25, \"numeric_range\": [1343.0, 9681.0]}, \"Weight\": {\"missing\": 0, \"unique_nonempty\": 24, \"numeric_range\": [15.0, 97.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"capacity.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"15285e385d7cceb3d0c67b56fb9a00c4cda6794465a1b27627fd4fad4c0574d6\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nproducts_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/products.csv'\nproducts_df = pd.read_csv(products_path, sep=',', dtype=str, keep_default_na=False)\nif 'ProductName' not in products_df.columns or 'Value' not in products_df.columns or 'Weight' not in products_df.columns:\n    raise KeyError(\"products.csv must contain 'ProductName', 'Value', and 'Weight' columns.\")\nproducts_df['ProductName'] = products_df['ProductName'].str.strip()\ntry:\n    products_df['Value'] = products_df['Value'].astype(int)\n    products_df['Weight'] = products_df['Weight'].astype(int)\nexcept Exception as e:\n    raise ValueError(f\"Failed to convert 'Value' or 'Weight' columns to int: {e}\")\nproduct_ids = products_df['ProductName'].tolist()\nvalue_dict = dict(zip(products_df['ProductName'], products_df['Value']))\nweight_dict = dict(zip(products_df['ProductName'], products_df['Weight']))\ncapacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA2/CarSales1/capacity.csv'\ncapacity_df = pd.read_csv(capacity_path, sep=',', dtype=str, keep_default_na=False)\nif 'Capacity' not in capacity_df.columns:\n    raise KeyError(\"capacity.csv must contain 'Capacity' column.\")\nif len(capacity_df) != 1:\n    raise ValueError('capacity.csv must contain exactly one row.')\ntry:\n    total_capacity = int(capacity_df.iloc[0]['Capacity'])\nexcept Exception as e:\n    raise ValueError(f\"Failed to convert 'Capacity' to int: {e}\")\nm = gp.Model('CarSalesInventoryReplenishment')\nx_vars = m.addVars(product_ids, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((value_dict[i] * x_vars[i] for i in product_ids)), gp.GRB.MAXIMIZE)\nm.addConstr(gp.quicksum((weight_dict[i] * x_vars[i] for i in product_ids)) <= total_capacity, name='InventoryCapacity')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total value/cost: {m.objVal:.2f}')\n    print('--- Optimal Daily Ordering Plan ---')\n    for i in product_ids:\n        qty = int(round(x_vars[i].X))\n        print(f'{i}: {qty} units')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 509925.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      75.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ],
+    [
+      "C20",
+      -0.0
+    ],
+    [
+      "C21",
+      -0.0
+    ],
+    [
+      "C22",
+      -0.0
+    ],
+    [
+      "C23",
+      -0.0
+    ],
+    [
+      "C24",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 8.365,
+  "evaluated_utc": "2026-10-06T08:53:32.839864+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

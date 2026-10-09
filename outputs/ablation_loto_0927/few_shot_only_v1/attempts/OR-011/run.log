@@ -1,0 +1,90 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Extract table records
+try:
+    table = None
+    for t in CSVQA_DATA["tables"]:
+        if t["table_id"] == "file_0_view_0":
+            table = t
+            break
+    if table is None:
+        raise ValueError("Table file_0_view_0 not found in CSVQA_DATA.")
+    records = table["records"]
+except Exception as e:
+    raise RuntimeError(f"Failed to extract table records: {e}")
+
+# Compile regex for parsing numeric values (allowing for commas, decimals)
+num_re = re.compile(r'^-?\d+(?:\.\d+)?$')
+
+# Build index set I and parameter dictionaries
+I = []
+a = {}
+d = {}
+s = {}
+
+for rec in records:
+    vals = rec["values"]
+    if "id_number" not in vals or vals["id_number"] != "id999":
+        continue
+    prod_id = rec  # Use the record itself as unique identifier
+    # Extract and validate parameters
+    try:
+        revenue_raw = str(vals["Revenue"]).replace(',', '').strip()
+        demand_raw = str(vals["Demand"]).replace(',', '').strip()
+        inventory_raw = str(vals["Initial Inventory"]).replace(',', '').strip()
+        if not num_re.match(revenue_raw):
+            raise ValueError(f"Revenue value '{vals['Revenue']}' is not numeric.")
+        if not num_re.match(demand_raw):
+            raise ValueError(f"Demand value '{vals['Demand']}' is not numeric.")
+        if not num_re.match(inventory_raw):
+            raise ValueError(f"Initial Inventory value '{vals['Initial Inventory']}' is not numeric.")
+        revenue = float(revenue_raw)
+        demand = float(demand_raw)
+        inventory = float(inventory_raw)
+        if revenue < 0 or demand < 0 or inventory < 0:
+            raise ValueError("Negative parameter value encountered.")
+    except Exception as e:
+        raise RuntimeError(f"Error parsing parameters for record: {e}")
+    I.append(prod_id)
+    a[prod_id] = revenue
+    d[prod_id] = demand
+    s[prod_id] = inventory
+
+# Validate that all required data is present
+if not I:
+    raise ValueError("No products with id_number = 'id999' found in file_0_view_0.")
+for prod_id in I:
+    if prod_id not in a or prod_id not in d or prod_id not in s:
+        raise ValueError(f"Missing parameter(s) for product {prod_id}.")
+
+# Build and solve the Gurobi model
+m = gp.Model('Supermarket_Revenue_Max')
+x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Objective: maximize total revenue
+m.setObjective(gp.quicksum(a[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+# Constraints: inventory and demand
+m.addConstrs((x[i] <= s[i] for i in I), name='')
+m.addConstrs((x[i] <= d[i] for i in I), name='')
+
+# Set MIPGap and optimize
+m.setParam('MIPGap', 1e-4)
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_0927_experiments.py", line 62, in worker
+    record=ns['execute_pipeline_case'](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/ablation_loto_0927/few_shot_only_v1/frozen_notebook.ipynb:cell29", line 93, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/ablation_loto_0927/few_shot_only_v1/frozen_notebook.ipynb:cell29", line 17, in execute_code
+  File "<string>", line 44, in <module>
+TypeError: unhashable type: 'dict'

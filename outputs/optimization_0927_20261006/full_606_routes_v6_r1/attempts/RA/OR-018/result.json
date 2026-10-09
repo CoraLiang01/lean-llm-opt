@@ -1,0 +1,43 @@
+{
+  "problem_id": "OR-018",
+  "query": "The supermarket offers a variety of top-selling products, with associated data provided in the ‘Revenue’ column. Each product has its own demand level. The retailer aims to maximize total revenue by focusing on the initial inventory of products classified under ‘Baby’. Inventory levels are detailed in the ‘Initial Inventory’ column. During the sales horizon, no restocking is allowed. Demand quantities for ‘Baby’ products are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. The decision variables x_i represent the number of units of each ‘Baby’ product i that the retailer plans to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 782819438.6,
+  "forced_route": "RA",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "RA",
+  "generated_model": "Let $I$ be the set of Baby products (here, $I = \\{\\text{Baby Food\\_255.28}\\}$).\n\nLet $x_i$ be the number of units of Baby product $i$ to fulfill, for $i \\in I$.\n\nParameters:\n- $r_i$: Revenue per unit of product $i$\n- $d_i$: Demand for product $i$\n- $s_i$: Initial Inventory of product $i$\n\nGiven data:\n- For $\\text{Baby Food\\_255.28}$: $r_i = 255.28$, $d_i = 3,\\!066,\\!513$, $s_i = 22,\\!749,\\!210$\n\nThe model is:\n\n$$\n\\begin{align*}\n\\max \\quad & 255.28\\, x_{\\text{Baby Food\\_255.28}} \\\\\n\\text{s.t.} \\quad\n& 0 \\leq x_{\\text{Baby Food\\_255.28}} \\leq 3,\\!066,\\!513 \\\\\n& x_{\\text{Baby Food\\_255.28}} \\leq 22,\\!749,\\!210 \\\\\n& x_{\\text{Baby Food\\_255.28}} \\in \\mathbb{Z}_{\\geq 0}\n\\end{align*}\n$$\n\nOr, more generally, for all $i \\in I$:\n$$\n\\begin{align*}\n\\max \\quad & \\sum_{i \\in I} r_i x_i \\\\\n\\text{s.t.} \\quad\n& 0 \\leq x_i \\leq d_i, \\quad \\forall i \\in I \\\\\n& x_i \\leq s_i, \\quad \\forall i \\in I \\\\\n& x_i \\in \\mathbb{Z}_{\\geq 0}, \\quad \\forall i \\in I\n\\end{align*}\n$$\n\nWhere, for this instance, $I = \\{\\text{Baby Food\\_255.28}\\}$, $r_i = 255.28$, $d_i = 3,\\!066,\\!513$, $s_i = 22,\\!749,\\!210$.",
+  "csvqa_observation": "[\n  {\n    \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv\",\n    \"values\": {\n      \"Product Name\": \"Baby Food_255.28\",\n      \"Revenue\": \"255.28\",\n      \"Demand\": \"3066513\",\n      \"Initial Inventory\": \"22749210\"\n    }\n  }\n]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_VALIDATED_SOURCE_ROWS",
+  "csvqa_trace": "{\"version\": \"GPT4.1-LO\", \"mode\": \"legacy\", \"status\": \"LEGACY_VALIDATED_SOURCE_ROWS\", \"plan\": null, \"planner_attempt_count\": 0, \"planner_outputs\": [], \"planner_errors\": [], \"validation_errors\": [], \"fallback_reason\": null, \"legacy_extraction_output\": \"[\\n  {\\n    \\\"source\\\": \\\"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv\\\",\\n    \\\"values\\\": {\\n      \\\"Product Name\\\": \\\"Baby Food_255.28\\\",\\n      \\\"Revenue\\\": \\\"255.28\\\",\\n      \\\"Demand\\\": \\\"3066513\\\",\\n      \\\"Initial Inventory\\\": \\\"22749210\\\"\\n    }\\n  }\\n]\", \"payload_hash\": \"b59971d40d888cdd17fd568c25fe6d287ea6b153f731e7f0f3b63d1faae1d03a\"}",
+  "solve_code": "LEGACY_OBSERVATION = '[\\n  {\\n    \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv\",\\n    \"values\": {\\n      \"Product Name\": \"Baby Food_255.28\",\\n      \"Revenue\": \"255.28\",\\n      \"Demand\": \"3066513\",\\n      \"Initial Inventory\": \"22749210\"\\n    }\\n  }\\n]'\nLEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv', 'values': {'Product Name': 'Baby Food_255.28', 'Revenue': '255.28', 'Demand': '3066513', 'Initial Inventory': '22749210'}}]\nimport gurobipy as gp\nfrom gurobipy import GRB\nrecords = LEGACY_RECORDS\nbaby_products = []\nrevenue = {}\ndemand = {}\ninitial_inventory = {}\nfor rec in records:\n    vals = rec['values']\n    pname = vals['Product Name']\n    baby_products.append(pname)\n    try:\n        revenue[pname] = float(vals['Revenue'])\n        demand[pname] = int(vals['Demand'])\n        initial_inventory[pname] = int(vals['Initial Inventory'])\n    except KeyError as e:\n        raise ValueError(f'Missing required field {e} for product {pname}')\nfor pname in baby_products:\n    if pname not in revenue or pname not in demand or pname not in initial_inventory:\n        raise ValueError(f'Missing data for product {pname}')\nm = gp.Model('Baby_Product_Fulfillment')\nx_vars = m.addVars(baby_products, lb=0, ub=[demand[p] for p in baby_products], vtype=GRB.INTEGER, name='')\nfor p in baby_products:\n    m.addConstr(x_vars[p] <= initial_inventory[p], name=f'inv_{p}')\nm.setObjective(gp.quicksum((revenue[p] * x_vars[p] for p in baby_products)), GRB.MAXIMIZE)\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for v in m.getVars():\n        print(f'{v.VarName}: {v.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 782819438.64,
+  "final_solution": [
+    [
+      "C0",
+      3066513.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 14.068,
+  "evaluated_utc": "2026-10-06T08:45:27.789273+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

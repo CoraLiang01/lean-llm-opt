@@ -1,0 +1,444 @@
+{
+  "problem_id": "OR-039",
+  "query": "In the context of New Car Sales in Norway, a car dealership is planning its inventory-replenishment strategy.For each vehicle type, the dealership has a “products.csv” file that records the benefit coefficient for that type, in other word, the value for each car.There are some warehouse that can store these cars.Each warehosue has a capacity limit, provided in “capacity.csv.”The objective is to decide how many units of each vehicle type to store in the warehouse so as to maximize total value while ensuring that each warehouse won't exceed capacity limit.The decision variable x_i represents the number of vehicles of type i to be ordered per day. The decision variables must be integers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 429000.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal number of each vehicle type to store in each warehouse, maximizing the total value of cars stored, while ensuring that the total weight of cars in each warehouse does not exceed its capacity. The decision variables are the integer number of each vehicle type assigned to each warehouse.\n2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem, specifically a multi-dimensional (multi-knapsack) integer allocation problem.\n3.  **Define Index Sets:** The primary indices are:\n    - Products (vehicle types), indexed by i (from products.csv, e.g., Sedans, SUVs, etc.)\n    - Warehouses, indexed by w (from capacity.csv, e.g., Warehouse 1, Warehouse 2, etc.)\n4.  **Define Decision Variables:**\n    -   `x[i, w]` = Number of vehicles of type i to store in warehouse w. Type: GRB.INTEGER (must be non-negative).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Value' column from products.csv (the benefit/value per vehicle type).\n    -   Constraint coefficients: 'Weight' column from products.csv (the weight per vehicle type).\n    -   Constraint RHS (limits): 'Capacity' column from capacity.csv (the maximum total weight each warehouse can store).\n6.  **Formulate Objective:** Maximize the total value of all vehicles stored across all warehouses, i.e., maximize sum over all products and warehouses of (Value[i] * x[i, w]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Warehouse Capacity): For each warehouse w, the sum over all products i of (Weight[i] * x[i, w]) ≤ Capacity[w]. This ensures the total weight of vehicles in each warehouse does not exceed its capacity.\n    -   Constraint 2 (Non-negativity and Integrality): For all i, w, x[i, w] ≥ 0 and integer.\n    -   (If there are any additional business rules, such as limits on the number of each vehicle type or total vehicles, these would be added as further constraints, but none are specified in the query.)\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 10\nColumns: ['Warehouse ID', 'Capacity']\nParsed column types: {'Warehouse ID': 'object', 'Capacity': 'int64'}\nPreview only (first 10 rows):\nWarehouse ID Capacity\n Warehouse 1      100\n Warehouse 2       80\n Warehouse 3      120\n Warehouse 4       90\n Warehouse 5       50\n Warehouse 6       30\n Warehouse 7      110\n Warehouse 8       40\n Warehouse 9       60\nWarehouse 10       35\nFull-file column statistics: {\"Warehouse ID\": {\"missing\": 0, \"unique_nonempty\": 10}, \"Capacity\": {\"missing\": 0, \"unique_nonempty\": 10, \"numeric_range\": [30.0, 120.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"capacity\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"capacity.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 10\nColumns: ['ProductName', 'Value', 'Weight']\nParsed column types: {'ProductName': 'object', 'Value': 'int64', 'Weight': 'int64'}\nPreview only (first 10 rows):\n      ProductName Value Weight\n           Sedans  1200     20\n             SUVs  1800     15\nElectric Vehicles  2500     25\n  Hybrid Vehicles  2000     18\n           Trucks  1500     10\n      Sports Cars  3000      5\n     Compact Cars  1000     22\n    Luxury Sedans  3500      8\n             Vans  1600     12\n    Pickup Trucks  1700      7\nFull-file column statistics: {\"ProductName\": {\"missing\": 0, \"unique_nonempty\": 10}, \"Value\": {\"missing\": 0, \"unique_nonempty\": 10, \"numeric_range\": [1000.0, 3500.0]}, \"Weight\": {\"missing\": 0, \"unique_nonempty\": 10, \"numeric_range\": [5.0, 25.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"capacity.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"value\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nproducts_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/products.csv', sep=',')\ncapacity_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA5/NewCarSalesInNorway2/capacity.csv', sep=',')\nproducts_df['ProductName'] = products_df['ProductName'].astype(str).str.strip()\ncapacity_df['Warehouse ID'] = capacity_df['Warehouse ID'].astype(str).str.strip()\nproducts = list(products_df['ProductName'])\nwarehouses = list(capacity_df['Warehouse ID'])\nvalue = products_df.set_index('ProductName')['Value'].astype(int).to_dict()\nweight = products_df.set_index('ProductName')['Weight'].astype(int).to_dict()\ncapacity = capacity_df.set_index('Warehouse ID')['Capacity'].astype(int).to_dict()\nif set(products) != set(value.keys()) or set(products) != set(weight.keys()):\n    raise ValueError('Mismatch in product identifiers between products and value/weight columns.')\nif set(warehouses) != set(capacity.keys()):\n    raise ValueError('Mismatch in warehouse identifiers between capacity file and warehouse list.')\nm = gp.Model('CarInventoryMultiKnapsack')\nx = m.addVars(products, warehouses, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((value[i] * x[i, w] for i in products for w in warehouses)), gp.GRB.MAXIMIZE)\nfor w in warehouses:\n    m.addConstr(gp.quicksum((weight[i] * x[i, w] for i in products)) <= capacity[w], name=f'cap_{w}')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total value: {m.objVal:.0f}')\n    print('\\n--- Inventory Plan (number of vehicles per type per warehouse) ---')\n    for w in warehouses:\n        print(f'\\nWarehouse: {w} (Capacity: {capacity[w]})')\n        total_weight = 0\n        total_value = 0\n        for i in products:\n            qty = int(round(x[i, w].X))\n            if qty > 0:\n                print(f'  {i}: {qty} units (Value: {value[i]}, Weight: {weight[i]})')\n                total_weight += qty * weight[i]\n                total_value += qty * value[i]\n        print(f'  >> Total weight used: {total_weight} / {capacity[w]}')\n        print(f'  >> Total value in warehouse: {total_value}')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "final_objective": 429000.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ],
+    [
+      "C20",
+      -0.0
+    ],
+    [
+      "C21",
+      -0.0
+    ],
+    [
+      "C22",
+      -0.0
+    ],
+    [
+      "C23",
+      -0.0
+    ],
+    [
+      "C24",
+      -0.0
+    ],
+    [
+      "C25",
+      -0.0
+    ],
+    [
+      "C26",
+      -0.0
+    ],
+    [
+      "C27",
+      -0.0
+    ],
+    [
+      "C28",
+      -0.0
+    ],
+    [
+      "C29",
+      -0.0
+    ],
+    [
+      "C30",
+      -0.0
+    ],
+    [
+      "C31",
+      -0.0
+    ],
+    [
+      "C32",
+      -0.0
+    ],
+    [
+      "C33",
+      -0.0
+    ],
+    [
+      "C34",
+      -0.0
+    ],
+    [
+      "C35",
+      -0.0
+    ],
+    [
+      "C36",
+      -0.0
+    ],
+    [
+      "C37",
+      -0.0
+    ],
+    [
+      "C38",
+      -0.0
+    ],
+    [
+      "C39",
+      -0.0
+    ],
+    [
+      "C40",
+      -0.0
+    ],
+    [
+      "C41",
+      -0.0
+    ],
+    [
+      "C42",
+      -0.0
+    ],
+    [
+      "C43",
+      -0.0
+    ],
+    [
+      "C44",
+      -0.0
+    ],
+    [
+      "C45",
+      -0.0
+    ],
+    [
+      "C46",
+      -0.0
+    ],
+    [
+      "C47",
+      -0.0
+    ],
+    [
+      "C48",
+      -0.0
+    ],
+    [
+      "C49",
+      -0.0
+    ],
+    [
+      "C50",
+      20.0
+    ],
+    [
+      "C51",
+      16.0
+    ],
+    [
+      "C52",
+      24.0
+    ],
+    [
+      "C53",
+      18.0
+    ],
+    [
+      "C54",
+      10.0
+    ],
+    [
+      "C55",
+      6.0
+    ],
+    [
+      "C56",
+      22.0
+    ],
+    [
+      "C57",
+      8.0
+    ],
+    [
+      "C58",
+      12.0
+    ],
+    [
+      "C59",
+      7.0
+    ],
+    [
+      "C60",
+      -0.0
+    ],
+    [
+      "C61",
+      -0.0
+    ],
+    [
+      "C62",
+      -0.0
+    ],
+    [
+      "C63",
+      -0.0
+    ],
+    [
+      "C64",
+      -0.0
+    ],
+    [
+      "C65",
+      -0.0
+    ],
+    [
+      "C66",
+      -0.0
+    ],
+    [
+      "C67",
+      -0.0
+    ],
+    [
+      "C68",
+      -0.0
+    ],
+    [
+      "C69",
+      -0.0
+    ],
+    [
+      "C70",
+      -0.0
+    ],
+    [
+      "C71",
+      -0.0
+    ],
+    [
+      "C72",
+      -0.0
+    ],
+    [
+      "C73",
+      -0.0
+    ],
+    [
+      "C74",
+      -0.0
+    ],
+    [
+      "C75",
+      -0.0
+    ],
+    [
+      "C76",
+      -0.0
+    ],
+    [
+      "C77",
+      -0.0
+    ],
+    [
+      "C78",
+      -0.0
+    ],
+    [
+      "C79",
+      -0.0
+    ],
+    [
+      "C80",
+      -0.0
+    ],
+    [
+      "C81",
+      -0.0
+    ],
+    [
+      "C82",
+      -0.0
+    ],
+    [
+      "C83",
+      -0.0
+    ],
+    [
+      "C84",
+      -0.0
+    ],
+    [
+      "C85",
+      -0.0
+    ],
+    [
+      "C86",
+      -0.0
+    ],
+    [
+      "C87",
+      -0.0
+    ],
+    [
+      "C88",
+      -0.0
+    ],
+    [
+      "C89",
+      -0.0
+    ],
+    [
+      "C90",
+      -0.0
+    ],
+    [
+      "C91",
+      -0.0
+    ],
+    [
+      "C92",
+      -0.0
+    ],
+    [
+      "C93",
+      -0.0
+    ],
+    [
+      "C94",
+      -0.0
+    ],
+    [
+      "C95",
+      -0.0
+    ],
+    [
+      "C96",
+      -0.0
+    ],
+    [
+      "C97",
+      -0.0
+    ],
+    [
+      "C98",
+      -0.0
+    ],
+    [
+      "C99",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "loto_variant": "examples_and_route",
+  "held_out_type": "RA",
+  "disabled_workflow_route": "RA",
+  "allowed_labels": "TP,NRM,FLP,AP,Mixture,Others",
+  "reference_sha256": "6b2987f96aeacece9f458d55aca072436922aec963be16223ac30a8890f79097",
+  "reference_count_after": 14,
+  "route_allowed": true,
+  "classification_correct": false,
+  "solution_correct": true,
+  "experiment_method": "examples_and_route",
+  "seconds": 19.825,
+  "classification_source": "fold_agent",
+  "classification_cache_sha256": "8b17fda06001ff4ebea07809838119bc81b6f49cb453b600aa87d5dc73881435",
+  "base_notebook_sha256": "a155d54c6df32abc8dfe263e03d00138848cfcca32422dff3c286f3b8c67f6b1",
+  "notebook_source_sha256": "dbc55bc1466b60c1dcea916f9ce32ac698ffd9ea4418e420312defa755319219",
+  "cache_fingerprint": "256b7b680b9758786f61799cd7b0822ce7cca365c92fd7d66e87ade1ee797a66",
+  "evaluated_utc": "2026-10-06T02:54:57.345678+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

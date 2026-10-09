@@ -1,0 +1,239 @@
+{
+  "problem_id": "OR-070",
+  "query": "In the construction industry, there are multiple managers and construction projects, with each manager incurring different costs for different projects based on their expertise and experience. This cost data is recorded in the \u201cmanager_project_costs.csv\u201d file, where each row represents a manager and each column indicates the cost for that manager to complete a specific project. The objective is to determine the most cost-effective assignment of managers to projects, ensuring that each project is assigned to a single manager and each manager is responsible for only one project. The goal is to minimize the total cost while satisfying these assignment constraints.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP5/manager_project_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "AP",
+  "true_route": "AP",
+  "label_objective": 8809.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "AP",
+  "assigned_route": "AP",
+  "generated_model": "##### Objective Function:\n\n$\\quad \\min \\sum_{m \\in M} \\sum_{p \\in P} c_{mp} \\, x_{mp}$\n\n##### Constraints:\n\n###### 1. Each manager is assigned to exactly one project:\n$\\sum_{p \\in P} x_{mp} = 1 \\quad \\forall m \\in M$\n\n###### 2. Each project is assigned to exactly one manager:\n$\\sum_{m \\in M} x_{mp} = 1 \\quad \\forall p \\in P$\n\n###### 3. Variable domains:\n$x_{mp} \\in \\{0,1\\} \\quad \\forall m \\in M,\\, p \\in P$\n\n##### Data Mapping\n\n- $M$: Set of managers, from column \"Manager\" in table_id \"file_0_view_0\"\n- $P$: Set of projects, from columns {\"Project 1 Cost\", \"Project 2 Cost\", \"Project 3 Cost\", \"Project 4 Cost\", \"Project 5 Cost\", \"Project 6 Cost\", \"Project 7 Cost\"} in table_id \"file_0_view_0\"\n- $c_{mp}$: Cost parameter, value from the cell at row with \"Manager\" = $m$ and column = project cost column for $p$ in table_id \"file_0_view_0\"\n- $x_{mp}$: Binary decision variable, equals 1 if manager $m$ is assigned to project $p$, 0 otherwise",
+  "csvqa_observation": "{\"tables\": [{\"table_id\": \"file_0_view_0\", \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP5/manager_project_costs.csv\", \"columns\": [\"Manager\", \"Project 1 Cost\", \"Project 2 Cost\", \"Project 3 Cost\", \"Project 4 Cost\", \"Project 5 Cost\", \"Project 6 Cost\", \"Project 7 Cost\"], \"records\": [{\"Manager\": \"Manager 1\", \"Project 1 Cost\": \"2972\", \"Project 2 Cost\": \"2727\", \"Project 3 Cost\": \"2795\", \"Project 4 Cost\": \"2922\", \"Project 5 Cost\": \"1302\", \"Project 6 Cost\": \"2489\", \"Project 7 Cost\": \"1533\"}, {\"Manager\": \"Manager 2\", \"Project 1 Cost\": \"1094\", \"Project 2 Cost\": \"2158\", \"Project 3 Cost\": \"2990\", \"Project 4 Cost\": \"1844\", \"Project 5 Cost\": \"2887\", \"Project 6 Cost\": \"2021\", \"Project 7 Cost\": \"2288\"}, {\"Manager\": \"Manager 3\", \"Project 1 Cost\": \"2133\", \"Project 2 Cost\": \"1675\", \"Project 3 Cost\": \"2422\", \"Project 4 Cost\": \"2639\", \"Project 5 Cost\": \"1033\", \"Project 6 Cost\": \"2261\", \"Project 7 Cost\": \"1695\"}, {\"Manager\": \"Manager 4\", \"Project 1 Cost\": \"1951\", \"Project 2 Cost\": \"2309\", \"Project 3 Cost\": \"2070\", \"Project 4 Cost\": \"2802\", \"Project 5 Cost\": \"2328\", \"Project 6 Cost\": \"1313\", \"Project 7 Cost\": \"2434\"}, {\"Manager\": \"Manager 5\", \"Project 1 Cost\": \"1269\", \"Project 2 Cost\": \"2153\", \"Project 3 Cost\": \"1296\", \"Project 4 Cost\": \"2685\", \"Project 5 Cost\": \"2627\", \"Project 6 Cost\": \"1610\", \"Project 7 Cost\": \"1641\"}, {\"Manager\": \"Manager 6\", \"Project 1 Cost\": \"1220\", \"Project 2 Cost\": \"1192\", \"Project 3 Cost\": \"2907\", \"Project 4 Cost\": \"2622\", \"Project 5 Cost\": \"2595\", \"Project 6 Cost\": \"1261\", \"Project 7 Cost\": \"2384\"}, {\"Manager\": \"Manager 7\", \"Project 1 Cost\": \"1286\", \"Project 2 Cost\": \"1659\", \"Project 3 Cost\": \"1179\", \"Project 4 Cost\": \"1348\", \"Project 5 Cost\": \"1420\", \"Project 6 Cost\": \"2862\", \"Project 7 Cost\": \"1959\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "DIRECT_FULL_SOURCE",
+  "csvqa_trace": "{\"status\": \"DIRECT_FULL_SOURCE\", \"formulation_protocol\": \"ReAct\", \"csvqa_call_count\": 0, \"planner_attempt_count\": 0, \"repair_count\": 0, \"fallback_count\": 0, \"retry_count\": 0, \"protocol_retry_count\": 0, \"protocol_retry_events\": \"[]\"}",
+  "solve_code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_problem():\n    csv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP5/manager_project_costs.csv'\n    tried_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']\n    for enc in tried_encodings:\n        try:\n            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False, encoding=enc)\n            break\n        except UnicodeDecodeError:\n            continue\n    else:\n        raise RuntimeError('Could not decode CSV with tried encodings.')\n    if 'Manager' not in df.columns:\n        raise ValueError(\"Missing 'Manager' column in input data.\")\n    manager_col = 'Manager'\n    project_cols = ['Project 1 Cost', 'Project 2 Cost', 'Project 3 Cost', 'Project 4 Cost', 'Project 5 Cost', 'Project 6 Cost', 'Project 7 Cost']\n    for col in project_cols:\n        if col not in df.columns:\n            raise ValueError(f'Missing project cost column: {col}')\n    managers = df[manager_col].tolist()\n    projects = project_cols.copy()\n    c = {}\n    for (idx, row) in df.iterrows():\n        m = row[manager_col]\n        c[m] = {}\n        for p in projects:\n            val = row[p]\n            try:\n                c[m][p] = float(val)\n            except ValueError:\n                raise ValueError(f\"Non-numeric cost for manager '{m}', project '{p}': '{val}'\")\n    if len(managers) != len(projects):\n        raise ValueError(f'Number of managers ({len(managers)}) does not match number of projects ({len(projects)}).')\n    for m in managers:\n        for p in projects:\n            if p not in c[m]:\n                raise ValueError(f\"Missing cost entry for manager '{m}', project '{p}'.\")\n    m = gp.Model('manager_project_assignment')\n    x_vars = m.addVars([(mgr, proj) for mgr in managers for proj in projects], vtype=GRB.BINARY, name='')\n    m.setObjective(gp.quicksum((c[mgr][proj] * x_vars[mgr, proj] for mgr in managers for proj in projects)), GRB.MINIMIZE)\n    m.addConstrs((gp.quicksum((x_vars[mgr, proj] for proj in projects)) == 1 for mgr in managers), name='')\n    m.addConstrs((gp.quicksum((x_vars[mgr, proj] for mgr in managers)) == 1 for proj in projects), name='')\n    m.Params.MIPGap = 0.0001\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal: {m.ObjVal}')\n        for var in m.getVars():\n            print(f'{var.VarName}: {var.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_problem()",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 8809.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      1.0
+    ],
+    [
+      "C7",
+      1.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      1.0
+    ],
+    [
+      "C19",
+      -0.0
+    ],
+    [
+      "C20",
+      -0.0
+    ],
+    [
+      "C21",
+      -0.0
+    ],
+    [
+      "C22",
+      -0.0
+    ],
+    [
+      "C23",
+      -0.0
+    ],
+    [
+      "C24",
+      -0.0
+    ],
+    [
+      "C25",
+      -0.0
+    ],
+    [
+      "C26",
+      1.0
+    ],
+    [
+      "C27",
+      -0.0
+    ],
+    [
+      "C28",
+      0.0
+    ],
+    [
+      "C29",
+      -0.0
+    ],
+    [
+      "C30",
+      1.0
+    ],
+    [
+      "C31",
+      -0.0
+    ],
+    [
+      "C32",
+      -0.0
+    ],
+    [
+      "C33",
+      -0.0
+    ],
+    [
+      "C34",
+      -0.0
+    ],
+    [
+      "C35",
+      -0.0
+    ],
+    [
+      "C36",
+      1.0
+    ],
+    [
+      "C37",
+      -0.0
+    ],
+    [
+      "C38",
+      -0.0
+    ],
+    [
+      "C39",
+      -0.0
+    ],
+    [
+      "C40",
+      -0.0
+    ],
+    [
+      "C41",
+      -0.0
+    ],
+    [
+      "C42",
+      -0.0
+    ],
+    [
+      "C43",
+      -0.0
+    ],
+    [
+      "C44",
+      0.0
+    ],
+    [
+      "C45",
+      1.0
+    ],
+    [
+      "C46",
+      -0.0
+    ],
+    [
+      "C47",
+      -0.0
+    ],
+    [
+      "C48",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 9.131,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "5ddad9b79a56ba8572d74f743afee427e23d6237567f19eb1ea2dfbd1fc32a81",
+  "cache_fingerprint": "c6a9b4b2041cfe451c4b229e130377137efd12dda9934ce292d519eb42249277",
+  "evaluated_utc": "2026-10-06T07:59:41.131721+00:00"
+}

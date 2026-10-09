@@ -1,0 +1,98 @@
+Let $x_i$ be the number of units of vehicle type $i$ to order daily, where $i$ indexes the vehicle types as listed in the original "products.csv" file.
+
+**Objective Function:**
+
+\[
+\max \Big(
+1752\,x_{\text{Sedan}}
++ 1856\,x_{\text{SUV}}
++ 8372\,x_{\text{Truck}}
++ 6168\,x_{\text{Convertible}}
++ 9681\,x_{\text{Minivan}}
++ 8062\,x_{\text{Coupe}}
++ 3895\,x_{\text{Hatchback}}
++ 3254\,x_{\text{Station Wagon}}
++ 1701\,x_{\text{Electric Car}}
++ 6799\,x_{\text{Hybrid Car}}
++ 2724\,x_{\text{Luxury Sedan}}
++ 6304\,x_{\text{Sports Car}}
++ 3255\,x_{\text{Crossover}}
++ 1923\,x_{\text{Diesel Truck}}
++ 4103\,x_{\text{Compact SUV}}
++ 4429\,x_{\text{Luxury SUV}}
++ 2663\,x_{\text{Cargo Van}}
++ 1691\,x_{\text{Pickup Truck}}
++ 5632\,x_{\text{Roadster}}
++ 4793\,x_{\text{Muscle Car}}
++ 1343\,x_{\text{Off-road Vehicle}}
++ 9124\,x_{\text{Camper Van}}
++ 3652\,x_{\text{Compact Car}}
++ 8842\,x_{\text{Motorcycle}}
++ 9176\,x_{\text{Electric SUV}}
+\Big)
+\]
+
+**Subject to:**
+
+\[
+15\,x_{\text{Sedan}}
++ 87\,x_{\text{SUV}}
++ 36\,x_{\text{Truck}}
++ 30\,x_{\text{Convertible}}
++ 33\,x_{\text{Minivan}}
++ 72\,x_{\text{Coupe}}
++ 75\,x_{\text{Hatchback}}
++ 71\,x_{\text{Station Wagon}}
++ 51\,x_{\text{Electric Car}}
++ 21\,x_{\text{Hybrid Car}}
++ 97\,x_{\text{Luxury Sedan}}
++ 52\,x_{\text{Sports Car}}
++ 25\,x_{\text{Crossover}}
++ 15\,x_{\text{Diesel Truck}}
++ 54\,x_{\text{Compact SUV}}
++ 57\,x_{\text{Luxury SUV}}
++ 18\,x_{\text{Cargo Van}}
++ 69\,x_{\text{Pickup Truck}}
++ 26\,x_{\text{Roadster}}
++ 38\,x_{\text{Muscle Car}}
++ 31\,x_{\text{Off-road Vehicle}}
++ 74\,x_{\text{Camper Van}}
++ 82\,x_{\text{Compact Car}}
++ 49\,x_{\text{Motorcycle}}
++ 64\,x_{\text{Electric SUV}}
+\leq 1576
+\]
+
+\[
+x_i \in \mathbb{Z}_{\geq 0} \quad \text{for all vehicle types } i
+\]
+
+**Where:**
+
+- $x_{\text{Sedan}}$ = number of Sedans to order daily
+- $x_{\text{SUV}}$ = number of SUVs to order daily
+- $x_{\text{Truck}}$ = number of Trucks to order daily
+- $x_{\text{Convertible}}$ = number of Convertibles to order daily
+- $x_{\text{Minivan}}$ = number of Minivans to order daily
+- $x_{\text{Coupe}}$ = number of Coupes to order daily
+- $x_{\text{Hatchback}}$ = number of Hatchbacks to order daily
+- $x_{\text{Station Wagon}}$ = number of Station Wagons to order daily
+- $x_{\text{Electric Car}}$ = number of Electric Cars to order daily
+- $x_{\text{Hybrid Car}}$ = number of Hybrid Cars to order daily
+- $x_{\text{Luxury Sedan}}$ = number of Luxury Sedans to order daily
+- $x_{\text{Sports Car}}$ = number of Sports Cars to order daily
+- $x_{\text{Crossover}}$ = number of Crossovers to order daily
+- $x_{\text{Diesel Truck}}$ = number of Diesel Trucks to order daily
+- $x_{\text{Compact SUV}}$ = number of Compact SUVs to order daily
+- $x_{\text{Luxury SUV}}$ = number of Luxury SUVs to order daily
+- $x_{\text{Cargo Van}}$ = number of Cargo Vans to order daily
+- $x_{\text{Pickup Truck}}$ = number of Pickup Trucks to order daily
+- $x_{\text{Roadster}}$ = number of Roadsters to order daily
+- $x_{\text{Muscle Car}}$ = number of Muscle Cars to order daily
+- $x_{\text{Off-road Vehicle}}$ = number of Off-road Vehicles to order daily
+- $x_{\text{Camper Van}}$ = number of Camper Vans to order daily
+- $x_{\text{Compact Car}}$ = number of Compact Cars to order daily
+- $x_{\text{Motorcycle}}$ = number of Motorcycles to order daily
+- $x_{\text{Electric SUV}}$ = number of Electric SUVs to order daily
+
+All variables are nonnegative integers.

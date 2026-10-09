@@ -1,0 +1,131 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Extract table records
+table = None
+for t in CSVQA_DATA["tables"]:
+    if t["table_id"] == "file_0_view_0":
+        table = t
+        break
+if table is None:
+    raise ValueError("Table file_0_view_0 not found in CSVQA_DATA.")
+
+records = table["records"]
+
+# Identify index set I: products where Product Name starts with "TABLET_"
+I = []
+a = {}
+d = {}
+s = {}
+
+for rec in records:
+    pname = rec["values"].get("Product Name")
+    if pname is None:
+        raise ValueError("Missing 'Product Name' in a record.")
+    if re.match(r"^TABLET_", str(pname)):
+        I.append(pname)
+        # Parse parameters
+        try:
+            a_val = rec["values"]["Revenue"]
+            d_val = rec["values"]["Demand"]
+            s_val = rec["values"]["Initial Inventory"]
+        except KeyError as e:
+            raise ValueError(f"Missing required column in record: {e}")
+        # Try to parse as int, fallback to float if needed
+        try:
+            a[pname] = int(a_val)
+        except:
+            a[pname] = float(a_val)
+        try:
+            d[pname] = int(d_val)
+        except:
+            d[pname] = float(d_val)
+        try:
+            s[pname] = int(s_val)
+        except:
+            s[pname] = float(s_val)
+
+# Validate all coefficients are present for all I
+for pname in I:
+    if pname not in a or pname not in d or pname not in s:
+        raise ValueError(f"Missing parameter for product {pname}.")
+
+# Build model
+m = gp.Model('Tablet_Revenue_Max')
+x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Objective: maximize total revenue
+m.setObjective(gp.quicksum(a[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+# Constraints: demand and inventory
+m.addConstrs((x[i] <= d[i] for i in I), name='')
+m.addConstrs((x[i] <= s[i] for i in I), name='')
+
+# Set MIPGap
+m.Params.MIPGap = 1e-4
+
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 54 rows, 27 columns and 54 nonzeros
+Model fingerprint: 0x8062437e
+Variable types: 0 continuous, 27 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+03, 5e+04]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+00, 3e+02]
+Found heuristic solution: objective 5486959.8300
+Presolve removed 54 rows and 27 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 5.48696e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 5.486959830000e+06, best bound 5.486959830000e+06, gap 0.0000%
+ObjVal: 5486959.829999999
+C0: 2.0
+C1: 43.0
+C2: 6.0
+C3: 6.0
+C4: 20.0
+C5: 22.0
+C6: 3.0
+C7: 16.0
+C8: 2.0
+C9: 2.0
+C10: 32.0
+C11: 14.0
+C12: 2.0
+C13: 2.0
+C14: 6.0
+C15: 2.0
+C16: 6.0
+C17: 2.0
+C18: 6.0
+C19: 6.0
+C20: 6.0
+C21: 12.0
+C22: 60.0
+C23: 8.0
+C24: 8.0
+C25: 38.0
+C26: 4.0
+Optimal objective: 5486959.829999999
+Optimal solution: [('C0', 2.0), ('C1', 43.0), ('C2', 6.0), ('C3', 6.0), ('C4', 20.0), ('C5', 22.0), ('C6', 3.0), ('C7', 16.0), ('C8', 2.0), ('C9', 2.0), ('C10', 32.0), ('C11', 14.0), ('C12', 2.0), ('C13', 2.0), ('C14', 6.0), ('C15', 2.0), ('C16', 6.0), ('C17', 2.0), ('C18', 6.0), ('C19', 6.0), ('C20', 6.0), ('C21', 12.0), ('C22', 60.0), ('C23', 8.0), ('C24', 8.0), ('C25', 38.0), ('C26', 4.0)]

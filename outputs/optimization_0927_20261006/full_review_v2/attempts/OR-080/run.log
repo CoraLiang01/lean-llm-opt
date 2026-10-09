@@ -1,0 +1,434 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mQuestion: A logistics company has 10 candidate trucks available to transport goods over four consecutive time periods. The customer demands in periods 1 through 4 are 1,500 kg, 2,000 kg, 1,800 kg, and 1,000 kg. Each truck's maximum capacity, startup cost, and unit transportation cost are provided in parameters.csv. All trucks are initially off immediately before period 1, and activating a truck in period 1 or any later period incurs its startup cost.
+
+    Once a truck is started, it must remain active for at least two consecutive periods, so a truck may not be started in period 4. If a truck is shut down in period t after being active in period t-1, it must remain inactive in both period t and period t+1 and cannot be restarted before period t+2. An inactive truck must transport zero weight, while the weight transported by an active truck cannot exceed its maximum capacity.
+
+    For each truck, the change in transported weight between two adjacent periods, including transitions to or from zero load, cannot exceed 300 kg. In every period, the total transported weight must be at least the customer demand. A 10% spare-capacity buffer must also be maintained, so the total transported weight in each period cannot exceed 90% of the combined maximum capacity of the trucks active in that period.
+
+    Determine the truck activation, startup, and transported-weight schedule that minimizes total startup and transportation costs.
+
+Thought: I need to identify the mathematical structure: the objective is to minimize total startup and transportation costs. Decision variables include binary truck activation (on/off), startup decisions, and continuous transported weights per truck per period. Constraints include minimum up-time (once started, a truck must stay on for at least two periods), minimum down-time (after shutdown, a truck must stay off for two periods), load ramping (change in transported weight per truck per period ≤ 300 kg), per-truck capacity, inactivity implies zero load, total transported weight per period ≥ demand, and total transported weight per period ≤ 90% of active trucks' combined capacity. There is strong coupling between activation, startup, and transported-weight decisions, with logical dependencies and ramping constraints.
+
+Action: FileQA
+
+Action Input: multi-period truck activation and startup scheduling with minimum up-time and down-time constraints, per-truck transported weights, ramping (max change per period), per-truck capacity, inactivity implies zero load, total transported weight per period meets demand and does not exceed 90% of active trucks' combined capacity, minimize total startup and transportation costs
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP
+
+[Retrieved example 2]
+prompt: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Type: Mixture
+
+[Retrieved example 3]
+prompt: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Type: Mixture
+
+[Retrieved example 4]
+prompt: A factory needs to rent a warehouse to store materials for the next 4 months. The required warehouse area for each month is listed in 39-1.csv.The longer the rental contract period, the greater the discount on warehouse rental fees. The specific data is listed in 39-2.csv.
+
+The warehouse rental contract can be processed at the beginning of each month, and each contract specifies the rental area and period. Therefore, the factory can rent a contract on any month, and each time, they can sign one contract or multiple contracts with different rental areas and rental periods. The overall goal is to minimize the rental fees paid. Try to establish a linear programming mathematical model based on the above requirements.
+Type: Others
+
+[Retrieved example 5]
+prompt: In the Superstore chain, multiple branches require inventory replenishment, and several suppliers located in different cities can provide the necessary goods. Each supplier incurs a fixed cost upon starting operations, with the fixed cost data provided in the 'fixed_cost.csv' file. Each branch needs to source a certain quantity of goods from these suppliers. For each branch, the transportation cost per unit of goods from each supplier is recorded in the 'transportation_costs.csv' file. Demand information can be gained in 'demand.csv'. The objective is to determine which suppliers to activate so that the demand of all branches is met while minimizing the total cost. Suppliers have no additional capacity limits in this instance. Let y_i indicate whether supplier i is activated, and let x_ij be the nonnegative continuous quantity shipped from supplier i to branch j. Each branch must receive exactly its demand, and inactive suppliers cannot ship any goods.
+Type: UFLP[0m
+Thought:[32;1m[1;3mThought: The problem involves multi-period truck activation and scheduling with minimum up-time and down-time constraints, per-truck transported weights, ramping (max change per period), per-truck capacity, inactivity implies zero load, and system-wide demand and spare-capacity constraints. The objective is to minimize total startup and transportation costs. The retrieved examples include a canonical transportation problem (TP), but that example lacks activation, startup, ramping, and logical dependency constraints. Other retrieved examples with activation/setup and production/assignment coupling are labeled Mixture. The current problem contains strong coupling between binary activation/startup, logical minimum up/down time, ramping, and continuous transported weights, which materially interact and go beyond any single canonical class.
+
+Final Answer: Mixture[0m
+
+[1m> Finished chain.[0m
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+Maximize
+39.62 x_1 - 178539 y_1 + 35.98 x_2 - 157708 y_2 + 37.96 x_3 - 85192 y_3
+
+Subject to
+x_1 <= 5732 (demand)
+x_1 <= 12892 (22-day individual production quota)
+x_1 >= 18 y_1 (minimum batch)
+x_1 <= 5732 y_1 (activation)
+x_2 <= 5607 (demand)
+x_2 <= 7238 (22-day individual production quota)
+x_2 >= 25 y_2 (minimum batch)
+x_2 <= 5607 y_2 (activation)
+x_3 <= 4653 (demand)
+x_3 <= 11902 (22-day individual production quota)
+x_3 >= 23 y_3 (minimum batch)
+x_3 <= 4653 y_3 (activation)
+x_1/586 + x_2/329 + x_3/541 <= 22 (shared production days)
+x_1, x_2, x_3 >= 0 integer; y_1, y_2, y_3 binary.
+
+###### Retrieved Information
+
+{
+  "daily_quota": {
+    "1": 586,
+    "2": 329,
+    "3": 541
+  },
+  "demand": {
+    "1": 5732,
+    "2": 5607,
+    "3": 4653
+  },
+  "fixed_cost": {
+    "1": 178539,
+    "2": 157708,
+    "3": 85192
+  },
+  "min_batch": {
+    "1": 18,
+    "2": 25,
+    "3": 23
+  },
+  "products": [
+    "A1",
+    "A2",
+    "A3"
+  ],
+  "profit": {
+    "1": 39.62,
+    "2": 35.98,
+    "3": 37.96
+  },
+  "quota": {
+    "1": 12892,
+    "2": 7238,
+    "3": 11902
+  }
+}
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A factory needs to rent a warehouse to store materials for the next 4 months. The required warehouse area for each month is listed in 39-1.csv.The longer the rental contract period, the greater the discount on warehouse rental fees. The specific data is listed in 39-2.csv.
+
+The warehouse rental contract can be processed at the beginning of each month, and each contract specifies the rental area and period. Therefore, the factory can rent a contract on any month, and each time, they can sign one contract or multiple contracts with different rental areas and rental periods. The overall goal is to minimize the rental fees paid. Try to establish a linear programming mathematical model based on the above requirements.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+28\, (x_{1,1} + x_{2,1} + x_{3,1} + x_{4,1})
++ 45\, (x_{1,2} + x_{2,2} + x_{3,2})
++ 60\, (x_{1,3} + x_{2,3})
++ 73\, x_{1,4}
+$$
+
+**subject to**
+
+$$
+x_{1,1} + x_{1,2} + x_{1,3} + x_{1,4} \geq 1500 
+\quad (\text{month 1})
+$$
+
+$$
+x_{1,2} + x_{1,3} + x_{1,4} + x_{2,1} + x_{2,2} + x_{2,3} \geq 1000 
+\quad (\text{month 2})
+$$
+
+$$
+x_{1,3} + x_{1,4} + x_{2,2} + x_{2,3} + x_{3,1} + x_{3,2} \geq 2000 
+\quad (\text{month 3})
+$$
+
+$$
+x_{1,4} + x_{2,3} + x_{3,2} + x_{4,1} \geq 1200 
+\quad (\text{month 4})
+$$
+
+**where**
+
+$$
+x_{s,p} \geq 0 
+\quad \text{for } s \in \{1,2,3,4\},\ p \in \{1,2,3,4\}
+\quad \text{only if } s+p-1 \leq 4
+$$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal activation, startup, and transported-weight schedule for 10 candidate trucks over 4 periods to meet customer demand (with a 10% spare-capacity buffer), minimize total startup and transportation costs, and respect truck-specific capacity, startup, ramping, and minimum up/down time constraints.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with fixed-charge (startup) and ramping/minimum up/down time constraints.
+3.  **Define Index Sets:** The primary indices are Trucks (i ∈ {1,…,10}) and Periods (t ∈ {1,2,3,4}).
+4.  **Define Decision Variables:**
+    -   `x[i,t]` = Amount of goods (kg) transported by truck i in period t. Type: GRB.CONTINUOUS, x[i,t] ≥ 0.
+    -   `y[i,t]` = 1 if truck i is active (on) in period t, 0 otherwise. Type: GRB.BINARY.
+    -   `z[i,t]` = 1 if truck i is started up at the beginning of period t, 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   Truck maximum capacity: `Q[i]` (from column 'Q').
+    -   Truck startup cost: `S[i]` (from column 'S').
+    -   Truck unit transportation cost: `C[i]` (from column 'C').
+    -   Customer demand per period: `d[t]` (from columns 'd1', 'd2', 'd3', 'd4'; same for all trucks).
+6.  **Formulate Objective:** Minimize total cost, which is the sum over all trucks and periods of (startup cost × startup indicator) plus (unit transportation cost × transported amount):  
+    Minimize ∑_{i,t} S[i] * z[i,t] + ∑_{i,t} C[i] * x[i,t].
+7.  **Formulate Constraints:**
+    -   **Demand Satisfaction:** For each period t, the total transported weight across all trucks must be at least the customer demand:  
+        ∑_{i} x[i,t] ≥ d[t].
+    -   **Spare-Capacity Buffer:** For each period t, the total transported weight cannot exceed 90% of the combined maximum capacity of active trucks:  
+        ∑_{i} x[i,t] ≤ 0.9 * ∑_{i} Q[i] * y[i,t].
+    -   **Truck Capacity:** For each truck i and period t, the transported weight cannot exceed the truck's capacity if active, and must be zero if inactive:  
+        0 ≤ x[i,t] ≤ Q[i] * y[i,t].
+    -   **Startup Definition:** For each truck i and period t, startup occurs if the truck is off in t-1 and on in t:  
+        z[i,1] = y[i,1] (since all trucks are initially off);  
+        For t > 1: z[i,t] ≥ y[i,t] - y[i,t-1].
+    -   **Minimum Up-Time:** If a truck is started in period t, it must remain active in period t and t+1 (cannot be started in period 4):  
+        For t ∈ {1,2,3}: z[i,t] ≤ y[i,t] and z[i,t] ≤ y[i,t+1];  
+        z[i,4] = 0 (no startups allowed in period 4).
+    -   **Minimum Down-Time:** If a truck is shut down in period t (i.e., y[i,t-1]=1, y[i,t]=0), it must remain off in t and t+1, and cannot be restarted before t+2:  
+        For t ∈ {1,2,3}: y[i,t-1] - y[i,t] ≤ 1 - y[i,t+1];  
+        For t ∈ {1,2}: y[i,t-1] - y[i,t] ≤ 1 - y[i,t+2].
+    -   **Ramping Constraint:** For each truck i and periods t=1 to 3, the change in transported weight between adjacent periods cannot exceed 300 kg (including transitions to/from zero):  
+        |x[i,t+1] - x[i,t]| ≤ 300.
+    -   **Initial State:** All trucks are off before period 1 (y[i,0]=0 for all i).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+
+# Read parameters.csv with explicit dtype and no NA conversion
+param_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv'
+df = pd.read_csv(param_path, sep=',', dtype=str, keep_default_na=False)
+
+# Normalize and extract truck IDs (as int)
+truck_ids = df['truck_id'].astype(int).tolist()
+num_trucks = len(truck_ids)
+
+# Periods: 1..4
+periods = [1, 2, 3, 4]
+
+# Extract truck parameters as dicts keyed by truck_id (int)
+Q_dict = dict(zip(df['truck_id'].astype(int), df['Q'].astype(float)))
+S_dict = dict(zip(df['truck_id'].astype(int), df['S'].astype(float)))
+C_dict = dict(zip(df['truck_id'].astype(int), df['C'].astype(float)))
+
+# Extract demand per period (from any row, as all are identical)
+demand_cols = ['d1', 'd2', 'd3', 'd4']
+demand = {}
+for t, col in enumerate(demand_cols, 1):
+    val = df.iloc[0][col]
+    demand[t] = float(val)
+
+# Validate that all trucks have required parameters
+for i in truck_ids:
+    if i not in Q_dict or i not in S_dict or i not in C_dict:
+        raise ValueError(f"Missing parameter for truck {i}")
+
+# Model
+m = gp.Model("TruckScheduling")
+
+# Decision variables
+# x[i,t]: amount transported by truck i in period t (continuous, >=0)
+x_vars = m.addVars(truck_ids, periods, lb=0.0, vtype=gp.GRB.CONTINUOUS, name='x')
+
+# y[i,t]: 1 if truck i is active in period t, 0 otherwise (binary)
+y_vars = m.addVars(truck_ids, periods, vtype=gp.GRB.BINARY, name='y')
+
+# z[i,t]: 1 if truck i is started up at beginning of period t, 0 otherwise (binary)
+z_vars = m.addVars(truck_ids, periods, vtype=gp.GRB.BINARY, name='z')
+
+# Objective: Minimize total startup and transportation costs
+startup_cost = gp.quicksum(S_dict[i] * z_vars[i, t] for i in truck_ids for t in periods)
+transp_cost = gp.quicksum(C_dict[i] * x_vars[i, t] for i in truck_ids for t in periods)
+m.setObjective(startup_cost + transp_cost, gp.GRB.MINIMIZE)
+
+# Constraints
+
+# 1. Demand satisfaction: sum_i x[i,t] >= demand[t] for all t
+for t in periods:
+    m.addConstr(gp.quicksum(x_vars[i, t] for i in truck_ids) >= demand[t], name=f'demand_{t}')
+
+# 2. Spare-capacity buffer: sum_i x[i,t] <= 0.9 * sum_i Q[i] * y[i,t] for all t
+for t in periods:
+    m.addConstr(
+        gp.quicksum(x_vars[i, t] for i in truck_ids) <=
+        0.9 * gp.quicksum(Q_dict[i] * y_vars[i, t] for i in truck_ids),
+        name=f'sparecap_{t}'
+    )
+
+# 3. Truck capacity: 0 <= x[i,t] <= Q[i] * y[i,t] for all i, t
+for i in truck_ids:
+    for t in periods:
+        m.addConstr(x_vars[i, t] <= Q_dict[i] * y_vars[i, t], name=f'cap_{i}_{t}')
+
+# 4. Startup definition
+for i in truck_ids:
+    # Initial state: all trucks off before period 1
+    # z[i,1] = y[i,1]
+    m.addConstr(z_vars[i, 1] == y_vars[i, 1], name=f'startup_init_{i}')
+    # For t > 1: z[i,t] >= y[i,t] - y[i,t-1]
+    for t in [2, 3, 4]:
+        m.addConstr(z_vars[i, t] >= y_vars[i, t] - y_vars[i, t-1], name=f'startup_def_{i}_{t}')
+
+# 5. Minimum up-time: If started at t, must be on at t and t+1 (cannot start in t=4)
+for i in truck_ids:
+    for t in [1, 2, 3]:
+        m.addConstr(z_vars[i, t] <= y_vars[i, t], name=f'minut_{i}_{t}_a')
+        m.addConstr(z_vars[i, t] <= y_vars[i, t+1], name=f'minut_{i}_{t}_b')
+    # No startups allowed in period 4
+    m.addConstr(z_vars[i, 4] == 0, name=f'nostart4_{i}')
+
+# 6. Minimum down-time: If shut down at t (on at t-1, off at t), must be off at t and t+1, can't restart before t+2
+for i in truck_ids:
+    # For t=1, y[i,0]=0 (initially off)
+    # For t=1, y[i,0]=0, so y[i,0]-y[i,1]= -y[i,1] <= 1 - y[i,2]
+    # But since y[i,0]=0, this is always satisfied, so skip t=1 for down-time
+    for t in [2, 3, 4]:
+        # y[i,t-1] - y[i,t] <= 1 - y[i,t+1] (for t=2,3; for t=4, t+1=5 is out of range)
+        if t < 4:
+            m.addConstr(y_vars[i, t-1] - y_vars[i, t] <= 1 - y_vars[i, t+1], name=f'mindown1_{i}_{t}')
+        # For t=2,3: y[i,t-1] - y[i,t] <= 1 - y[i,t+2]
+        if t < 3:
+            m.addConstr(y_vars[i, t-1] - y_vars[i, t] <= 1 - y_vars[i, t+2], name=f'mindown2_{i}_{t}')
+
+# 7. Ramping constraint: |x[i,t+1] - x[i,t]| <= 300 for t=1,2,3
+for i in truck_ids:
+    for t in [1, 2, 3]:
+        m.addConstr(x_vars[i, t+1] - x_vars[i, t] <= 300, name=f'rampup_{i}_{t}')
+        m.addConstr(x_vars[i, t] - x_vars[i, t+1] <= 300, name=f'rampdown_{i}_{t}')
+
+# 8. Inactive truck must transport zero weight (already enforced by x[i,t] <= Q[i]*y[i,t] and x[i,t] >= 0)
+
+# 9. All variables are already bounded appropriately
+
+# Optimize
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 248 rows, 120 columns and 650 nonzeros
+Model fingerprint: 0x426780da
+Variable types: 40 continuous, 80 integer (80 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+03]
+  Objective range  [2e+00, 5e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 2e+03]
+Found heuristic solution: objective 20625.000000
+Presolve removed 100 rows and 30 columns
+Presolve time: 0.00s
+Presolved: 148 rows, 90 columns, 480 nonzeros
+Variable types: 40 continuous, 50 integer (50 binary)
+
+Root relaxation: objective 1.418000e+04, 63 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 14180.0000    0    8 20625.0000 14180.0000  31.2%     -    0s
+H    0     0                    15150.000000 14180.0000  6.40%     -    0s
+H    0     0                    14330.000000 14180.0000  1.05%     -    0s
+H    0     0                    14300.000000 14180.0000  0.84%     -    0s
+     0     0 14262.8571    0   17 14300.0000 14262.8571  0.26%     -    0s
+     0     0 14266.6667    0   18 14300.0000 14266.6667  0.23%     -    0s
+     0     0 14273.3333    0    6 14300.0000 14273.3333  0.19%     -    0s
+     0     0 14300.0000    0   10 14300.0000 14300.0000  0.00%     -    0s
+
+Cutting planes:
+  Learned: 2
+  Gomory: 1
+  Cover: 1
+  Implied bound: 1
+  MIR: 3
+  Flow cover: 4
+  Mod-K: 1
+  RLT: 1
+
+Explored 1 nodes (94 simplex iterations) in 0.01 seconds (0.01 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 4: 14300 14330 15150 20625 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.430000000000e+04, best bound 1.430000000000e+04, gap 0.0000%
+Optimal objective: 14300.0
+Optimal solution: [('C0', 800.0), ('C1', 1000.0), ('C2', 900.0), ('C3', 600.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 200.0), ('C31', 0.0), ('C32', 700.0), ('C33', 1000.0), ('C34', 700.0), ('C35', 400.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 1.0), ('C41', 1.0), ('C42', 1.0), ('C43', 1.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', 0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', 0.0), ('C52', -0.0), ('C53', -0.0), ('C54', -0.0), ('C55', 0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', 0.0), ('C60', -0.0), ('C61', -0.0), ('C62', -0.0), ('C63', 0.0), ('C64', -0.0), ('C65', -0.0), ('C66', -0.0), ('C67', 0.0), ('C68', 1.0), ('C69', 1.0), ('C70', 1.0), ('C71', 1.0), ('C72', 1.0), ('C73', 1.0), ('C74', 1.0), ('C75', 1.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', 0.0), ('C80', 1.0), ('C81', -0.0), ('C82', -0.0), ('C83', 0.0), ('C84', 0.0), ('C85', -0.0), ('C86', -0.0), ('C87', 0.0), ('C88', 0.0), ('C89', -0.0), ('C90', -0.0), ('C91', 0.0), ('C92', 0.0), ('C93', -0.0), ('C94', -0.0), ('C95', 0.0), ('C96', 0.0), ('C97', -0.0), ('C98', -0.0), ('C99', 0.0), ('C100', 0.0), ('C101', -0.0), ('C102', -0.0), ('C103', 0.0), ('C104', 0.0), ('C105', -0.0), ('C106', -0.0), ('C107', 0.0), ('C108', 1.0), ('C109', -0.0), ('C110', -0.0), ('C111', 0.0), ('C112', 1.0), ('C113', -0.0), ('C114', -0.0), ('C115', 0.0), ('C116', 0.0), ('C117', -0.0), ('C118', -0.0), ('C119', 0.0)]

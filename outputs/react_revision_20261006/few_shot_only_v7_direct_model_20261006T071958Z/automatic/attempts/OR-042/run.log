@@ -1,0 +1,172 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I have the required current data and can formulate the model.
+Final Answer:
+ABSTRACT MATHEMATICAL MODEL
+
+Sets:
+- $I$: set of drug types, indexed by $i$ (from all ProductName in products.csv)
+
+Parameters:
+- $v_i$: benefit coefficient of drug $i$ (Value column in products.csv)
+- $w_i$: weight per unit of drug $i$ (Weight column in products.csv)
+- $C$: total inventory capacity (Capacity column in capacity.csv)
+
+Decision Variables:
+- $x_i \in \mathbb{Z}_{\geq 0}$: number of units of drug $i$ to order daily
+
+Objective:
+\[
+\max \sum_{i \in I} v_i x_i
+\]
+
+Subject to:
+\[
+\sum_{i \in I} w_i x_i \leq C
+\]
+\[
+x_i \in \mathbb{Z}_{\geq 0} \quad \forall i \in I
+\]
+
+DATA MAPPING
+
+- $I$: All records ProductName in table_id file_1_view_0, column ProductName
+- $v_i$: table_id file_1_view_0, column Value, keyed by ProductName
+- $w_i$: table_id file_1_view_0, column Weight, keyed by ProductName
+- $C$: table_id file_0_view_0, column Capacity (single value)
+- $x_i$: decision variable for each $i \in I$[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read products.csv
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/products.csv"
+    try:
+        products_df = pd.read_csv(products_path, dtype=str, keep_default_na=False, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            products_df = pd.read_csv(products_path, dtype=str, keep_default_na=False, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                products_df = pd.read_csv(products_path, dtype=str, keep_default_na=False, encoding='gbk')
+            except UnicodeDecodeError:
+                products_df = pd.read_csv(products_path, dtype=str, keep_default_na=False, encoding='latin-1')
+
+    # Read capacity.csv
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/capacity.csv"
+    try:
+        capacity_df = pd.read_csv(capacity_path, dtype=str, keep_default_na=False, encoding='utf-8-sig')
+    except UnicodeDecodeError:
+        try:
+            capacity_df = pd.read_csv(capacity_path, dtype=str, keep_default_na=False, encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                capacity_df = pd.read_csv(capacity_path, dtype=str, keep_default_na=False, encoding='gbk')
+            except UnicodeDecodeError:
+                capacity_df = pd.read_csv(capacity_path, dtype=str, keep_default_na=False, encoding='latin-1')
+
+    # Extract set I (ProductName)
+    if 'ProductName' not in products_df.columns or 'Value' not in products_df.columns or 'Weight' not in products_df.columns:
+        raise ValueError("products.csv must contain columns: ProductName, Value, Weight")
+    I = products_df['ProductName'].tolist()
+
+    # Extract v_i and w_i as dictionaries keyed by ProductName
+    try:
+        v_i = products_df.set_index('ProductName')['Value'].astype(float).to_dict()
+        w_i = products_df.set_index('ProductName')['Weight'].astype(float).to_dict()
+    except Exception as e:
+        raise ValueError(f"Error converting Value or Weight to float: {e}")
+
+    # Extract C (single value)
+    if 'Capacity' not in capacity_df.columns:
+        raise ValueError("capacity.csv must contain column: Capacity")
+    try:
+        C = float(capacity_df['Capacity'].iloc[0])
+    except Exception as e:
+        raise ValueError(f"Error converting Capacity to float: {e}")
+
+    # Validate all required coefficients are present for every i in I
+    missing_v = [i for i in I if i not in v_i]
+    missing_w = [i for i in I if i not in w_i]
+    if missing_v or missing_w:
+        raise ValueError(f"Missing Value or Weight for products: {missing_v + missing_w}")
+
+    # Build model
+    m = gp.Model('Pharmacy_Inventory')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    quantity_vars = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize sum_i v_i x_i
+    m.setObjective(gp.quicksum(v_i[i] * quantity_vars[i] for i in I), GRB.MAXIMIZE)
+
+    # Constraint: sum_i w_i x_i <= C
+    m.addConstr(gp.quicksum(w_i[i] * quantity_vars[i] for i in I) <= C, name='capacity')
+
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 20 columns and 20 nonzeros
+Model fingerprint: 0xf58bd490
+Variable types: 0 continuous, 20 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [5e+01, 5e+02]
+  Objective range  [3e+02, 1e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+03, 4e+03]
+Found heuristic solution: objective 47970.000000
+Presolve removed 1 rows and 20 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 81918 47970 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 8.191800000000e+04, best bound 8.191800000000e+04, gap 0.0000%
+ObjVal: 81918.0
+C0: -0.0
+C1: -0.0
+C2: -0.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: 82.0
+C10: -0.0
+C11: -0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+Optimal objective: 81918.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', -0.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', 82.0), ('C10', -0.0), ('C11', -0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0)]

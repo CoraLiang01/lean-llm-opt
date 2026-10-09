@@ -1,0 +1,119 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/UFLP_testing/UFLP9/demand.csv",
+    "values": {
+      "document_page_count": "8",
+      "archive_revision_number": "4",
+      "customer": "C1",
+      "demand": "1083",
+      "record_view_count": "76",
+      "archive_batch_number": "301"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/UFLP_testing/UFLP9/demand.csv",
+    "values": {
+      "document_page_count": "6",
+      "archive_revision_number": "5",
+      "customer": "C2",
+      "demand": "776",
+      "record_view_count": "58",
+      "archive_batch_number": "304"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/UFLP_testing/UFLP9/demand.csv",
+    "values": {
+      "document_page_count": "2",
+      "archive_revision_number": "2",
+      "customer": "C3",
+      "demand": "16214",
+      "record_view_count": "27",
+      "archive_batch_number": "301"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/UFLP_testing/UFLP9/fixed_cost.csv",
+    "values": {
+      "archive_batch_number": "301",
+      "document_page_count": "8",
+      "archive_revision_number": "2",
+      "Unnamed: 0": "S1",
+      "record_view_count": "43",
+      "fixed_costs": "102.33"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/UFLP_testing/UFLP9/fixed_cost.csv",
+    "values": {
+      "archive_batch_number": "301",
+      "document_page_count": "6",
+      "archive_revision_number": "4",
+      "Unnamed: 0": "S2",
+      "record_view_count": "27",
+      "fixed_costs": "94.92"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/UFLP_testing/UFLP9/fixed_cost.csv",
+    "values": {
+      "archive_batch_number": "305",
+      "document_page_count": "8",
+      "archive_revision_number": "2",
+      "Unnamed: 0": "S3",
+      "record_view_count": "58",
+      "fixed_costs": "91.83"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/UFLP_testing/UFLP9/transportation_costs.csv",
+    "values": {
+      "document_template_family": "Standard",
+      "record_label_font": "Helvetica",
+      "Unnamed: 0": "S1",
+      "archive_storage_medium": "Paper",
+      "C1": "1506.22",
+      "C2": "70.9",
+      "record_display_theme": "Olive",
+      "C3": "8.44",
+      "archive_revision_number": "4",
+      "record_view_count": "76",
+      "archive_batch_number": "301",
+      "document_page_count": "6"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/UFLP_testing/UFLP9/transportation_costs.csv",
+    "values": {
+      "document_template_family": "Compact",
+      "record_label_font": "Calibri",
+      "Unnamed: 0": "S2",
+      "archive_storage_medium": "Paper",
+      "C1": "1732.65",
+      "C2": "1780.72",
+      "record_display_theme": "Azure",
+      "C3": "567.44",
+      "archive_revision_number": "4",
+      "record_view_count": "12",
+      "archive_batch_number": "303",
+      "document_page_count": "8"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/UFLP_testing/UFLP9/transportation_costs.csv",
+    "values": {
+      "document_template_family": "Compact",
+      "record_label_font": "Helvetica",
+      "Unnamed: 0": "S3",
+      "archive_storage_medium": "Digital",
+      "C1": "115.66",
+      "C2": "100.76",
+      "record_display_theme": "Amber",
+      "C3": "64.68",
+      "archive_revision_number": "1",
+      "record_view_count": "27",
+      "archive_batch_number": "302",
+      "document_page_count": "4"
+    }
+  }
+]

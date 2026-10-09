@@ -1,0 +1,63 @@
+--- LOTO_Examples_And_Route_GPT4.1_Large-scale_ReAct.ipynb:cell3:v9
++++ LOTO_Examples_And_Route_GPT4.1_Large-scale_ReAct.ipynb:cell3:v10
+@@ -2,7 +2,7 @@
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/react_revision_20261006/examples_and_route_v9"
++RESULTS_DIR = PROJECT_ROOT / "outputs/react_revision_20261006/examples_and_route_v10"
+ # Edit this one value when the notebook file is renamed.
+ NOTEBOOK_FILENAME = "LOTO_Examples_And_Route_GPT4.1_Large-scale_ReAct.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+@@ -16,7 +16,7 @@
+ load_dotenv(PROJECT_ROOT / ".env", override=False)
+ user_api_key = os.environ.get("OPENAI_API_KEY")
+ 
+-VERSION = "react-source-data-v9"
++VERSION = "react-source-data-v10"
+ MODEL_SNAPSHOT = "gpt-4.1-2025-04-14"
+ NRM_RETRY_ON_TRUNCATION = False  # Single attempt; truncation remains a failed case.
+ EMBEDDING_MODEL = "text-embedding-ada-002"
+@@ -36,4 +36,4 @@
+ LOTO_VARIANT = "examples_and_route"
+ LOTO_REMOVE_ROUTE = True
+ LOTO_BASE_NOTEBOOK = "LEAN_LLM_OPT_4.1_Large-scale_1006_ReAct.ipynb"
+-LOTO_BASE_SHA256 = "b747bbb0f7a1dcfa348baef31aab6ff8c6a7e938bbf5ef08fd25c6df07e38950"
++LOTO_BASE_SHA256 = "9850407baf1d558de648e3f07489ca1b5650e4698857878a24067e43f640b5fc"
+--- LOTO_Examples_And_Route_GPT4.1_Large-scale_ReAct.ipynb:cell15:v9
++++ LOTO_Examples_And_Route_GPT4.1_Large-scale_ReAct.ipynb:cell15:v10
+@@ -1,3 +1,5 @@
++MODEL_CONSISTENCY_INSTRUCTIONS = '\nUse single ordinary ASCII spaces and newlines for formatting. Do not align columns,\npad lines with Unicode spaces, or use tables; preserve exact source identifiers.\nBefore the Final Answer, check units, conservation signs and bound applicability.\nDerive interval durations from source time labels; a row is not necessarily one hour.\nFor a closed flow system use one consistent sign convention and balance totals of zero.\nUnconditional quantity limits must not be multiplied by activation variables.\nRetain activation links required for operating/open decisions: such logical links are\nseparate from unconditional limits and may use valid bounds derived from current data.\n'
++
+ def formulate_with_csvqa(query, dataset_address, route, system_prompt, tool_description, prefix, suffix):
+     """Original ReAct with mandatory current CSVQA and user-authorized protocol restarts."""
+     route = normalize_route(route)
+@@ -57,6 +59,7 @@
+ Keep numerical data in the Observation; do not repeat its tables or enumerate parameters.
+ Do not treat any demonstration's Observation as current problem data.
+ {agent_scratchpad}"""
++    suffix = suffix.replace("{agent_scratchpad}", MODEL_CONSISTENCY_INSTRUCTIONS + "\n{agent_scratchpad}")
+     def create_agent():
+         csvqa_result.clear()
+         current_observations.clear()
+--- LOTO_Examples_And_Route_GPT4.1_Large-scale_ReAct.ipynb:cell27:v9
++++ LOTO_Examples_And_Route_GPT4.1_Large-scale_ReAct.ipynb:cell27:v10
+@@ -178,6 +178,18 @@
+ Read external CSVs with dtype=str and keep_default_na=False, then explicitly convert required numeric fields. Preserve empty fields and literal identifiers; do not turn a missing relationship into a string 'nan'.
+ Apply unconditional quantity/resource bounds unconditionally. Only use activation-conditioned bounds when the current query explicitly makes them conditional; an activation fee alone does not make an otherwise unconditional bound conditional.
+ Add comparisons as constraints; never sum TempConstr objects or use them as linear-expression terms.
++
++
++Omit ub rather than writing ub=None; for example, addVars(keys, vtype=gp.GRB.INTEGER,
++name='') has nonnegative variables with no finite upper bound. Never pass None as a bound.
++gp.min_, max_, abs_, and_, or_ are general expressions, not linear terms: equate them
++to a single auxiliary variable; never place them in an inequality or objective sum.
++An indicator trigger must be a separately defined GRB.BINARY variable, never an integer
++quantity or a continuous variable. Link quantity to binary activation with valid bounds
++derived from the data, preserving unconditional limits and the original variable domain.
++Combine fragments of one logical table before applying latest-revision, deletion or
++deduplication rules. Use the complete query-defined grouping key and selection order,
++then aggregate; selecting versions separately per file can retain superseded records.
+ 
+ Set MIPGap=1e-4 before optimize().
+ If Status == GRB.OPTIMAL, print ObjVal and every variable's VarName and X.

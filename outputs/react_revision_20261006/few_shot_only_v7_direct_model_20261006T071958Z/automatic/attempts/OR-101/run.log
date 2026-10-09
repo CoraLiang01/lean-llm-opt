@@ -1,0 +1,289 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I have the required current data and can formulate the model.
+Final Answer:
+**Mathematical Model**
+
+Let:
+- $I$ = set of products, indexed by $i$ (from all Product in file_2_view_0)
+- $D$ = set of devices, indexed by $d$ (from all Device in file_0_view_0 and file_1_view_0)
+- $x_i$ = quantity of product $i$ to produce (continuous, $x_i \geq 0$)
+
+Parameters:
+- $p_i$ = unit profit of product $i$ (from file_2_view_0, column Unit_Profit)
+- $t_{d,i}$ = processing time required on device $d$ per unit of product $i$ (from file_0_view_0, column $Pj$ for product $Pj$ on device $d$)
+- $c_d$ = monthly capacity of device $d$ (from file_1_view_0, column Monthly_Capacity)
+
+**Objective:**
+\[
+\max \sum_{i \in I} p_i x_i
+\]
+
+**Constraints:**
+\[
+\sum_{i \in I} t_{d,i} x_i \leq c_d \qquad \forall d \in D
+\]
+\[
+x_i \geq 0 \qquad \forall i \in I
+\]
+
+**Data Mapping**
+
+- $I$: All Product in file_2_view_0["Product"]
+- $D$: All Device in file_0_view_0["Device"] and file_1_view_0["Device"]
+- $p_i$: file_2_view_0["Unit_Profit"], keyed by Product
+- $t_{d,i}$: file_0_view_0, row Device $d$, column $Pj$ for product $Pj$
+- $c_d$: file_1_view_0["Monthly_Capacity"], keyed by Device
+
+- Decision variables: $x_i$ (continuous, nonnegative), for all $i \in I$[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # File paths from Source Schema
+    device_time_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture18/device_time.csv"
+    monthly_device_capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture18/monthly_device_capacity.csv"
+    unit_product_profits_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture18/unit_product_profits.csv"
+
+    # Try reading CSVs with fallback encodings
+    def read_csv_fallback(path):
+        encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+        for enc in encodings:
+            try:
+                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with tried encodings.")
+
+    # Read data
+    device_time_df = read_csv_fallback(device_time_path)
+    monthly_device_capacity_df = read_csv_fallback(monthly_device_capacity_path)
+    unit_product_profits_df = read_csv_fallback(unit_product_profits_path)
+
+    # Index sets
+    products = list(unit_product_profits_df["Product"])
+    devices_time = list(device_time_df["Device"])
+    devices_capacity = list(monthly_device_capacity_df["Device"])
+    devices = sorted(set(devices_time) | set(devices_capacity))
+
+    # Check all products are present in device_time columns
+    device_time_products = [col for col in device_time_df.columns if col != "Device"]
+    missing_products = set(products) - set(device_time_products)
+    if missing_products:
+        raise ValueError(f"Products missing in device_time.csv: {missing_products}")
+
+    # Check all devices have capacity and time data
+    missing_time_devices = set(devices) - set(devices_time)
+    missing_capacity_devices = set(devices) - set(devices_capacity)
+    if missing_time_devices:
+        raise ValueError(f"Devices missing in device_time.csv: {missing_time_devices}")
+    if missing_capacity_devices:
+        raise ValueError(f"Devices missing in monthly_device_capacity.csv: {missing_capacity_devices}")
+
+    # Parameters
+    # p_i: unit profit for each product
+    try:
+        p_i = {row["Product"]: float(row["Unit_Profit"]) for _, row in unit_product_profits_df.iterrows()}
+    except Exception as e:
+        raise ValueError(f"Error parsing Unit_Profit: {e}")
+
+    # t_{d,i}: processing time required on device d per unit of product i
+    t_di = {}
+    for _, row in device_time_df.iterrows():
+        d = row["Device"]
+        for i in products:
+            try:
+                val = row[i]
+                t_di[d, i] = float(val)
+            except Exception as e:
+                raise ValueError(f"Error parsing processing time for device {d}, product {i}: {e}")
+
+    # c_d: monthly capacity for each device
+    try:
+        c_d = {row["Device"]: float(row["Monthly_Capacity"]) for _, row in monthly_device_capacity_df.iterrows()}
+    except Exception as e:
+        raise ValueError(f"Error parsing Monthly_Capacity: {e}")
+
+    # Validate all required coefficients are present
+    for d in devices:
+        if d not in c_d:
+            raise ValueError(f"Missing capacity for device {d}")
+        for i in products:
+            if (d, i) not in t_di:
+                raise ValueError(f"Missing processing time for device {d}, product {i}")
+    for i in products:
+        if i not in p_i:
+            raise ValueError(f"Missing unit profit for product {i}")
+
+    # Model
+    m = gp.Model("monthly_production_plan")
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, continuous
+    quantity_vars = m.addVars(products, lb=0, vtype=GRB.CONTINUOUS, name="x")
+
+    # Objective: maximize total profit
+    m.setObjective(gp.quicksum(p_i[i] * quantity_vars[i] for i in products), GRB.MAXIMIZE)
+
+    # Constraints: device capacity
+    for d in devices:
+        m.addConstr(
+            gp.quicksum(t_di[d, i] * quantity_vars[i] for i in products) <= c_d[d],
+            name=f"cap_{d}"
+        )
+
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 10 rows, 111 columns and 1069 nonzeros
+Model fingerprint: 0x050b8b67
+Coefficient statistics:
+  Matrix range     [2e-01, 1e+01]
+  Objective range  [5e+00, 5e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e+03, 5e+03]
+Presolve time: 0.00s
+Presolved: 10 rows, 111 columns, 1069 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    2.8661100e+33   1.041087e+33   2.866110e+03      0s
+      17    2.5820154e+04   0.000000e+00   0.000000e+00      0s
+
+Solved in 17 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  2.582015356e+04
+ObjVal: 25820.15355597092
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 16.254369283402035
+C5: 0.0
+C6: 0.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 140.184611481725
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 24.5930542335453
+C48: 0.0
+C49: 154.66606491755184
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 0.0
+C68: 0.0
+C69: 0.0
+C70: 0.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 111.26976112384763
+C83: 0.0
+C84: 25.016802752471612
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 0.0
+C96: 0.0
+C97: 0.0
+C98: 0.0
+C99: 0.0
+C100: 0.0
+C101: 0.0
+C102: 0.0
+C103: 0.0
+C104: 0.0
+C105: 0.0
+C106: 0.0
+C107: 134.45522411545736
+C108: 0.0
+C109: 0.0
+C110: 0.0
+Optimal objective: 25820.15355597092
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 16.254369283402035), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 140.184611481725), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 24.5930542335453), ('C48', 0.0), ('C49', 154.66606491755184), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 111.26976112384763), ('C83', 0.0), ('C84', 25.016802752471612), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 134.45522411545736), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0)]

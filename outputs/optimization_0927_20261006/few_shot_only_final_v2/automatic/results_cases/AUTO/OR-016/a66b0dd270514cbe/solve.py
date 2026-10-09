@@ -1,0 +1,237 @@
+CSVQA_DATA = {'route': 'NRM',
+ 'tables': [{'table_id': 'file_0_view_0',
+             'file_index': 0,
+             'file_name': 'RetailSalesDataset.csv',
+             'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM7/RetailSalesDataset.csv',
+             'role': 'file_0',
+             'columns': ['Product Name', 'Revenue', 'Demand', 'Initial Inventory'],
+             'original_rows': 35,
+             'returned_rows': 35,
+             'filters': {'logic': 'and', 'conditions': []},
+             'records': [{'source_row': 0,
+                          'values': {'Product Name': 'Beauty - 25',
+                                     'Revenue': '25',
+                                     'Demand': '240',
+                                     'Initial Inventory': '1570'}},
+                         {'source_row': 1,
+                          'values': {'Product Name': 'Beauty - 30',
+                                     'Revenue': '30',
+                                     'Demand': '202',
+                                     'Initial Inventory': '1330'}},
+                         {'source_row': 2,
+                          'values': {'Product Name': 'Beauty - 300',
+                                     'Revenue': '300',
+                                     'Demand': '216',
+                                     'Initial Inventory': '1420'}},
+                         {'source_row': 3,
+                          'values': {'Product Name': 'Beauty - 50',
+                                     'Revenue': '50',
+                                     'Demand': '263',
+                                     'Initial Inventory': '1700'}},
+                         {'source_row': 4,
+                          'values': {'Product Name': 'Beauty - 500',
+                                     'Revenue': '500',
+                                     'Demand': '256',
+                                     'Initial Inventory': '1690'}},
+                         {'source_row': 5,
+                          'values': {'Product Name': 'Clothing - 25',
+                                     'Revenue': '25',
+                                     'Demand': '281',
+                                     'Initial Inventory': '1840'}},
+                         {'source_row': 6,
+                          'values': {'Product Name': 'Clothing - 30',
+                                     'Revenue': '30',
+                                     'Demand': '261',
+                                     'Initial Inventory': '1710'}},
+                         {'source_row': 7,
+                          'values': {'Product Name': 'Clothing - 300',
+                                     'Revenue': '300',
+                                     'Demand': '295',
+                                     'Initial Inventory': '1930'}},
+                         {'source_row': 8,
+                          'values': {'Product Name': 'Clothing - 50',
+                                     'Revenue': '50',
+                                     'Demand': '290',
+                                     'Initial Inventory': '1890'}},
+                         {'source_row': 9,
+                          'values': {'Product Name': 'Clothing - 500',
+                                     'Revenue': '500',
+                                     'Demand': '244',
+                                     'Initial Inventory': '1570'}},
+                         {'source_row': 10,
+                          'values': {'Product Name': 'Electronics - 25',
+                                     'Revenue': '25',
+                                     'Demand': '273',
+                                     'Initial Inventory': '1810'}},
+                         {'source_row': 11,
+                          'values': {'Product Name': 'Electronics - 30',
+                                     'Revenue': '30',
+                                     'Demand': '220',
+                                     'Initial Inventory': '1410'}},
+                         {'source_row': 12,
+                          'values': {'Product Name': 'Electronics - 300',
+                                     'Revenue': '300',
+                                     'Demand': '286',
+                                     'Initial Inventory': '1830'}},
+                         {'source_row': 13,
+                          'values': {'Product Name': 'Electronics - 50',
+                                     'Revenue': '50',
+                                     'Demand': '268',
+                                     'Initial Inventory': '1750'}},
+                         {'source_row': 14,
+                          'values': {'Product Name': 'Electronics - 500',
+                                     'Revenue': '500',
+                                     'Demand': '262',
+                                     'Initial Inventory': '1690'}},
+                         {'source_row': 15,
+                          'values': {'Product Name': 'Home Goods - 25',
+                                     'Revenue': '25',
+                                     'Demand': '255',
+                                     'Initial Inventory': '1660'}},
+                         {'source_row': 16,
+                          'values': {'Product Name': 'Home Goods - 30',
+                                     'Revenue': '30',
+                                     'Demand': '218',
+                                     'Initial Inventory': '1417'}},
+                         {'source_row': 17,
+                          'values': {'Product Name': 'Home Goods - 50',
+                                     'Revenue': '50',
+                                     'Demand': '278',
+                                     'Initial Inventory': '1807'}},
+                         {'source_row': 18,
+                          'values': {'Product Name': 'Home Goods - 300',
+                                     'Revenue': '300',
+                                     'Demand': '195',
+                                     'Initial Inventory': '1268'}},
+                         {'source_row': 19,
+                          'values': {'Product Name': 'Home Goods - 500',
+                                     'Revenue': '500',
+                                     'Demand': '248',
+                                     'Initial Inventory': '1612'}},
+                         {'source_row': 20,
+                          'values': {'Product Name': 'Sports - 25',
+                                     'Revenue': '25',
+                                     'Demand': '269',
+                                     'Initial Inventory': '1749'}},
+                         {'source_row': 21,
+                          'values': {'Product Name': 'Sports - 30',
+                                     'Revenue': '30',
+                                     'Demand': '227',
+                                     'Initial Inventory': '1476'}},
+                         {'source_row': 22,
+                          'values': {'Product Name': 'Sports - 50',
+                                     'Revenue': '50',
+                                     'Demand': '285',
+                                     'Initial Inventory': '1853'}},
+                         {'source_row': 23,
+                          'values': {'Product Name': 'Sports - 300',
+                                     'Revenue': '300',
+                                     'Demand': '208',
+                                     'Initial Inventory': '1352'}},
+                         {'source_row': 24,
+                          'values': {'Product Name': 'Sports - 500',
+                                     'Revenue': '500',
+                                     'Demand': '259',
+                                     'Initial Inventory': '1684'}},
+                         {'source_row': 25,
+                          'values': {'Product Name': 'Furniture - 25',
+                                     'Revenue': '25',
+                                     'Demand': '242',
+                                     'Initial Inventory': '1573'}},
+                         {'source_row': 26,
+                          'values': {'Product Name': 'Furniture - 30',
+                                     'Revenue': '30',
+                                     'Demand': '213',
+                                     'Initial Inventory': '1385'}},
+                         {'source_row': 27,
+                          'values': {'Product Name': 'Furniture - 50',
+                                     'Revenue': '50',
+                                     'Demand': '272',
+                                     'Initial Inventory': '1768'}},
+                         {'source_row': 28,
+                          'values': {'Product Name': 'Furniture - 300',
+                                     'Revenue': '300',
+                                     'Demand': '224',
+                                     'Initial Inventory': '1456'}},
+                         {'source_row': 29,
+                          'values': {'Product Name': 'Furniture - 500',
+                                     'Revenue': '500',
+                                     'Demand': '251',
+                                     'Initial Inventory': '1632'}},
+                         {'source_row': 30,
+                          'values': {'Product Name': 'Toys - 25',
+                                     'Revenue': '25',
+                                     'Demand': '257',
+                                     'Initial Inventory': '1671'}},
+                         {'source_row': 31,
+                          'values': {'Product Name': 'Toys - 30',
+                                     'Revenue': '30',
+                                     'Demand': '235',
+                                     'Initial Inventory': '1528'}},
+                         {'source_row': 32,
+                          'values': {'Product Name': 'Toys - 50',
+                                     'Revenue': '50',
+                                     'Demand': '291',
+                                     'Initial Inventory': '1892'}},
+                         {'source_row': 33,
+                          'values': {'Product Name': 'Toys - 300',
+                                     'Revenue': '300',
+                                     'Demand': '199',
+                                     'Initial Inventory': '1294'}},
+                         {'source_row': 34,
+                          'values': {'Product Name': 'Toys - 500',
+                                     'Revenue': '500',
+                                     'Demand': '264',
+                                     'Initial Inventory': '1716'}}]}],
+ 'relationships': [],
+ 'ignored_file_indices': [],
+ 'validation': {'status': 'PYTHON_FULL_CSV'}}
+import gurobipy as gp
+from gurobipy import GRB
+import re
+table_id = 'file_0_view_0'
+table = None
+for t in CSVQA_DATA['tables']:
+    if t['table_id'] == table_id:
+        table = t
+        break
+if table is None:
+    raise ValueError(f'Table {table_id} not found in CSVQA_DATA.')
+records = table['records']
+if not records:
+    raise ValueError('No records found in the data table.')
+product_names = []
+revenue = {}
+demand = {}
+inventory = {}
+for rec in records:
+    vals = rec['values']
+    try:
+        product = vals['Product Name']
+        product_names.append(product)
+        rev_match = re.match('^\\s*([+-]?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)\\s*$', str(vals['Revenue']).replace(',', ''))
+        dem_match = re.match('^\\s*([+-]?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)\\s*$', str(vals['Demand']).replace(',', ''))
+        inv_match = re.match('^\\s*([+-]?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)\\s*$', str(vals['Initial Inventory']).replace(',', ''))
+        if not (rev_match and dem_match and inv_match):
+            raise ValueError(f"Unmatched numeric clause for product '{product}'.")
+        revenue[product] = float(rev_match.group(1))
+        demand[product] = int(float(dem_match.group(1)))
+        inventory[product] = int(float(inv_match.group(1)))
+    except Exception as e:
+        raise ValueError(f"Error parsing record for product '{vals.get('Product Name', '<unknown>')}': {e}")
+for p in product_names:
+    if p not in revenue or p not in demand or p not in inventory:
+        raise ValueError(f"Missing data for product '{p}'.")
+m = gp.Model('RetailRevenueMaximization')
+x_vars = m.addVars(product_names, vtype=GRB.INTEGER, lb=0, name='')
+m.setObjective(gp.quicksum((revenue[p] * x_vars[p] for p in product_names)), GRB.MAXIMIZE)
+m.addConstrs((x_vars[p] <= inventory[p] for p in product_names), name='')
+m.addConstrs((x_vars[p] <= demand[p] for p in product_names), name='')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

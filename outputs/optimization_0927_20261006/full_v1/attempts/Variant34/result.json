@@ -1,0 +1,324 @@
+{
+  "problem_id": "Variant34",
+  "query": "Stock the three display sections of MARKET_SQUARE. Each item_ref is a product-and-section option identified by location_id. Determine the number of packs to display in each option, maximizing net merchandising benefit. Each section has its own capacity; unused space cannot be transferred to another section. The supplied tables describe the current plan; use their rows directly. The benefit rows contain signed amount_cents components; sum them for each item to obtain its per-unit benefit. Deduct item_fee once for each option with positive quantity. Convert liters to ml using 1000 ml per liter. Choose zero for unauthorized options. For any other option, choose zero or an integer from minimum_lot to maximum_order. Sum the signed capacity_ledger entries separately by resource; the total usage of that resource must stay within this amount. Across all options, each category must meet its lower and upper quantity limits; category activation_fee_cents is deducted once if used. The incompatible table forbids joint selection, while requires means positive quantity of item_ref needs positive quantity of prerequisite_ref, without proportional quantities. Each bundle row contributes bonus_cents once if both options are selected; if either is unselected or unauthorized the bonus is zero. Report the maximum net benefit in USD cents. All fixed fees and bonuses are in the same unit.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_01/export_01.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_02/export_02.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_03/export_03.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_04/export_04.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_05/export_05.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_06/export_06.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_01/export_07.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_02/export_08.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_03/export_09.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_04/export_10.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_05/export_11.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_06/export_12.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_01/export_13.csv",
+  "input_kind": "external_csv",
+  "true_label": "Mixture",
+  "true_route": "Others",
+  "label_objective": 98866.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Mixture",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the integer number of packs to display for each authorized product-and-section option (item_ref), maximizing total net merchandising benefit (in USD cents), subject to section capacities, per-option and per-category limits, incompatibility and prerequisite rules, and bundle bonuses. The plan must deduct fixed item and category activation fees as specified, and only authorized options may be selected.\n2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with fixed-charge (activation fee) and logical (incompatibility, requires, bundle) constraints.\n3.  **Define Index Sets:** The primary indices are:\n    - Options: set of item_ref (product-and-section options) from the union of all item tables (all rows used).\n    - Sections: set of location_id (display sections) from item tables.\n    - Categories: set of category from category table.\n    - Resources: set of resource from capacity_ledger and usage tables.\n    - Bundles: set of (item_a, item_b) pairs from bundle table.\n    - Incompatibles: set of (item_a, item_b) pairs from incompatible table.\n    - Requires: set of (item_ref, prerequisite_ref) pairs from requires table.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of packs of option i (item_ref) to display. Type: GRB.INTEGER, domain: {0} or [minimum_lot, maximum_order] if authorized, 0 if unauthorized.\n    -   `y[i]` = 1 if option i is selected (x[i] > 0), 0 otherwise. Type: GRB.BINARY.\n    -   `z[c]` = 1 if any option in category c is selected (sum over i in c of y[i] > 0), 0 otherwise. Type: GRB.BINARY.\n    -   `b[bundle]` = 1 if both options in bundle are selected (y[item_a] = y[item_b] = 1), 0 otherwise. Type: GRB.BINARY.\n5.  **Identify Parameters (from Schema):**\n    -   Per-unit benefit for each option: sum of amount_cents for each item_ref in benefit table.\n    -   Item activation fee: activation_fee_cents from item_fee table, applied once per option if selected.\n    -   Category activation fee: activation_fee_cents from category table, applied once per category if any option in that category is selected.\n    -   Section capacity: sum of amount (converted to ml if needed) for each resource (section) from capacity_ledger table.\n    -   Per-pack resource usage: amount (converted to ml if needed) for each item_ref and resource from usage tables.\n    -   Option bounds: minimum_lot and maximum_order from item tables, only if authorized = 1; otherwise, x[i] = 0.\n    -   Category quantity limits: minimum_quantity and maximum_quantity from category table, sum over all options in category.\n    -   Incompatibility pairs: from incompatible table.\n    -   Requires pairs: from requires table.\n    -   Bundle bonuses: bonus_cents from bundle table.\n6.  **Formulate Objective:** Maximize total net merchandising benefit, defined as:\n    -   Sum over all options of (per-unit benefit * x[i])\n    -   Minus sum over all selected options of item activation_fee_cents * y[i]\n    -   Minus sum over all activated categories of category activation_fee_cents * z[c]\n    -   Plus sum over all activated bundles of bonus_cents * b[bundle]\n    -   All terms in USD cents.\n7.  **Formulate Constraints:**\n    -   Option authorization and bounds: For each option i, x[i] = 0 if unauthorized; if authorized, x[i] = 0 or x[i] in [minimum_lot, maximum_order] (integer).\n    -   Section (resource) capacity: For each resource r, sum over all options i of (per-pack usage of r by i * x[i]) ≤ total available capacity of r (sum of amount in capacity_ledger for r, converting units as needed).\n    -   Category quantity limits: For each category c, sum over all options i in c of x[i] ≥ minimum_quantity[c] and ≤ maximum_quantity[c].\n    -   Linking variables: For each option i, y[i] = 1 if x[i] > 0, 0 otherwise; for each category c, z[c] = 1 if any y[i] in c is 1, 0 otherwise.\n    -   Incompatibility: For each (item_a, item_b) in incompatible, y[item_a] + y[item_b] ≤ 1.\n    -   Requires: For each (item_ref, prerequisite_ref) in requires, y[item_ref] ≤ y[prerequisite_ref].\n    -   Bundle activation: For each bundle (item_a, item_b), b[bundle] = 1 if y[item_a] = y[item_b] = 1, 0 otherwise.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_01/export_01.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 60\nColumns: ['table', 'item_ref', 'component', 'amount_cents']\nParsed column types: {'table': 'object', 'item_ref': 'object', 'component': 'object', 'amount_cents': 'int64'}\nPreview only (first 10 rows):\n  table      item_ref     component amount_cents\nbenefit Raf6249743aab   item24_base          674\nbenefit R77b5ceefbc30 item22_rebate          -24\nbenefit R1f5cabe17f56   item12_base         1051\nbenefit R51e14ed234fb item25_rebate          -18\nbenefit Ra54c415fd225  item7_rebate          -19\nbenefit Rdb9e5c3398ec    item3_base         1283\nbenefit R6ff46dde76b5 item19_rebate          -34\nbenefit R21d9ec858608   item27_base         9044\nbenefit R5e5bafcd3a11    item9_base          490\nbenefit R68d1acbf1b45  item1_rebate          -15\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_ref\": {\"missing\": 0, \"unique_nonempty\": 30}, \"component\": {\"missing\": 0, \"unique_nonempty\": 60}, \"amount_cents\": {\"missing\": 0, \"unique_nonempty\": 50, \"numeric_range\": [-49.0, 9044.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"amount_cents\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"benefit\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 60, \"prefix\": 60, \"contains\": 60, \"examples\": [\"benefit\"]}], \"exact_matching_columns\": 1}, {\"term\": \"item_ref\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_02/export_02.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 8\nColumns: ['table', 'item_a', 'item_b', 'bonus_cents']\nParsed column types: {'table': 'object', 'item_a': 'object', 'item_b': 'object', 'bonus_cents': 'int64'}\nPreview only (first 10 rows):\n table        item_a        item_b bonus_cents\nbundle R911cbab9a301 R81173150688b         369\nbundle Rd654f83d9c9b R51e14ed234fb         425\nbundle Rcf72b0319ae6 R18fe9c1e5f4c         228\nbundle Rcf2a2fbd9a16 R6ff46dde76b5         241\nbundle R6b719309ca14 R23ae26e45153         215\nbundle R144b336321b3 R23ae26e45153         431\nbundle R6b719309ca14 Raf6249743aab         158\nbundle Raf6249743aab R144b336321b3         352\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_a\": {\"missing\": 0, \"unique_nonempty\": 7}, \"item_b\": {\"missing\": 0, \"unique_nonempty\": 7}, \"bonus_cents\": {\"missing\": 0, \"unique_nonempty\": 8, \"numeric_range\": [158.0, 431.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"bonus_cents\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"bundle\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 8, \"prefix\": 8, \"contains\": 8, \"examples\": [\"bundle\"]}], \"exact_matching_columns\": 1}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_03/export_03.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 6\nColumns: ['table', 'resource', 'entry', 'amount', 'unit']\nParsed column types: {'table': 'object', 'resource': 'object', 'entry': 'object', 'amount': 'int64', 'unit': 'object'}\nPreview only (first 10 rows):\n          table  resource       entry amount unit\ncapacity_ledger SECTION_C     opening 227000   ml\ncapacity_ledger SECTION_A     opening 234000   ml\ncapacity_ledger SECTION_B     opening 267000   ml\ncapacity_ledger SECTION_B reservation  -9000   ml\ncapacity_ledger SECTION_C reservation -11000   ml\ncapacity_ledger SECTION_A reservation -11000   ml\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"resource\": {\"missing\": 0, \"unique_nonempty\": 3}, \"entry\": {\"missing\": 0, \"unique_nonempty\": 2}, \"amount\": {\"missing\": 0, \"unique_nonempty\": 5, \"numeric_range\": [-11000.0, 267000.0]}, \"unit\": {\"missing\": 0, \"unique_nonempty\": 1}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"amount\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"capacity_ledger\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 6, \"prefix\": 6, \"contains\": 6, \"examples\": [\"capacity_ledger\"]}], \"exact_matching_columns\": 1}, {\"term\": \"ml\", \"matching_columns\": [{\"column\": \"unit\", \"exact\": 6, \"prefix\": 6, \"contains\": 6, \"examples\": [\"ml\"]}], \"exact_matching_columns\": 1}, {\"term\": \"resource\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"unit\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_04/export_04.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 4\nColumns: ['table', 'category', 'minimum_quantity', 'maximum_quantity', 'activation_fee_cents']\nParsed column types: {'table': 'object', 'category': 'object', 'minimum_quantity': 'int64', 'maximum_quantity': 'int64', 'activation_fee_cents': 'int64'}\nPreview only (first 10 rows):\n   table category minimum_quantity maximum_quantity activation_fee_cents\ncategory       G2                7               19                  215\ncategory       G0                7               19                  180\ncategory       G1                8               20                  382\ncategory       G3               10               22                  164\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"category\": {\"missing\": 0, \"unique_nonempty\": 4}, \"minimum_quantity\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [7.0, 10.0]}, \"maximum_quantity\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [19.0, 22.0]}, \"activation_fee_cents\": {\"missing\": 0, \"unique_nonempty\": 4, \"numeric_range\": [164.0, 382.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"activation_fee_cents\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"category\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 4, \"prefix\": 4, \"contains\": 4, \"examples\": [\"category\"]}], \"exact_matching_columns\": 1}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_05/export_05.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 30\nColumns: ['table', 'ref', 'kind', 'entity_id', 'display_name']\nParsed column types: {'table': 'object', 'ref': 'object', 'kind': 'object', 'entity_id': 'object', 'display_name': 'int64'}\nPreview only (first 10 rows):\n   table           ref kind      entity_id display_name\nidentity R6b719309ca14 item RA10_OPTION_11            1\nidentity Raf6249743aab item RA10_OPTION_25            5\nidentity Rcf2a2fbd9a16 item RA10_OPTION_21            1\nidentity R1f5cabe17f56 item RA10_OPTION_13            3\nidentity R18fe9c1e5f4c item RA10_OPTION_15            5\nidentity R3f4281b8fad6 item RA10_OPTION_27            7\nidentity R35cb0535ec96 item RA10_OPTION_05            5\nidentity Rcf72b0319ae6 item RA10_OPTION_17            7\nidentity R86c8af615f03 item RA10_OPTION_03            3\nidentity Rbe862dd546a3 item RA10_OPTION_01            1\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"ref\": {\"missing\": 0, \"unique_nonempty\": 30}, \"kind\": {\"missing\": 0, \"unique_nonempty\": 1}, \"entity_id\": {\"missing\": 0, \"unique_nonempty\": 30}, \"display_name\": {\"missing\": 0, \"unique_nonempty\": 10, \"numeric_range\": [1.0, 10.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"item\", \"matching_columns\": [{\"column\": \"kind\", \"exact\": 30, \"prefix\": 30, \"contains\": 30, \"examples\": [\"item\"]}], \"exact_matching_columns\": 1}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_06/export_06.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 10\nColumns: ['table', 'item_a', 'item_b']\nParsed column types: {'table': 'object', 'item_a': 'object', 'item_b': 'object'}\nPreview only (first 10 rows):\n       table        item_a        item_b\nincompatible Re218e287b09c Rbadcf0b5397e\nincompatible R694597094779 R18fe9c1e5f4c\nincompatible R911cbab9a301 R5e5bafcd3a11\nincompatible Raf6249743aab Rdb9e5c3398ec\nincompatible R68d1acbf1b45 Rcf2a2fbd9a16\nincompatible R1f5cabe17f56 R23ae26e45153\nincompatible R1f5cabe17f56 R694597094779\nincompatible R86c8af615f03 Raf6249743aab\nincompatible Ra54c415fd225 R694597094779\nincompatible R5e5bafcd3a11 Raf6249743aab\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_a\": {\"missing\": 0, \"unique_nonempty\": 9}, \"item_b\": {\"missing\": 0, \"unique_nonempty\": 8}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"incompatible\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 10, \"prefix\": 10, \"contains\": 10, \"examples\": [\"incompatible\"]}], \"exact_matching_columns\": 1}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_01/export_07.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 15\nColumns: ['table', 'item_ref', 'category', 'authorized', 'minimum_lot', 'maximum_order', 'configuration_id', 'location_id']\nParsed column types: {'table': 'object', 'item_ref': 'object', 'category': 'object', 'authorized': 'int64', 'minimum_lot': 'int64', 'maximum_order': 'int64', 'configuration_id': 'object', 'location_id': 'object'}\nPreview only (first 10 rows):\ntable      item_ref category authorized minimum_lot maximum_order configuration_id location_id\n item R18fe9c1e5f4c       G2          1           2            13           CFG_02   SECTION_C\n item Rcf72b0319ae6       G0          1           2             9           CFG_02   SECTION_B\n item Rd654f83d9c9b       G2          1           2             8           CFG_01   SECTION_A\n item R77b5ceefbc30       G2          0           2            10           CFG_03   SECTION_B\n item R35cb0535ec96       G0          1           2            10           CFG_01   SECTION_B\n item R6b719309ca14       G2          1           2            13           CFG_02   SECTION_B\n item R86c8af615f03       G2          1           2            12           CFG_01   SECTION_C\n item R81173150688b       G0          1           2             9           CFG_01   SECTION_C\n item Rbadcf0b5397e       G3          1           2             7           CFG_03   SECTION_C\n item R6ff46dde76b5       G3          1           2             8           CFG_02   SECTION_B\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_ref\": {\"missing\": 0, \"unique_nonempty\": 15}, \"category\": {\"missing\": 0, \"unique_nonempty\": 4}, \"authorized\": {\"missing\": 0, \"unique_nonempty\": 2, \"numeric_range\": [0.0, 1.0]}, \"minimum_lot\": {\"missing\": 0, \"unique_nonempty\": 1, \"numeric_range\": [2.0, 2.0]}, \"maximum_order\": {\"missing\": 0, \"unique_nonempty\": 6, \"numeric_range\": [7.0, 13.0]}, \"configuration_id\": {\"missing\": 0, \"unique_nonempty\": 3}, \"location_id\": {\"missing\": 0, \"unique_nonempty\": 3}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"category\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"item\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 15, \"prefix\": 15, \"contains\": 15, \"examples\": [\"item\"]}], \"exact_matching_columns\": 1}, {\"term\": \"item_ref\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"location_id\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"maximum_order\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"minimum_lot\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_02/export_08.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 15\nColumns: ['table', 'item_ref', 'category', 'authorized', 'minimum_lot', 'maximum_order', 'configuration_id', 'location_id']\nParsed column types: {'table': 'object', 'item_ref': 'object', 'category': 'object', 'authorized': 'int64', 'minimum_lot': 'int64', 'maximum_order': 'int64', 'configuration_id': 'object', 'location_id': 'object'}\nPreview only (first 10 rows):\ntable      item_ref category authorized minimum_lot maximum_order configuration_id location_id\n item R1f5cabe17f56       G0          1           2            10           CFG_02   SECTION_A\n item R3f4281b8fad6       G2          0           2            10           CFG_03   SECTION_C\n item R8af59fb1b6d9       G2          1           2            10           CFG_02   SECTION_A\n item R144b336321b3       G0          0           2            13           CFG_03   SECTION_B\n item Raf6249743aab       G0          1           2             8           CFG_03   SECTION_A\n item Rcf2a2fbd9a16       G0          1           2             8           CFG_03   SECTION_C\n item Rbe862dd546a3       G0          1           2            11           CFG_01   SECTION_A\n item R694597094779       G1          1           2            10           CFG_02   SECTION_B\n item R672fb805523e       G1          1           2            13           CFG_02   SECTION_C\n item R5e5bafcd3a11       G1          1           2             7           CFG_01   SECTION_A\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_ref\": {\"missing\": 0, \"unique_nonempty\": 15}, \"category\": {\"missing\": 0, \"unique_nonempty\": 4}, \"authorized\": {\"missing\": 0, \"unique_nonempty\": 2, \"numeric_range\": [0.0, 1.0]}, \"minimum_lot\": {\"missing\": 0, \"unique_nonempty\": 1, \"numeric_range\": [2.0, 2.0]}, \"maximum_order\": {\"missing\": 0, \"unique_nonempty\": 5, \"numeric_range\": [7.0, 13.0]}, \"configuration_id\": {\"missing\": 0, \"unique_nonempty\": 3}, \"location_id\": {\"missing\": 0, \"unique_nonempty\": 3}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"category\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"item\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 15, \"prefix\": 15, \"contains\": 15, \"examples\": [\"item\"]}], \"exact_matching_columns\": 1}, {\"term\": \"item_ref\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"location_id\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"maximum_order\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"minimum_lot\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_03/export_09.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 30\nColumns: ['table', 'item_ref', 'activation_fee_cents']\nParsed column types: {'table': 'object', 'item_ref': 'object', 'activation_fee_cents': 'int64'}\nPreview only (first 10 rows):\n   table      item_ref activation_fee_cents\nitem_fee R8af59fb1b6d9                  275\nitem_fee Rbe862dd546a3                  367\nitem_fee R18fe9c1e5f4c                  260\nitem_fee R77b5ceefbc30                  267\nitem_fee R81173150688b                  384\nitem_fee Raf6249743aab                  255\nitem_fee R1f5cabe17f56                  359\nitem_fee R86c8af615f03                  135\nitem_fee Rcf72b0319ae6                  354\nitem_fee R3f4281b8fad6                  314\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_ref\": {\"missing\": 0, \"unique_nonempty\": 30}, \"activation_fee_cents\": {\"missing\": 0, \"unique_nonempty\": 30, \"numeric_range\": [131.0, 482.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"activation_fee_cents\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"item_fee\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 30, \"prefix\": 30, \"contains\": 30, \"examples\": [\"item_fee\"]}], \"exact_matching_columns\": 1}, {\"term\": \"item_ref\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_04/export_10.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 30\nColumns: ['table', 'item_ref', 'historical_sales', 'forecast_units', 'margin_percent']\nParsed column types: {'table': 'object', 'item_ref': 'object', 'historical_sales': 'int64', 'forecast_units': 'int64', 'margin_percent': 'int64'}\nPreview only (first 10 rows):\n table      item_ref historical_sales forecast_units margin_percent\nmarket R18fe9c1e5f4c                3              3             35\nmarket Rd654f83d9c9b                3              2             32\nmarket R1f5cabe17f56                3              1             13\nmarket R35cb0535ec96                2              1             19\nmarket R77b5ceefbc30                2              2             11\nmarket R144b336321b3                1              2             26\nmarket R3f4281b8fad6                3              1             28\nmarket Raf6249743aab                3              3             12\nmarket R86c8af615f03                3              1             16\nmarket Rbe862dd546a3                2              3             24\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_ref\": {\"missing\": 0, \"unique_nonempty\": 30}, \"historical_sales\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [1.0, 3.0]}, \"forecast_units\": {\"missing\": 0, \"unique_nonempty\": 3, \"numeric_range\": [1.0, 3.0]}, \"margin_percent\": {\"missing\": 0, \"unique_nonempty\": 17, \"numeric_range\": [5.0, 35.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"item_ref\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_05/export_11.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 18\nColumns: ['table', 'item_ref', 'prerequisite_ref']\nParsed column types: {'table': 'object', 'item_ref': 'object', 'prerequisite_ref': 'object'}\nPreview only (first 10 rows):\n   table      item_ref prerequisite_ref\nrequires Rcf72b0319ae6    R68d1acbf1b45\nrequires R3f4281b8fad6    R81173150688b\nrequires Rcf2a2fbd9a16    Re218e287b09c\nrequires R8af59fb1b6d9    Rdb9e5c3398ec\nrequires R18fe9c1e5f4c    R9cb1d79c603b\nrequires Raf6249743aab    R68d1acbf1b45\nrequires R1f5cabe17f56    Rd654f83d9c9b\nrequires R77b5ceefbc30    R6b719309ca14\nrequires R144b336321b3    R86c8af615f03\nrequires R6ff46dde76b5    Rbe862dd546a3\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_ref\": {\"missing\": 0, \"unique_nonempty\": 18}, \"prerequisite_ref\": {\"missing\": 0, \"unique_nonempty\": 11}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"item_ref\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"prerequisite_ref\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"requires\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 18, \"prefix\": 18, \"contains\": 18, \"examples\": [\"requires\"]}], \"exact_matching_columns\": 1}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_06/export_12.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 15\nColumns: ['table', 'item_ref', 'resource', 'amount', 'unit']\nParsed column types: {'table': 'object', 'item_ref': 'object', 'resource': 'object', 'amount': 'int64', 'unit': 'object'}\nPreview only (first 10 rows):\ntable      item_ref  resource amount  unit\nusage R981c210270a2 SECTION_A      8 liter\nusage Rbe862dd546a3 SECTION_A      3 liter\nusage R21d9ec858608 SECTION_A      3 liter\nusage R5e5bafcd3a11 SECTION_A      7 liter\nusage Rdb9e5c3398ec SECTION_A      4 liter\nusage Rcf72b0319ae6 SECTION_B      6 liter\nusage Ra54c415fd225 SECTION_B      8 liter\nusage R6ff46dde76b5 SECTION_B      7 liter\nusage R35cb0535ec96 SECTION_B      8 liter\nusage R68d1acbf1b45 SECTION_B      4 liter\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_ref\": {\"missing\": 0, \"unique_nonempty\": 15}, \"resource\": {\"missing\": 0, \"unique_nonempty\": 3}, \"amount\": {\"missing\": 0, \"unique_nonempty\": 6, \"numeric_range\": [2.0, 8.0]}, \"unit\": {\"missing\": 0, \"unique_nonempty\": 1}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"amount\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"item_ref\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"liter\", \"matching_columns\": [{\"column\": \"unit\", \"exact\": 15, \"prefix\": 15, \"contains\": 15, \"examples\": [\"liter\"]}], \"exact_matching_columns\": 1}, {\"term\": \"resource\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"unit\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"usage\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 15, \"prefix\": 15, \"contains\": 15, \"examples\": [\"usage\"]}], \"exact_matching_columns\": 1}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_01/export_13.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 15\nColumns: ['table', 'item_ref', 'resource', 'amount', 'unit']\nParsed column types: {'table': 'object', 'item_ref': 'object', 'resource': 'object', 'amount': 'int64', 'unit': 'object'}\nPreview only (first 10 rows):\ntable      item_ref  resource amount  unit\nusage R8af59fb1b6d9 SECTION_A      7 liter\nusage Raf6249743aab SECTION_A      3 liter\nusage R1f5cabe17f56 SECTION_A      7 liter\nusage Rd654f83d9c9b SECTION_A      6 liter\nusage R23ae26e45153 SECTION_A      3 liter\nusage R6b719309ca14 SECTION_B      2 liter\nusage R694597094779 SECTION_B      5 liter\nusage R51e14ed234fb SECTION_B      8 liter\nusage R144b336321b3 SECTION_B      6 liter\nusage R77b5ceefbc30 SECTION_B      3 liter\nFull-file column statistics: {\"table\": {\"missing\": 0, \"unique_nonempty\": 1}, \"item_ref\": {\"missing\": 0, \"unique_nonempty\": 15}, \"resource\": {\"missing\": 0, \"unique_nonempty\": 3}, \"amount\": {\"missing\": 0, \"unique_nonempty\": 7, \"numeric_range\": [2.0, 8.0]}, \"unit\": {\"missing\": 0, \"unique_nonempty\": 1}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"amount\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"item_ref\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"liter\", \"matching_columns\": [{\"column\": \"unit\", \"exact\": 15, \"prefix\": 15, \"contains\": 15, \"examples\": [\"liter\"]}], \"exact_matching_columns\": 1}, {\"term\": \"resource\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"table\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"unit\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"usage\", \"matching_columns\": [{\"column\": \"table\", \"exact\": 15, \"prefix\": 15, \"contains\": 15, \"examples\": [\"usage\"]}], \"exact_matching_columns\": 1}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_paths = ['/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_01/export_01.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_02/export_02.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_03/export_03.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_04/export_04.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_05/export_05.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_06/export_06.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_01/export_07.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_02/export_08.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_03/export_09.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_04/export_10.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_05/export_11.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_06/export_12.csv', '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant34/inputs/batch_01/export_13.csv']\ndfs = [pd.read_csv(path, dtype=str, keep_default_na=False) for path in csv_paths]\n\ndef norm(s):\n    return s.casefold().strip() if isinstance(s, str) else s\nitem_df1 = dfs[6]\nitem_df2 = dfs[7]\nitem_df = pd.concat([item_df1, item_df2], ignore_index=True)\nitem_df['item_ref'] = item_df['item_ref'].apply(norm)\nitem_df['category'] = item_df['category'].apply(norm)\nitem_df['location_id'] = item_df['location_id'].apply(norm)\nitem_df['authorized'] = item_df['authorized'].astype(int)\nitem_df['minimum_lot'] = item_df['minimum_lot'].astype(int)\nitem_df['maximum_order'] = item_df['maximum_order'].astype(int)\noptions = list(item_df['item_ref'].unique())\noption_params = {}\nfor (_, row) in item_df.iterrows():\n    i = row['item_ref']\n    option_params[i] = {'category': row['category'], 'authorized': row['authorized'], 'minimum_lot': row['minimum_lot'], 'maximum_order': row['maximum_order'], 'location_id': row['location_id']}\nsections = sorted(item_df['location_id'].unique())\ncat_df = dfs[3]\ncat_df['category'] = cat_df['category'].apply(norm)\ncat_df['minimum_quantity'] = cat_df['minimum_quantity'].astype(int)\ncat_df['maximum_quantity'] = cat_df['maximum_quantity'].astype(int)\ncat_df['activation_fee_cents'] = cat_df['activation_fee_cents'].astype(int)\ncategories = list(cat_df['category'].unique())\ncat_min = dict(zip(cat_df['category'], cat_df['minimum_quantity']))\ncat_max = dict(zip(cat_df['category'], cat_df['maximum_quantity']))\ncat_fee = dict(zip(cat_df['category'], cat_df['activation_fee_cents']))\nbenefit_df = dfs[0]\nbenefit_df['item_ref'] = benefit_df['item_ref'].apply(norm)\nbenefit_df['amount_cents'] = benefit_df['amount_cents'].astype(int)\nbenefit_per_option = benefit_df.groupby('item_ref')['amount_cents'].sum().to_dict()\nfor i in options:\n    if i not in benefit_per_option:\n        benefit_per_option[i] = 0\nitem_fee_df = dfs[8]\nitem_fee_df['item_ref'] = item_fee_df['item_ref'].apply(norm)\nitem_fee_df['activation_fee_cents'] = item_fee_df['activation_fee_cents'].astype(int)\nitem_fee = dict(zip(item_fee_df['item_ref'], item_fee_df['activation_fee_cents']))\nfor i in options:\n    if i not in item_fee:\n        item_fee[i] = 0\ncap_df = dfs[2]\ncap_df['resource'] = cap_df['resource'].apply(norm)\ncap_df['amount'] = cap_df['amount'].astype(int)\ncap_df['unit'] = cap_df['unit'].apply(norm)\nresource_caps = cap_df.groupby('resource')['amount'].sum().to_dict()\nresources = list(resource_caps.keys())\nusage_df1 = dfs[11]\nusage_df2 = dfs[12]\nusage_df = pd.concat([usage_df1, usage_df2], ignore_index=True)\nusage_df['item_ref'] = usage_df['item_ref'].apply(norm)\nusage_df['resource'] = usage_df['resource'].apply(norm)\nusage_df['amount'] = usage_df['amount'].astype(int)\nusage_df['unit'] = usage_df['unit'].apply(norm)\nusage_df['amount_ml'] = usage_df['amount'] * 1000\nusage_per_option_resource = {}\nfor (_, row) in usage_df.iterrows():\n    usage_per_option_resource[row['item_ref'], row['resource']] = row['amount_ml']\nfor i in options:\n    for r in resources:\n        if (i, r) not in usage_per_option_resource:\n            usage_per_option_resource[i, r] = 0\noption_bounds = {}\nfor i in options:\n    p = option_params[i]\n    if p['authorized'] == 1:\n        option_bounds[i] = (0, p['maximum_order'])\n    else:\n        option_bounds[i] = (0, 0)\nincomp_df = dfs[5]\nincomp_df['item_a'] = incomp_df['item_a'].apply(norm)\nincomp_df['item_b'] = incomp_df['item_b'].apply(norm)\nincompatibles = set()\nfor (_, row) in incomp_df.iterrows():\n    incompatibles.add((row['item_a'], row['item_b']))\n    incompatibles.add((row['item_b'], row['item_a']))\nreq_df = dfs[10]\nreq_df['item_ref'] = req_df['item_ref'].apply(norm)\nreq_df['prerequisite_ref'] = req_df['prerequisite_ref'].apply(norm)\nrequires = set()\nfor (_, row) in req_df.iterrows():\n    requires.add((row['item_ref'], row['prerequisite_ref']))\nbundle_df = dfs[1]\nbundle_df['item_a'] = bundle_df['item_a'].apply(norm)\nbundle_df['item_b'] = bundle_df['item_b'].apply(norm)\nbundle_df['bonus_cents'] = bundle_df['bonus_cents'].astype(int)\nbundles = []\nbundle_bonus = {}\nfor (_, row) in bundle_df.iterrows():\n    (a, b) = (row['item_a'], row['item_b'])\n    bundles.append((a, b))\n    bundle_bonus[a, b] = row['bonus_cents']\nm = gp.Model('market_square_merchandising')\nx_vars = m.addVars(options, vtype=gp.GRB.INTEGER, lb=[option_bounds[i][0] for i in options], ub=[option_bounds[i][1] for i in options], name='')\ny_vars = m.addVars(options, vtype=gp.GRB.BINARY, name='')\nz_vars = m.addVars(categories, vtype=gp.GRB.BINARY, name='')\nb_vars = m.addVars(bundles, vtype=gp.GRB.BINARY, name='')\nfor i in options:\n    m.addConstr(x_vars[i] <= option_bounds[i][1] * y_vars[i], name=f'link_x_y_{i}')\n    if option_params[i]['authorized'] == 1:\n        m.addConstr(x_vars[i] >= option_params[i]['minimum_lot'] * y_vars[i], name=f'minlot_x_y_{i}')\n    else:\n        m.addConstr(x_vars[i] == 0, name=f'unauth_x_{i}')\nfor r in resources:\n    m.addConstr(gp.quicksum((usage_per_option_resource[i, r] * x_vars[i] for i in options)) <= resource_caps[r], name=f'cap_{r}')\nfor c in categories:\n    m.addConstr(gp.quicksum((x_vars[i] for i in options if option_params[i]['category'] == c)) >= cat_min[c], name=f'cat_min_{c}')\n    m.addConstr(gp.quicksum((x_vars[i] for i in options if option_params[i]['category'] == c)) <= cat_max[c], name=f'cat_max_{c}')\nfor c in categories:\n    for i in options:\n        if option_params[i]['category'] == c:\n            m.addConstr(z_vars[c] >= y_vars[i], name=f'cat_z_ge_y_{c}_{i}')\n    m.addConstr(z_vars[c] <= gp.quicksum((y_vars[i] for i in options if option_params[i]['category'] == c)), name=f'cat_z_le_sumy_{c}')\nfor (a, b) in incompatibles:\n    if a in options and b in options:\n        m.addConstr(y_vars[a] + y_vars[b] <= 1, name=f'incomp_{a}_{b}')\nfor (i, pre) in requires:\n    if i in options and pre in options:\n        m.addConstr(y_vars[i] <= y_vars[pre], name=f'req_{i}_{pre}')\nfor (a, b) in bundles:\n    if a in options and b in options:\n        m.addConstr(b_vars[a, b] <= y_vars[a], name=f'bundle_b_le_ya_{a}_{b}')\n        m.addConstr(b_vars[a, b] <= y_vars[b], name=f'bundle_b_le_yb_{a}_{b}')\n        m.addConstr(b_vars[a, b] >= y_vars[a] + y_vars[b] - 1, name=f'bundle_b_ge_sum_{a}_{b}')\n    else:\n        m.addConstr(b_vars[a, b] == 0, name=f'bundle_b_zero_{a}_{b}')\nbenefit_term = gp.quicksum((benefit_per_option[i] * x_vars[i] for i in options))\nitem_fee_term = gp.quicksum((item_fee[i] * y_vars[i] for i in options))\ncat_fee_term = gp.quicksum((cat_fee[c] * z_vars[c] for c in categories))\nbundle_term = gp.quicksum((bundle_bonus[a, b] * b_vars[a, b] for (a, b) in bundles))\nm.setObjective(benefit_term - item_fee_term - cat_fee_term + bundle_term, gp.GRB.MAXIMIZE)\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 98866.0,
+  "final_solution": [
+    [
+      "C0",
+      9.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      8.0
+    ],
+    [
+      "C3",
+      0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      2.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      2.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      8.0
+    ],
+    [
+      "C10",
+      6.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      9.0
+    ],
+    [
+      "C14",
+      0.0
+    ],
+    [
+      "C15",
+      6.0
+    ],
+    [
+      "C16",
+      0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ],
+    [
+      "C20",
+      -0.0
+    ],
+    [
+      "C21",
+      11.0
+    ],
+    [
+      "C22",
+      -0.0
+    ],
+    [
+      "C23",
+      11.0
+    ],
+    [
+      "C24",
+      -0.0
+    ],
+    [
+      "C25",
+      8.0
+    ],
+    [
+      "C26",
+      -0.0
+    ],
+    [
+      "C27",
+      -0.0
+    ],
+    [
+      "C28",
+      -0.0
+    ],
+    [
+      "C29",
+      -0.0
+    ],
+    [
+      "C30",
+      1.0
+    ],
+    [
+      "C31",
+      0.0
+    ],
+    [
+      "C32",
+      1.0
+    ],
+    [
+      "C33",
+      0.0
+    ],
+    [
+      "C34",
+      0.0
+    ],
+    [
+      "C35",
+      1.0
+    ],
+    [
+      "C36",
+      0.0
+    ],
+    [
+      "C37",
+      1.0
+    ],
+    [
+      "C38",
+      0.0
+    ],
+    [
+      "C39",
+      1.0
+    ],
+    [
+      "C40",
+      1.0
+    ],
+    [
+      "C41",
+      0.0
+    ],
+    [
+      "C42",
+      0.0
+    ],
+    [
+      "C43",
+      1.0
+    ],
+    [
+      "C44",
+      0.0
+    ],
+    [
+      "C45",
+      1.0
+    ],
+    [
+      "C46",
+      0.0
+    ],
+    [
+      "C47",
+      0.0
+    ],
+    [
+      "C48",
+      0.0
+    ],
+    [
+      "C49",
+      0.0
+    ],
+    [
+      "C50",
+      0.0
+    ],
+    [
+      "C51",
+      1.0
+    ],
+    [
+      "C52",
+      0.0
+    ],
+    [
+      "C53",
+      1.0
+    ],
+    [
+      "C54",
+      0.0
+    ],
+    [
+      "C55",
+      1.0
+    ],
+    [
+      "C56",
+      0.0
+    ],
+    [
+      "C57",
+      0.0
+    ],
+    [
+      "C58",
+      0.0
+    ],
+    [
+      "C59",
+      0.0
+    ],
+    [
+      "C60",
+      1.0
+    ],
+    [
+      "C61",
+      1.0
+    ],
+    [
+      "C62",
+      1.0
+    ],
+    [
+      "C63",
+      1.0
+    ],
+    [
+      "C64",
+      0.0
+    ],
+    [
+      "C65",
+      1.0
+    ],
+    [
+      "C66",
+      0.0
+    ],
+    [
+      "C67",
+      0.0
+    ],
+    [
+      "C68",
+      0.0
+    ],
+    [
+      "C69",
+      0.0
+    ],
+    [
+      "C70",
+      0.0
+    ],
+    [
+      "C71",
+      0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "variants",
+  "seconds": 31.83,
+  "evaluated_utc": "2026-10-06T03:25:57.937053+00:00",
+  "notebook_source_sha256": "d2f4f72fc2d67baab041f2440fa4fd866be06a4defd180fc5edce65637dce7d9",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

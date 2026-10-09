@@ -1,0 +1,40 @@
+#### Mathematical Optimization Model
+
+**Index Set:**
+- $I$: set of all products (from "Product Name" in table_id: file_0_view_0)
+
+**Parameters:**
+- $A_i$: revenue per unit of product $i$ (from "Revenue", table_id: file_0_view_0)
+- $d_i$: expected demand for product $i$ during the sales cycle (from "Demand", table_id: file_0_view_0)
+- $I_i$: initial inventory of product $i$ (from "Initial Inventory", table_id: file_0_view_0)
+
+**Decision Variables:**
+- $x_i$: number of orders fulfilled for product $i$, $x_i \in \mathbb{Z}_+, \forall i \in I$
+
+**Objective:**
+\[
+\max \sum_{i \in I} A_i x_i
+\]
+
+**Constraints:**
+1. Inventory constraint:
+   \[
+   x_i \leq I_i, \quad \forall i \in I
+   \]
+2. Demand constraint:
+   \[
+   x_i \leq d_i, \quad \forall i \in I
+   \]
+3. Non-negativity and integrality:
+   \[
+   x_i \in \mathbb{Z}_+, \quad \forall i \in I
+   \]
+
+---
+
+**Data Mapping**
+
+- Index set $I$: All "Product Name" entries in table_id: file_0_view_0, column "Product Name"
+- Parameter $A_i$: table_id: file_0_view_0, column "Revenue"
+- Parameter $d_i$: table_id: file_0_view_0, column "Demand"
+- Parameter $I_i$: table_id: file_0_view_0, column "Initial Inventory"

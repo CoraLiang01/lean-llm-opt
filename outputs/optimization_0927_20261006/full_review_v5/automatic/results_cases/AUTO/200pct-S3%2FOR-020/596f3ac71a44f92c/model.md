@@ -1,0 +1,84 @@
+##### Sets
+
+- Warehouses (suppliers): $I = \{S1, S2, S3, S4, S5\}$
+- Stores (customers): $J = \{D1, D2, D3, D4, D5\}$
+
+##### Parameters
+
+- Demand at store $j$ ($d_j$):
+
+| Store | Demand ($d_j$) |
+|-------|---------------|
+| D1    | 428           |
+| D2    | 217           |
+| D3    | 214           |
+| D4    | 380           |
+| D5    | 254           |
+
+- Supply capacity at warehouse $i$ ($s_i$):
+
+| Warehouse | Supply Capacity ($s_i$) |
+|-----------|------------------------|
+| S1        | 428                    |
+| S2        | 217                    |
+| S3        | 214                    |
+| S4        | 380                    |
+| S5        | 254                    |
+
+- Transportation cost per unit from warehouse $i$ to store $j$ ($c_{ij}$):
+
+|         | D1                | D2                | D3                | D4                | D5                |
+|---------|-------------------|-------------------|-------------------|-------------------|-------------------|
+| S1      | 269.3910588020795 | 1.453733539093394 | 99.60345345756603 | 26.64078166309837 | 9.537688956880922 |
+| S2      | 9.291846876785185 | 10.874778437070225| 144.52609291614627| 11.420133077898234| 153.1756819927813 |
+| S3      | 9.674584301671008 | 2.6191650959687944| 100.8242249168735 | 3.212191088791688 | 133.8493396124168 |
+| S4      | 270.57498480010247| 32.50253586       | 4.6842098096469815| 1.5682269686546804| 9.58927599        |
+| S5      | 226.0331910675782 | 8.669161980826471 | 65.47681316968448 | 9.068765258459958 | 202.65015316425533|
+
+##### Decision Variables
+
+- $x_{ij} \geq 0$: quantity shipped from warehouse $i$ to store $j$ (continuous).
+
+##### Objective Function
+
+\[
+\min \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij}
+\]
+
+##### Constraints
+
+1. **Demand satisfaction:** For each store $j \in J$,
+   \[
+   \sum_{i \in I} x_{ij} \geq d_j
+   \]
+   (Each store must receive at least its demand.)
+
+2. **Supply capacity:** For each warehouse $i \in I$,
+   \[
+   \sum_{j \in J} x_{ij} \leq s_i
+   \]
+   (No warehouse may ship more than its supply capacity.)
+
+3. **Non-negativity:**
+   \[
+   x_{ij} \geq 0 \quad \forall i \in I,\, j \in J
+   \]
+
+##### Complete Model
+
+\[
+\begin{align*}
+\min\ & \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij} \\
+\text{s.t.}\quad
+& \sum_{i \in I} x_{ij} \geq d_j \quad \forall j \in J \\
+& \sum_{j \in J} x_{ij} \leq s_i \quad \forall i \in I \\
+& x_{ij} \geq 0 \quad \forall i \in I,\, j \in J
+\end{align*}
+\]
+
+Where:
+
+- $I = \{S1, S2, S3, S4, S5\}$
+- $J = \{D1, D2, D3, D4, D5\}$
+- $d_j$ and $s_i$ as in the tables above
+- $c_{ij}$ as in the cost table above

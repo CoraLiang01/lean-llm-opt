@@ -1,0 +1,39 @@
+LEGACY_OBSERVATION = '{"values": {"daily_cleaning_cost": "204.6", "resource_capacity": "180"}}\n\n{"values": {"supplier_service_tier": "Standard", "item_name": "Baguette", "ingredient_supplier_rating": "4.7", "item_value": "888", "average_baking_minutes": "30", "resource_requirement": "4"}}\n\n{"values": {"supplier_service_tier": "Premium", "item_name": "Croissant", "ingredient_supplier_rating": "3.2", "item_value": "134", "average_baking_minutes": "30", "resource_requirement": "2"}}\n\n{"values": {"supplier_service_tier": "Standard", "item_name": "Sourdough", "ingredient_supplier_rating": "3.2", "item_value": "129", "average_baking_minutes": "45", "resource_requirement": "4"}}\n\n{"values": {"supplier_service_tier": "Priority", "item_name": "Rye Bread", "ingredient_supplier_rating": "3.5", "item_value": "370", "average_baking_minutes": "30", "resource_requirement": "3"}}\n\n{"values": {"supplier_service_tier": "Standard", "item_name": "Brioche", "ingredient_supplier_rating": "4.7", "item_value": "921", "average_baking_minutes": "12", "resource_requirement": "2"}}\n\n{"values": {"supplier_service_tier": "Premium", "item_name": "Focaccia", "ingredient_supplier_rating": "3.5", "item_value": "765", "average_baking_minutes": "24", "resource_requirement": "1"}}\n\n{"values": {"supplier_service_tier": "Priority", "item_name": "Ciabatta", "ingredient_supplier_rating": "3.2", "item_value": "154", "average_baking_minutes": "45", "resource_requirement": "2"}}\n\n{"values": {"supplier_service_tier": "Premium", "item_name": "Pita", "ingredient_supplier_rating": "3.8", "item_value": "837", "average_baking_minutes": "18", "resource_requirement": "1"}}\n\n{"values": {"supplier_service_tier": "Premium", "item_name": "Bagel", "ingredient_supplier_rating": "4.7", "item_value": "584", "average_baking_minutes": "30", "resource_requirement": "3"}}\n\n{"values": {"supplier_service_tier": "Standard", "item_name": "English Muffin", "ingredient_supplier_rating": "4.4", "item_value": "365", "average_baking_minutes": "12", "resource_requirement": "3"}}'
+LEGACY_RECORDS = [{'source': '', 'values': {'daily_cleaning_cost': '204.6', 'resource_capacity': '180'}}, {'source': '', 'values': {'supplier_service_tier': 'Standard', 'item_name': 'Baguette', 'ingredient_supplier_rating': '4.7', 'item_value': '888', 'average_baking_minutes': '30', 'resource_requirement': '4'}}, {'source': '', 'values': {'supplier_service_tier': 'Premium', 'item_name': 'Croissant', 'ingredient_supplier_rating': '3.2', 'item_value': '134', 'average_baking_minutes': '30', 'resource_requirement': '2'}}, {'source': '', 'values': {'supplier_service_tier': 'Standard', 'item_name': 'Sourdough', 'ingredient_supplier_rating': '3.2', 'item_value': '129', 'average_baking_minutes': '45', 'resource_requirement': '4'}}, {'source': '', 'values': {'supplier_service_tier': 'Priority', 'item_name': 'Rye Bread', 'ingredient_supplier_rating': '3.5', 'item_value': '370', 'average_baking_minutes': '30', 'resource_requirement': '3'}}, {'source': '', 'values': {'supplier_service_tier': 'Standard', 'item_name': 'Brioche', 'ingredient_supplier_rating': '4.7', 'item_value': '921', 'average_baking_minutes': '12', 'resource_requirement': '2'}}, {'source': '', 'values': {'supplier_service_tier': 'Premium', 'item_name': 'Focaccia', 'ingredient_supplier_rating': '3.5', 'item_value': '765', 'average_baking_minutes': '24', 'resource_requirement': '1'}}, {'source': '', 'values': {'supplier_service_tier': 'Priority', 'item_name': 'Ciabatta', 'ingredient_supplier_rating': '3.2', 'item_value': '154', 'average_baking_minutes': '45', 'resource_requirement': '2'}}, {'source': '', 'values': {'supplier_service_tier': 'Premium', 'item_name': 'Pita', 'ingredient_supplier_rating': '3.8', 'item_value': '837', 'average_baking_minutes': '18', 'resource_requirement': '1'}}, {'source': '', 'values': {'supplier_service_tier': 'Premium', 'item_name': 'Bagel', 'ingredient_supplier_rating': '4.7', 'item_value': '584', 'average_baking_minutes': '30', 'resource_requirement': '3'}}, {'source': '', 'values': {'supplier_service_tier': 'Standard', 'item_name': 'English Muffin', 'ingredient_supplier_rating': '4.4', 'item_value': '365', 'average_baking_minutes': '12', 'resource_requirement': '3'}}]
+import gurobipy as gp
+from gurobipy import GRB
+records = LEGACY_RECORDS
+resource_capacity = None
+for rec in records:
+    vals = rec.get('values', {})
+    if 'resource_capacity' in vals:
+        resource_capacity = int(vals['resource_capacity'])
+        break
+if resource_capacity is None:
+    raise ValueError('Missing resource_capacity in LEGACY_RECORDS')
+items = []
+profit = {}
+resource_req = {}
+for rec in records:
+    vals = rec.get('values', {})
+    if 'item_name' in vals:
+        name = vals['item_name']
+        items.append(name)
+        if 'item_value' not in vals or 'resource_requirement' not in vals:
+            raise ValueError(f'Missing item_value or resource_requirement for {name}')
+        profit[name] = int(vals['item_value'])
+        resource_req[name] = int(vals['resource_requirement'])
+if len(items) != len(profit) or len(items) != len(resource_req):
+    raise ValueError('Mismatch in items, profit, or resource_req lengths')
+m = gp.Model('Bakery_Bread_Order')
+x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='')
+m.setObjective(gp.quicksum((profit[i] * x[i] for i in items)), GRB.MAXIMIZE)
+m.addConstr(gp.quicksum((resource_req[i] * x[i] for i in items)) <= resource_capacity, name='storage')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')

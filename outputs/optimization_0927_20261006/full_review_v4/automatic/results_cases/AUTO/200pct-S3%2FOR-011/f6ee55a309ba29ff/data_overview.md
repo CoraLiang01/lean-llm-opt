@@ -1,0 +1,150 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/capacity.csv",
+    "values": {
+      "previous_period_capacity": "991",
+      "Capacity": "875",
+      "capacity_two_periods_ago": "1049"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Spinach",
+      "previous_period_replenishment_policy": "On demand",
+      "Weight": "230",
+      "two_periods_ago_stock_status": "Balanced",
+      "two_periods_ago_unit_value": "66",
+      "previous_period_resource_requirement": "261",
+      "previous_period_unit_value": "58",
+      "Value": "64",
+      "previous_period_stock_status": "Balanced"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Shiitake Mushrooms",
+      "previous_period_replenishment_policy": "Daily",
+      "Weight": "637",
+      "two_periods_ago_stock_status": "Overstock",
+      "two_periods_ago_unit_value": "61",
+      "previous_period_resource_requirement": "523",
+      "previous_period_unit_value": "81",
+      "Value": "75",
+      "previous_period_stock_status": "Balanced"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Apples",
+      "previous_period_replenishment_policy": "Daily",
+      "Weight": "773",
+      "two_periods_ago_stock_status": "Overstock",
+      "two_periods_ago_unit_value": "76",
+      "previous_period_resource_requirement": "895",
+      "previous_period_unit_value": "79",
+      "Value": "68",
+      "previous_period_stock_status": "Stockout"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Carrots",
+      "previous_period_replenishment_policy": "Weekly",
+      "Weight": "653",
+      "two_periods_ago_stock_status": "Balanced",
+      "two_periods_ago_unit_value": "13",
+      "previous_period_resource_requirement": "659",
+      "previous_period_unit_value": "9",
+      "Value": "11",
+      "previous_period_stock_status": "Stockout"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Basil",
+      "previous_period_replenishment_policy": "Weekly",
+      "Weight": "755",
+      "two_periods_ago_stock_status": "Stockout",
+      "two_periods_ago_unit_value": "98",
+      "previous_period_resource_requirement": "730",
+      "previous_period_unit_value": "77",
+      "Value": "91",
+      "previous_period_stock_status": "Overstock"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Potatoes",
+      "previous_period_replenishment_policy": "On demand",
+      "Weight": "670",
+      "two_periods_ago_stock_status": "Overstock",
+      "two_periods_ago_unit_value": "36",
+      "previous_period_resource_requirement": "709",
+      "previous_period_unit_value": "26",
+      "Value": "31",
+      "previous_period_stock_status": "Stockout"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Green Beans",
+      "previous_period_replenishment_policy": "Weekly",
+      "Weight": "505",
+      "two_periods_ago_stock_status": "Overstock",
+      "two_periods_ago_unit_value": "77",
+      "previous_period_resource_requirement": "498",
+      "previous_period_unit_value": "87",
+      "Value": "90",
+      "previous_period_stock_status": "Balanced"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Blueberries",
+      "previous_period_replenishment_policy": "On demand",
+      "Weight": "821",
+      "two_periods_ago_stock_status": "Overstock",
+      "two_periods_ago_unit_value": "58",
+      "previous_period_resource_requirement": "736",
+      "previous_period_unit_value": "66",
+      "Value": "56",
+      "previous_period_stock_status": "Stockout"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Oranges",
+      "previous_period_replenishment_policy": "On demand",
+      "Weight": "83",
+      "two_periods_ago_stock_status": "Overstock",
+      "two_periods_ago_unit_value": "11",
+      "previous_period_resource_requirement": "91",
+      "previous_period_unit_value": "12",
+      "Value": "10",
+      "previous_period_stock_status": "Balanced"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S3/Large-scale-or/RA_testing/RA12/SupermarketSalesData2/products.csv",
+    "values": {
+      "ProductName": "Watermelons",
+      "previous_period_replenishment_policy": "On demand",
+      "Weight": "249",
+      "two_periods_ago_stock_status": "Balanced",
+      "two_periods_ago_unit_value": "21",
+      "previous_period_resource_requirement": "209",
+      "previous_period_unit_value": "22",
+      "Value": "24",
+      "previous_period_stock_status": "Overstock"
+    }
+  }
+]

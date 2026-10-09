@@ -1,0 +1,970 @@
+* Signature: 0x888410e58cb9cc6c
+NAME _copy
+ROWS
+ N  OBJ
+ G  Coverage_0
+ G  Coverage_1
+ G  Coverage_2
+ G  Coverage_3
+ G  Coverage_4
+ G  Coverage_5
+ G  Coverage_6
+ G  Coverage_7
+ G  Coverage_8
+ G  Coverage_9
+ G  Coverage_10
+ G  Coverage_11
+ G  Coverage_12
+ G  Coverage_13
+ G  Coverage_14
+ G  Coverage_15
+ G  Coverage_16
+ G  Coverage_17
+ G  Coverage_18
+ G  Coverage_19
+ G  Coverage_20
+ G  Coverage_21
+ G  Coverage_22
+ G  Coverage_23
+ G  Coverage_24
+ G  Coverage_25
+ G  Coverage_26
+ G  Coverage_27
+ G  Coverage_28
+ G  Coverage_29
+ G  Coverage_30
+ G  Coverage_31
+ G  Coverage_32
+ G  Coverage_33
+ G  Coverage_34
+ G  Coverage_35
+ G  Coverage_36
+ G  Coverage_37
+ G  Coverage_38
+ G  Coverage_39
+ G  Coverage_40
+ G  Coverage_41
+ G  Coverage_42
+ G  Coverage_43
+ G  Coverage_44
+ G  Coverage_45
+ G  Coverage_46
+ G  Coverage_47
+COLUMNS
+    MARKER    'MARKER'                 'INTORG'
+    x[0]      OBJ       1
+    x[0]      Coverage_0  1
+    x[0]      Coverage_1  1
+    x[0]      Coverage_2  1
+    x[0]      Coverage_3  1
+    x[0]      Coverage_4  1
+    x[0]      Coverage_5  1
+    x[0]      Coverage_6  1
+    x[0]      Coverage_7  1
+    x[0]      Coverage_8  1
+    x[0]      Coverage_9  1
+    x[0]      Coverage_10  1
+    x[0]      Coverage_11  1
+    x[0]      Coverage_12  1
+    x[0]      Coverage_13  1
+    x[0]      Coverage_14  1
+    x[0]      Coverage_15  1
+    x[1]      OBJ       1
+    x[1]      Coverage_1  1
+    x[1]      Coverage_2  1
+    x[1]      Coverage_3  1
+    x[1]      Coverage_4  1
+    x[1]      Coverage_5  1
+    x[1]      Coverage_6  1
+    x[1]      Coverage_7  1
+    x[1]      Coverage_8  1
+    x[1]      Coverage_9  1
+    x[1]      Coverage_10  1
+    x[1]      Coverage_11  1
+    x[1]      Coverage_12  1
+    x[1]      Coverage_13  1
+    x[1]      Coverage_14  1
+    x[1]      Coverage_15  1
+    x[1]      Coverage_16  1
+    x[2]      OBJ       1
+    x[2]      Coverage_2  1
+    x[2]      Coverage_3  1
+    x[2]      Coverage_4  1
+    x[2]      Coverage_5  1
+    x[2]      Coverage_6  1
+    x[2]      Coverage_7  1
+    x[2]      Coverage_8  1
+    x[2]      Coverage_9  1
+    x[2]      Coverage_10  1
+    x[2]      Coverage_11  1
+    x[2]      Coverage_12  1
+    x[2]      Coverage_13  1
+    x[2]      Coverage_14  1
+    x[2]      Coverage_15  1
+    x[2]      Coverage_16  1
+    x[2]      Coverage_17  1
+    x[3]      OBJ       1
+    x[3]      Coverage_3  1
+    x[3]      Coverage_4  1
+    x[3]      Coverage_5  1
+    x[3]      Coverage_6  1
+    x[3]      Coverage_7  1
+    x[3]      Coverage_8  1
+    x[3]      Coverage_9  1
+    x[3]      Coverage_10  1
+    x[3]      Coverage_11  1
+    x[3]      Coverage_12  1
+    x[3]      Coverage_13  1
+    x[3]      Coverage_14  1
+    x[3]      Coverage_15  1
+    x[3]      Coverage_16  1
+    x[3]      Coverage_17  1
+    x[3]      Coverage_18  1
+    x[4]      OBJ       1
+    x[4]      Coverage_4  1
+    x[4]      Coverage_5  1
+    x[4]      Coverage_6  1
+    x[4]      Coverage_7  1
+    x[4]      Coverage_8  1
+    x[4]      Coverage_9  1
+    x[4]      Coverage_10  1
+    x[4]      Coverage_11  1
+    x[4]      Coverage_12  1
+    x[4]      Coverage_13  1
+    x[4]      Coverage_14  1
+    x[4]      Coverage_15  1
+    x[4]      Coverage_16  1
+    x[4]      Coverage_17  1
+    x[4]      Coverage_18  1
+    x[4]      Coverage_19  1
+    x[5]      OBJ       1
+    x[5]      Coverage_5  1
+    x[5]      Coverage_6  1
+    x[5]      Coverage_7  1
+    x[5]      Coverage_8  1
+    x[5]      Coverage_9  1
+    x[5]      Coverage_10  1
+    x[5]      Coverage_11  1
+    x[5]      Coverage_12  1
+    x[5]      Coverage_13  1
+    x[5]      Coverage_14  1
+    x[5]      Coverage_15  1
+    x[5]      Coverage_16  1
+    x[5]      Coverage_17  1
+    x[5]      Coverage_18  1
+    x[5]      Coverage_19  1
+    x[5]      Coverage_20  1
+    x[6]      OBJ       1
+    x[6]      Coverage_6  1
+    x[6]      Coverage_7  1
+    x[6]      Coverage_8  1
+    x[6]      Coverage_9  1
+    x[6]      Coverage_10  1
+    x[6]      Coverage_11  1
+    x[6]      Coverage_12  1
+    x[6]      Coverage_13  1
+    x[6]      Coverage_14  1
+    x[6]      Coverage_15  1
+    x[6]      Coverage_16  1
+    x[6]      Coverage_17  1
+    x[6]      Coverage_18  1
+    x[6]      Coverage_19  1
+    x[6]      Coverage_20  1
+    x[6]      Coverage_21  1
+    x[7]      OBJ       1
+    x[7]      Coverage_7  1
+    x[7]      Coverage_8  1
+    x[7]      Coverage_9  1
+    x[7]      Coverage_10  1
+    x[7]      Coverage_11  1
+    x[7]      Coverage_12  1
+    x[7]      Coverage_13  1
+    x[7]      Coverage_14  1
+    x[7]      Coverage_15  1
+    x[7]      Coverage_16  1
+    x[7]      Coverage_17  1
+    x[7]      Coverage_18  1
+    x[7]      Coverage_19  1
+    x[7]      Coverage_20  1
+    x[7]      Coverage_21  1
+    x[7]      Coverage_22  1
+    x[8]      OBJ       1
+    x[8]      Coverage_8  1
+    x[8]      Coverage_9  1
+    x[8]      Coverage_10  1
+    x[8]      Coverage_11  1
+    x[8]      Coverage_12  1
+    x[8]      Coverage_13  1
+    x[8]      Coverage_14  1
+    x[8]      Coverage_15  1
+    x[8]      Coverage_16  1
+    x[8]      Coverage_17  1
+    x[8]      Coverage_18  1
+    x[8]      Coverage_19  1
+    x[8]      Coverage_20  1
+    x[8]      Coverage_21  1
+    x[8]      Coverage_22  1
+    x[8]      Coverage_23  1
+    x[9]      OBJ       1
+    x[9]      Coverage_9  1
+    x[9]      Coverage_10  1
+    x[9]      Coverage_11  1
+    x[9]      Coverage_12  1
+    x[9]      Coverage_13  1
+    x[9]      Coverage_14  1
+    x[9]      Coverage_15  1
+    x[9]      Coverage_16  1
+    x[9]      Coverage_17  1
+    x[9]      Coverage_18  1
+    x[9]      Coverage_19  1
+    x[9]      Coverage_20  1
+    x[9]      Coverage_21  1
+    x[9]      Coverage_22  1
+    x[9]      Coverage_23  1
+    x[9]      Coverage_24  1
+    x[10]     OBJ       1
+    x[10]     Coverage_10  1
+    x[10]     Coverage_11  1
+    x[10]     Coverage_12  1
+    x[10]     Coverage_13  1
+    x[10]     Coverage_14  1
+    x[10]     Coverage_15  1
+    x[10]     Coverage_16  1
+    x[10]     Coverage_17  1
+    x[10]     Coverage_18  1
+    x[10]     Coverage_19  1
+    x[10]     Coverage_20  1
+    x[10]     Coverage_21  1
+    x[10]     Coverage_22  1
+    x[10]     Coverage_23  1
+    x[10]     Coverage_24  1
+    x[10]     Coverage_25  1
+    x[11]     OBJ       1
+    x[11]     Coverage_11  1
+    x[11]     Coverage_12  1
+    x[11]     Coverage_13  1
+    x[11]     Coverage_14  1
+    x[11]     Coverage_15  1
+    x[11]     Coverage_16  1
+    x[11]     Coverage_17  1
+    x[11]     Coverage_18  1
+    x[11]     Coverage_19  1
+    x[11]     Coverage_20  1
+    x[11]     Coverage_21  1
+    x[11]     Coverage_22  1
+    x[11]     Coverage_23  1
+    x[11]     Coverage_24  1
+    x[11]     Coverage_25  1
+    x[11]     Coverage_26  1
+    x[12]     OBJ       1
+    x[12]     Coverage_12  1
+    x[12]     Coverage_13  1
+    x[12]     Coverage_14  1
+    x[12]     Coverage_15  1
+    x[12]     Coverage_16  1
+    x[12]     Coverage_17  1
+    x[12]     Coverage_18  1
+    x[12]     Coverage_19  1
+    x[12]     Coverage_20  1
+    x[12]     Coverage_21  1
+    x[12]     Coverage_22  1
+    x[12]     Coverage_23  1
+    x[12]     Coverage_24  1
+    x[12]     Coverage_25  1
+    x[12]     Coverage_26  1
+    x[12]     Coverage_27  1
+    x[13]     OBJ       1
+    x[13]     Coverage_13  1
+    x[13]     Coverage_14  1
+    x[13]     Coverage_15  1
+    x[13]     Coverage_16  1
+    x[13]     Coverage_17  1
+    x[13]     Coverage_18  1
+    x[13]     Coverage_19  1
+    x[13]     Coverage_20  1
+    x[13]     Coverage_21  1
+    x[13]     Coverage_22  1
+    x[13]     Coverage_23  1
+    x[13]     Coverage_24  1
+    x[13]     Coverage_25  1
+    x[13]     Coverage_26  1
+    x[13]     Coverage_27  1
+    x[13]     Coverage_28  1
+    x[14]     OBJ       1
+    x[14]     Coverage_14  1
+    x[14]     Coverage_15  1
+    x[14]     Coverage_16  1
+    x[14]     Coverage_17  1
+    x[14]     Coverage_18  1
+    x[14]     Coverage_19  1
+    x[14]     Coverage_20  1
+    x[14]     Coverage_21  1
+    x[14]     Coverage_22  1
+    x[14]     Coverage_23  1
+    x[14]     Coverage_24  1
+    x[14]     Coverage_25  1
+    x[14]     Coverage_26  1
+    x[14]     Coverage_27  1
+    x[14]     Coverage_28  1
+    x[14]     Coverage_29  1
+    x[15]     OBJ       1
+    x[15]     Coverage_15  1
+    x[15]     Coverage_16  1
+    x[15]     Coverage_17  1
+    x[15]     Coverage_18  1
+    x[15]     Coverage_19  1
+    x[15]     Coverage_20  1
+    x[15]     Coverage_21  1
+    x[15]     Coverage_22  1
+    x[15]     Coverage_23  1
+    x[15]     Coverage_24  1
+    x[15]     Coverage_25  1
+    x[15]     Coverage_26  1
+    x[15]     Coverage_27  1
+    x[15]     Coverage_28  1
+    x[15]     Coverage_29  1
+    x[15]     Coverage_30  1
+    x[16]     OBJ       1
+    x[16]     Coverage_16  1
+    x[16]     Coverage_17  1
+    x[16]     Coverage_18  1
+    x[16]     Coverage_19  1
+    x[16]     Coverage_20  1
+    x[16]     Coverage_21  1
+    x[16]     Coverage_22  1
+    x[16]     Coverage_23  1
+    x[16]     Coverage_24  1
+    x[16]     Coverage_25  1
+    x[16]     Coverage_26  1
+    x[16]     Coverage_27  1
+    x[16]     Coverage_28  1
+    x[16]     Coverage_29  1
+    x[16]     Coverage_30  1
+    x[16]     Coverage_31  1
+    x[17]     OBJ       1
+    x[17]     Coverage_17  1
+    x[17]     Coverage_18  1
+    x[17]     Coverage_19  1
+    x[17]     Coverage_20  1
+    x[17]     Coverage_21  1
+    x[17]     Coverage_22  1
+    x[17]     Coverage_23  1
+    x[17]     Coverage_24  1
+    x[17]     Coverage_25  1
+    x[17]     Coverage_26  1
+    x[17]     Coverage_27  1
+    x[17]     Coverage_28  1
+    x[17]     Coverage_29  1
+    x[17]     Coverage_30  1
+    x[17]     Coverage_31  1
+    x[17]     Coverage_32  1
+    x[18]     OBJ       1
+    x[18]     Coverage_18  1
+    x[18]     Coverage_19  1
+    x[18]     Coverage_20  1
+    x[18]     Coverage_21  1
+    x[18]     Coverage_22  1
+    x[18]     Coverage_23  1
+    x[18]     Coverage_24  1
+    x[18]     Coverage_25  1
+    x[18]     Coverage_26  1
+    x[18]     Coverage_27  1
+    x[18]     Coverage_28  1
+    x[18]     Coverage_29  1
+    x[18]     Coverage_30  1
+    x[18]     Coverage_31  1
+    x[18]     Coverage_32  1
+    x[18]     Coverage_33  1
+    x[19]     OBJ       1
+    x[19]     Coverage_19  1
+    x[19]     Coverage_20  1
+    x[19]     Coverage_21  1
+    x[19]     Coverage_22  1
+    x[19]     Coverage_23  1
+    x[19]     Coverage_24  1
+    x[19]     Coverage_25  1
+    x[19]     Coverage_26  1
+    x[19]     Coverage_27  1
+    x[19]     Coverage_28  1
+    x[19]     Coverage_29  1
+    x[19]     Coverage_30  1
+    x[19]     Coverage_31  1
+    x[19]     Coverage_32  1
+    x[19]     Coverage_33  1
+    x[19]     Coverage_34  1
+    x[20]     OBJ       1
+    x[20]     Coverage_20  1
+    x[20]     Coverage_21  1
+    x[20]     Coverage_22  1
+    x[20]     Coverage_23  1
+    x[20]     Coverage_24  1
+    x[20]     Coverage_25  1
+    x[20]     Coverage_26  1
+    x[20]     Coverage_27  1
+    x[20]     Coverage_28  1
+    x[20]     Coverage_29  1
+    x[20]     Coverage_30  1
+    x[20]     Coverage_31  1
+    x[20]     Coverage_32  1
+    x[20]     Coverage_33  1
+    x[20]     Coverage_34  1
+    x[20]     Coverage_35  1
+    x[21]     OBJ       1
+    x[21]     Coverage_21  1
+    x[21]     Coverage_22  1
+    x[21]     Coverage_23  1
+    x[21]     Coverage_24  1
+    x[21]     Coverage_25  1
+    x[21]     Coverage_26  1
+    x[21]     Coverage_27  1
+    x[21]     Coverage_28  1
+    x[21]     Coverage_29  1
+    x[21]     Coverage_30  1
+    x[21]     Coverage_31  1
+    x[21]     Coverage_32  1
+    x[21]     Coverage_33  1
+    x[21]     Coverage_34  1
+    x[21]     Coverage_35  1
+    x[21]     Coverage_36  1
+    x[22]     OBJ       1
+    x[22]     Coverage_22  1
+    x[22]     Coverage_23  1
+    x[22]     Coverage_24  1
+    x[22]     Coverage_25  1
+    x[22]     Coverage_26  1
+    x[22]     Coverage_27  1
+    x[22]     Coverage_28  1
+    x[22]     Coverage_29  1
+    x[22]     Coverage_30  1
+    x[22]     Coverage_31  1
+    x[22]     Coverage_32  1
+    x[22]     Coverage_33  1
+    x[22]     Coverage_34  1
+    x[22]     Coverage_35  1
+    x[22]     Coverage_36  1
+    x[22]     Coverage_37  1
+    x[23]     OBJ       1
+    x[23]     Coverage_23  1
+    x[23]     Coverage_24  1
+    x[23]     Coverage_25  1
+    x[23]     Coverage_26  1
+    x[23]     Coverage_27  1
+    x[23]     Coverage_28  1
+    x[23]     Coverage_29  1
+    x[23]     Coverage_30  1
+    x[23]     Coverage_31  1
+    x[23]     Coverage_32  1
+    x[23]     Coverage_33  1
+    x[23]     Coverage_34  1
+    x[23]     Coverage_35  1
+    x[23]     Coverage_36  1
+    x[23]     Coverage_37  1
+    x[23]     Coverage_38  1
+    x[24]     OBJ       1
+    x[24]     Coverage_24  1
+    x[24]     Coverage_25  1
+    x[24]     Coverage_26  1
+    x[24]     Coverage_27  1
+    x[24]     Coverage_28  1
+    x[24]     Coverage_29  1
+    x[24]     Coverage_30  1
+    x[24]     Coverage_31  1
+    x[24]     Coverage_32  1
+    x[24]     Coverage_33  1
+    x[24]     Coverage_34  1
+    x[24]     Coverage_35  1
+    x[24]     Coverage_36  1
+    x[24]     Coverage_37  1
+    x[24]     Coverage_38  1
+    x[24]     Coverage_39  1
+    x[25]     OBJ       1
+    x[25]     Coverage_25  1
+    x[25]     Coverage_26  1
+    x[25]     Coverage_27  1
+    x[25]     Coverage_28  1
+    x[25]     Coverage_29  1
+    x[25]     Coverage_30  1
+    x[25]     Coverage_31  1
+    x[25]     Coverage_32  1
+    x[25]     Coverage_33  1
+    x[25]     Coverage_34  1
+    x[25]     Coverage_35  1
+    x[25]     Coverage_36  1
+    x[25]     Coverage_37  1
+    x[25]     Coverage_38  1
+    x[25]     Coverage_39  1
+    x[25]     Coverage_40  1
+    x[26]     OBJ       1
+    x[26]     Coverage_26  1
+    x[26]     Coverage_27  1
+    x[26]     Coverage_28  1
+    x[26]     Coverage_29  1
+    x[26]     Coverage_30  1
+    x[26]     Coverage_31  1
+    x[26]     Coverage_32  1
+    x[26]     Coverage_33  1
+    x[26]     Coverage_34  1
+    x[26]     Coverage_35  1
+    x[26]     Coverage_36  1
+    x[26]     Coverage_37  1
+    x[26]     Coverage_38  1
+    x[26]     Coverage_39  1
+    x[26]     Coverage_40  1
+    x[26]     Coverage_41  1
+    x[27]     OBJ       1
+    x[27]     Coverage_27  1
+    x[27]     Coverage_28  1
+    x[27]     Coverage_29  1
+    x[27]     Coverage_30  1
+    x[27]     Coverage_31  1
+    x[27]     Coverage_32  1
+    x[27]     Coverage_33  1
+    x[27]     Coverage_34  1
+    x[27]     Coverage_35  1
+    x[27]     Coverage_36  1
+    x[27]     Coverage_37  1
+    x[27]     Coverage_38  1
+    x[27]     Coverage_39  1
+    x[27]     Coverage_40  1
+    x[27]     Coverage_41  1
+    x[27]     Coverage_42  1
+    x[28]     OBJ       1
+    x[28]     Coverage_28  1
+    x[28]     Coverage_29  1
+    x[28]     Coverage_30  1
+    x[28]     Coverage_31  1
+    x[28]     Coverage_32  1
+    x[28]     Coverage_33  1
+    x[28]     Coverage_34  1
+    x[28]     Coverage_35  1
+    x[28]     Coverage_36  1
+    x[28]     Coverage_37  1
+    x[28]     Coverage_38  1
+    x[28]     Coverage_39  1
+    x[28]     Coverage_40  1
+    x[28]     Coverage_41  1
+    x[28]     Coverage_42  1
+    x[28]     Coverage_43  1
+    x[29]     OBJ       1
+    x[29]     Coverage_29  1
+    x[29]     Coverage_30  1
+    x[29]     Coverage_31  1
+    x[29]     Coverage_32  1
+    x[29]     Coverage_33  1
+    x[29]     Coverage_34  1
+    x[29]     Coverage_35  1
+    x[29]     Coverage_36  1
+    x[29]     Coverage_37  1
+    x[29]     Coverage_38  1
+    x[29]     Coverage_39  1
+    x[29]     Coverage_40  1
+    x[29]     Coverage_41  1
+    x[29]     Coverage_42  1
+    x[29]     Coverage_43  1
+    x[29]     Coverage_44  1
+    x[30]     OBJ       1
+    x[30]     Coverage_30  1
+    x[30]     Coverage_31  1
+    x[30]     Coverage_32  1
+    x[30]     Coverage_33  1
+    x[30]     Coverage_34  1
+    x[30]     Coverage_35  1
+    x[30]     Coverage_36  1
+    x[30]     Coverage_37  1
+    x[30]     Coverage_38  1
+    x[30]     Coverage_39  1
+    x[30]     Coverage_40  1
+    x[30]     Coverage_41  1
+    x[30]     Coverage_42  1
+    x[30]     Coverage_43  1
+    x[30]     Coverage_44  1
+    x[30]     Coverage_45  1
+    x[31]     OBJ       1
+    x[31]     Coverage_31  1
+    x[31]     Coverage_32  1
+    x[31]     Coverage_33  1
+    x[31]     Coverage_34  1
+    x[31]     Coverage_35  1
+    x[31]     Coverage_36  1
+    x[31]     Coverage_37  1
+    x[31]     Coverage_38  1
+    x[31]     Coverage_39  1
+    x[31]     Coverage_40  1
+    x[31]     Coverage_41  1
+    x[31]     Coverage_42  1
+    x[31]     Coverage_43  1
+    x[31]     Coverage_44  1
+    x[31]     Coverage_45  1
+    x[31]     Coverage_46  1
+    x[32]     OBJ       1
+    x[32]     Coverage_32  1
+    x[32]     Coverage_33  1
+    x[32]     Coverage_34  1
+    x[32]     Coverage_35  1
+    x[32]     Coverage_36  1
+    x[32]     Coverage_37  1
+    x[32]     Coverage_38  1
+    x[32]     Coverage_39  1
+    x[32]     Coverage_40  1
+    x[32]     Coverage_41  1
+    x[32]     Coverage_42  1
+    x[32]     Coverage_43  1
+    x[32]     Coverage_44  1
+    x[32]     Coverage_45  1
+    x[32]     Coverage_46  1
+    x[32]     Coverage_47  1
+    x[33]     OBJ       1
+    x[33]     Coverage_0  1
+    x[33]     Coverage_33  1
+    x[33]     Coverage_34  1
+    x[33]     Coverage_35  1
+    x[33]     Coverage_36  1
+    x[33]     Coverage_37  1
+    x[33]     Coverage_38  1
+    x[33]     Coverage_39  1
+    x[33]     Coverage_40  1
+    x[33]     Coverage_41  1
+    x[33]     Coverage_42  1
+    x[33]     Coverage_43  1
+    x[33]     Coverage_44  1
+    x[33]     Coverage_45  1
+    x[33]     Coverage_46  1
+    x[33]     Coverage_47  1
+    x[34]     OBJ       1
+    x[34]     Coverage_0  1
+    x[34]     Coverage_1  1
+    x[34]     Coverage_34  1
+    x[34]     Coverage_35  1
+    x[34]     Coverage_36  1
+    x[34]     Coverage_37  1
+    x[34]     Coverage_38  1
+    x[34]     Coverage_39  1
+    x[34]     Coverage_40  1
+    x[34]     Coverage_41  1
+    x[34]     Coverage_42  1
+    x[34]     Coverage_43  1
+    x[34]     Coverage_44  1
+    x[34]     Coverage_45  1
+    x[34]     Coverage_46  1
+    x[34]     Coverage_47  1
+    x[35]     OBJ       1
+    x[35]     Coverage_0  1
+    x[35]     Coverage_1  1
+    x[35]     Coverage_2  1
+    x[35]     Coverage_35  1
+    x[35]     Coverage_36  1
+    x[35]     Coverage_37  1
+    x[35]     Coverage_38  1
+    x[35]     Coverage_39  1
+    x[35]     Coverage_40  1
+    x[35]     Coverage_41  1
+    x[35]     Coverage_42  1
+    x[35]     Coverage_43  1
+    x[35]     Coverage_44  1
+    x[35]     Coverage_45  1
+    x[35]     Coverage_46  1
+    x[35]     Coverage_47  1
+    x[36]     OBJ       1
+    x[36]     Coverage_0  1
+    x[36]     Coverage_1  1
+    x[36]     Coverage_2  1
+    x[36]     Coverage_3  1
+    x[36]     Coverage_36  1
+    x[36]     Coverage_37  1
+    x[36]     Coverage_38  1
+    x[36]     Coverage_39  1
+    x[36]     Coverage_40  1
+    x[36]     Coverage_41  1
+    x[36]     Coverage_42  1
+    x[36]     Coverage_43  1
+    x[36]     Coverage_44  1
+    x[36]     Coverage_45  1
+    x[36]     Coverage_46  1
+    x[36]     Coverage_47  1
+    x[37]     OBJ       1
+    x[37]     Coverage_0  1
+    x[37]     Coverage_1  1
+    x[37]     Coverage_2  1
+    x[37]     Coverage_3  1
+    x[37]     Coverage_4  1
+    x[37]     Coverage_37  1
+    x[37]     Coverage_38  1
+    x[37]     Coverage_39  1
+    x[37]     Coverage_40  1
+    x[37]     Coverage_41  1
+    x[37]     Coverage_42  1
+    x[37]     Coverage_43  1
+    x[37]     Coverage_44  1
+    x[37]     Coverage_45  1
+    x[37]     Coverage_46  1
+    x[37]     Coverage_47  1
+    x[38]     OBJ       1
+    x[38]     Coverage_0  1
+    x[38]     Coverage_1  1
+    x[38]     Coverage_2  1
+    x[38]     Coverage_3  1
+    x[38]     Coverage_4  1
+    x[38]     Coverage_5  1
+    x[38]     Coverage_38  1
+    x[38]     Coverage_39  1
+    x[38]     Coverage_40  1
+    x[38]     Coverage_41  1
+    x[38]     Coverage_42  1
+    x[38]     Coverage_43  1
+    x[38]     Coverage_44  1
+    x[38]     Coverage_45  1
+    x[38]     Coverage_46  1
+    x[38]     Coverage_47  1
+    x[39]     OBJ       1
+    x[39]     Coverage_0  1
+    x[39]     Coverage_1  1
+    x[39]     Coverage_2  1
+    x[39]     Coverage_3  1
+    x[39]     Coverage_4  1
+    x[39]     Coverage_5  1
+    x[39]     Coverage_6  1
+    x[39]     Coverage_39  1
+    x[39]     Coverage_40  1
+    x[39]     Coverage_41  1
+    x[39]     Coverage_42  1
+    x[39]     Coverage_43  1
+    x[39]     Coverage_44  1
+    x[39]     Coverage_45  1
+    x[39]     Coverage_46  1
+    x[39]     Coverage_47  1
+    x[40]     OBJ       1
+    x[40]     Coverage_0  1
+    x[40]     Coverage_1  1
+    x[40]     Coverage_2  1
+    x[40]     Coverage_3  1
+    x[40]     Coverage_4  1
+    x[40]     Coverage_5  1
+    x[40]     Coverage_6  1
+    x[40]     Coverage_7  1
+    x[40]     Coverage_40  1
+    x[40]     Coverage_41  1
+    x[40]     Coverage_42  1
+    x[40]     Coverage_43  1
+    x[40]     Coverage_44  1
+    x[40]     Coverage_45  1
+    x[40]     Coverage_46  1
+    x[40]     Coverage_47  1
+    x[41]     OBJ       1
+    x[41]     Coverage_0  1
+    x[41]     Coverage_1  1
+    x[41]     Coverage_2  1
+    x[41]     Coverage_3  1
+    x[41]     Coverage_4  1
+    x[41]     Coverage_5  1
+    x[41]     Coverage_6  1
+    x[41]     Coverage_7  1
+    x[41]     Coverage_8  1
+    x[41]     Coverage_41  1
+    x[41]     Coverage_42  1
+    x[41]     Coverage_43  1
+    x[41]     Coverage_44  1
+    x[41]     Coverage_45  1
+    x[41]     Coverage_46  1
+    x[41]     Coverage_47  1
+    x[42]     OBJ       1
+    x[42]     Coverage_0  1
+    x[42]     Coverage_1  1
+    x[42]     Coverage_2  1
+    x[42]     Coverage_3  1
+    x[42]     Coverage_4  1
+    x[42]     Coverage_5  1
+    x[42]     Coverage_6  1
+    x[42]     Coverage_7  1
+    x[42]     Coverage_8  1
+    x[42]     Coverage_9  1
+    x[42]     Coverage_42  1
+    x[42]     Coverage_43  1
+    x[42]     Coverage_44  1
+    x[42]     Coverage_45  1
+    x[42]     Coverage_46  1
+    x[42]     Coverage_47  1
+    x[43]     OBJ       1
+    x[43]     Coverage_0  1
+    x[43]     Coverage_1  1
+    x[43]     Coverage_2  1
+    x[43]     Coverage_3  1
+    x[43]     Coverage_4  1
+    x[43]     Coverage_5  1
+    x[43]     Coverage_6  1
+    x[43]     Coverage_7  1
+    x[43]     Coverage_8  1
+    x[43]     Coverage_9  1
+    x[43]     Coverage_10  1
+    x[43]     Coverage_43  1
+    x[43]     Coverage_44  1
+    x[43]     Coverage_45  1
+    x[43]     Coverage_46  1
+    x[43]     Coverage_47  1
+    x[44]     OBJ       1
+    x[44]     Coverage_0  1
+    x[44]     Coverage_1  1
+    x[44]     Coverage_2  1
+    x[44]     Coverage_3  1
+    x[44]     Coverage_4  1
+    x[44]     Coverage_5  1
+    x[44]     Coverage_6  1
+    x[44]     Coverage_7  1
+    x[44]     Coverage_8  1
+    x[44]     Coverage_9  1
+    x[44]     Coverage_10  1
+    x[44]     Coverage_11  1
+    x[44]     Coverage_44  1
+    x[44]     Coverage_45  1
+    x[44]     Coverage_46  1
+    x[44]     Coverage_47  1
+    x[45]     OBJ       1
+    x[45]     Coverage_0  1
+    x[45]     Coverage_1  1
+    x[45]     Coverage_2  1
+    x[45]     Coverage_3  1
+    x[45]     Coverage_4  1
+    x[45]     Coverage_5  1
+    x[45]     Coverage_6  1
+    x[45]     Coverage_7  1
+    x[45]     Coverage_8  1
+    x[45]     Coverage_9  1
+    x[45]     Coverage_10  1
+    x[45]     Coverage_11  1
+    x[45]     Coverage_12  1
+    x[45]     Coverage_45  1
+    x[45]     Coverage_46  1
+    x[45]     Coverage_47  1
+    x[46]     OBJ       1
+    x[46]     Coverage_0  1
+    x[46]     Coverage_1  1
+    x[46]     Coverage_2  1
+    x[46]     Coverage_3  1
+    x[46]     Coverage_4  1
+    x[46]     Coverage_5  1
+    x[46]     Coverage_6  1
+    x[46]     Coverage_7  1
+    x[46]     Coverage_8  1
+    x[46]     Coverage_9  1
+    x[46]     Coverage_10  1
+    x[46]     Coverage_11  1
+    x[46]     Coverage_12  1
+    x[46]     Coverage_13  1
+    x[46]     Coverage_46  1
+    x[46]     Coverage_47  1
+    x[47]     OBJ       1
+    x[47]     Coverage_0  1
+    x[47]     Coverage_1  1
+    x[47]     Coverage_2  1
+    x[47]     Coverage_3  1
+    x[47]     Coverage_4  1
+    x[47]     Coverage_5  1
+    x[47]     Coverage_6  1
+    x[47]     Coverage_7  1
+    x[47]     Coverage_8  1
+    x[47]     Coverage_9  1
+    x[47]     Coverage_10  1
+    x[47]     Coverage_11  1
+    x[47]     Coverage_12  1
+    x[47]     Coverage_13  1
+    x[47]     Coverage_14  1
+    x[47]     Coverage_47  1
+    MARKER    'MARKER'                 'INTEND'
+RHS
+    RHS1      Coverage_0  2
+    RHS1      Coverage_1  3
+    RHS1      Coverage_2  4
+    RHS1      Coverage_3  6
+    RHS1      Coverage_4  5
+    RHS1      Coverage_5  4
+    RHS1      Coverage_6  5
+    RHS1      Coverage_7  6
+    RHS1      Coverage_8  7
+    RHS1      Coverage_9  8
+    RHS1      Coverage_10  9
+    RHS1      Coverage_11  9
+    RHS1      Coverage_12  8
+    RHS1      Coverage_13  8
+    RHS1      Coverage_14  9
+    RHS1      Coverage_15  9
+    RHS1      Coverage_16  10
+    RHS1      Coverage_17  12
+    RHS1      Coverage_18  11
+    RHS1      Coverage_19  11
+    RHS1      Coverage_20  12
+    RHS1      Coverage_21  11
+    RHS1      Coverage_22  10
+    RHS1      Coverage_23  9
+    RHS1      Coverage_24  8
+    RHS1      Coverage_25  7
+    RHS1      Coverage_26  6
+    RHS1      Coverage_27  5
+    RHS1      Coverage_28  5
+    RHS1      Coverage_29  6
+    RHS1      Coverage_30  7
+    RHS1      Coverage_31  8
+    RHS1      Coverage_32  9
+    RHS1      Coverage_33  10
+    RHS1      Coverage_34  9
+    RHS1      Coverage_35  8
+    RHS1      Coverage_36  7
+    RHS1      Coverage_37  6
+    RHS1      Coverage_38  5
+    RHS1      Coverage_39  4
+    RHS1      Coverage_40  4
+    RHS1      Coverage_41  3
+    RHS1      Coverage_42  3
+    RHS1      Coverage_43  3
+    RHS1      Coverage_44  3
+    RHS1      Coverage_45  4
+    RHS1      Coverage_46  4
+    RHS1      Coverage_47  4
+BOUNDS
+ LI BND1      x[0]      0
+ LI BND1      x[1]      0
+ LI BND1      x[2]      0
+ LI BND1      x[3]      0
+ LI BND1      x[4]      0
+ LI BND1      x[5]      0
+ LI BND1      x[6]      0
+ LI BND1      x[7]      0
+ LI BND1      x[8]      0
+ LI BND1      x[9]      0
+ LI BND1      x[10]     0
+ LI BND1      x[11]     0
+ LI BND1      x[12]     0
+ LI BND1      x[13]     0
+ LI BND1      x[14]     0
+ LI BND1      x[15]     0
+ LI BND1      x[16]     0
+ LI BND1      x[17]     0
+ LI BND1      x[18]     0
+ LI BND1      x[19]     0
+ LI BND1      x[20]     0
+ LI BND1      x[21]     0
+ LI BND1      x[22]     0
+ LI BND1      x[23]     0
+ LI BND1      x[24]     0
+ LI BND1      x[25]     0
+ LI BND1      x[26]     0
+ LI BND1      x[27]     0
+ LI BND1      x[28]     0
+ LI BND1      x[29]     0
+ LI BND1      x[30]     0
+ LI BND1      x[31]     0
+ LI BND1      x[32]     0
+ LI BND1      x[33]     0
+ LI BND1      x[34]     0
+ LI BND1      x[35]     0
+ LI BND1      x[36]     0
+ LI BND1      x[37]     0
+ LI BND1      x[38]     0
+ LI BND1      x[39]     0
+ LI BND1      x[40]     0
+ LI BND1      x[41]     0
+ LI BND1      x[42]     0
+ LI BND1      x[43]     0
+ LI BND1      x[44]     0
+ LI BND1      x[45]     0
+ LI BND1      x[46]     0
+ LI BND1      x[47]     0
+ENDATA

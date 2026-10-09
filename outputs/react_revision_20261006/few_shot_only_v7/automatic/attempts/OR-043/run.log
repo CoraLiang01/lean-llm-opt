@@ -1,0 +1,167 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+##### Abstract Mathematical Model
+
+Let:
+- $I$ = set of drug products (indexed by $i$), from products.csv, column ProductName
+- $x_i$ = number of units of drug $i$ to order each day (decision variable), $x_i \in \mathbb{Z}_{\geq 0}$
+- $b_i$ = benefit per unit of drug $i$ (from products.csv, column Value)
+- $w_i$ = weight (stock space requirement) per unit of drug $i$ (from products.csv, column Weight)
+- $C$ = total stock capacity (from capacity.csv, column Capacity)
+
+**Objective:**
+$$
+\max \sum_{i \in I} b_i x_i
+$$
+
+**Subject to:**
+$$
+\sum_{i \in I} w_i x_i \leq C
+$$
+
+$$
+x_i \in \mathbb{Z}_{\geq 0} \quad \forall i \in I
+$$
+
+---
+
+##### Data Mapping
+
+- $I$: products.csv, column ProductName
+- $b_i$: products.csv, column Value, keyed by ProductName
+- $w_i$: products.csv, column Weight, keyed by ProductName
+- $C$: capacity.csv, column Capacity
+- $x_i$: decision variable, number of units to order for each $i \in I$[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    csv_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    def read_csv_with_encodings(path):
+        for enc in csv_encodings:
+            try:
+                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with tried encodings.")
+
+    # Paths from source schema
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA9/PharmaSalesData2/products.csv"
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA9/PharmaSalesData2/capacity.csv"
+
+    # Read data
+    products_df = read_csv_with_encodings(products_path)
+    capacity_df = read_csv_with_encodings(capacity_path)
+
+    # Validate required columns
+    for col in ['ProductName', 'Value', 'Weight']:
+        if col not in products_df.columns:
+            raise ValueError(f"Missing column {col} in products.csv")
+    if 'Capacity' not in capacity_df.columns:
+        raise ValueError("Missing column Capacity in capacity.csv")
+
+    # Prepare product data
+    products_df = products_df.copy()
+    products_df['Value'] = pd.to_numeric(products_df['Value'], errors='raise')
+    products_df['Weight'] = pd.to_numeric(products_df['Weight'], errors='raise')
+    product_keys = list(products_df['ProductName'])
+    value_dict = dict(zip(products_df['ProductName'], products_df['Value']))
+    weight_dict = dict(zip(products_df['ProductName'], products_df['Weight']))
+
+    # Prepare capacity (single scalar)
+    if len(capacity_df) != 1:
+        raise ValueError("capacity.csv must contain exactly one row for total capacity.")
+    try:
+        total_capacity = float(capacity_df.iloc[0]['Capacity'])
+    except Exception:
+        raise ValueError("Capacity value in capacity.csv is not a valid number.")
+
+    # Check for missing coefficients
+    for k in product_keys:
+        if k not in value_dict or k not in weight_dict:
+            raise ValueError(f"Missing value or weight for product {k}")
+
+    # Build model
+    m = gp.Model('Pharmacy_Replenishment')
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_i >= 0, integer
+    quantity_vars = m.addVars(product_keys, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total benefit
+    m.setObjective(gp.quicksum(value_dict[i] * quantity_vars[i] for i in product_keys), GRB.MAXIMIZE)
+
+    # Capacity constraint
+    m.addConstr(gp.quicksum(weight_dict[i] * quantity_vars[i] for i in product_keys) <= total_capacity, name='capacity')
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for v in m.getVars():
+            print(f'{v.VarName}: {v.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 20 columns and 20 nonzeros
+Model fingerprint: 0x364cdb09
+Variable types: 0 continuous, 20 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [5e+01, 9e+02]
+  Objective range  [1e+02, 2e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [5e+02, 5e+02]
+Found heuristic solution: objective 1670.0000000
+Presolve removed 1 rows and 20 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 13570 1670 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.357000000000e+04, best bound 1.357000000000e+04, gap 0.0000%
+ObjVal: 13570.0
+C0: 0.0
+C1: 0.0
+C2: -0.0
+C3: 0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: 10.0
+C10: -0.0
+C11: 0.0
+C12: -0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+Optimal objective: 13570.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', -0.0), ('C3', 0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', 10.0), ('C10', -0.0), ('C11', 0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0)]

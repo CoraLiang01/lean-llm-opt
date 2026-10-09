@@ -1,0 +1,117 @@
+{
+  "problem_id": "OR-042",
+  "query": "A chain pharmacy needs to restock its drug inventory. For each drug type (e.g., NSAIDs, antirheumatic drugs, acetic-acid derivatives, etc.), the benefit coefficient is listed in “products.csv.” The pharmacy faces a single overall inventory-capacity constraint, provided in “capacity.csv.”\n    The goal is to decide the daily order quantity of each drug typeso as to maximize total benefit while ensuring that the total weight of all ordered units does not exceed the overall capacity.The decision variables x_i  represent the number of units of type  i  drug to be ordered daily.The decision variables must be integers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 81918.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal daily order quantity for each drug type to maximize total benefit, subject to a single overall inventory weight capacity. Each drug type has a benefit coefficient and a per-unit weight; the total weight of all ordered drugs must not exceed the given capacity. The order quantities must be integer values.\n2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem, specifically a 0-1 or general integer knapsack problem.\n3.  **Define Index Sets:** The primary index is the set of drug types (Products), as listed in products.csv.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of drug type `i` to order daily. Type: GRB.INTEGER.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients (benefit per unit) will come from column: 'Value' in products.csv.\n    -   Constraint coefficients (weight per unit) will come from column: 'Weight' in products.csv.\n    -   Constraint RHS (total capacity) will come from: 'Capacity' in capacity.csv.\n6.  **Formulate Objective:** Maximize the total benefit, i.e., maximize the sum over all drug types of (Value[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Inventory Capacity): The sum over all drug types of (Weight[i] * x[i]) must be less than or equal to the total capacity from capacity.csv.\n    -   Constraint 2 (Non-negativity and Integrality): For each drug type, x[i] must be an integer and x[i] ≥ 0.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/capacity.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 1\nColumns: ['Capacity']\nParsed column types: {'Capacity': 'int64'}\nPreview only (first 10 rows):\nCapacity\n    4120\nFull-file column statistics: {\"Capacity\": {\"missing\": 0, \"unique_nonempty\": 1, \"numeric_range\": [4120.0, 4120.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"capacity\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"capacity.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/products.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 20\nColumns: ['ProductName', 'Value', 'Weight']\nParsed column types: {'ProductName': 'object', 'Value': 'int64', 'Weight': 'int64'}\nPreview only (first 10 rows):\n            ProductName Value Weight\n                 NSAIDs   585     50\n    Antirheumatic Drugs   557    329\nAcetic Acid Derivatives   963    410\n            Antibiotics   301    452\n        Antiviral Drugs   425    350\n      Antifungal Agents   260    159\n        Antidepressants   848    353\n         Antipsychotics   461    291\n         Antihistamines   840    302\n        Corticosteroids   999     50\nFull-file column statistics: {\"ProductName\": {\"missing\": 0, \"unique_nonempty\": 20}, \"Value\": {\"missing\": 0, \"unique_nonempty\": 20, \"numeric_range\": [260.0, 999.0]}, \"Weight\": {\"missing\": 0, \"unique_nonempty\": 19, \"numeric_range\": [50.0, 470.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"antirheumatic drugs\", \"matching_columns\": [{\"column\": \"ProductName\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"Antirheumatic Drugs\"]}], \"exact_matching_columns\": 1}, {\"term\": \"capacity.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"nsaids\", \"matching_columns\": [{\"column\": \"ProductName\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"NSAIDs\"]}], \"exact_matching_columns\": 1}, {\"term\": \"products.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"weight\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"ec73ca1b571a7842f0819f6dd38f1f1ba2ce230ec4fa0872fe95fac113023516\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\ncapacity_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/capacity.csv', sep=',', dtype=str, keep_default_na=False)\nif 'Capacity' not in capacity_df.columns:\n    raise KeyError(\"Column 'Capacity' not found in capacity.csv\")\nif len(capacity_df) != 1:\n    raise ValueError('capacity.csv must have exactly one row')\ntry:\n    total_capacity = int(capacity_df.loc[0, 'Capacity'])\nexcept Exception as e:\n    raise ValueError(f\"Could not convert capacity value to int: {capacity_df.loc[0, 'Capacity']}\") from e\nproducts_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA8/PharmaSalesData1/products.csv', sep=',', dtype=str, keep_default_na=False)\nrequired_columns = ['ProductName', 'Value', 'Weight']\nfor col in required_columns:\n    if col not in products_df.columns:\n        raise KeyError(f\"Column '{col}' not found in products.csv\")\nproducts_df['ProductName'] = products_df['ProductName'].astype(str)\ntry:\n    products_df['Value'] = products_df['Value'].astype(int)\n    products_df['Weight'] = products_df['Weight'].astype(int)\nexcept Exception as e:\n    raise ValueError(\"Could not convert 'Value' or 'Weight' columns to int in products.csv\") from e\nproduct_ids = products_df['ProductName'].tolist()\nvalue_dict = dict(zip(products_df['ProductName'], products_df['Value']))\nweight_dict = dict(zip(products_df['ProductName'], products_df['Weight']))\nif set(value_dict.keys()) != set(product_ids) or set(weight_dict.keys()) != set(product_ids):\n    raise ValueError('Mismatch in product identifiers between value/weight and product list.')\nm = gp.Model('PharmacyInventoryKnapsack')\nx_vars = m.addVars(product_ids, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((value_dict[i] * x_vars[i] for i in product_ids)), gp.GRB.MAXIMIZE)\nm.addConstr(gp.quicksum((weight_dict[i] * x_vars[i] for i in product_ids)) <= total_capacity, name='TotalWeightCapacity')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total value/cost: {m.objVal:.2f}')\n    print('--- Order Plan ---')\n    for i in product_ids:\n        qty = x_vars[i].X\n        if qty > 0.5:\n            print(f'  {i}: {int(round(qty))} units (Value/unit: {value_dict[i]}, Weight/unit: {weight_dict[i]})')\n    total_weight = sum((weight_dict[i] * x_vars[i].X for i in product_ids))\n    print(f'Total weight used: {total_weight:.0f} / {total_capacity}')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 81918.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      82.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": false,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 14.215,
+  "evaluated_utc": "2026-10-06T05:47:13.681364+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

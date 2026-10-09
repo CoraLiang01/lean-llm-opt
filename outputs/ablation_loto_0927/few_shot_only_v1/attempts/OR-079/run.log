@@ -1,0 +1,301 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+# Data
+factories = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15']
+centers = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
+
+fixed_cost = {
+    'A1': 0,
+    'A2': 175,
+    'A3': 300,
+    'A4': 375,
+    'A5': 500,
+    'A6': 200,
+    'A7': 260,
+    'A8': 220,
+    'A9': 320,
+    'A10': 280,
+    'A11': 350,
+    'A12': 420,
+    'A13': 470,
+    'A14': 520,
+    'A15': 560
+}
+
+capacity = {
+    'A1': 30,
+    'A2': 10,
+    'A3': 20,
+    'A4': 30,
+    'A5': 40,
+    'A6': 20,
+    'A7': 25,
+    'A8': 30,
+    'A9': 35,
+    'A10': 20,
+    'A11': 40,
+    'A12': 25,
+    'A13': 30,
+    'A14': 50,
+    'A15': 45
+}
+
+shipping_cost = {
+    'A1':  {'B1': 8,  'B2': 4,  'B3': 3,  'B4': 6,  'B5': 7,  'B6': 5,  'B7': 9,  'B8': 8},
+    'A2':  {'B1': 5,  'B2': 2,  'B3': 3,  'B4': 5,  'B5': 6,  'B6': 4,  'B7': 7,  'B8': 6},
+    'A3':  {'B1': 4,  'B2': 3,  'B3': 4,  'B4': 6,  'B5': 5,  'B6': 5,  'B7': 6,  'B8': 7},
+    'A4':  {'B1': 9,  'B2': 7,  'B3': 5,  'B4': 8,  'B5': 9,  'B6': 6,  'B7': 10, 'B8': 7},
+    'A5':  {'B1': 10, 'B2': 4,  'B3': 2,  'B4': 6,  'B5': 8,  'B6': 5,  'B7': 7,  'B8': 3},
+    'A6':  {'B1': 6,  'B2': 5,  'B3': 4,  'B4': 5,  'B5': 7,  'B6': 6,  'B7': 8,  'B8': 5},
+    'A7':  {'B1': 7,  'B2': 6,  'B3': 5,  'B4': 4,  'B5': 6,  'B6': 7,  'B7': 9,  'B8': 6},
+    'A8':  {'B1': 5,  'B2': 4,  'B3': 6,  'B4': 3,  'B5': 5,  'B6': 6,  'B7': 7,  'B8': 6},
+    'A9':  {'B1': 8,  'B2': 7,  'B3': 6,  'B4': 7,  'B5': 9,  'B6': 8,  'B7': 10, 'B8': 7},
+    'A10': {'B1': 6,  'B2': 5,  'B3': 7,  'B4': 4,  'B5': 6,  'B6': 5,  'B7': 7,  'B8': 5},
+    'A11': {'B1': 9,  'B2': 6,  'B3': 4,  'B4': 6,  'B5': 8,  'B6': 7,  'B7': 9,  'B8': 6},
+    'A12': {'B1': 7,  'B2': 5,  'B3': 6,  'B4': 5,  'B5': 6,  'B6': 5,  'B7': 8,  'B8': 5},
+    'A13': {'B1': 8,  'B2': 6,  'B3': 5,  'B4': 6,  'B5': 7,  'B6': 6,  'B7': 8,  'B8': 7},
+    'A14': {'B1': 9,  'B2': 5,  'B3': 3,  'B4': 5,  'B5': 7,  'B6': 4,  'B7': 6,  'B8': 4},
+    'A15': {'B1': 10, 'B2': 6,  'B3': 4,  'B4': 5,  'B5': 8,  'B6': 5,  'B7': 7,  'B8': 5}
+}
+
+demand = {
+    'B1': 30,
+    'B2': 25,
+    'B3': 20,
+    'B4': 35,
+    'B5': 25,
+    'B6': 30,
+    'B7': 25,
+    'B8': 30
+}
+
+# Data validation
+for i in factories:
+    if i not in fixed_cost or i not in capacity or i not in shipping_cost:
+        raise ValueError(f"Missing data for factory {i}")
+    for j in centers:
+        if j not in shipping_cost[i]:
+            raise ValueError(f"Missing shipping cost for ({i},{j})")
+for j in centers:
+    if j not in demand:
+        raise ValueError(f"Missing demand for center {j}")
+
+# Model
+m = gp.Model('ElectroTech_Facility_Location')
+x = m.addVars(factories, centers, lb=0, vtype=GRB.CONTINUOUS, name='x')
+y = m.addVars(factories, vtype=GRB.BINARY, name='y')
+
+m.setObjective(
+    gp.quicksum(fixed_cost[i] * y[i] for i in factories) +
+    gp.quicksum(shipping_cost[i][j] * x[i, j] for i in factories for j in centers),
+    GRB.MINIMIZE
+)
+
+# Demand satisfaction
+m.addConstrs(
+    (gp.quicksum(x[i, j] for i in factories) == demand[j] for j in centers),
+    name='demand'
+)
+
+# Factory capacity and activation
+m.addConstrs(
+    (gp.quicksum(x[i, j] for j in centers) <= capacity[i] * y[i] for i in factories),
+    name='capacity'
+)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 23 rows, 135 columns and 255 nonzeros
+Model fingerprint: 0x9145cb5a
+Variable types: 120 continuous, 15 integer (15 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 5e+01]
+  Objective range  [2e+00, 6e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [2e+01, 4e+01]
+Found heuristic solution: objective 4290.0000000
+Presolve removed 0 rows and 1 columns
+Presolve time: 0.00s
+Presolved: 23 rows, 134 columns, 254 nonzeros
+Variable types: 120 continuous, 14 integer (14 binary)
+
+Root relaxation: objective 2.888929e+03, 45 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 2888.92857    0    2 4290.00000 2888.92857  32.7%     -    0s
+H    0     0                    3430.0000000 2888.92857  15.8%     -    0s
+H    0     0                    3125.0000000 2888.92857  7.55%     -    0s
+H    0     0                    3045.0000000 2888.92857  5.13%     -    0s
+H    0     0                    2990.0000000 2888.92857  3.38%     -    0s
+     0     0 2910.00000    0    2 2990.00000 2910.00000  2.68%     -    0s
+H    0     0                    2965.0000000 2910.00000  1.85%     -    0s
+     0     0 2940.00000    0    1 2965.00000 2940.00000  0.84%     -    0s
+     0     0 2945.00000    0    2 2965.00000 2945.00000  0.67%     -    0s
+     0     0 2945.00000    0    2 2965.00000 2945.00000  0.67%     -    0s
+
+Cutting planes:
+  Implied bound: 2
+  MIR: 4
+  Flow cover: 3
+
+Explored 1 nodes (67 simplex iterations) in 0.02 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 6: 2965 2990 3045 ... 4290
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.965000000000e+03, best bound 2.965000000000e+03, gap 0.0000%
+ObjVal: 2965.0
+C0: 0.0
+C1: 15.0
+C2: 10.0
+C3: 0.0
+C4: 0.0
+C5: 5.0
+C6: 0.0
+C7: 0.0
+C8: 0.0
+C9: 10.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 5.0
+C52: 20.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 30.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 30.0
+C65: 0.0
+C66: 0.0
+C67: 0.0
+C68: 5.0
+C69: 0.0
+C70: 0.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 10.0
+C83: 0.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 30.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 0.0
+C96: 0.0
+C97: 0.0
+C98: 0.0
+C99: 0.0
+C100: 0.0
+C101: 0.0
+C102: 0.0
+C103: 0.0
+C104: 0.0
+C105: 0.0
+C106: 0.0
+C107: 0.0
+C108: 0.0
+C109: 25.0
+C110: 25.0
+C111: 0.0
+C112: 0.0
+C113: 0.0
+C114: 0.0
+C115: 0.0
+C116: 0.0
+C117: 0.0
+C118: 0.0
+C119: 0.0
+C120: 1.0
+C121: 1.0
+C122: 0.0
+C123: 0.0
+C124: 0.0
+C125: 0.0
+C126: 1.0
+C127: 1.0
+C128: 1.0
+C129: 0.0
+C130: 1.0
+C131: 0.0
+C132: 0.0
+C133: 1.0
+C134: 0.0
+Optimal objective: 2965.0
+Optimal solution: [('C0', 0.0), ('C1', 15.0), ('C2', 10.0), ('C3', 0.0), ('C4', 0.0), ('C5', 5.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 10.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 5.0), ('C52', 20.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 30.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 30.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 5.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 10.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 30.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 0.0), ('C108', 0.0), ('C109', 25.0), ('C110', 25.0), ('C111', 0.0), ('C112', 0.0), ('C113', 0.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 0.0), ('C118', 0.0), ('C119', 0.0), ('C120', 1.0), ('C121', 1.0), ('C122', 0.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 1.0), ('C127', 1.0), ('C128', 1.0), ('C129', 0.0), ('C130', 1.0), ('C131', 0.0), ('C132', 0.0), ('C133', 1.0), ('C134', 0.0)]

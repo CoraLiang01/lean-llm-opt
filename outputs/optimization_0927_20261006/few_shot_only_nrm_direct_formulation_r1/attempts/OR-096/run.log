@@ -1,0 +1,343 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+**Objective Function:**
+$$
+\min Z = 200\,x_{1} + 250\,x_{2} + 380\,x_{3} + 350\,x_{4} + 50\,y_{3} + 50\,y_{4}
+$$
+
+**Constraints:**
+
+Flour demand constraint:
+$$
+30\,x_{1} + 20\,x_{2} + 40\,x_{3} + 10\,x_{4} = 100
+$$
+
+Rice demand constraint:
+$$
+20\,x_{1} + 30\,x_{2} + 10\,x_{3} + 40\,x_{4} = 80
+$$
+
+Supplier usage constraints for new suppliers:
+$$
+x_{3} \leq M\,y_{3}
+$$
+$$
+x_{4} \leq M\,y_{4}
+$$
+
+Existing-supplier order bounds (zero orders are allowed):
+$$
+x_{1} \geq 0
+$$
+$$
+x_{2} \geq 0
+$$
+
+Non-negativity for new suppliers:
+$$
+x_{3} \geq 0
+$$
+$$
+x_{4} \geq 0
+$$
+
+Binary variables for new supplier selection:
+$$
+y_{3} \in \{0,1\}
+$$
+$$
+y_{4} \in \{0,1\}
+$$
+
+Where $M$ is a sufficiently large constant (e.g., $M = 100$).
+
+**Decision Variables:**
+$$
+x_{i} \geq 0, \quad i = 1,2,3,4
+$$
+$$
+y_{j} \in \{0,1\}, \quad j = 3,4
+$$
+
+**Retrieved Information**
+
+- Supplier 1: Existing Supplier, Flour per batch = 30, Rice per batch = 20, Price per batch = 200, No new-supplier activation fee
+- Supplier 2: Existing Supplier, Flour per batch = 20, Rice per batch = 30, Price per batch = 250, No new-supplier activation fee
+- Supplier 3: New Supplier, Flour per batch = 40, Rice per batch = 10, Price per batch = 380, Administrative fee = 50
+- Supplier 4: New Supplier, Flour per batch = 10, Rice per batch = 40, Price per batch = 350, Administrative fee = 50
+
+- Demand: Flour = 100 kg, Rice = 80 kg
+
+- $x_{i}$: Continuous batch equivalents ordered from supplier $i$ ($i=1,2,3,4$)
+- $y_{j}$: Binary variable indicating if new supplier $j$ ($j=3,4$) is selected (1 if selected, 0 otherwise)
+
+Secondary objective, with strictly lower lexicographic priority than total cost: minimize y_3 + y_4. Existing suppliers are available with nonnegative continuous orders, including zero. Fractional batches are allowed for all suppliers. Supplier type and If new supplier consistently identify 1/2 as existing and 3/4 as new. The New supplier administrative fee field applies only where If new supplier is Yes; the stored values for suppliers 1/2 are inactive in this model.
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A specialty chemical factory produces three premium products (A, B, C) by blending three raw materials (1, 2, 3). The factory supplies custom formulations to high-end manufacturers:
+
+Product A is a precision industrial lubricant requiring ≥50% Material 1 and ≤25% Material 2
+Product B is an aerospace-grade adhesive requiring ≥25% Material 1 and ≤50% Material 2
+Product C is a general-purpose compound with no material restrictions
+Raw material costs and availability are in raw_materials.csv, while product specifications and selling prices are in products.csv. Determine the optimal blending plan to maximize daily profit.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+#### Decision Variables
+- $x_{ij}$: kg of material $j$ used in product $i$ 
+$i \in \{\text{A}, \text{B}, \text{C}\}, j \in \{1,2,3\}$
+
+#### Objective Function
+Maximize profit: 
+$\quad \quad \max \ 60(x_{A1} + x_{A2} + x_{A3}) + 70(x_{B1} + x_{B2} + x_{B3}) + 60(x_{C1} + x_{C2} + x_{C3})$
+$\quad \quad - 65(x_{A1} + x_{B1} + x_{C1}) - 25(x_{A2} + x_{B2} + x_{C2}) - 35(x_{A3} + x_{B3} + x_{C3})$
+
+#### Constraints
+**1. Material Availability** 
+$\quad \quad x_{A1} + x_{B1} + x_{C1} \leq 100$ 
+$\quad \quad x_{A2} + x_{B2} + x_{C2} \leq 100$ 
+$\quad \quad x_{A3} + x_{B3} + x_{C3} \leq 60$ 
+
+**2. Product A Specifications** 
+$\quad \quad x_{A1} \geq 0.5(x_{A1} + x_{A2} + x_{A3})$ 
+$\quad \quad x_{A2} \leq 0.25(x_{A1} + x_{A2} + x_{A3})$ 
+
+**3. Product B Specifications** 
+$\quad \quad x_{B1} \geq 0.25(x_{B1} + x_{B2} + x_{B3})$ 
+$\quad \quad x_{B2} \leq 0.5(x_{B1} + x_{B2} + x_{B3})$ 
+
+**4. Non-negativity** 
+$\quad \quad x_{ij} \geq 0 \quad \forall i,j$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to assign white and nonwhite elementary students from each of 31 neighborhoods to two schools, minimizing total travel distance, while ensuring each school's enrollment does not exceed its capacity and each school's white-student percentage is within 10 percentage points of the district's 60% white ratio.
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) transportation/assignment problem with side constraints (capacity and racial balance).
+3.  **Define Index Sets:** The primary indices are:
+    - Schools (S): from `school_capacity.csv` (all rows, i.e., School I and II)
+    - Neighborhoods (N): from `neighborhoods_population.csv` (all 31 rows)
+    - Student Groups (G): {White, NonWhite}
+4.  **Define Decision Variables:**
+    - `x[s, n, g]` = Number of students of group g (White or NonWhite) from neighborhood n assigned to school s. Type: GRB.CONTINUOUS (nonnegative, can be fractional if partial assignments are allowed; otherwise, GRB.INTEGER if only whole students are allowed).
+5.  **Identify Parameters (from Schema):**
+    - School capacities: `Capacity` from `school_capacity.csv` (by School)
+    - Neighborhood populations: `Population_White`, `Population_NonWhite` from `neighborhoods_population.csv` (by Neighborhood)
+    - Distances: `distance.csv` (distance from each School to each Neighborhood)
+    - District-wide total white and nonwhite student counts: sum over all neighborhoods
+    - District white ratio: 60% (from query)
+6.  **Formulate Objective:** Minimize the total travel distance for all students: sum over all schools, neighborhoods, and groups of (distance from school to neighborhood) × (number of students assigned).
+7.  **Formulate Constraints:**
+    - **Neighborhood Assignment:** For each neighborhood n and group g, the sum over schools s of x[s, n, g] equals the total number of students of group g in neighborhood n (from `neighborhoods_population.csv`).
+    - **School Capacity:** For each school s, the total number of students assigned (sum over all neighborhoods and both groups) does not exceed the school's capacity (from `school_capacity.csv`).
+    - **Racial Balance:** For each school s, the percentage of white students assigned must be within 10 percentage points of the district white ratio (i.e., between 50% and 70% white). That is, for each school s:  
+      0.5 ≤ (total white students assigned to s) / (total students assigned to s) ≤ 0.7, with denominators > 0.
+    - **Nonnegativity:** All x[s, n, g] ≥ 0.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+import re
+
+# 1. Read all required CSVs with dtype=str and keep_default_na=False
+school_capacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture15/school_capacity.csv'
+neighborhoods_population_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture15/neighborhoods_population.csv'
+distance_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture15/distance.csv'
+
+school_capacity_df = pd.read_csv(school_capacity_path, dtype=str, keep_default_na=False)
+neighborhoods_population_df = pd.read_csv(neighborhoods_population_path, dtype=str, keep_default_na=False)
+distance_df = pd.read_csv(distance_path, dtype=str, keep_default_na=False)
+
+# 2. Normalize and extract entity sets
+
+# Schools: all rows in school_capacity.csv
+schools = school_capacity_df['School'].astype(str).tolist()
+
+# Neighborhoods: all rows in neighborhoods_population.csv
+neighborhoods = neighborhoods_population_df['Neighborhood'].astype(str).tolist()
+
+# Student groups: fixed as per query
+groups = ['White', 'NonWhite']
+
+# 3. Build parameter dictionaries
+
+# School capacities
+school_capacity_df['Capacity'] = school_capacity_df['Capacity'].astype(float)
+school_capacities = dict(zip(school_capacity_df['School'].astype(str), school_capacity_df['Capacity']))
+
+# Neighborhood populations by group
+neighborhoods_population_df['Population_White'] = neighborhoods_population_df['Population_White'].astype(float)
+neighborhoods_population_df['Population_NonWhite'] = neighborhoods_population_df['Population_NonWhite'].astype(float)
+pop_white = dict(zip(neighborhoods_population_df['Neighborhood'].astype(str), neighborhoods_population_df['Population_White']))
+pop_nonwhite = dict(zip(neighborhoods_population_df['Neighborhood'].astype(str), neighborhoods_population_df['Population_NonWhite']))
+
+# Build a nested dict: pop_by_group[neighborhood][group]
+pop_by_group = {}
+for n in neighborhoods:
+    pop_by_group[n] = {
+        'White': pop_white[n],
+        'NonWhite': pop_nonwhite[n]
+    }
+
+# Distance: distance from each school to each neighborhood
+# distance_df: rows are schools, columns are School, N01, N02, ..., N31
+distance_dict = {}
+for _, row in distance_df.iterrows():
+    school = str(row['School'])
+    distance_dict[school] = {}
+    for n in neighborhoods:
+        # Some columns may have leading/trailing spaces; match exactly
+        val = row[n]
+        try:
+            distance_dict[school][n] = float(val)
+        except Exception:
+            raise ValueError(f"Distance value for school {school}, neighborhood {n} is not a valid float: '{val}'")
+
+# 4. Compute district-wide totals and white ratio
+total_white = sum(pop_white[n] for n in neighborhoods)
+total_nonwhite = sum(pop_nonwhite[n] for n in neighborhoods)
+total_students = total_white + total_nonwhite
+district_white_ratio = 0.6  # as per query
+
+# 5. Create Gurobi model
+m = gp.Model("SchoolAssignment")
+
+# 6. Decision variables: x_vars[s, n, g] = number of students of group g from neighborhood n assigned to school s
+# All variables are continuous and >= 0
+x_vars = m.addVars(
+    schools, neighborhoods, groups,
+    lb=0.0,
+    vtype=gp.GRB.CONTINUOUS,
+    name="x"
+)
+
+# 7. Objective: Minimize total travel distance
+m.setObjective(
+    gp.quicksum(
+        distance_dict[s][n] * x_vars[s, n, g]
+        for s in schools for n in neighborhoods for g in groups
+    ),
+    gp.GRB.MINIMIZE
+)
+
+# 8. Constraints
+
+# (a) Neighborhood assignment: For each neighborhood n and group g, sum over schools s of x[s, n, g] == population of group g in n
+for n in neighborhoods:
+    for g in groups:
+        m.addConstr(
+            gp.quicksum(x_vars[s, n, g] for s in schools) == pop_by_group[n][g],
+            name=f"Assign_{n}_{g}"
+        )
+
+# (b) School capacity: For each school s, total assigned students <= capacity
+for s in schools:
+    m.addConstr(
+        gp.quicksum(x_vars[s, n, g] for n in neighborhoods for g in groups) <= school_capacities[s],
+        name=f"Capacity_{s}"
+    )
+
+# (c) Racial balance: For each school s, white % in [0.5, 0.7] if school has any students assigned
+for s in schools:
+    total_white_s = gp.quicksum(x_vars[s, n, 'White'] for n in neighborhoods)
+    total_nonwhite_s = gp.quicksum(x_vars[s, n, 'NonWhite'] for n in neighborhoods)
+    total_students_s = total_white_s + total_nonwhite_s
+
+    # Only enforce if school has students assigned (denominator > 0)
+    # Gurobi allows division by an expression if denominator is always positive, but here, to avoid division by zero,
+    # we use equivalent linear inequalities:
+    # 0.5 * total_students_s <= total_white_s <= 0.7 * total_students_s
+    # If total_students_s == 0, both sides are zero, so constraints are satisfied.
+
+    m.addConstr(
+        total_white_s >= 0.5 * total_students_s,
+        name=f"RacialBalanceLower_{s}"
+    )
+    m.addConstr(
+        total_white_s <= 0.7 * total_students_s,
+        name=f"RacialBalanceUpper_{s}"
+    )
+
+# 9. Solve
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 68 rows, 124 columns and 496 nonzeros
+Model fingerprint: 0x0746994f
+Coefficient statistics:
+  Matrix range     [3e-01, 1e+00]
+  Objective range  [1e+00, 4e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+01, 2e+03]
+Presolve removed 68 rows and 124 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    5.0440000e+03   0.000000e+00   0.000000e+00      0s
+
+Solved in 0 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  5.044000000e+03
+Optimal objective: 5044.0
+Optimal solution: [('C0', 78.0), ('C1', 22.0), ('C2', 57.0), ('C3', 33.0), ('C4', 47.0), ('C5', 63.0), ('C6', 78.0), ('C7', 22.0), ('C8', 57.0), ('C9', 33.0), ('C10', 47.0), ('C11', 63.0), ('C12', 78.0), ('C13', 22.0), ('C14', 57.0), ('C15', 33.0), ('C16', 46.0), ('C17', 64.0), ('C18', 77.0), ('C19', 23.0), ('C20', 56.0), ('C21', 34.0), ('C22', 46.0), ('C23', 64.0), ('C24', 77.0), ('C25', 23.0), ('C26', 56.0), ('C27', 34.0), ('C28', 46.0), ('C29', 64.0), ('C30', 77.0), ('C31', 23.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 56.0), ('C95', 34.0), ('C96', 46.0), ('C97', 64.0), ('C98', 77.0), ('C99', 23.0), ('C100', 56.0), ('C101', 34.0), ('C102', 46.0), ('C103', 64.0), ('C104', 77.0), ('C105', 23.0), ('C106', 56.0), ('C107', 34.0), ('C108', 46.0), ('C109', 64.0), ('C110', 77.0), ('C111', 23.0), ('C112', 56.0), ('C113', 34.0), ('C114', 46.0), ('C115', 64.0), ('C116', 77.0), ('C117', 23.0), ('C118', 56.0), ('C119', 34.0), ('C120', 46.0), ('C121', 64.0), ('C122', 74.0), ('C123', 46.0)]

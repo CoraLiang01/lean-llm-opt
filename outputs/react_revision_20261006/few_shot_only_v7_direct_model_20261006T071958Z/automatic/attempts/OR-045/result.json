@@ -1,0 +1,83 @@
+{
+  "problem_id": "OR-045",
+  "query": "A supermarket needs to restock its inventory, and for each type of produce (such as leafy vegetables, mushrooms, etc.), there is an associated benefit table provided in \"products.csv.\" The supermarket faces an overall inventory-capacity constraint, provided in \u201ccapacity.csv.\u201d. The goal is to decide the daily order quantity of each produce type so as to maximize total benefit while ensuring that the total weight of all ordered units does not exceed the overall capacity.The decision variables x_i represents the number of units of type i of produce to be ordered daily.The decision variables must be integers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA11/SupermarketSalesData1/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA11/SupermarketSalesData1/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 885.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "RA",
+  "assigned_route": "RA",
+  "generated_model": "ABSTRACT MATHEMATICAL MODEL\n\nSets:\n- $I$: set of produce types (indexed by $i$), from all ProductName in products.csv.\n\nParameters:\n- $w_i$: weight per unit of produce $i$ (from Weight in products.csv).\n- $v_i$: value per unit of produce $i$ (from Value in products.csv).\n- $C$: total inventory capacity (from Capacity in capacity.csv).\n\nDecision Variables:\n- $x_i \\in \\mathbb{Z}_{\\geq 0}$: number of units of produce $i$ to order daily.\n\nObjective:\n\\[\n\\max \\sum_{i \\in I} v_i x_i\n\\]\n\nSubject to:\n\\[\n\\sum_{i \\in I} w_i x_i \\leq C\n\\]\n\\[\nx_i \\in \\mathbb{Z}_{\\geq 0} \\quad \\forall i \\in I\n\\]\n\nDATA MAPPING\n\n- $I$: All ProductName in table_id file_1_view_0, column ProductName.\n- $w_i$: file_1_view_0, column Weight, keyed by ProductName.\n- $v_i$: file_1_view_0, column Value, keyed by ProductName.\n- $C$: file_0_view_0, column Capacity.\n- $x_i$: decision variable for each $i \\in I$.",
+  "csvqa_observation": "{\"tables\": [{\"table_id\": \"file_0_view_0\", \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA11/SupermarketSalesData1/capacity.csv\", \"columns\": [\"Capacity\"], \"records\": [{\"Capacity\": \"1035\"}]}, {\"table_id\": \"file_1_view_0\", \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA11/SupermarketSalesData1/products.csv\", \"columns\": [\"ProductName\", \"Weight\", \"Value\"], \"records\": [{\"ProductName\": \"Spinach\", \"Weight\": \"282\", \"Value\": \"49\"}, {\"ProductName\": \"Shiitake Mushrooms\", \"Weight\": \"83\", \"Value\": \"30\"}, {\"ProductName\": \"Apples\", \"Weight\": \"251\", \"Value\": \"30\"}, {\"ProductName\": \"Carrots\", \"Weight\": \"257\", \"Value\": \"18\"}, {\"ProductName\": \"Basil\", \"Weight\": \"88\", \"Value\": \"54\"}, {\"ProductName\": \"Potatoes\", \"Weight\": \"52\", \"Value\": \"27\"}, {\"ProductName\": \"Green Beans\", \"Weight\": \"198\", \"Value\": \"91\"}, {\"ProductName\": \"Blueberries\", \"Weight\": \"203\", \"Value\": \"88\"}, {\"ProductName\": \"Oranges\", \"Weight\": \"87\", \"Value\": \"78\"}, {\"ProductName\": \"Watermelons\", \"Weight\": \"265\", \"Value\": \"22\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "DIRECT_FULL_SOURCE",
+  "csvqa_trace": "{\"status\": \"DIRECT_FULL_SOURCE\", \"formulation_protocol\": \"ReAct\", \"csvqa_call_count\": 0, \"planner_attempt_count\": 0, \"repair_count\": 0, \"fallback_count\": 0, \"retry_count\": 0, \"protocol_retry_count\": 0, \"protocol_retry_events\": \"[]\"}",
+  "solve_code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_problem():\n    product_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA11/SupermarketSalesData1/products.csv'\n    decode_errors = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']\n    for enc in decode_errors:\n        try:\n            products_df = pd.read_csv(product_path, dtype=str, keep_default_na=False, encoding=enc)\n            break\n        except Exception:\n            if enc == decode_errors[-1]:\n                raise\n    capacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA11/SupermarketSalesData1/capacity.csv'\n    for enc in decode_errors:\n        try:\n            capacity_df = pd.read_csv(capacity_path, dtype=str, keep_default_na=False, encoding=enc)\n            break\n        except Exception:\n            if enc == decode_errors[-1]:\n                raise\n    required_product_cols = {'ProductName', 'Weight', 'Value'}\n    if not required_product_cols.issubset(products_df.columns):\n        missing = required_product_cols - set(products_df.columns)\n        raise ValueError(f'Missing columns in products.csv: {missing}')\n    if 'Capacity' not in capacity_df.columns:\n        raise ValueError(\"Missing 'Capacity' column in capacity.csv\")\n    I = products_df['ProductName'].tolist()\n    if len(I) != len(set(I)):\n        raise ValueError('Duplicate ProductName entries found in products.csv')\n    try:\n        w_i = products_df.set_index('ProductName')['Weight'].astype(float).to_dict()\n        v_i = products_df.set_index('ProductName')['Value'].astype(float).to_dict()\n    except Exception as e:\n        raise ValueError(f'Error converting Weight/Value to float: {e}')\n    try:\n        C = float(capacity_df.iloc[0]['Capacity'])\n    except Exception as e:\n        raise ValueError(f'Error converting Capacity to float: {e}')\n    for i in I:\n        if i not in w_i or i not in v_i:\n            raise ValueError(f'Missing weight or value for product {i}')\n    m = gp.Model('Supermarket_Produce_Order')\n    m.Params.MIPGap = 0.0001\n    quantity_vars = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='')\n    m.setObjective(gp.quicksum((v_i[i] * quantity_vars[i] for i in I)), GRB.MAXIMIZE)\n    m.addConstr(gp.quicksum((w_i[i] * quantity_vars[i] for i in I)) <= C, name='capacity')\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal: {m.ObjVal}')\n        for var in m.getVars():\n            print(f'{var.VarName}: {var.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_problem()",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 1,
+  "api_retry_events": "[{\"endpoint\": \"/v1/chat/completions\", \"retry_index\": 1}]",
+  "final_objective": 885.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      1.0
+    ],
+    [
+      "C6",
+      0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      11.0
+    ],
+    [
+      "C9",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 194.449,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "5ddad9b79a56ba8572d74f743afee427e23d6237567f19eb1ea2dfbd1fc32a81",
+  "cache_fingerprint": "10fbf6c12a7fd3928a810f9d5f0f0c55a9b21692eae3179d8727c6de7994e087",
+  "evaluated_utc": "2026-10-06T07:57:53.339753+00:00"
+}

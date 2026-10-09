@@ -1,0 +1,126 @@
+{
+  "problem_id": "OR-040",
+  "query": "A real-estate developer is planning property development in New York City. For each area (e.g., Queens, Brooklyn, etc.), the developer has a “products.csv” file that records the benefit coefficient for that area.\n    The developer also faces a single overall development-capacity constraint, provided in “capacity.csv.” file. The objective is to decide the daily scale of development in each area so as to maximize total benefit while ensuring that the sum of all development units does not exceed the overall capacity. The decision variables  x_i  represent the scale of development in area  i  each day.The decision variables must be integers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 74260.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal daily scale of property development in each New York City area to maximize total benefit, subject to an overall development-capacity constraint. The decision variables represent integer units of development per area per day.\n2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem (specifically, an integer resource allocation/knapsack-type model).\n3.  **Define Index Sets:** The primary indices are Areas (as listed in the 'ProductName' column of products.csv).\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of development units per day in area `i`. Type: GRB.INTEGER.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Value' column in products.csv (benefit per unit for area `i`).\n    -   Constraint coefficients: 'Weight' column in products.csv (capacity consumed per unit in area `i`).\n    -   Constraint RHS: 'Capacity' value from capacity.csv (total available development capacity).\n6.  **Formulate Objective:** Maximize the total benefit across all areas, i.e., maximize sum over all areas `i` of (Value[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Overall Capacity): The sum over all areas `i` of (Weight[i] * x[i]) must not exceed the total capacity from capacity.csv.\n    -   Constraint 2 (Non-negativity and Integrality): For all areas `i`, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/capacity.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 1\nColumns: ['Capacity']\nParsed column types: {'Capacity': 'int64'}\nPreview only (first 10 rows):\nCapacity\n    4466\nFull-file column statistics: {\"Capacity\": {\"missing\": 0, \"unique_nonempty\": 1, \"numeric_range\": [4466.0, 4466.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"capacity\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"capacity.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/products.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 20\nColumns: ['ProductName', 'Value', 'Weight']\nParsed column types: {'ProductName': 'object', 'Value': 'int64', 'Weight': 'int64'}\nPreview only (first 10 rows):\n     ProductName Value Weight\n          Queens   443    104\n        Brooklyn   522    368\n       Manhattan   300    483\n           Bronx   767    165\n   Staten Island   300    105\n          Harlem   309    123\n Upper East Side   598    131\n Lower Manhattan   460    341\n         Midtown   318    258\nLong Island City   126    469\nFull-file column statistics: {\"ProductName\": {\"missing\": 0, \"unique_nonempty\": 20}, \"Value\": {\"missing\": 0, \"unique_nonempty\": 18, \"numeric_range\": [126.0, 940.0]}, \"Weight\": {\"missing\": 0, \"unique_nonempty\": 20, \"numeric_range\": [56.0, 495.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"brooklyn\", \"matching_columns\": [{\"column\": \"ProductName\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"Brooklyn\"]}], \"exact_matching_columns\": 1}, {\"term\": \"capacity.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"queens\", \"matching_columns\": [{\"column\": \"ProductName\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"Queens\"]}], \"exact_matching_columns\": 1}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\nimport math\nproducts_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/products.csv'\nproducts_df = pd.read_csv(products_path, sep=',', dtype=str, keep_default_na=False)\ncapacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA6/NYCPropertySales1/capacity.csv'\ncapacity_df = pd.read_csv(capacity_path, sep=',', dtype=str, keep_default_na=False)\narea_ids = products_df['ProductName'].tolist()\ntry:\n    value_col = 'Value'\n    weight_col = 'Weight'\n    id_col = 'ProductName'\n    for col in [id_col, value_col, weight_col]:\n        if col not in products_df.columns:\n            raise KeyError(f\"Column '{col}' not found in products.csv\")\n    value_param = {}\n    weight_param = {}\n    for (idx, row) in products_df.iterrows():\n        area = str(row[id_col])\n        try:\n            value = int(row[value_col])\n            weight = int(row[weight_col])\n        except Exception as e:\n            raise ValueError(f\"Non-integer value in products.csv at row {idx + 2} for area '{area}': {e}\")\n        value_param[area] = value\n        weight_param[area] = weight\nexcept Exception as e:\n    raise RuntimeError(f'Error processing products.csv: {e}')\nif 'Capacity' not in capacity_df.columns:\n    raise KeyError(\"Column 'Capacity' not found in capacity.csv\")\nif len(capacity_df) != 1:\n    raise ValueError('capacity.csv must contain exactly one row')\ntry:\n    total_capacity = int(capacity_df.iloc[0]['Capacity'])\nexcept Exception as e:\n    raise ValueError(f'Non-integer value in capacity.csv: {e}')\nif set(area_ids) != set(value_param.keys()) or set(area_ids) != set(weight_param.keys()):\n    raise ValueError('Mismatch between area identifiers and parameter keys in products.csv')\nm = gp.Model('NYC_Property_Development')\nx_vars = m.addVars(area_ids, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((value_param[area] * x_vars[area] for area in area_ids)), gp.GRB.MAXIMIZE)\nm.addConstr(gp.quicksum((weight_param[area] * x_vars[area] for area in area_ids)) <= total_capacity, name='capacity')\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 74260.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      79.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "loto_variant": "examples_and_route",
+  "held_out_type": "RA",
+  "disabled_workflow_route": "RA",
+  "allowed_labels": "TP,NRM,FLP,AP,Mixture,Others",
+  "reference_sha256": "6b2987f96aeacece9f458d55aca072436922aec963be16223ac30a8890f79097",
+  "reference_count_after": 14,
+  "route_allowed": true,
+  "classification_correct": false,
+  "solution_correct": true,
+  "experiment_method": "examples_and_route",
+  "seconds": 13.479,
+  "classification_source": "fold_agent",
+  "classification_cache_sha256": "52ec80ea04cf1b59e48c6b602023d28f0778e866bf7e176463a1ce3f3db6e2ee",
+  "base_notebook_sha256": "abae7197f1ecd8e16bdc642756e08db68374aeda38c3e803b595c7e0573fc448",
+  "notebook_source_sha256": "83c6ac1e07877bf63ffb7c28408cb0118055abeb17e2d8e8076bfe189adcabe7",
+  "cache_fingerprint": "9a30dd815d2e579bdcb7f640d434fd95b971165664054212ac45cf21bc270226",
+  "evaluated_utc": "2026-10-06T04:03:57.397108+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

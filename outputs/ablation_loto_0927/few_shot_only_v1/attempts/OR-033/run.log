@@ -1,0 +1,108 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Extract table
+tables = CSVQA_DATA["tables"]
+table = None
+for t in tables:
+    if t["table_id"] == "file_0_view_0":
+        table = t
+        break
+if table is None:
+    raise ValueError("Required table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+# Extract columns
+columns = table["columns"]
+required_columns = ["Product Name", "Revenue", "Demand", "Initial Inventory"]
+for col in required_columns:
+    if col not in columns:
+        raise ValueError(f"Required column '{col}' not found in table.")
+
+# Build index set I: all records where 'Product Name' contains 'Baby'
+records = table["records"]
+I = []
+A = {}
+d = {}
+Iinv = {}
+
+for rec in records:
+    vals = rec["values"]
+    pname = vals["Product Name"]
+    if not isinstance(pname, str):
+        continue
+    if re.search(r'Baby', pname):
+        # Parse and validate coefficients
+        try:
+            revenue = vals["Revenue"]
+            demand = vals["Demand"]
+            initial_inventory = vals["Initial Inventory"]
+            # Accept int or float, but cast to int for demand/inventory
+            if revenue is None or demand is None or initial_inventory is None:
+                raise ValueError
+            revenue = float(revenue)
+            demand = int(float(demand))
+            initial_inventory = int(float(initial_inventory))
+        except Exception:
+            raise ValueError(f"Invalid or missing data for product '{pname}'.")
+        I.append(pname)
+        A[pname] = revenue
+        d[pname] = demand
+        Iinv[pname] = initial_inventory
+
+# Validate index set and parameter coverage
+if not I:
+    raise ValueError("No products with 'Baby' in 'Product Name' found.")
+for pname in I:
+    if pname not in A or pname not in d or pname not in Iinv:
+        raise ValueError(f"Missing parameter(s) for product '{pname}'.")
+
+# Model
+m = gp.Model('Baby_Product_Revenue')
+x = m.addVars(I, lb=0, ub={i: min(d[i], Iinv[i]) for i in I}, vtype=GRB.INTEGER, name='x')
+
+# Objective
+m.setObjective(gp.quicksum(A[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+# Constraints
+m.addConstrs((x[i] <= d[i] for i in I), name='demand')
+m.addConstrs((x[i] <= Iinv[i] for i in I), name='inventory')
+
+# Set MIPGap
+m.Params.MIPGap = 1e-4
+
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 2 rows, 1 columns and 2 nonzeros
+Model fingerprint: 0x54a06d27
+Variable types: 0 continuous, 1 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [3e+02, 3e+02]
+  Bounds range     [8e+05, 8e+05]
+  RHS range        [8e+05, 6e+06]
+Found heuristic solution: objective 1.955062e+08
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.95506e+08 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.955061880000e+08, best bound 1.955061880000e+08, gap 0.0000%
+ObjVal: 195506188.0
+C0: 765850.0
+Optimal objective: 195506188.0
+Optimal solution: [('C0', 765850.0)]

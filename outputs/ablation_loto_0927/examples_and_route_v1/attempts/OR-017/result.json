@@ -1,0 +1,64 @@
+{
+  "problem_id": "OR-017",
+  "query": "A retail store is managing the sales of various product categories, with detailed revenue data available in the ‘Revenue’ column of the dataset. Each product category has its own demand level. The retailer aims to maximize total revenue by focusing on the initial inventory of products classified under ‘ZZ’. Inventory levels are detailed in the ‘Initial Inventory’ column. Demand quantities are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. The decision variables x_i represent the number of units of each ‘ZZ’ product i that the store plans to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM8/RetailStoreSalesTransactions(ScannerData).csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 2015.08,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "RA",
+  "assigned_route": "RA",
+  "generated_model": "Let $x_i$ be the number of units of product $i$ (where $i$ is a SKU classified as ‘ZZ’) to fulfill.\n\nObjective:\n$$\n\\max \\; 24.38\\, x_{\\text{ZZ2AO}} + 30.12\\, x_{\\text{ZZDW7}} + 19.52\\, x_{\\text{ZZM1A}} + 10.79\\, x_{\\text{ZZNC5}} + 111.81\\, x_{\\text{ZZX6K}}\n$$\n\nSubject to:\n\\[\n\\begin{align*}\n0 \\leq x_{\\text{ZZ2AO}} &\\leq \\min\\{2,\\,10.0\\} = 2 \\\\\n0 \\leq x_{\\text{ZZDW7}} &\\leq \\min\\{4,\\,20.0\\} = 4 \\\\\n0 \\leq x_{\\text{ZZM1A}} &\\leq \\min\\{82,\\,530.0\\} = 82 \\\\\n0 \\leq x_{\\text{ZZNC5}} &\\leq \\min\\{2,\\,10.0\\} = 2 \\\\\n0 \\leq x_{\\text{ZZX6K}} &\\leq \\min\\{2,\\,10.0\\} = 2 \\\\\nx_i &\\in \\mathbb{Z}_{\\geq 0} \\quad \\forall i \\in \\{\\text{ZZ2AO}, \\text{ZZDW7}, \\text{ZZM1A}, \\text{ZZNC5}, \\text{ZZX6K}\\}\n\\end{align*}\n\\]\n\nWhere:\n- $x_i$ = number of units of product $i$ to fulfill (decision variable, integer, $0 \\leq x_i \\leq \\min\\{\\text{Demand}_i,\\,\\text{Initial Inventory}_i\\}$)\n- Revenue, Demand, and Initial Inventory are as given in the table below:\n\n| SKU     | Revenue | Demand | Initial Inventory |\n|---------|---------|--------|------------------|\n| ZZ2AO   | 24.38   | 2      | 10.0             |\n| ZZDW7   | 30.12   | 4      | 20.0             |\n| ZZM1A   | 19.52   | 82     | 530.0            |\n| ZZNC5   | 10.79   | 2      | 10.0             |\n| ZZX6K   | 111.81  | 2      | 10.0             |",
+  "csvqa_observation": "```csv\nSKU,Revenue,Demand,Initial Inventory\nZZ2AO,24.38,2,10.0\nZZDW7,30.12,4,20.0\nZZM1A,19.52,82,530.0\nZZNC5,10.79,2,10.0\nZZX6K,111.81,2,10.0\n```",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_FULL_DATA",
+  "solve_code": "LEGACY_OBSERVATION = '```csv\\nSKU,Revenue,Demand,Initial Inventory\\nZZ2AO,24.38,2,10.0\\nZZDW7,30.12,4,20.0\\nZZM1A,19.52,82,530.0\\nZZNC5,10.79,2,10.0\\nZZX6K,111.81,2,10.0\\n```'\nLEGACY_RECORDS = [{'source': '', 'values': {'SKU': 'ZZ2AO', 'Revenue': '24.38', 'Demand': '2', 'Initial Inventory': '10.0'}}, {'source': '', 'values': {'SKU': 'ZZDW7', 'Revenue': '30.12', 'Demand': '4', 'Initial Inventory': '20.0'}}, {'source': '', 'values': {'SKU': 'ZZM1A', 'Revenue': '19.52', 'Demand': '82', 'Initial Inventory': '530.0'}}, {'source': '', 'values': {'SKU': 'ZZNC5', 'Revenue': '10.79', 'Demand': '2', 'Initial Inventory': '10.0'}}, {'source': '', 'values': {'SKU': 'ZZX6K', 'Revenue': '111.81', 'Demand': '2', 'Initial Inventory': '10.0'}}]\nimport gurobipy as gp\nfrom gurobipy import GRB\nrecords = LEGACY_RECORDS\nskus = []\nrevenue = {}\ndemand = {}\ninit_inventory = {}\ncapacity = {}\nfor rec in records:\n    vals = rec['values']\n    sku = vals['SKU']\n    skus.append(sku)\n    revenue[sku] = float(vals['Revenue'])\n    demand[sku] = int(float(vals['Demand']))\n    init_inventory[sku] = float(vals['Initial Inventory'])\n    capacity[sku] = min(demand[sku], init_inventory[sku])\nfor sku in skus:\n    if sku not in revenue or sku not in demand or sku not in init_inventory or (sku not in capacity):\n        raise ValueError(f'Missing data for SKU {sku}')\nm = gp.Model('ZZ_Fulfillment')\nx = m.addVars(skus, lb=0, ub=capacity, vtype=GRB.INTEGER, name='')\nm.setObjective(gp.quicksum((revenue[i] * x[i] for i in skus)), GRB.MAXIMIZE)\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for var in m.getVars():\n        print(f'{var.VarName}: {var.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "final_objective": 2015.08,
+  "final_solution": [
+    [
+      "C0",
+      2.0
+    ],
+    [
+      "C1",
+      4.0
+    ],
+    [
+      "C2",
+      82.0
+    ],
+    [
+      "C3",
+      2.0
+    ],
+    [
+      "C4",
+      2.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "loto_variant": "examples_and_route",
+  "held_out_type": "NRM",
+  "disabled_workflow_route": "NRM",
+  "allowed_labels": "TP,RA,FLP,AP,Mixture,Others",
+  "reference_sha256": "6b2987f96aeacece9f458d55aca072436922aec963be16223ac30a8890f79097",
+  "reference_count_after": 14,
+  "route_allowed": true,
+  "classification_correct": false,
+  "solution_correct": true,
+  "experiment_method": "examples_and_route",
+  "seconds": 33.094,
+  "classification_source": "fold_agent",
+  "classification_cache_sha256": "8b17fda06001ff4ebea07809838119bc81b6f49cb453b600aa87d5dc73881435",
+  "base_notebook_sha256": "a155d54c6df32abc8dfe263e03d00138848cfcca32422dff3c286f3b8c67f6b1",
+  "notebook_source_sha256": "dbc55bc1466b60c1dcea916f9ce32ac698ffd9ea4418e420312defa755319219",
+  "cache_fingerprint": "598bb2d6f0b5fff577d429cf3bd0e1ba32e8902e74d12730de66d0462722963f",
+  "evaluated_utc": "2026-10-06T02:51:41.711429+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

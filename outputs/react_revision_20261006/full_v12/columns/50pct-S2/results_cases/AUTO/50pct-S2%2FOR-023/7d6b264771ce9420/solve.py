@@ -1,0 +1,197 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'The Iowa Department of Commerce requires that any store selling alcohol in bottled form for off-premises '
+          'consumption must hold a Class ‚ÄúE‚Äù liquor license, a typical arrangement for most state liquor '
+          'regulatory authorities. All alcohol sales from stores registered with the Iowa Department of Commerce are '
+          'recorded in the department‚Äôs system, which is publicly released as open data by the State of Iowa. '
+          'Several suppliers located in different cities can provide the necessary liquor products to these licensed '
+          'stores. Each supplier incurs a fixed cost when starting operations, with the fixed cost data provided in '
+          '‚Äúfixed_cost.csv.‚Äù The Department needs to source a unit of each liquor product for the stores from '
+          'these suppliers. For each product, the transportation cost per unit from each supplier to each store is '
+          'recorded in ‚Äútransportation_costs.csv.‚Äù Additionally, each store has a specific demand for these '
+          'products, which is provided in ‚Äúdemand.csv.‚Äù The objective is to determine which suppliers to activate '
+          'so that the demand for all liquor products across all licensed stores is met while minimizing the total '
+          'cost. The decision variables y_i are binary, indicating whether a supplier is operational (open). The '
+          'decision variables x_{ij} represent the quantity of goods that each store S_j sources from supplier F_i.',
+ 'relationships': [],
+ 'route': 'FLP',
+ 'tables': [{'columns': ['customer_support_ticket_count', 'Customer', 'demand'],
+             'file_index': 0,
+             'file_name': 'demand.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 5,
+             'records': [{'source_row': 0,
+                          'values': {'Customer': 'Customer_1', 'customer_support_ticket_count': '3', 'demand': '2397'}},
+                         {'source_row': 1,
+                          'values': {'Customer': 'Customer_2', 'customer_support_ticket_count': '8', 'demand': '1889'}},
+                         {'source_row': 2,
+                          'values': {'Customer': 'Customer_3', 'customer_support_ticket_count': '1', 'demand': '2518'}},
+                         {'source_row': 3,
+                          'values': {'Customer': 'Customer_4', 'customer_support_ticket_count': '8', 'demand': '3218'}},
+                         {'source_row': 4,
+                          'values': {'Customer': 'Customer_5',
+                                     'customer_support_ticket_count': '5',
+                                     'demand': '1813'}}],
+             'returned_rows': 5,
+             'role': 'file_0',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['facility_staff_count', 'Unnamed: 1', 'fixed_costs'],
+             'file_index': 1,
+             'file_name': 'fixed_cost.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 5,
+             'records': [{'source_row': 0,
+                          'values': {'Unnamed: 1': 'MOUNT AYR', 'facility_staff_count': '12', 'fixed_costs': '96.58'}},
+                         {'source_row': 1,
+                          'values': {'Unnamed: 1': 'WAUKEE', 'facility_staff_count': '12', 'fixed_costs': '94.06'}},
+                         {'source_row': 2,
+                          'values': {'Unnamed: 1': 'WAVERLY', 'facility_staff_count': '20', 'fixed_costs': '94.37'}},
+                         {'source_row': 3,
+                          'values': {'Unnamed: 1': 'PELLA', 'facility_staff_count': '8', 'fixed_costs': '82.88'}},
+                         {'source_row': 4,
+                          'values': {'Unnamed: 1': 'DES MOINES',
+                                     'facility_staff_count': '50',
+                                     'fixed_costs': '94.95999999999999'}}],
+             'returned_rows': 5,
+             'role': 'file_1',
+             'table_id': 'file_1_view_0'},
+            {'columns': ['Unnamed: 0',
+                         'CLARINDA',
+                         'customer_support_staff_count',
+                         'operations_region',
+                         'FORT MADISON',
+                         'annual_inspection_count',
+                         'SIOUX CITY',
+                         'TOLEDO',
+                         'BANCROFT'],
+             'file_index': 2,
+             'file_name': 'transportation_costs.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 5,
+             'records': [{'source_row': 0,
+                          'values': {'BANCROFT': '1685.53',
+                                     'CLARINDA': '694.6799999999999',
+                                     'FORT MADISON': '17.48',
+                                     'SIOUX CITY': '20.07',
+                                     'TOLEDO': '199.02',
+                                     'Unnamed: 0': 'MOUNT AYR',
+                                     'annual_inspection_count': '6',
+                                     'customer_support_staff_count': '20',
+                                     'operations_region': 'West'}},
+                         {'source_row': 1,
+                          'values': {'BANCROFT': '90.69',
+                                     'CLARINDA': '15.13',
+                                     'FORT MADISON': '1.5',
+                                     'SIOUX CITY': '1.43',
+                                     'TOLEDO': '27.88',
+                                     'Unnamed: 0': 'WAUKEE',
+                                     'annual_inspection_count': '2',
+                                     'customer_support_staff_count': '12',
+                                     'operations_region': 'South'}},
+                         {'source_row': 2,
+                          'values': {'BANCROFT': '78.73',
+                                     'CLARINDA': '2.34',
+                                     'FORT MADISON': '349.34',
+                                     'SIOUX CITY': '246.6',
+                                     'TOLEDO': '41.3',
+                                     'Unnamed: 0': 'WAVERLY',
+                                     'annual_inspection_count': '3',
+                                     'customer_support_staff_count': '16',
+                                     'operations_region': 'South'}},
+                         {'source_row': 3,
+                          'values': {'BANCROFT': '38.93',
+                                     'CLARINDA': '1181.6',
+                                     'FORT MADISON': '1458.53',
+                                     'SIOUX CITY': '1646.36',
+                                     'TOLEDO': '1924.55',
+                                     'Unnamed: 0': 'PELLA',
+                                     'annual_inspection_count': '3',
+                                     'customer_support_staff_count': '5',
+                                     'operations_region': 'North'}},
+                         {'source_row': 4,
+                          'values': {'BANCROFT': '103.84',
+                                     'CLARINDA': '1030.8',
+                                     'FORT MADISON': '43.48',
+                                     'SIOUX CITY': '932.4299999999999',
+                                     'TOLEDO': '55.39',
+                                     'Unnamed: 0': 'DES MOINES',
+                                     'annual_inspection_count': '3',
+                                     'customer_support_staff_count': '16',
+                                     'operations_region': 'North'}}],
+             'returned_rows': 5,
+             'role': 'file_2',
+             'table_id': 'file_2_view_0'}],
+ 'validation': {'fallback_reason': "Matrix validation failed: {'matrix_table_id': 'file_2_view_0', 'shape': [5, 5], "
+                                   "'expected_shape': [5, 5], 'row_ids_aligned': True, 'column_ids_aligned': False, "
+                                   "'row_mapping_basis': 'exact', 'column_mapping_basis': 'unresolved'}",
+                'planner_errors': ["Matrix validation failed: {'matrix_table_id': 'file_2_view_0', 'shape': [5, 5], "
+                                   "'expected_shape': [5, 5], 'row_ids_aligned': True, 'column_ids_aligned': False, "
+                                   "'row_mapping_basis': 'exact', 'column_mapping_basis': 'unresolved'}"],
+                'status': 'FALLBACK_FULL_DATA'}}
+import pandas as pd
+CSVQA_FRAMES = {t["table_id"]: pd.DataFrame([r["values"] for r in t["records"]], columns=t["columns"], index=[r["source_row"] for r in t["records"]]) for t in CSVQA_DATA["tables"]}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_FRAMES):
+    suppliers = []
+    fixed_cost = {}
+    frame_fixed = CSVQA_FRAMES['file_1_view_0']
+    for (_, row) in frame_fixed.iterrows():
+        supplier = row['Unnamed: 1']
+        suppliers.append(supplier)
+        try:
+            fixed_cost[supplier] = float(row['fixed_costs'])
+        except Exception:
+            raise ValueError(f"Invalid fixed_costs for supplier {supplier}: {row['fixed_costs']}")
+    customers = []
+    demand = {}
+    frame_demand = CSVQA_FRAMES['file_0_view_0']
+    for (_, row) in frame_demand.iterrows():
+        customer = row['Customer']
+        customers.append(customer)
+        try:
+            demand[customer] = float(row['demand'])
+        except Exception:
+            raise ValueError(f"Invalid demand for customer {customer}: {row['demand']}")
+    cost = {i: {} for i in suppliers}
+    frame_cost = CSVQA_FRAMES['file_2_view_0']
+    for (_, row) in frame_cost.iterrows():
+        supplier = row['Unnamed: 0']
+        if supplier not in suppliers:
+            continue
+        for customer in customers:
+            if customer not in row:
+                raise ValueError(f'Customer {customer} not found in transportation_costs.csv columns')
+            try:
+                cost[supplier][customer] = float(row[customer])
+            except Exception:
+                raise ValueError(f'Invalid cost for supplier {supplier}, customer {customer}: {row[customer]}')
+    M = sum((demand[j] for j in customers))
+    M_i = {i: M for i in suppliers}
+    for i in suppliers:
+        if i not in fixed_cost:
+            raise ValueError(f'Missing fixed cost for supplier {i}')
+        if i not in cost:
+            raise ValueError(f'Missing cost row for supplier {i}')
+        for j in customers:
+            if j not in cost[i]:
+                raise ValueError(f'Missing cost for supplier {i}, customer {j}')
+    for j in customers:
+        if j not in demand:
+            raise ValueError(f'Missing demand for customer {j}')
+    m = gp.Model('Iowa_Liquor_FLP')
+    m.setParam('MIPGap', 0.0001)
+    x_vars = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='')
+    y_vars = m.addVars(suppliers, vtype=GRB.BINARY, name='')
+    m.setObjective(gp.quicksum((cost[i][j] * x_vars[i, j] for i in suppliers for j in customers)) + gp.quicksum((fixed_cost[i] * y_vars[i] for i in suppliers)), GRB.MINIMIZE)
+    m.addConstrs((gp.quicksum((x_vars[i, j] for i in suppliers)) == demand[j] for j in customers), name='')
+    m.addConstrs((gp.quicksum((x_vars[i, j] for j in customers)) <= M_i[i] * y_vars[i] for i in suppliers), name='')
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+m = solve_problem(CSVQA_FRAMES)

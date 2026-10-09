@@ -1,0 +1,139 @@
+{
+  "problem_id": "OR-072",
+  "query": "For a certain daytime and nighttime service bus route, the number of drivers and crew members required during each time period is given in 42.csv:\n\n    Assuming that the drivers and crew members start working at the beginning of each time period and work continuously for 4 hours, how many drivers and crew members should be assigned to this bus route at least? Write down the linear programming model for this problem.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others1/42.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 320.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the minimum number of drivers and crew members that should be assigned to a bus route, given the required number of personnel for each hour of the day (24 periods), where each assigned person starts at the beginning of an hour and works continuously for 4 hours. The goal is to cover all hourly requirements with as few staff as possible.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) covering problem (specifically, a set covering/time-shift scheduling problem).\n3.  **Define Index Sets:** The primary index is the set of time periods (hours), indexed by \\( t = 1, 2, ..., 24 \\) (from the 'Shift' column).\n4.  **Define Decision Variables:**\n    -   `x[t]` = Number of drivers/crew members who start their 4-hour shift at time period \\( t \\). Type: GRB.INTEGER (nonnegative integer).\n5.  **Identify Parameters (from Schema):**\n    -   The required number of staff for each time period comes from the 'Number Required' column, indexed by 'Shift' (1 to 24).\n    -   The time periods are defined by the 'Shift' or 'Time' columns.\n6.  **Formulate Objective:** Minimize the total number of drivers/crew members assigned, i.e., minimize the sum over all \\( x[t] \\) for \\( t = 1 \\) to \\( 24 \\).\n7.  **Formulate Constraints:**\n    -   Coverage Constraint: For each time period \\( s \\) (from 1 to 24), the sum of all staff whose 4-hour shift covers period \\( s \\) must be at least the required number for that period. That is, for each \\( s \\), sum \\( x[t] \\) over all \\( t \\) such that a shift starting at \\( t \\) covers period \\( s \\) (i.e., \\( t \\leq s \\leq t+3 \\), with wrap-around for the 24-hour cycle), must be greater than or equal to 'Number Required' for period \\( s \\).\n    -   Nonnegativity and Integrality: \\( x[t] \\geq 0 \\), integer, for all \\( t \\).\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others1/42.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 24\nColumns: ['Shift', 'Time', 'Number Required']\nParsed column types: {'Shift': 'int64', 'Time': 'object', 'Number Required': 'int64'}\nPreview only (first 10 rows):\nShift       Time Number Required\n    1  0:00-1:00              20\n    2  1:00-2:00              18\n    3  2:00-3:00              15\n    4  3:00-4:00              15\n    5  4:00-5:00              20\n    6  5:00-6:00              30\n    7  6:00-7:00              60\n    8  7:00-8:00              70\n    9  8:00-9:00              50\n   10 9:00-10:00              55\nFull-file column statistics: {\"Shift\": {\"missing\": 0, \"unique_nonempty\": 24, \"numeric_range\": [1.0, 24.0]}, \"Time\": {\"missing\": 0, \"unique_nonempty\": 24}, \"Number Required\": {\"missing\": 0, \"unique_nonempty\": 15, \"numeric_range\": [15.0, 85.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"time\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"60e56c66a4df0d6401f3e1b0320a71a7ef85d894613776bd4a94954999533579\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\ndf = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others1/42.csv', dtype=str, keep_default_na=False)\nif df.shape[0] != 24:\n    raise ValueError(f'Expected 24 rows for 24 periods, got {df.shape[0]}.')\ntry:\n    df['Shift'] = df['Shift'].astype(int)\n    df['Number Required'] = df['Number Required'].astype(int)\nexcept Exception as e:\n    raise ValueError(f'Failed to convert Shift or Number Required to int: {e}')\nshifts = sorted(df['Shift'].unique())\nif shifts != list(range(1, 25)):\n    raise ValueError(f'Shift indices must be 1..24, got {shifts}')\nrequired = dict(zip(df['Shift'], df['Number Required']))\nm = gp.Model('BusShiftCover')\nx_vars = m.addVars(shifts, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((x_vars[t] for t in shifts)), gp.GRB.MINIMIZE)\nfor s in shifts:\n    covering_ts = [t for t in shifts if (s - t) % 24 in [0, 1, 2, 3]]\n    m.addConstr(gp.quicksum((x_vars[t] for t in covering_ts)) >= required[s], name=f'cover_{s}')\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'ObjVal: {m.objVal}')\n    for t in shifts:\n        print(f'{x_vars[t].VarName} {x_vars[t].X}')\nelse:\n    print(f'Solver status: {m.status}')",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 320.0,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      0.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      15.0
+    ],
+    [
+      "C4",
+      5.0
+    ],
+    [
+      "C5",
+      10.0
+    ],
+    [
+      "C6",
+      30.0
+    ],
+    [
+      "C7",
+      25.0
+    ],
+    [
+      "C8",
+      0.0
+    ],
+    [
+      "C9",
+      0.0
+    ],
+    [
+      "C10",
+      40.0
+    ],
+    [
+      "C11",
+      35.0
+    ],
+    [
+      "C12",
+      5.0
+    ],
+    [
+      "C13",
+      0.0
+    ],
+    [
+      "C14",
+      20.0
+    ],
+    [
+      "C15",
+      30.0
+    ],
+    [
+      "C16",
+      10.0
+    ],
+    [
+      "C17",
+      15.0
+    ],
+    [
+      "C18",
+      30.0
+    ],
+    [
+      "C19",
+      15.0
+    ],
+    [
+      "C20",
+      0.0
+    ],
+    [
+      "C21",
+      0.0
+    ],
+    [
+      "C22",
+      20.0
+    ],
+    [
+      "C23",
+      15.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 14.783,
+  "classification_source": "computed",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "cache_fingerprint": "6b09b9571231082ff4f52d4e0ff8551a4733da48e999b822690ba72123632ab3",
+  "evaluated_utc": "2026-10-06T02:59:56.516047+00:00"
+}

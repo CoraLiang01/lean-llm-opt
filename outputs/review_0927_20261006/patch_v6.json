@@ -1,0 +1,47 @@
+[
+  {
+    "cell": 11,
+    "old": "def build_csvqa_components(",
+    "new": "def validate_legacy_source_rows(observation, documents):\n    \"\"\"Accept only exact source-row evidence, including original fields and multiplicity.\"\"\"\n    from collections import Counter\n    original = [json.loads(document.page_content) for document in documents]\n    observed = json.loads(str(observation))\n    if not isinstance(observed, list) or (original and not observed):\n        raise ValueError(\"Legacy extraction must return a nonempty source-row array\")\n    def signature(row):\n        if not isinstance(row, dict) or not isinstance(row.get(\"values\"), dict):\n            raise ValueError(\"Legacy extraction row is missing its original field mapping\")\n        return (str(row.get(\"source\", \"\")), tuple(sorted(\n            (str(column), str(value)) for column, value in row[\"values\"].items())))\n    available = Counter(signature(row) for row in original)\n    for row in observed:\n        key = signature(row)\n        if available[key] <= 0:\n            raise ValueError(\"Legacy extraction contains altered/derived fields, a foreign row, or an extra duplicate\")\n        available[key] -= 1\n    return str(observation)\n\n\ndef build_csvqa_components("
+  },
+  {
+    "cell": 11,
+    "old": "        return str(result)\n",
+    "new": "        try:\n            observation = validate_legacy_source_rows(result, documents)\n            return observation, \"LEGACY_VALIDATED_SOURCE_ROWS\", None, str(result)\n        except (KeyError, TypeError, ValueError) as exc:\n            # Recover original evidence; selection remains the modeling agent's query-based task.\n            observation = json.dumps([json.loads(d.page_content) for d in documents], ensure_ascii=False)\n            print(f\"[Rejected legacy extraction]: {exc}\\n{result}\")\n            return observation, \"LEGACY_SOURCE_VALIDATION_FALLBACK\", str(exc), str(result)\n"
+  },
+  {
+    "cell": 11,
+    "old": "            observation = rag_answer(tool_query)\n",
+    "new": "            observation, status, fallback_reason, legacy_output = rag_answer(tool_query)\n            if fallback_reason:\n                errors.append(fallback_reason)\n"
+  },
+  {
+    "cell": 11,
+    "old": "            \"validation_errors\": errors, \"fallback_reason\": fallback_reason,\n",
+    "new": "            \"validation_errors\": errors, \"fallback_reason\": fallback_reason,\n            \"legacy_extraction_output\": legacy_output if not planned else None,\n"
+  },
+  {
+    "cell": 15,
+    "old": "    prefix += QUERY_SEMANTICS_GUIDANCE\n",
+    "new": "    prefix += QUERY_SEMANTICS_GUIDANCE\n    prefix += \"\\nUse the ReAct protocol: after reasoning/tools, begin the final model with the literal marker Final Answer:. Any complete source fallback is evidence, not automatic selection: apply only the original query's subset and eligibility rules in the model.\"\n"
+  },
+  {
+    "cell": 25,
+    "old": "        code_gen_template += QUERY_SEMANTICS_GUIDANCE + SOURCE_TABLE_GUIDANCE\n",
+    "new": "        code_gen_template += QUERY_SEMANTICS_GUIDANCE + SOURCE_TABLE_GUIDANCE\n        code_gen_template += \"\\nDataFrame.columns is an Index, not a dictionary: test column_name in df.columns, then access df[column_name]. Do not call columns.get(). Gurobi comparisons are TempConstr objects: pass them to addConstr, never multiply them or pass them to quicksum. For a positive-quantity prerequisite, use the already linked binary selection flags: selected_item <= selected_prerequisite, without a quantity ratio.\"\n"
+  },
+  {
+    "cell": 29,
+    "old": "        model_text = formulation[\"formulation\"]\n",
+    "new": "        record[\"csvqa_trace\"] = json.dumps(formulation.get(\"trace\", {}), ensure_ascii=False)\n        model_text = formulation[\"formulation\"]\n"
+  },
+  {
+    "cell": 33,
+    "old": "RECORD_ARTIFACT_FILES = {",
+    "new": "RECORD_ARTIFACT_FILES = {\n    \"csvqa_trace\": \"csvqa_trace.json\","
+  },
+  {
+    "cell": 3,
+    "old": "outputs/optimization_0927_20261006/full_review_v4",
+    "new": "outputs/optimization_0927_20261006/full_review_v6"
+  }
+]

@@ -1,0 +1,87 @@
+{
+  "problem_id": "OR-023",
+  "query": "The supermarket offers a variety of top-selling products with revenue data in the ‘Revenue’ column. The retailer aims to maximize total revenue using the initial inventory of products classified under ‘ELE-S’. Inventory levels are given in the ‘Initial Inventory’ column. Demand quantities are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. Decision variables x_i indicate the number of units of each ‘ELE-S’ product i that the company plans to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM14/SalesStoreoverview.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 63628.0,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal fulfillment plan for products classified under ‘ELE-S’ to maximize total revenue, given known deterministic demand and initial inventory for each product. The decision is how many units of each ‘ELE-S’ product to fulfill, subject to not exceeding either demand or available inventory.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem.\n3.  **Define Index Sets:** The primary index is the set of products with ‘ELE-S’ in the ‘Product_Reference’ column.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of product i (where i is an ‘ELE-S’ product) to fulfill. Type: GRB.INTEGER.\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: ‘Revenue’ column (per-unit revenue for each product).\n    -   Constraint coefficients: Implicitly 1 per unit for both inventory and demand constraints.\n    -   Constraint RHS: ‘Initial Inventory’ (maximum available units per product), ‘Demand’ (maximum fulfillable units per product).\n6.  **Formulate Objective:** Maximize total revenue, i.e., maximize the sum over all ‘ELE-S’ products of (Revenue[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Inventory Limit): For each ‘ELE-S’ product i, x[i] ≤ Initial Inventory[i].\n    -   Constraint 2 (Demand Limit): For each ‘ELE-S’ product i, x[i] ≤ Demand[i].\n    -   Constraint 3 (Non-negativity and Integrality): For each ‘ELE-S’ product i, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM14/SalesStoreoverview.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 161\nColumns: ['Product_Reference', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product_Reference': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'float64'}\nPreview only (first 10 rows):\nProduct_Reference Revenue Demand Initial Inventory\n ELE-ACC-10000478     2.0    140            1000.0\n ELE-ACC-10002424     2.0    136            1000.0\n ELE-ACC-10018567     2.0    268            2000.0\n ELE-ACC-10019567     2.0    121            1000.0\n ELE-CAM-10000475    12.0    812            6000.0\n ELE-CAM-10002121    12.0    875            6000.0\n ELE-CAM-10015234    12.0   1519           12000.0\n ELE-CAM-10016234    12.0    868            6000.0\n ELE-HEA-10000460     3.0    192            1500.0\n ELE-HEA-10000493     3.6    230            1800.0\nFull-file column statistics: {\"Product_Reference\": {\"missing\": 0, \"unique_nonempty\": 161}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 27, \"numeric_range\": [0.15, 18.0]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 141, \"numeric_range\": [7.0, 3965.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 45, \"numeric_range\": [50.0, 30000.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"ele-s\", \"matching_columns\": [{\"column\": \"Product_Reference\", \"exact\": 0, \"prefix\": 12, \"contains\": 12, \"examples\": [\"ELE-SMA-10000463\", \"ELE-SMA-10000487\", \"ELE-SMA-10003333\"]}], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"26e7fcc3f9b779e0fa34fcaa44a09880048f12d74e95e879df6b038340140686\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM14/SalesStoreoverview.csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\n\ndef is_eles(val):\n    return 'ele-s' in val.strip().casefold()\neles_mask = df['Product_Reference'].apply(is_eles)\neles_df = df[eles_mask].copy()\nif eles_df.empty:\n    raise ValueError(\"No products found with 'ELE-S' in 'Product_Reference'.\")\nproduct_ids = eles_df['Product_Reference'].tolist()\neles_df['Revenue'] = eles_df['Revenue'].astype(float)\neles_df['Demand'] = eles_df['Demand'].astype(float)\neles_df['Initial Inventory'] = eles_df['Initial Inventory'].astype(float)\nrevenue = dict(zip(eles_df['Product_Reference'], eles_df['Revenue']))\ndemand = dict(zip(eles_df['Product_Reference'], eles_df['Demand']))\ninit_inventory = dict(zip(eles_df['Product_Reference'], eles_df['Initial Inventory']))\nm = gp.Model('ELE-S_Fulfillment')\nx_vars = m.addVars(product_ids, vtype=gp.GRB.INTEGER, lb=0, name='')\nfor i in product_ids:\n    m.addConstr(x_vars[i] <= init_inventory[i], name=f'inv_{i}')\n    m.addConstr(x_vars[i] <= demand[i], name=f'dem_{i}')\nm.setObjective(gp.quicksum((revenue[i] * x_vars[i] for i in product_ids)), gp.GRB.MAXIMIZE)\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total value/cost: {m.objVal:.2f}')\n    print(\"--- Fulfillment Plan for 'ELE-S' Products ---\")\n    for i in product_ids:\n        print(f'Product {i}: Fulfill {int(round(x_vars[i].X))} units (Demand: {int(demand[i])}, Inventory: {int(init_inventory[i])}, Revenue/unit: {revenue[i]})')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 63628.0,
+  "final_solution": [
+    [
+      "C0",
+      295.0
+    ],
+    [
+      "C1",
+      1002.0
+    ],
+    [
+      "C2",
+      958.0
+    ],
+    [
+      "C3",
+      777.0
+    ],
+    [
+      "C4",
+      271.0
+    ],
+    [
+      "C5",
+      244.0
+    ],
+    [
+      "C6",
+      990.0
+    ],
+    [
+      "C7",
+      1000.0
+    ],
+    [
+      "C8",
+      169.0
+    ],
+    [
+      "C9",
+      155.0
+    ],
+    [
+      "C10",
+      327.0
+    ],
+    [
+      "C11",
+      174.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 8.158,
+  "evaluated_utc": "2026-10-06T08:48:21.318833+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

@@ -1,0 +1,453 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "6",
+      "Warehouse (i)": "1",
+      "Opening Cost (fi)": "3000",
+      "warehouse_roof_material": "Concrete",
+      "Capacity (units)": "180"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "4",
+      "Warehouse (i)": "2",
+      "Opening Cost (fi)": "3200",
+      "warehouse_roof_material": "Concrete",
+      "Capacity (units)": "160"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "4",
+      "Warehouse (i)": "3",
+      "Opening Cost (fi)": "3100",
+      "warehouse_roof_material": "Steel",
+      "Capacity (units)": "200"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "2",
+      "Warehouse (i)": "4",
+      "Opening Cost (fi)": "2800",
+      "warehouse_roof_material": "Composite",
+      "Capacity (units)": "150"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "6",
+      "Warehouse (i)": "5",
+      "Opening Cost (fi)": "3500",
+      "warehouse_roof_material": "Composite",
+      "Capacity (units)": "170"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "3",
+      "Warehouse (i)": "6",
+      "Opening Cost (fi)": "2700",
+      "warehouse_roof_material": "Composite",
+      "Capacity (units)": "190"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "1",
+      "Warehouse (i)": "7",
+      "Opening Cost (fi)": "2900",
+      "warehouse_roof_material": "Steel",
+      "Capacity (units)": "160"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "2",
+      "Warehouse (i)": "8",
+      "Opening Cost (fi)": "3050",
+      "warehouse_roof_material": "Steel",
+      "Capacity (units)": "175"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "1",
+      "Warehouse (i)": "9",
+      "Opening Cost (fi)": "3100",
+      "warehouse_roof_material": "Steel",
+      "Capacity (units)": "170"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "1",
+      "Warehouse (i)": "10",
+      "Opening Cost (fi)": "2200",
+      "warehouse_roof_material": "Concrete",
+      "Capacity (units)": "180"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/PotentialWarehouses_Costs.csv",
+    "values": {
+      "warehouse_inspection_count_2025_q4": "3",
+      "Warehouse (i)": "11",
+      "Opening Cost (fi)": "2890",
+      "warehouse_roof_material": "Steel",
+      "Capacity (units)": "190"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "1",
+      "store_staff_training_hours_2025_q4": "12",
+      "Demand (units, dj)": "30"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "2",
+      "store_staff_training_hours_2025_q4": "48",
+      "Demand (units, dj)": "40"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "3",
+      "store_staff_training_hours_2025_q4": "18",
+      "Demand (units, dj)": "20"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "4",
+      "store_staff_training_hours_2025_q4": "48",
+      "Demand (units, dj)": "35"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "5",
+      "store_staff_training_hours_2025_q4": "18",
+      "Demand (units, dj)": "20"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "6",
+      "store_staff_training_hours_2025_q4": "36",
+      "Demand (units, dj)": "25"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "7",
+      "store_staff_training_hours_2025_q4": "18",
+      "Demand (units, dj)": "45"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "8",
+      "store_staff_training_hours_2025_q4": "48",
+      "Demand (units, dj)": "38"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "9",
+      "store_staff_training_hours_2025_q4": "12",
+      "Demand (units, dj)": "32"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "10",
+      "store_staff_training_hours_2025_q4": "18",
+      "Demand (units, dj)": "41"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/Stores_Demands.csv",
+    "values": {
+      "Store (j)": "11",
+      "store_staff_training_hours_2025_q4": "36",
+      "Demand (units, dj)": "44"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "3",
+      "Unnamed: 1": "W1",
+      "W1": "12",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "6",
+      "W2": "11",
+      "W3": "14",
+      "cost_record_logistics_training_hours_2025_q4": "12",
+      "cost_record_carrier_briefing_count_2025_q4": "3",
+      "W4": "15",
+      "W5": "17",
+      "cost_record_carrier_contact_channel": "Email",
+      "W6": "13",
+      "cost_record_tariff_review_meeting_count_2025_q4": "8",
+      "W7": "12",
+      "W8": "16",
+      "W9": "16",
+      "W10": "14",
+      "W11": "15"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "7",
+      "Unnamed: 1": "W2",
+      "W1": "17",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "2",
+      "W2": "19",
+      "W3": "15",
+      "cost_record_logistics_training_hours_2025_q4": "12",
+      "cost_record_carrier_briefing_count_2025_q4": "2",
+      "W4": "20",
+      "W5": "18",
+      "cost_record_carrier_contact_channel": "Telephone",
+      "W6": "14",
+      "cost_record_tariff_review_meeting_count_2025_q4": "4",
+      "W7": "17",
+      "W8": "15",
+      "W9": "13",
+      "W10": "15",
+      "W11": "16"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "5",
+      "Unnamed: 1": "W3",
+      "W1": "13",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "6",
+      "W2": "14",
+      "W3": "12",
+      "cost_record_logistics_training_hours_2025_q4": "30",
+      "cost_record_carrier_briefing_count_2025_q4": "1",
+      "W4": "14",
+      "W5": "16",
+      "cost_record_carrier_contact_channel": "Telephone",
+      "W6": "15",
+      "cost_record_tariff_review_meeting_count_2025_q4": "6",
+      "W7": "11",
+      "W8": "14",
+      "W9": "16",
+      "W10": "18",
+      "W11": "17"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "2",
+      "Unnamed: 1": "W4",
+      "W1": "18",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "2",
+      "W2": "16",
+      "W3": "17",
+      "cost_record_logistics_training_hours_2025_q4": "24",
+      "cost_record_carrier_briefing_count_2025_q4": "4",
+      "W4": "13",
+      "W5": "18",
+      "cost_record_carrier_contact_channel": "Telephone",
+      "W6": "17",
+      "cost_record_tariff_review_meeting_count_2025_q4": "6",
+      "W7": "14",
+      "W8": "19",
+      "W9": "16",
+      "W10": "13",
+      "W11": "18"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "7",
+      "Unnamed: 1": "W5",
+      "W1": "10",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "4",
+      "W2": "13",
+      "W3": "12",
+      "cost_record_logistics_training_hours_2025_q4": "18",
+      "cost_record_carrier_briefing_count_2025_q4": "4",
+      "W4": "19",
+      "W5": "15",
+      "cost_record_carrier_contact_channel": "Email",
+      "W6": "11",
+      "cost_record_tariff_review_meeting_count_2025_q4": "4",
+      "W7": "12",
+      "W8": "14",
+      "W9": "12",
+      "W10": "15",
+      "W11": "17"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "3",
+      "Unnamed: 1": "W6",
+      "W1": "15",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "2",
+      "W2": "12",
+      "W3": "14",
+      "cost_record_logistics_training_hours_2025_q4": "12",
+      "cost_record_carrier_briefing_count_2025_q4": "1",
+      "W4": "16",
+      "W5": "13",
+      "cost_record_carrier_contact_channel": "Portal",
+      "W6": "17",
+      "cost_record_tariff_review_meeting_count_2025_q4": "1",
+      "W7": "16",
+      "W8": "16",
+      "W9": "14",
+      "W10": "18",
+      "W11": "19"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "2",
+      "Unnamed: 1": "W7",
+      "W1": "14",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "2",
+      "W2": "13",
+      "W3": "15",
+      "cost_record_logistics_training_hours_2025_q4": "18",
+      "cost_record_carrier_briefing_count_2025_q4": "3",
+      "W4": "17",
+      "W5": "12",
+      "cost_record_carrier_contact_channel": "Telephone",
+      "W6": "13",
+      "cost_record_tariff_review_meeting_count_2025_q4": "1",
+      "W7": "14",
+      "W8": "15",
+      "W9": "12",
+      "W10": "16",
+      "W11": "14"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "7",
+      "Unnamed: 1": "W8",
+      "W1": "19",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "4",
+      "W2": "16",
+      "W3": "18",
+      "cost_record_logistics_training_hours_2025_q4": "24",
+      "cost_record_carrier_briefing_count_2025_q4": "1",
+      "W4": "20",
+      "W5": "17",
+      "cost_record_carrier_contact_channel": "Email",
+      "W6": "19",
+      "cost_record_tariff_review_meeting_count_2025_q4": "4",
+      "W7": "16",
+      "W8": "18",
+      "W9": "15",
+      "W10": "15",
+      "W11": "18"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "1",
+      "Unnamed: 1": "W9",
+      "W1": "17",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "4",
+      "W2": "18",
+      "W3": "12",
+      "cost_record_logistics_training_hours_2025_q4": "18",
+      "cost_record_carrier_briefing_count_2025_q4": "4",
+      "W4": "14",
+      "W5": "16",
+      "cost_record_carrier_contact_channel": "Portal",
+      "W6": "15",
+      "cost_record_tariff_review_meeting_count_2025_q4": "8",
+      "W7": "14",
+      "W8": "17",
+      "W9": "21",
+      "W10": "15",
+      "W11": "18"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "1",
+      "Unnamed: 1": "W10",
+      "W1": "14",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "10",
+      "W2": "13",
+      "W3": "15",
+      "cost_record_logistics_training_hours_2025_q4": "12",
+      "cost_record_carrier_briefing_count_2025_q4": "2",
+      "W4": "17",
+      "W5": "16",
+      "cost_record_carrier_contact_channel": "Portal",
+      "W6": "18",
+      "cost_record_tariff_review_meeting_count_2025_q4": "8",
+      "W7": "14",
+      "W8": "19",
+      "W9": "15",
+      "W10": "17",
+      "W11": "19"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/UFLP_testing/UFLP14/TransportationCost.csv",
+    "values": {
+      "cost_record_route_survey_count_2025_q4": "2",
+      "Unnamed: 1": "W11",
+      "W1": "15",
+      "cost_record_dispatch_coordination_meeting_count_2025_q4": "10",
+      "W2": "13",
+      "W3": "16",
+      "cost_record_logistics_training_hours_2025_q4": "36",
+      "cost_record_carrier_briefing_count_2025_q4": "1",
+      "W4": "17",
+      "W5": "11",
+      "cost_record_carrier_contact_channel": "Portal",
+      "W6": "13",
+      "cost_record_tariff_review_meeting_count_2025_q4": "4",
+      "W7": "14",
+      "W8": "15",
+      "W9": "19",
+      "W10": "21",
+      "W11": "13"
+    }
+  }
+]

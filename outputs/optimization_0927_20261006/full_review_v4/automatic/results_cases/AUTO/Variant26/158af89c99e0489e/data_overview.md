@@ -1,0 +1,629 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W10",
+      "project_id": "P00",
+      "cost_cents": "147",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W10",
+      "project_id": "P01",
+      "cost_cents": "114",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W10",
+      "project_id": "P03",
+      "cost_cents": "998",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W10",
+      "project_id": "P04",
+      "cost_cents": "1270",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W10",
+      "project_id": "P07",
+      "cost_cents": "953",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W19",
+      "project_id": "P00",
+      "cost_cents": "5",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W19",
+      "project_id": "P02",
+      "cost_cents": "9",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Senior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W19",
+      "project_id": "P03",
+      "cost_cents": "109",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W19",
+      "project_id": "P04",
+      "cost_cents": "1306",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W19",
+      "project_id": "P05",
+      "cost_cents": "626",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W19",
+      "project_id": "P06",
+      "cost_cents": "466",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W19",
+      "project_id": "P07",
+      "cost_cents": "1365",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W11",
+      "project_id": "P00",
+      "cost_cents": "235",
+      "on_leave": "0",
+      "worker_skill": "Senior",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W11",
+      "project_id": "P02",
+      "cost_cents": "1034",
+      "on_leave": "0",
+      "worker_skill": "Senior",
+      "required_skill": "Senior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W11",
+      "project_id": "P03",
+      "cost_cents": "782",
+      "on_leave": "0",
+      "worker_skill": "Senior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W11",
+      "project_id": "P04",
+      "cost_cents": "556",
+      "on_leave": "0",
+      "worker_skill": "Senior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W11",
+      "project_id": "P05",
+      "cost_cents": "1018",
+      "on_leave": "0",
+      "worker_skill": "Senior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W11",
+      "project_id": "P07",
+      "cost_cents": "1136",
+      "on_leave": "0",
+      "worker_skill": "Senior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W00",
+      "project_id": "P01",
+      "cost_cents": "17",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W00",
+      "project_id": "P04",
+      "cost_cents": "430",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W00",
+      "project_id": "P05",
+      "cost_cents": "1385",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W00",
+      "project_id": "P06",
+      "cost_cents": "260",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W00",
+      "project_id": "P07",
+      "cost_cents": "1107",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W20",
+      "project_id": "P00",
+      "cost_cents": "675",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W20",
+      "project_id": "P01",
+      "cost_cents": "1055",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W20",
+      "project_id": "P02",
+      "cost_cents": "8",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Senior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W20",
+      "project_id": "P03",
+      "cost_cents": "703",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W20",
+      "project_id": "P06",
+      "cost_cents": "893",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W20",
+      "project_id": "P07",
+      "cost_cents": "129",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W04",
+      "project_id": "P00",
+      "cost_cents": "4",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W04",
+      "project_id": "P01",
+      "cost_cents": "8",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W04",
+      "project_id": "P02",
+      "cost_cents": "16",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Senior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W04",
+      "project_id": "P03",
+      "cost_cents": "543",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W04",
+      "project_id": "P04",
+      "cost_cents": "205",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W04",
+      "project_id": "P05",
+      "cost_cents": "1149",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W04",
+      "project_id": "P06",
+      "cost_cents": "533",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W04",
+      "project_id": "P07",
+      "cost_cents": "732",
+      "on_leave": "0",
+      "worker_skill": "Junior",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W06",
+      "project_id": "P00",
+      "cost_cents": "1217",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W06",
+      "project_id": "P01",
+      "cost_cents": "425",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W06",
+      "project_id": "P02",
+      "cost_cents": "1320",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Senior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W06",
+      "project_id": "P03",
+      "cost_cents": "1097",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W06",
+      "project_id": "P04",
+      "cost_cents": "822",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W06",
+      "project_id": "P05",
+      "cost_cents": "221",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W06",
+      "project_id": "P06",
+      "cost_cents": "496",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W06",
+      "project_id": "P07",
+      "cost_cents": "908",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W14",
+      "project_id": "P01",
+      "cost_cents": "1361",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W14",
+      "project_id": "P03",
+      "cost_cents": "379",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W14",
+      "project_id": "P04",
+      "cost_cents": "239",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W14",
+      "project_id": "P05",
+      "cost_cents": "460",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W14",
+      "project_id": "P06",
+      "cost_cents": "130",
+      "on_leave": "0",
+      "worker_skill": "Intermediate",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W15",
+      "project_id": "P00",
+      "cost_cents": "722",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Intermediate"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W15",
+      "project_id": "P02",
+      "cost_cents": "577",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Senior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W15",
+      "project_id": "P03",
+      "cost_cents": "1062",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W15",
+      "project_id": "P04",
+      "cost_cents": "1314",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W15",
+      "project_id": "P05",
+      "cost_cents": "528",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W15",
+      "project_id": "P06",
+      "cost_cents": "835",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant26/inputs/batch_03/export_03.csv",
+    "values": {
+      "worker_id": "W15",
+      "project_id": "P07",
+      "cost_cents": "918",
+      "on_leave": "0",
+      "worker_skill": "Expert",
+      "required_skill": "Junior"
+    }
+  }
+]

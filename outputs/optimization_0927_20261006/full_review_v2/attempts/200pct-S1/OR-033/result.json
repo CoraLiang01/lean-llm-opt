@@ -1,0 +1,228 @@
+{
+  "problem_id": "200pct-S1/OR-033",
+  "query": "A certain restaurant operates 24 hours a day and requires a minimum number of waitstaff as shown in 44.csv.\n\n    Each waitstaff works continuously for 8 hours a day. The goal is to find the minimum number of waitstaff that satisfies the above conditions and represent this problem as a linear programming model.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/Others_example/Others2/44.csv",
+  "input_kind": "external_csv",
+  "true_label": "Others",
+  "true_route": "Others",
+  "label_objective": 25.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the minimum number of waitstaff needed and their shift assignments so that, at every half-hour period of a 24-hour day, the number of waitstaff on duty meets or exceeds the required minimum specified in the 'Requirement' column of 44.csv. Each waitstaff works a continuous 8-hour shift.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) set covering/scheduling problem.\n3.  **Define Index Sets:** The primary indices are time periods (let T = set of 48 half-hour intervals in the day, as given by the 'Time' column).\n4.  **Define Decision Variables:**\n    -   `x[s]` = Number of waitstaff starting their 8-hour shift at time period s (for each s in T). Type: GRB.INTEGER.\n5.  **Identify Parameters (from Schema):**\n    -   Staffing requirements per period from column: 'Requirement' (maps each t in T to required minimum staff).\n    -   Shift coverage: Each shift starting at s covers the 16 consecutive periods from s (wrap-around at midnight).\n6.  **Formulate Objective:** Minimize the total number of waitstaff scheduled, i.e., minimize sum over all s in T of x[s].\n7.  **Formulate Constraints:**\n    -   Coverage Constraint: For each time period t in T, the sum of x[s] over all shift start times s whose 8-hour shift covers t (i.e., for all s such that t is within the 16 consecutive periods starting at s, modulo 48) must be greater than or equal to the required minimum staff for period t (from 'Requirement').\n    -   Non-negativity and integrality: For all s in T, x[s] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/Others_example/Others2/44.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 48\nColumns: ['ArchiveAttachmentCount', 'ArchiveAccessCount', 'Time', 'ArchivePageCount', 'ArchiveRevisionCount', 'Requirement']\nParsed column types: {'ArchiveAttachmentCount': 'int64', 'ArchiveAccessCount': 'int64', 'Time': 'object', 'ArchivePageCount': 'int64', 'ArchiveRevisionCount': 'int64', 'Requirement': 'int64'}\nPreview only (first 10 rows):\nArchiveAttachmentCount ArchiveAccessCount            Time ArchivePageCount ArchiveRevisionCount Requirement\n                    18                 21 2:00am - 2:30am                4                   24           2\n                    10                 14 2:30am - 3:00am               19                    2           3\n                     9                  3 3:00am - 3:30am                5                    4           4\n                    30                 29 3:30am - 4:00am               28                   25           6\n                    17                  5 4:00am - 4:30am               21                   13           5\n                    10                 27 4:30am - 5:00am               25                   12           4\n                    30                  5 5:00am - 5:30am               18                    1           5\n                     2                  3 5:30am - 6:00am               13                    9           6\n                    30                  2 6:00am - 6:30am                5                   23           7\n                    13                 13 6:30am - 7:00am                8                   28           8\nFull-file column statistics: {\"ArchiveAttachmentCount\": {\"missing\": 0, \"unique_nonempty\": 23, \"numeric_range\": [1.0, 30.0]}, \"ArchiveAccessCount\": {\"missing\": 0, \"unique_nonempty\": 25, \"numeric_range\": [1.0, 29.0]}, \"Time\": {\"missing\": 0, \"unique_nonempty\": 48}, \"ArchivePageCount\": {\"missing\": 0, \"unique_nonempty\": 23, \"numeric_range\": [1.0, 30.0]}, \"ArchiveRevisionCount\": {\"missing\": 0, \"unique_nonempty\": 21, \"numeric_range\": [1.0, 28.0]}, \"Requirement\": {\"missing\": 0, \"unique_nonempty\": 11, \"numeric_range\": [2.0, 12.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: []",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S1/Large-scale-or/Others_example/Others2/44.csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\nperiods = list(df['Time'])\nif len(periods) != 48:\n    raise ValueError(f'Expected 48 periods, got {len(periods)}')\nperiod_idx_to_label = {i: periods[i] for i in range(48)}\nperiod_label_to_idx = {periods[i]: i for i in range(48)}\ntry:\n    requirements = df['Requirement'].astype(int).to_dict()\nexcept Exception as e:\n    raise ValueError(f\"Could not convert 'Requirement' column to int: {e}\")\nperiod_idx_to_req = {i: int(df.loc[i, 'Requirement']) for i in range(48)}\nm = gp.Model('WaitstaffScheduling')\nx_vars = m.addVars(range(48), vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((x_vars[s] for s in range(48))), gp.GRB.MINIMIZE)\nfor t in range(48):\n    covering_s = [s for s in range(48) if (t - s) % 48 < 16]\n    m.addConstr(gp.quicksum((x_vars[s] for s in covering_s)) >= period_idx_to_req[t], name=f'cover_{t}')\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total value/cost: {m.objVal:.0f} (Minimum number of waitstaff)')\n    print('\\n--- Shift Start Assignments ---')\n    for s in range(48):\n        val = x_vars[s].X\n        if val > 1e-06:\n            print(f'Start at period {s} ({period_idx_to_label[s]}): {int(round(val))} staff')\n    print('\\n--- Coverage per period ---')\n    for t in range(48):\n        covering_s = [s for s in range(48) if (t - s) % 48 < 16]\n        coverage = sum((x_vars[s].X for s in covering_s))\n        print(f'Period {t} ({period_idx_to_label[t]}): Requirement={period_idx_to_req[t]}, Covered={int(round(coverage))}')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 25.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      2.0
+    ],
+    [
+      "C3",
+      1.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      5.0
+    ],
+    [
+      "C6",
+      2.0
+    ],
+    [
+      "C7",
+      2.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      1.0
+    ],
+    [
+      "C19",
+      1.0
+    ],
+    [
+      "C20",
+      1.0
+    ],
+    [
+      "C21",
+      4.0
+    ],
+    [
+      "C22",
+      1.0
+    ],
+    [
+      "C23",
+      1.0
+    ],
+    [
+      "C24",
+      0.0
+    ],
+    [
+      "C25",
+      0.0
+    ],
+    [
+      "C26",
+      -0.0
+    ],
+    [
+      "C27",
+      -0.0
+    ],
+    [
+      "C28",
+      -0.0
+    ],
+    [
+      "C29",
+      -0.0
+    ],
+    [
+      "C30",
+      0.0
+    ],
+    [
+      "C31",
+      0.0
+    ],
+    [
+      "C32",
+      1.0
+    ],
+    [
+      "C33",
+      -0.0
+    ],
+    [
+      "C34",
+      -0.0
+    ],
+    [
+      "C35",
+      -0.0
+    ],
+    [
+      "C36",
+      1.0
+    ],
+    [
+      "C37",
+      2.0
+    ],
+    [
+      "C38",
+      -0.0
+    ],
+    [
+      "C39",
+      -0.0
+    ],
+    [
+      "C40",
+      -0.0
+    ],
+    [
+      "C41",
+      -0.0
+    ],
+    [
+      "C42",
+      -0.0
+    ],
+    [
+      "C43",
+      -0.0
+    ],
+    [
+      "C44",
+      -0.0
+    ],
+    [
+      "C45",
+      -0.0
+    ],
+    [
+      "C46",
+      -0.0
+    ],
+    [
+      "C47",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "200pct-S1",
+  "seconds": 12.095,
+  "evaluated_utc": "2026-10-06T05:02:11.531457+00:00",
+  "notebook_source_sha256": "fb0a1ca4285332eafc42da7919dce3eb52a8f7cd9541d2bc614f28d5355910a5",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

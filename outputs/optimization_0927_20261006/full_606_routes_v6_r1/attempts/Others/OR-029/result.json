@@ -1,0 +1,87 @@
+{
+  "problem_id": "OR-029",
+  "query": "An e-commerce platform sells women’s clothing items with revenue data provided in the ‘Revenue’ column. The company aims to maximize total revenue using the initial inventory of products classified under ‘FAUX’. Inventory levels are detailed in the ‘Initial Inventory’ column. Demand quantities are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. Decision variables x_i represent the number of units of each ‘FAUX’ product i that will be fulfilled.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM20/ZARASales.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 5090631.58,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to maximize total revenue from fulfilling demand for women’s clothing products classified under ‘FAUX’, using available initial inventory, with deterministic known demand and per-unit revenue for each product. The decision is how many units of each ‘FAUX’ product to fulfill, subject to inventory and demand limits.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem (all variables are continuous and bounded by inventory and demand).\n3.  **Define Index Sets:** The primary index is the set of products i where ‘Product Name’ contains ‘FAUX’ (i.e., all ‘FAUX’ products in the data).\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of ‘FAUX’ product i to fulfill. Type: GRB.CONTINUOUS (can be fractional unless the query requires integer, which it does not).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: ‘Revenue’ column (per-unit revenue for each product i).\n    -   Constraint coefficients: ‘Demand’ column (maximum fulfillable demand for each product i).\n    -   Constraint RHS: ‘Initial Inventory’ column (maximum available inventory for each product i).\n6.  **Formulate Objective:** Maximize total revenue, i.e., maximize sum over i of (‘Revenue’[i] * x[i]) for all ‘FAUX’ products.\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Inventory Limit): For each ‘FAUX’ product i, x[i] ≤ ‘Initial Inventory’[i] (cannot fulfill more than available inventory).\n    -   Constraint 2 (Demand Limit): For each ‘FAUX’ product i, x[i] ≤ ‘Demand’[i] (cannot fulfill more than demand).\n    -   Constraint 3 (Non-negativity): For each ‘FAUX’ product i, x[i] ≥ 0 (cannot fulfill negative quantities).\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM20/ZARASales.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 194\nColumns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product Name': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'int64'}\nPreview only (first 10 rows):\n                              Product Name Revenue Demand Initial Inventory\n           100% FEATHER FILL PUFFER JACKET   169.0   4030             30030\n                      100% LINEN OVERSHIRT    89.9   3348             24740\n                     100% WOOL SUIT JACKET   169.0   2609             19160\n                 ABSTRACT JACQUARD SWEATER    59.9    736              5290\n               ABSTRACT PRINT KNIT T-SHIRT    39.9   2777             20930\n                    ABSTRACT PRINT T-SHIRT    39.9   1238              9960\n                    ACID WASH DENIM JACKET    89.9   2683             19170\n                 ADHERENT STRIPES SNEAKERS    45.9   1369              9910\nALPACA AND WOOL BLEND TIE DYE KNIT SWEATER    49.9   1367              9940\n            ALPACA BLEND OPEN KNIT SWEATER    79.9   2455             17360\nFull-file column statistics: {\"Product Name\": {\"missing\": 0, \"unique_nonempty\": 194}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 28, \"numeric_range\": [7.99, 439.0]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 190, \"numeric_range\": [658.0, 14546.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 188, \"numeric_range\": [5290.0, 109100.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"faux\", \"matching_columns\": [{\"column\": \"Product Name\", \"exact\": 0, \"prefix\": 12, \"contains\": 12, \"examples\": [\"FAUX FUR JEWEL SWEATER\", \"FAUX LEATHER BOMBER JACKET\", \"FAUX LEATHER BOXY FIT JACKET\"]}], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"1f9f4f5589ce5f764136b41e47b3b3be7b252d3283b554fd343d6b5271cf0b38\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM20/ZARASales.csv'\ndf = pd.read_csv(csv_path, dtype=str, keep_default_na=False)\nproduct_name_norm = df['Product Name'].str.strip().str.casefold()\nfaux_mask = product_name_norm.str.contains('faux')\ndf_faux = df.loc[faux_mask].copy()\nrequired_columns = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nfor col in required_columns:\n    if col not in df_faux.columns:\n        raise KeyError(f\"Required column '{col}' not found in CSV.\")\nproduct_keys = df_faux['Product Name'].tolist()\n\ndef to_float_series(series, colname):\n    try:\n        return series.astype(float)\n    except Exception as e:\n        raise ValueError(f\"Could not convert column '{colname}' to float: {e}\")\n\ndef to_int_series(series, colname):\n    try:\n        return series.astype(int)\n    except Exception as e:\n        raise ValueError(f\"Could not convert column '{colname}' to int: {e}\")\nrevenue = to_float_series(df_faux['Revenue'], 'Revenue')\ndemand = to_int_series(df_faux['Demand'], 'Demand')\ninitial_inventory = to_int_series(df_faux['Initial Inventory'], 'Initial Inventory')\nrevenue_dict = dict(zip(product_keys, revenue))\ndemand_dict = dict(zip(product_keys, demand))\ninventory_dict = dict(zip(product_keys, initial_inventory))\nm = gp.Model('FauxRevenueMaximization')\nx_vars = m.addVars(product_keys, lb=0.0, vtype=gp.GRB.CONTINUOUS, name='')\nfor i in product_keys:\n    m.addConstr(x_vars[i] <= inventory_dict[i], name=f'inventory_{i}')\n    m.addConstr(x_vars[i] <= demand_dict[i], name=f'demand_{i}')\nm.setObjective(gp.quicksum((revenue_dict[i] * x_vars[i] for i in product_keys)), gp.GRB.MAXIMIZE)\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total value/cost: {m.objVal:.2f}')\n    print(\"--- Fulfillment Plan for 'FAUX' Products ---\")\n    for i in product_keys:\n        fulfilled = x_vars[i].X\n        print(f'Product: {i}')\n        print(f'  Units fulfilled: {fulfilled:.2f} (Demand: {demand_dict[i]}, Inventory: {inventory_dict[i]}, Revenue/unit: {revenue_dict[i]:.2f})')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 5090631.580000001,
+  "final_solution": [
+    [
+      "C0",
+      3025.0
+    ],
+    [
+      "C1",
+      9585.0
+    ],
+    [
+      "C2",
+      4486.0
+    ],
+    [
+      "C3",
+      10322.0
+    ],
+    [
+      "C4",
+      4868.0
+    ],
+    [
+      "C5",
+      8482.0
+    ],
+    [
+      "C6",
+      2607.0
+    ],
+    [
+      "C7",
+      1784.0
+    ],
+    [
+      "C8",
+      6626.0
+    ],
+    [
+      "C9",
+      3256.0
+    ],
+    [
+      "C10",
+      2955.0
+    ],
+    [
+      "C11",
+      910.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 10.301,
+  "evaluated_utc": "2026-10-06T08:50:21.140134+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

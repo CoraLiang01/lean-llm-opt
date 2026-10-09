@@ -1,0 +1,120 @@
+{
+  "problem_id": "OR-073",
+  "query": "A factory produces three products, I, II, and III. Each product goes through two processing procedures, A and B. The factory has two types of equipment, A1 and A2, to complete procedure A, and three types of equipment, B1, B2, and B3, to complete procedure B. Product I can be processed on either type of A equipment or any type of B equipment. Product II can be processed on any type of A equipment, but when completing procedure B, it can only be processed on B1 equipment. Product III can only be processed on A2 and B2 equipment. Given the processing time, raw material cost, product selling price, available equipment operating time, and equipment cost at full load for each type of equipment, as shown in 43.csv, determine the optimal production plan to maximize profit. All production quantities should be continuous.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture3/43.csv",
+  "input_kind": "external_csv",
+  "true_label": "Mixture",
+  "true_route": "Others",
+  "label_objective": 1146.57,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "RA",
+  "assigned_route": "RA",
+  "generated_model": "Let:\n- $x_{i}$ = quantity of product $i$ produced, where $i \\in \\{\\text{I}, \\text{II}, \\text{III}\\}$, all $x_i \\geq 0$ and continuous.\n- $y_{A1,i}$ = amount of product $i$ processed on equipment A1 (similarly for $y_{A2,i}$, $y_{A3,i}$, $y_{B1,i}$, $y_{B2,i}$, $y_{B3,i}$, $y_{B4,i}$), all $\\geq 0$ and continuous.\n\nParameters (from 43.csv, in source order):\n\nEquipment / Cost | Product I | Product II | Product III | Available Equipment Operating Time | Equipment Cost at Full Load (yuan)\n---|---|---|---|---|---\nA1 | 5 | 10 |  | 6000 | 300\nA2 | 7 | 9 | 12 | 10000 | 321\nA3 | 6 | 11 | 2 | 8000 | 203\nB1 | 6 | 8 |  | 4000 | 250\nB2 | 4 |  | 11 | 7000 | 783\nB3 | 7 |  |  | 4000 | 200\nB4 | 3 | 5 | 8 | 5000 | 300\nRaw Material Cost (yuan/unit) | 0.25 | 0.35 | 0.5 |  | \nUnit Price (yuan/unit) | 1.25 | 2 | 2.8 |  | \n\nDefine:\n\n- $c_i$ = raw material cost per unit of product $i$\n- $s_i$ = selling price per unit of product $i$\n- $t_{e,i}$ = processing time per unit of product $i$ on equipment $e$\n- $T_e$ = available operating time for equipment $e$\n- $C_e$ = equipment cost at full load for equipment $e$\n\nDecision variables:\n- $y_{e,i}$: amount of product $i$ processed on equipment $e$ (continuous, $\\geq 0$)\n\nProduct-equipment assignment constraints (from description):\n\n- Product I: A1, A2, A3 for procedure A; B1, B2, B3, B4 for procedure B\n- Product II: A1, A2, A3 for procedure A; B1, B4 for procedure B\n- Product III: A2, A3 for procedure A; B2, B4 for procedure B\n\nLet $A = \\{\\text{A1}, \\text{A2}, \\text{A3}\\}$, $B = \\{\\text{B1}, \\text{B2}, \\text{B3}, \\text{B4}\\}$\n\n#### Objective Function\n\nMaximize total profit:\n\n\\[\n\\max \\left[\n(s_{\\text{I}} - c_{\\text{I}}) x_{\\text{I}} +\n(s_{\\text{II}} - c_{\\text{II}}) x_{\\text{II}} +\n(s_{\\text{III}} - c_{\\text{III}}) x_{\\text{III}}\n- \\sum_{e \\in A \\cup B} C_e \\cdot \\frac{1}{T_e} \\cdot \\left( \\sum_{i} t_{e,i} y_{e,i} \\right)\n\\right]\n\\]\n\n#### Constraints\n\n1. **Production-Processing Consistency**\n\nFor each product, the amount produced must be processed through both A and B procedures:\n\n- For procedure A:\n    - $x_{\\text{I}} = \\sum_{e \\in A} y_{e,\\text{I}}$\n    - $x_{\\text{II}} = \\sum_{e \\in A} y_{e,\\text{II}}$\n    - $x_{\\text{III}} = \\sum_{e \\in \\{\\text{A2}, \\text{A3}\\}} y_{e,\\text{III}}$\n\n- For procedure B:\n    - $x_{\\text{I}} = \\sum_{e \\in B} y_{e,\\text{I}}$\n    - $x_{\\text{II}} = y_{\\text{B1},\\text{II}} + y_{\\text{B4},\\text{II}}$\n    - $x_{\\text{III}} = y_{\\text{B2},\\text{III}} + y_{\\text{B4},\\text{III}}$\n\n2. **Equipment Time Capacity**\n\nFor each equipment $e$:\n\n\\[\n\\sum_{i} t_{e,i} y_{e,i} \\leq T_e\n\\]\n\nwhere $t_{e,i}$ is blank if product $i$ cannot be processed on equipment $e$ (i.e., $y_{e,i} = 0$).\n\nExplicitly, for each equipment (from source order):\n\n- A1: $5y_{\\text{A1},\\text{I}} + 10y_{\\text{A1},\\text{II}} \\leq 6000$\n- A2: $7y_{\\text{A2},\\text{I}} + 9y_{\\text{A2},\\text{II}} + 12y_{\\text{A2},\\text{III}} \\leq 10000$\n- A3: $6y_{\\text{A3},\\text{I}} + 11y_{\\text{A3},\\text{II}} + 2y_{\\text{A3},\\text{III}} \\leq 8000$\n- B1: $6y_{\\text{B1},\\text{I}} + 8y_{\\text{B1},\\text{II}} \\leq 4000$\n- B2: $4y_{\\text{B2},\\text{I}} + 11y_{\\text{B2},\\text{III}} \\leq 7000$\n- B3: $7y_{\\text{B3},\\text{I}} \\leq 4000$\n- B4: $3y_{\\text{B4},\\text{I}} + 5y_{\\text{B4},\\text{II}} + 8y_{\\text{B4},\\text{III}} \\leq 5000$\n\n3. **Product-Equipment Assignment Restrictions**\n\nSet $y_{e,i} = 0$ if product $i$ cannot be processed on equipment $e$ (i.e., if $t_{e,i}$ is blank in the table).\n\n#### Variable Domains\n\n\\[\nx_{\\text{I}}, x_{\\text{II}}, x_{\\text{III}} \\geq 0 \\\\\ny_{e,i} \\geq 0 \\quad \\text{for all allowed } (e,i)\n\\]\n\n#### Parameters (from data):\n\n- $c_{\\text{I}} = 0.25$, $c_{\\text{II}} = 0.35$, $c_{\\text{III}} = 0.5$\n- $s_{\\text{I}} = 1.25$, $s_{\\text{II}} = 2$, $s_{\\text{III}} = 2.8$\n- $C_{\\text{A1}} = 300$, $C_{\\text{A2}} = 321$, $C_{\\text{A3}} = 203$, $C_{\\text{B1}} = 250$, $C_{\\text{B2}} = 783$, $C_{\\text{B3}} = 200$, $C_{\\text{B4}} = 300$\n- $T_{\\text{A1}} = 6000$, $T_{\\text{A2}} = 10000$, $T_{\\text{A3}} = 8000$, $T_{\\text{B1}} = 4000$, $T_{\\text{B2}} = 7000$, $T_{\\text{B3}} = 4000$, $T_{\\text{B4}} = 5000$\n- $t_{e,i}$ as in the table above.\n\n#### Complete Model\n\nMaximize:\n\\[\n(1.25 - 0.25)x_{\\text{I}} + (2 - 0.35)x_{\\text{II}} + (2.8 - 0.5)x_{\\text{III}}\n- \\left[\n\\frac{300}{6000}(5y_{\\text{A1},\\text{I}} + 10y_{\\text{A1},\\text{II}})\n+ \\frac{321}{10000}(7y_{\\text{A2},\\text{I}} + 9y_{\\text{A2},\\text{II}} + 12y_{\\text{A2},\\text{III}})\n+ \\frac{203}{8000}(6y_{\\text{A3},\\text{I}} + 11y_{\\text{A3},\\text{II}} + 2y_{\\text{A3},\\text{III}})\n+ \\frac{250}{4000}(6y_{\\text{B1},\\text{I}} + 8y_{\\text{B1},\\text{II}})\n+ \\frac{783}{7000}(4y_{\\text{B2},\\text{I}} + 11y_{\\text{B2},\\text{III}})\n+ \\frac{200}{4000}(7y_{\\text{B3},\\text{I}})\n+ \\frac{300}{5000}(3y_{\\text{B4},\\text{I}} + 5y_{\\text{B4},\\text{II}} + 8y_{\\text{B4},\\text{III}})\n\\right]\n\\]\n\nSubject to:\n\n\\[\n\\begin{align*}\n& x_{\\text{I}} = y_{\\text{A1},\\text{I}} + y_{\\text{A2},\\text{I}} + y_{\\text{A3},\\text{I}} \\\\\n& x_{\\text{II}} = y_{\\text{A1},\\text{II}} + y_{\\text{A2},\\text{II}} + y_{\\text{A3},\\text{II}} \\\\\n& x_{\\text{III}} = y_{\\text{A2},\\text{III}} + y_{\\text{A3},\\text{III}} \\\\\n& x_{\\text{I}} = y_{\\text{B1},\\text{I}} + y_{\\text{B2},\\text{I}} + y_{\\text{B3},\\text{I}} + y_{\\text{B4},\\text{I}} \\\\\n& x_{\\text{II}} = y_{\\text{B1},\\text{II}} + y_{\\text{B4},\\text{II}} \\\\\n& x_{\\text{III}} = y_{\\text{B2},\\text{III}} + y_{\\text{B4},\\text{III}} \\\\\n& 5y_{\\text{A1},\\text{I}} + 10y_{\\text{A1},\\text{II}} \\leq 6000 \\\\\n& 7y_{\\text{A2},\\text{I}} + 9y_{\\text{A2},\\text{II}} + 12y_{\\text{A2},\\text{III}} \\leq 10000 \\\\\n& 6y_{\\text{A3},\\text{I}} + 11y_{\\text{A3},\\text{II}} + 2y_{\\text{A3},\\text{III}} \\leq 8000 \\\\\n& 6y_{\\text{B1},\\text{I}} + 8y_{\\text{B1},\\text{II}} \\leq 4000 \\\\\n& 4y_{\\text{B2},\\text{I}} + 11y_{\\text{B2},\\text{III}} \\leq 7000 \\\\\n& 7y_{\\text{B3},\\text{I}} \\leq 4000 \\\\\n& 3y_{\\text{B4},\\text{I}} + 5y_{\\text{B4},\\text{II}} + 8y_{\\text{B4},\\text{III}} \\leq 5000 \\\\\n& y_{e,i} = 0 \\text{ if } t_{e,i} \\text{ is blank in the table above} \\\\\n& x_{\\text{I}}, x_{\\text{II}}, x_{\\text{III}} \\geq 0 \\\\\n& y_{e,i} \\geq 0 \\text{ for all allowed } (e,i)\n\\end{align*}\n\\]",
+  "csvqa_observation": "{\"values\": {\"Equipment / Cost\": \"A1\", \"Product I\": \"5\", \"Product II\": \"10\", \"Product III\": \"\", \"Available Equipment Operating Time\": \"6000\", \"Equipment Cost at Full Load (yuan)\": \"300\"}}\n{\"values\": {\"Equipment / Cost\": \"A2\", \"Product I\": \"7\", \"Product II\": \"9\", \"Product III\": \"12\", \"Available Equipment Operating Time\": \"10000\", \"Equipment Cost at Full Load (yuan)\": \"321\"}}\n{\"values\": {\"Equipment / Cost\": \"A3\", \"Product I\": \"6\", \"Product II\": \"11\", \"Product III\": \"2\", \"Available Equipment Operating Time\": \"8000\", \"Equipment Cost at Full Load (yuan)\": \"203\"}}\n{\"values\": {\"Equipment / Cost\": \"B1\", \"Product I\": \"6\", \"Product II\": \"8\", \"Product III\": \"\", \"Available Equipment Operating Time\": \"4000\", \"Equipment Cost at Full Load (yuan)\": \"250\"}}\n{\"values\": {\"Equipment / Cost\": \"B2\", \"Product I\": \"4\", \"Product II\": \"\", \"Product III\": \"11\", \"Available Equipment Operating Time\": \"7000\", \"Equipment Cost at Full Load (yuan)\": \"783\"}}\n{\"values\": {\"Equipment / Cost\": \"B3\", \"Product I\": \"7\", \"Product II\": \"\", \"Product III\": \"\", \"Available Equipment Operating Time\": \"4000\", \"Equipment Cost at Full Load (yuan)\": \"200\"}}\n{\"values\": {\"Equipment / Cost\": \"B4\", \"Product I\": \"3\", \"Product II\": \"5\", \"Product III\": \"8\", \"Available Equipment Operating Time\": \"5000\", \"Equipment Cost at Full Load (yuan)\": \"300\"}}\n{\"values\": {\"Equipment / Cost\": \"Raw Material Cost (yuan/unit)\", \"Product I\": \"0.25\", \"Product II\": \"0.35\", \"Product III\": \"0.5\", \"Available Equipment Operating Time\": \"\", \"Equipment Cost at Full Load (yuan)\": \"\"}}\n{\"values\": {\"Equipment / Cost\": \"Unit Price (yuan/unit)\", \"Product I\": \"1.25\", \"Product II\": \"2\", \"Product III\": \"2.8\", \"Available Equipment Operating Time\": \"\", \"Equipment Cost at Full Load (yuan)\": \"\"}}",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_FULL_DATA",
+  "solve_code": "LEGACY_OBSERVATION = '{\"values\": {\"Equipment / Cost\": \"A1\", \"Product I\": \"5\", \"Product II\": \"10\", \"Product III\": \"\", \"Available Equipment Operating Time\": \"6000\", \"Equipment Cost at Full Load (yuan)\": \"300\"}}\\n{\"values\": {\"Equipment / Cost\": \"A2\", \"Product I\": \"7\", \"Product II\": \"9\", \"Product III\": \"12\", \"Available Equipment Operating Time\": \"10000\", \"Equipment Cost at Full Load (yuan)\": \"321\"}}\\n{\"values\": {\"Equipment / Cost\": \"A3\", \"Product I\": \"6\", \"Product II\": \"11\", \"Product III\": \"2\", \"Available Equipment Operating Time\": \"8000\", \"Equipment Cost at Full Load (yuan)\": \"203\"}}\\n{\"values\": {\"Equipment / Cost\": \"B1\", \"Product I\": \"6\", \"Product II\": \"8\", \"Product III\": \"\", \"Available Equipment Operating Time\": \"4000\", \"Equipment Cost at Full Load (yuan)\": \"250\"}}\\n{\"values\": {\"Equipment / Cost\": \"B2\", \"Product I\": \"4\", \"Product II\": \"\", \"Product III\": \"11\", \"Available Equipment Operating Time\": \"7000\", \"Equipment Cost at Full Load (yuan)\": \"783\"}}\\n{\"values\": {\"Equipment / Cost\": \"B3\", \"Product I\": \"7\", \"Product II\": \"\", \"Product III\": \"\", \"Available Equipment Operating Time\": \"4000\", \"Equipment Cost at Full Load (yuan)\": \"200\"}}\\n{\"values\": {\"Equipment / Cost\": \"B4\", \"Product I\": \"3\", \"Product II\": \"5\", \"Product III\": \"8\", \"Available Equipment Operating Time\": \"5000\", \"Equipment Cost at Full Load (yuan)\": \"300\"}}\\n{\"values\": {\"Equipment / Cost\": \"Raw Material Cost (yuan/unit)\", \"Product I\": \"0.25\", \"Product II\": \"0.35\", \"Product III\": \"0.5\", \"Available Equipment Operating Time\": \"\", \"Equipment Cost at Full Load (yuan)\": \"\"}}\\n{\"values\": {\"Equipment / Cost\": \"Unit Price (yuan/unit)\", \"Product I\": \"1.25\", \"Product II\": \"2\", \"Product III\": \"2.8\", \"Available Equipment Operating Time\": \"\", \"Equipment Cost at Full Load (yuan)\": \"\"}}'\nLEGACY_RECORDS = [{'source': '', 'values': {'Equipment / Cost': 'A1', 'Product I': '5', 'Product II': '10', 'Product III': '', 'Available Equipment Operating Time': '6000', 'Equipment Cost at Full Load (yuan)': '300'}}, {'source': '', 'values': {'Equipment / Cost': 'A2', 'Product I': '7', 'Product II': '9', 'Product III': '12', 'Available Equipment Operating Time': '10000', 'Equipment Cost at Full Load (yuan)': '321'}}, {'source': '', 'values': {'Equipment / Cost': 'A3', 'Product I': '6', 'Product II': '11', 'Product III': '2', 'Available Equipment Operating Time': '8000', 'Equipment Cost at Full Load (yuan)': '203'}}, {'source': '', 'values': {'Equipment / Cost': 'B1', 'Product I': '6', 'Product II': '8', 'Product III': '', 'Available Equipment Operating Time': '4000', 'Equipment Cost at Full Load (yuan)': '250'}}, {'source': '', 'values': {'Equipment / Cost': 'B2', 'Product I': '4', 'Product II': '', 'Product III': '11', 'Available Equipment Operating Time': '7000', 'Equipment Cost at Full Load (yuan)': '783'}}, {'source': '', 'values': {'Equipment / Cost': 'B3', 'Product I': '7', 'Product II': '', 'Product III': '', 'Available Equipment Operating Time': '4000', 'Equipment Cost at Full Load (yuan)': '200'}}, {'source': '', 'values': {'Equipment / Cost': 'B4', 'Product I': '3', 'Product II': '5', 'Product III': '8', 'Available Equipment Operating Time': '5000', 'Equipment Cost at Full Load (yuan)': '300'}}, {'source': '', 'values': {'Equipment / Cost': 'Raw Material Cost (yuan/unit)', 'Product I': '0.25', 'Product II': '0.35', 'Product III': '0.5', 'Available Equipment Operating Time': '', 'Equipment Cost at Full Load (yuan)': ''}}, {'source': '', 'values': {'Equipment / Cost': 'Unit Price (yuan/unit)', 'Product I': '1.25', 'Product II': '2', 'Product III': '2.8', 'Available Equipment Operating Time': '', 'Equipment Cost at Full Load (yuan)': ''}}]\nimport gurobipy as gp\nfrom gurobipy import GRB\nequipment = []\nproducts = []\nt = {}\nT = {}\nC = {}\nc = {}\ns = {}\nfor rec in LEGACY_RECORDS:\n    v = rec['values']\n    eq = v['Equipment / Cost']\n    if eq in ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'B4']:\n        equipment.append(eq)\n        for prod in ['Product I', 'Product II', 'Product III']:\n            if prod not in products and v[prod] not in [None, '']:\n                products.append(prod)\n            if v[prod] not in [None, '']:\n                t.setdefault(eq, {})[prod] = float(v[prod])\n        T[eq] = float(v['Available Equipment Operating Time'])\n        C[eq] = float(v['Equipment Cost at Full Load (yuan)'])\n    elif eq == 'Raw Material Cost (yuan/unit)':\n        for prod in ['Product I', 'Product II', 'Product III']:\n            c[prod] = float(v[prod])\n    elif eq == 'Unit Price (yuan/unit)':\n        for prod in ['Product I', 'Product II', 'Product III']:\n            s[prod] = float(v[prod])\nprod_short = {'Product I': 'I', 'Product II': 'II', 'Product III': 'III'}\nproducts = ['Product I', 'Product II', 'Product III']\nallowed = []\nfor e in equipment:\n    for i in products:\n        if e in t and i in t[e]:\n            allowed.append((e, i))\nA = [e for e in equipment if e.startswith('A')]\nB = [e for e in equipment if e.startswith('B')]\nA_proc = {'Product I': [e for e in A if (e, 'Product I') in allowed], 'Product II': [e for e in A if (e, 'Product II') in allowed], 'Product III': [e for e in A if (e, 'Product III') in allowed]}\nB_proc = {'Product I': [e for e in B if (e, 'Product I') in allowed], 'Product II': [e for e in B if (e, 'Product II') in allowed], 'Product III': [e for e in B if (e, 'Product III') in allowed]}\nm = gp.Model('factory_opt')\nx = m.addVars(products, lb=0, vtype=GRB.CONTINUOUS, name='')\ny = m.addVars(allowed, lb=0, vtype=GRB.CONTINUOUS, name='')\nm.addConstr(x['Product I'] == gp.quicksum((y[e, 'Product I'] for e in A_proc['Product I'])), name='A_I')\nm.addConstr(x['Product II'] == gp.quicksum((y[e, 'Product II'] for e in A_proc['Product II'])), name='A_II')\nm.addConstr(x['Product III'] == gp.quicksum((y[e, 'Product III'] for e in A_proc['Product III'])), name='A_III')\nm.addConstr(x['Product I'] == gp.quicksum((y[e, 'Product I'] for e in B_proc['Product I'])), name='B_I')\nm.addConstr(x['Product II'] == gp.quicksum((y[e, 'Product II'] for e in B_proc['Product II'])), name='B_II')\nm.addConstr(x['Product III'] == gp.quicksum((y[e, 'Product III'] for e in B_proc['Product III'])), name='B_III')\nfor e in equipment:\n    expr = gp.LinExpr()\n    for i in products:\n        if (e, i) in allowed:\n            expr += t[e][i] * y[e, i]\n    m.addConstr(expr <= T[e], name=f'cap_{e}')\nprofit = gp.LinExpr()\nfor i in products:\n    profit += (s[i] - c[i]) * x[i]\nequip_cost = gp.LinExpr()\nfor e in equipment:\n    denom = T[e]\n    numer = C[e]\n    for i in products:\n        if (e, i) in allowed:\n            equip_cost += numer / denom * t[e][i] * y[e, i]\nm.setObjective(profit - equip_cost, GRB.MAXIMIZE)\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for var in m.getVars():\n        print(f'{var.VarName}: {var.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "final_objective": 2480.6953201970446,
+  "final_solution": [
+    [
+      "C0",
+      959.9753694581281
+    ],
+    [
+      "C1",
+      500.0
+    ],
+    [
+      "C2",
+      1120.073891625616
+    ],
+    [
+      "C3",
+      0.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      0.0
+    ],
+    [
+      "C6",
+      500.0
+    ],
+    [
+      "C7",
+      0.0
+    ],
+    [
+      "C8",
+      959.9753694581281
+    ],
+    [
+      "C9",
+      0.0
+    ],
+    [
+      "C10",
+      1120.073891625616
+    ],
+    [
+      "C11",
+      0.0
+    ],
+    [
+      "C12",
+      500.0
+    ],
+    [
+      "C13",
+      388.5467980295566
+    ],
+    [
+      "C14",
+      495.0738916256158
+    ],
+    [
+      "C15",
+      571.4285714285714
+    ],
+    [
+      "C16",
+      0.0
+    ],
+    [
+      "C17",
+      0.0
+    ],
+    [
+      "C18",
+      625.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "loto_variant": "examples_and_route",
+  "held_out_type": "Mixture",
+  "disabled_workflow_route": "Others",
+  "allowed_labels": "TP,NRM,RA,FLP,AP",
+  "reference_sha256": "6b2987f96aeacece9f458d55aca072436922aec963be16223ac30a8890f79097",
+  "reference_count_after": 7,
+  "route_allowed": true,
+  "classification_correct": false,
+  "solution_correct": false,
+  "experiment_method": "examples_and_route",
+  "seconds": 38.435,
+  "classification_source": "fold_agent",
+  "classification_cache_sha256": "8b17fda06001ff4ebea07809838119bc81b6f49cb453b600aa87d5dc73881435",
+  "base_notebook_sha256": "a155d54c6df32abc8dfe263e03d00138848cfcca32422dff3c286f3b8c67f6b1",
+  "notebook_source_sha256": "dbc55bc1466b60c1dcea916f9ce32ac698ffd9ea4418e420312defa755319219",
+  "cache_fingerprint": "7da748afb88dbb6a009a537695ca630de116312a1b59c6e37247c86f69fa7603",
+  "evaluated_utc": "2026-10-06T02:59:43.796913+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

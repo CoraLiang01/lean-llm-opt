@@ -1,0 +1,126 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Parse CSVQA_DATA for table file_0_view_0
+if "CSVQA_DATA" not in globals():
+    raise RuntimeError("CSVQA_DATA not found. Please provide CSVQA_DATA at execution.")
+
+tables = CSVQA_DATA.get("tables", [])
+table = None
+for t in tables:
+    if t.get("table_id") == "file_0_view_0":
+        table = t
+        break
+if table is None:
+    raise RuntimeError("Table with table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+records = table.get("records", [])
+if not records:
+    raise RuntimeError("No records found in table 'file_0_view_0'.")
+
+# Extract data using regex for structured CSV text
+product_names = []
+revenue = {}
+demand = {}
+inventory = {}
+
+for rec in records:
+    values = rec.get("values", {})
+    # Validate all required columns are present
+    for col in ["Product Name", "Revenue", "Demand", "Initial Inventory"]:
+        if col not in values:
+            raise RuntimeError(f"Missing column '{col}' in record.")
+    pname = values["Product Name"]
+    # Use regex to parse numeric fields robustly
+    rev_match = re.match(r"^\s*(-?\d+(?:\.\d+)?)\s*$", str(values["Revenue"]))
+    dem_match = re.match(r"^\s*(\d+)\s*$", str(values["Demand"]))
+    inv_match = re.match(r"^\s*(\d+)\s*$", str(values["Initial Inventory"]))
+    if not rev_match:
+        raise RuntimeError(f"Revenue value '{values['Revenue']}' for product '{pname}' is not a valid number.")
+    if not dem_match:
+        raise RuntimeError(f"Demand value '{values['Demand']}' for product '{pname}' is not a valid non-negative integer.")
+    if not inv_match:
+        raise RuntimeError(f"Initial Inventory value '{values['Initial Inventory']}' for product '{pname}' is not a valid non-negative integer.")
+    product_names.append(pname)
+    revenue[pname] = float(rev_match.group(1))
+    demand[pname] = int(dem_match.group(1))
+    inventory[pname] = int(inv_match.group(1))
+
+# Validate dimensions and identifier coverage
+if not (set(product_names) == set(revenue.keys()) == set(demand.keys()) == set(inventory.keys())):
+    raise RuntimeError("Mismatch in product identifiers among data columns.")
+
+# Model
+m = gp.Model('Product_Fulfillment')
+x = m.addVars(product_names, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Constraints: x_i <= d_i, x_i <= I_i
+m.addConstrs((x[i] <= demand[i] for i in product_names), name='')
+m.addConstrs((x[i] <= inventory[i] for i in product_names), name='')
+
+# Objective: maximize sum_i A_i * x_i
+m.setObjective(gp.quicksum(revenue[i] * x[i] for i in product_names), GRB.MAXIMIZE)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 48 rows, 24 columns and 48 nonzeros
+Model fingerprint: 0x3dc4df8e
+Variable types: 0 continuous, 24 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+02, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+00, 3e+03]
+Found heuristic solution: objective 285816.00000
+Presolve removed 48 rows and 24 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 285816 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.858160000000e+05, best bound 2.858160000000e+05, gap 0.0000%
+ObjVal: 285816.0
+C0: 6.0
+C1: 4.0
+C2: 16.0
+C3: 14.0
+C4: 4.0
+C5: 32.0
+C6: 8.0
+C7: 2.0
+C8: 10.0
+C9: 8.0
+C10: 18.0
+C11: 2.0
+C12: 4.0
+C13: 8.0
+C14: 2.0
+C15: 198.0
+C16: 32.0
+C17: 18.0
+C18: 570.0
+C19: 6.0
+C20: 26.0
+C21: 6.0
+C22: 33.0
+C23: 33.0
+Optimal objective: 285816.0
+Optimal solution: [('C0', 6.0), ('C1', 4.0), ('C2', 16.0), ('C3', 14.0), ('C4', 4.0), ('C5', 32.0), ('C6', 8.0), ('C7', 2.0), ('C8', 10.0), ('C9', 8.0), ('C10', 18.0), ('C11', 2.0), ('C12', 4.0), ('C13', 8.0), ('C14', 2.0), ('C15', 198.0), ('C16', 32.0), ('C17', 18.0), ('C18', 570.0), ('C19', 6.0), ('C20', 26.0), ('C21', 6.0), ('C22', 33.0), ('C23', 33.0)]

@@ -1,0 +1,792 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mQuestion: A fund manager holds a portfolio of 6 assets and is considering using 120 European option types for hedging. Each option’s per-contract cost, delta, gamma, vega, and trading limits are given in OptionCharacteristics.csv. The underlying asset(s) each option refers to are given in Option_AssetReferenceMatrix.csv, with A[i,j]=1 if option i references asset j and 0 otherwise. (Note: some options may reference more than one asset.)
+
+    Variables:
+    Let x_i be the integer number of contracts (positive for buy/long, negative for sell/short) for option i,\ i=1,\dots,120.
+
+    Objective:
+    Minimize total hedging cost:
+    \min \sum_{i=1}^{120} \text{Cost}[i] \cdot |x_i|
+
+    Subject to:
+
+    For each Greek G \in \{\Delta,\Gamma,\text{Vega}\}, the net portfolio exposure after hedging must satisfy:
+    \bigg| G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G[i] \cdot A[i,j] \cdot x_i \bigg| \leq \text{Tolerance}_G
+
+    Where:
+    • G_{\text{initial}} is the initial exposure for that Greek (given).
+    • G[i] is the per-contract Greek exposure of option i (from OptionCharacteristics.csv).
+    • A[i,j] is from Option_AssetReferenceMatrix.csv.
+    • \text{Tolerance}_G is the band for each risk metric (given).
+
+    Trading limits:
+    \text{MaxShort}[i] \leq x_i \leq \text{MaxLong}[i], \quad i=1,\dots,120
+
+    Data provided:
+    • OptionCharacteristics.csv: Option, Cost, Delta, Gamma, Vega, MaxLong, MaxShort
+    • Option_AssetReferenceMatrix.csv: binary matrix (120 × 6) showing which option references which asset (A[i,j])
+    • Initial net Delta = 0.25, Gamma = 0.08, Vega = 0.17
+    • Risk band tolerances: |\Delta| \le 0.06,\ |\Gamma| \le 0.05,\ |\text{Vega}| \le 0.07
+
+    Task:
+    Find the optimal integer positions x_i,\ i=1,\dots,120 that minimize total hedging cost, such that all risk exposures after hedging are within their respective bands, while respecting per-option trading limits and using the asset-reference information in the constraints.
+
+Thought: I need to identify the mathematical structure: the objective is to minimize total cost of hedging positions (sum over absolute value of integer variables times per-contract cost). Decision variables are integer numbers of contracts for each option (can be positive or negative). Constraints: for each Greek (Delta, Gamma, Vega), the net exposure after hedging (initial plus sum over all options and assets, weighted by per-contract Greek and asset-reference) must be within a given tolerance band. Each x_i is bounded by per-option trading limits. There is no explicit assignment, transportation, facility location, or network revenue management structure. I should call FileQA to retrieve structurally similar labeled reference problems.
+
+Action: FileQA
+
+Action Input: Integer variables x_i (number of contracts for each option), minimize total cost (sum of per-contract cost times |x_i|), subject to: for each risk metric (Delta, Gamma, Vega), the net exposure after hedging (initial plus sum over all options and referenced assets, weighted by per-contract Greek and asset-reference matrix) must be within a tolerance band; per-option trading limits on x_i; options may reference multiple assets.
+[0m
+Observation: [36;1m[1;3m[Retrieved example 1]
+prompt: A supermarket needs to allocate various products, including high-demand items like the Sony Alpha Refrigerator, Sony Bravia XR, and Sony PlayStation 5, across different retail shelves. The product values and space requirements are provided in the "Products.csv" dataset. Additionally, the store has multiple shelves, each with a total space limit and specific space constraints for Sony and Apple products, as outlined in the "Capacity.csv" file. The goal is to determine the optimal number of units of each Sony product to place on each shelf to maximize total value while ensuring that the space used by Sony products on each shelf does not exceed the brand-specific limits. The decision variables x_ij represent the number of units of product i to be placed on shelf j. The variables x_ij must be nonnegative integers because the products are counted in whole units.
+Type: RA
+
+[Retrieved example 2]
+prompt: The data of the store offers several styles of Nike shoes is provided in "nike_Shoes_Sales.csv". Through the dataset, the revenue of each shoes is listed in the column "Revenue". Each style has its own demand limit. The store’s objective is to maximize the total revenue based on the fixed initial inventories of the Nike x Olivia Kim brand, which are detailed in column “Initial Inventory.” During the sales horizon, no replenishment is allowed, and there are no in-transit inventories. For this deterministic reference instance, the column “Demand” specifies the known total demand for each style over the entire sales horizon. The instance is eligible for trading when the sum of “Demand” over the four Nike x Olivia Kim styles is at least 100. Sales decisions are made for eligible instances. The decision variables x_i represent the number of customer requests the store intends to fulfill for Nike shoe style i, with each x_i being a positive integer.
+In addition, the four styles share a dispatch capacity of 100 units over the sales horizon: their total fulfilled quantity cannot exceed 100. This capacity is an explicit synthetic scenario assumption, not a measured field in the source CSV.
+Type: NRM
+
+[Retrieved example 3]
+prompt: In the construction sector, there is a group of managers and a set of construction projects. The cost for a manager to oversee a specific project varies depending on their expertise and experience. This cost data is stored in a CSV file named 'manager_project_cost.csv', where each row corresponds to a manager and each column indicates the cost for that manager to handle a particular project. The aim is to determine the optimal assignment strategy that minimizes the overall cost of completing all projects. Every project must be managed by exactly one manager, and each manager must be responsible for exactly one project. Assignments are chosen jointly to minimize total cost; an individual manager need not receive their cheapest project. The goal is to minimize the total cost while adhering to the constraints that each project is assigned to one manager and each manager is assigned to one project
+Type: AP
+
+[Retrieved example 4]
+prompt: A supermarket needs to replenish its daily stock of flour and rice to meet customer demand while minimizing total procurement costs. The exact required quantities are 100 kg of flour and 80 kg of rice. No more, no less. There are two existing suppliers (Supplier 1 and 2) available for ordering, with order quantities allowed to be zero. Orders from all four suppliers are measured in continuous batch equivalents, allowing fractional batches. Additionally, two new suppliers (Supplier 3 and 4) are available, but selecting any new supplier incurs a fixed management fee of 50 RMB per supplier (e.g., choosing Supplier 3 adds 50 RMB, while selecting both adds 100 RMB). If a new supplier is not chosen, no orders can be placed with them. The total cost consists of procurement expenses from all selected suppliers plus the fixed fees for any new suppliers. The objective is to minimize total cost as the primary goal, with a secondary preference for using fewer new suppliers. Detailed information for each supply is in 'supplier_details.csv'. The New supplier administrative fee field applies only to suppliers whose If new supplier value is Yes.
+Type: Others
+
+[Retrieved example 5]
+prompt: Walmart stores play a critical role in supplying essential goods to various customer groups on a daily basis. The problem involves determining the optimal transportation plan that satisfies the demands of 4 customer groups, whose daily demand data is provided in "customer_demand.csv". These demands must be met using supplies from 3 Walmart stores, each with a specific daily supply capacity detailed in "supply_capacity.csv". The transportation cost per unit of goods from each Walmart store to each customer group is recorded in "transportation_costs.csv". The objective is to determine the quantity of goods transported from each Walmart store to each customer group, ensuring that all demands are met without exceeding the supply capacity of any store, while minimizing the total transportation cost. Let x_ij denote the nonnegative continuous quantity shipped from store i to customer group j. Each customer group must receive at least its stated demand, and each store may ship no more than its supply capacity.
+Type: TP[0m
+Thought:[32;1m[1;3mThought: The problem involves integer decision variables representing the number of contracts for each option (can be positive or negative), with the objective to minimize total hedging cost (sum over per-contract cost times absolute value of x_i). The main constraints are that, for each risk metric (Delta, Gamma, Vega), the net exposure after hedging (initial plus sum over all options and referenced assets, weighted by per-contract Greek and asset-reference matrix) must be within a specified tolerance band. Each x_i is bounded by per-option trading limits. There is no explicit source-destination flow, assignment, facility opening, or network revenue management structure. The retrieved examples include resource allocation (RA) problems with allocation of products to shelves under capacity and brand constraints, assignment problems (AP), transportation problems (TP), and others. The closest structural match is the RA example, where integer variables are allocated to minimize cost or maximize value under multiple resource or exposure constraints. The presence of multiple risk constraints and per-option bounds fits the RA archetype, as there are no additional mechanisms such as assignment, transportation, or facility location. Therefore, the most appropriate available workflow is RA.
+
+Final Answer: RA[0m
+
+[1m> Finished chain.[0m
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mQuestion: A fund manager holds a portfolio of 6 assets and is considering using 120 European option types for hedging. Each option’s per-contract cost, delta, gamma, vega, and trading limits are given in OptionCharacteristics.csv. The underlying asset(s) each option refers to are given in Option_AssetReferenceMatrix.csv, with A[i,j]=1 if option i references asset j and 0 otherwise. (Note: some options may reference more than one asset.)
+
+Variables:
+Let $x_i$ be the integer number of contracts (positive for buy/long, negative for sell/short) for option $i$, $i=1,\dots,120$.
+
+Objective:
+Minimize total hedging cost:
+$$
+\min \sum_{i=1}^{120} \text{Cost}[i] \cdot |x_i|
+$$
+
+Subject to:
+
+For each Greek $G \in \{\Delta,\Gamma,\text{Vega}\}$, the net portfolio exposure after hedging must satisfy:
+$$
+\left| G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G[i] \cdot A[i,j] \cdot x_i \right| \leq \text{Tolerance}_G
+$$
+
+Where:
+• $G_{\text{initial}}$ is the initial exposure for that Greek (given).
+• $G[i]$ is the per-contract Greek exposure of option $i$ (from OptionCharacteristics.csv).
+• $A[i,j]$ is from Option_AssetReferenceMatrix.csv.
+• $\text{Tolerance}_G$ is the band for each risk metric (given).
+
+Trading limits:
+$$
+\text{MaxShort}[i] \leq x_i \leq \text{MaxLong}[i], \quad i=1,\dots,120
+$$
+
+Data provided:
+• OptionCharacteristics.csv: Option, Cost, Delta, Gamma, Vega, MaxLong, MaxShort
+• Option_AssetReferenceMatrix.csv: binary matrix (120 × 6) showing which option references which asset (A[i,j])
+• Initial net Delta = 0.25, Gamma = 0.08, Vega = 0.17
+• Risk band tolerances: $|\Delta| \le 0.06$, $|\Gamma| \le 0.05$, $|\text{Vega}| \le 0.07$
+
+Task:
+Find the optimal integer positions $x_i,\ i=1,\dots,120$ that minimize total hedging cost, such that all risk exposures after hedging are within their respective bands, while respecting per-option trading limits and using the asset-reference information in the constraints.
+
+Thought: Retrieve all data needed by the question, in source order. Preserve identifiers, coefficients, and any additional constraints. If the question does not request a subset, retrieve the whole dataset.
+
+Action: CSVQA
+
+Action Input: Retrieve all data from OptionCharacteristics.csv and Option_AssetReferenceMatrix.csv, preserving source order and all identifiers and values.
+[0m
+Observation: [36;1m[1;3mOptionCharacteristics.csv
+
+{"Option": "Opt_1", "Cost": "9", "Delta": "-0.54", "Gamma": "0.12", "Vega": "0.1", "MaxLong": "9", "MaxShort": "-14"}
+{"Option": "Opt_2", "Cost": "6", "Delta": "0.51", "Gamma": "0.1", "Vega": "0.16", "MaxLong": "9", "MaxShort": "-14"}
+{"Option": "Opt_3", "Cost": "13", "Delta": "0.17", "Gamma": "0.02", "Vega": "0.19", "MaxLong": "10", "MaxShort": "-7"}
+{"Option": "Opt_4", "Cost": "10", "Delta": "-0.24", "Gamma": "0.03", "Vega": "0.18", "MaxLong": "7", "MaxShort": "-5"}
+{"Option": "Opt_5", "Cost": "7", "Delta": "-0.61", "Gamma": "0.14", "Vega": "0.11", "MaxLong": "12", "MaxShort": "-9"}
+{"Option": "Opt_6", "Cost": "9", "Delta": "-0.26", "Gamma": "0.09", "Vega": "0.24", "MaxLong": "5", "MaxShort": "-13"}
+{"Option": "Opt_7", "Cost": "12", "Delta": "-0.24", "Gamma": "0.01", "Vega": "0.2", "MaxLong": "10", "MaxShort": "-5"}
+{"Option": "Opt_8", "Cost": "5", "Delta": "0.32", "Gamma": "0.02", "Vega": "0.16", "MaxLong": "8", "MaxShort": "-7"}
+{"Option": "Opt_9", "Cost": "9", "Delta": "0.19", "Gamma": "0.1", "Vega": "0.17", "MaxLong": "5", "MaxShort": "-8"}
+{"Option": "Opt_10", "Cost": "13", "Delta": "0.54", "Gamma": "0.01", "Vega": "0.13", "MaxLong": "11", "MaxShort": "-5"}
+{"Option": "Opt_11", "Cost": "13", "Delta": "-0.04", "Gamma": "0.03", "Vega": "0.1", "MaxLong": "13", "MaxShort": "-5"}
+{"Option": "Opt_12", "Cost": "10", "Delta": "-0.53", "Gamma": "0.09", "Vega": "0.12", "MaxLong": "8", "MaxShort": "-12"}
+{"Option": "Opt_13", "Cost": "7", "Delta": "0.3", "Gamma": "0.11", "Vega": "0.2", "MaxLong": "8", "MaxShort": "-6"}
+{"Option": "Opt_14", "Cost": "6", "Delta": "0.37", "Gamma": "0.1", "Vega": "0.05", "MaxLong": "10", "MaxShort": "-12"}
+{"Option": "Opt_15", "Cost": "10", "Delta": "0.09", "Gamma": "0.04", "Vega": "0.07", "MaxLong": "7", "MaxShort": "-11"}
+{"Option": "Opt_16", "Cost": "10", "Delta": "0.38", "Gamma": "0.11", "Vega": "0.06", "MaxLong": "10", "MaxShort": "-14"}
+{"Option": "Opt_17", "Cost": "5", "Delta": "-0.01", "Gamma": "0.04", "Vega": "0.06", "MaxLong": "11", "MaxShort": "-14"}
+{"Option": "Opt_18", "Cost": "8", "Delta": "0.03", "Gamma": "0.06", "Vega": "0.22", "MaxLong": "14", "MaxShort": "-6"}
+{"Option": "Opt_19", "Cost": "7", "Delta": "-0.1", "Gamma": "0.11", "Vega": "0.19", "MaxLong": "14", "MaxShort": "-10"}
+{"Option": "Opt_20", "Cost": "4", "Delta": "-0.66", "Gamma": "0.1", "Vega": "0.14", "MaxLong": "7", "MaxShort": "-10"}
+{"Option": "Opt_21", "Cost": "10", "Delta": "-0.55", "Gamma": "0.13", "Vega": "0.07", "MaxLong": "11", "MaxShort": "-7"}
+{"Option": "Opt_22", "Cost": "14", "Delta": "-0.66", "Gamma": "0.1", "Vega": "0.15", "MaxLong": "7", "MaxShort": "-6"}
+{"Option": "Opt_23", "Cost": "8", "Delta": "0.19", "Gamma": "0.09", "Vega": "0.14", "MaxLong": "6", "MaxShort": "-5"}
+{"Option": "Opt_24", "Cost": "4", "Delta": "-0.26", "Gamma": "0.02", "Vega": "0.08", "MaxLong": "14", "MaxShort": "-10"}
+{"Option": "Opt_25", "Cost": "14", "Delta": "0.01", "Gamma": "0.06", "Vega": "0.14", "MaxLong": "8", "MaxShort": "-9"}
+{"Option": "Opt_26", "Cost": "7", "Delta": "0.57", "Gamma": "0.05", "Vega": "0.13", "MaxLong": "12", "MaxShort": "-13"}
+{"Option": "Opt_27", "Cost": "3", "Delta": "-0.35", "Gamma": "0.04", "Vega": "0.17", "MaxLong": "13", "MaxShort": "-5"}
+{"Option": "Opt_28", "Cost": "14", "Delta": "-0.13", "Gamma": "0.15", "Vega": "0.18", "MaxLong": "11", "MaxShort": "-11"}
+{"Option": "Opt_29", "Cost": "12", "Delta": "0.36", "Gamma": "0.07", "Vega": "0.06", "MaxLong": "5", "MaxShort": "-9"}
+{"Option": "Opt_30", "Cost": "8", "Delta": "-0.38", "Gamma": "0.13", "Vega": "0.12", "MaxLong": "7", "MaxShort": "-9"}
+{"Option": "Opt_31", "Cost": "14", "Delta": "-0.59", "Gamma": "0.1", "Vega": "0.18", "MaxLong": "13", "MaxShort": "-6"}
+{"Option": "Opt_32", "Cost": "11", "Delta": "-0.29", "Gamma": "0.12", "Vega": "0.15", "MaxLong": "5", "MaxShort": "-7"}
+{"Option": "Opt_33", "Cost": "3", "Delta": "-0.47", "Gamma": "0.08", "Vega": "0.22", "MaxLong": "13", "MaxShort": "-11"}
+{"Option": "Opt_34", "Cost": "13", "Delta": "0.6", "Gamma": "0.09", "Vega": "0.18", "MaxLong": "12", "MaxShort": "-10"}
+{"Option": "Opt_35", "Cost": "13", "Delta": "0.43", "Gamma": "0.08", "Vega": "0.08", "MaxLong": "5", "MaxShort": "-6"}
+{"Option": "Opt_36", "Cost": "12", "Delta": "0.19", "Gamma": "0.04", "Vega": "0.06", "MaxLong": "10", "MaxShort": "-10"}
+{"Option": "Opt_37", "Cost": "14", "Delta": "0.52", "Gamma": "0.11", "Vega": "0.18", "MaxLong": "9", "MaxShort": "-6"}
+{"Option": "Opt_38", "Cost": "14", "Delta": "0.43", "Gamma": "0.05", "Vega": "0.06", "MaxLong": "10", "MaxShort": "-6"}
+{"Option": "Opt_39", "Cost": "5", "Delta": "-0.44", "Gamma": "0.01", "Vega": "0.17", "MaxLong": "14", "MaxShort": "-6"}
+{"Option": "Opt_40", "Cost": "14", "Delta": "0.55", "Gamma": "0.1", "Vega": "0.24", "MaxLong": "9", "MaxShort": "-7"}
+{"Option": "Opt_41", "Cost": "9", "Delta": "0.06", "Gamma": "0.03", "Vega": "0.17", "MaxLong": "10", "MaxShort": "-6"}
+{"Option": "Opt_42", "Cost": "6", "Delta": "0.43", "Gamma": "0.14", "Vega": "0.13", "MaxLong": "9", "MaxShort": "-8"}
+{"Option": "Opt_43", "Cost": "11", "Delta": "0.55", "Gamma": "0.14", "Vega": "0.18", "MaxLong": "9", "MaxShort": "-13"}
+{"Option": "Opt_44", "Cost": "5", "Delta": "-0.25", "Gamma": "0.14", "Vega": "0.14", "MaxLong": "8", "MaxShort": "-10"}
+{"Option": "Opt_45", "Cost": "7", "Delta": "-0.55", "Gamma": "0.06", "Vega": "0.16", "MaxLong": "7", "MaxShort": "-5"}
+{"Option": "Opt_46", "Cost": "5", "Delta": "-0.38", "Gamma": "0.01", "Vega": "0.24", "MaxLong": "7", "MaxShort": "-12"}
+{"Option": "Opt_47", "Cost": "9", "Delta": "-0.1", "Gamma": "0.14", "Vega": "0.13", "MaxLong": "8", "MaxShort": "-11"}
+{"Option": "Opt_48", "Cost": "7", "Delta": "0.45", "Gamma": "0.07", "Vega": "0.24", "MaxLong": "13", "MaxShort": "-14"}
+{"Option": "Opt_49", "Cost": "11", "Delta": "0.51", "Gamma": "0.15", "Vega": "0.23", "MaxLong": "6", "MaxShort": "-7"}
+{"Option": "Opt_50", "Cost": "9", "Delta": "-0.69", "Gamma": "0.14", "Vega": "0.09", "MaxLong": "13", "MaxShort": "-5"}
+{"Option": "Opt_51", "Cost": "4", "Delta": "0.02", "Gamma": "0.13", "Vega": "0.06", "MaxLong": "5", "MaxShort": "-9"}
+{"Option": "Opt_52", "Cost": "6", "Delta": "-0.12", "Gamma": "0.05", "Vega": "0.07", "MaxLong": "5", "MaxShort": "-8"}
+{"Option": "Opt_53", "Cost": "11", "Delta": "-0.39", "Gamma": "0.06", "Vega": "0.05", "MaxLong": "9", "MaxShort": "-14"}
+{"Option": "Opt_54", "Cost": "14", "Delta": "-0.53", "Gamma": "0.13", "Vega": "0.07", "MaxLong": "10", "MaxShort": "-12"}
+{"Option": "Opt_55", "Cost": "4", "Delta": "-0.23", "Gamma": "0.05", "Vega": "0.19", "MaxLong": "10", "MaxShort": "-5"}
+{"Option": "Opt_56", "Cost": "12", "Delta": "0.62", "Gamma": "0.03", "Vega": "0.06", "MaxLong": "7", "MaxShort": "-14"}
+{"Option": "Opt_57", "Cost": "11", "Delta": "-0.25", "Gamma": "0.09", "Vega": "0.11", "MaxLong": "11", "MaxShort": "-5"}
+{"Option": "Opt_58", "Cost": "12", "Delta": "0.03", "Gamma": "0.14", "Vega": "0.22", "MaxLong": "13", "MaxShort": "-8"}
+{"Option": "Opt_59", "Cost": "7", "Delta": "0.28", "Gamma": "0.11", "Vega": "0.05", "MaxLong": "14", "MaxShort": "-12"}
+{"Option": "Opt_60", "Cost": "4", "Delta": "-0.19", "Gamma": "0.09", "Vega": "0.21", "MaxLong": "12", "MaxShort": "-9"}
+{"Option": "Opt_61", "Cost": "6", "Delta": "0.66", "Gamma": "0.02", "Vega": "0.11", "MaxLong": "10", "MaxShort": "-6"}
+{"Option": "Opt_62", "Cost": "14", "Delta": "0.65", "Gamma": "0.1", "Vega": "0.07", "MaxLong": "12", "MaxShort": "-10"}
+{"Option": "Opt_63", "Cost": "14", "Delta": "-0.35", "Gamma": "0.15", "Vega": "0.19", "MaxLong": "9", "MaxShort": "-9"}
+{"Option": "Opt_64", "Cost": "9", "Delta": "0", "Gamma": "0.03", "Vega": "0.18", "MaxLong": "12", "MaxShort": "-6"}
+{"Option": "Opt_65", "Cost": "14", "Delta": "-0.28", "Gamma": "0.08", "Vega": "0.23", "MaxLong": "14", "MaxShort": "-7"}
+{"Option": "Opt_66", "Cost": "10", "Delta": "-0.3", "Gamma": "0.13", "Vega": "0.2", "MaxLong": "8", "MaxShort": "-13"}
+{"Option": "Opt_67", "Cost": "5", "Delta": "-0.65", "Gamma": "0.11", "Vega": "0.21", "MaxLong": "14", "MaxShort": "-11"}
+{"Option": "Opt_68", "Cost": "3", "Delta": "0.15", "Gamma": "0.11", "Vega": "0.11", "MaxLong": "12", "MaxShort": "-11"}
+{"Option": "Opt_69", "Cost": "6", "Delta": "0", "Gamma": "0.11", "Vega": "0.09", "MaxLong": "14", "MaxShort": "-10"}
+{"Option": "Opt_70", "Cost": "4", "Delta": "-0.63", "Gamma": "0.06", "Vega": "0.2", "MaxLong": "6", "MaxShort": "-12"}
+{"Option": "Opt_71", "Cost": "10", "Delta": "-0.31", "Gamma": "0.05", "Vega": "0.21", "MaxLong": "9", "MaxShort": "-8"}
+{"Option": "Opt_72", "Cost": "6", "Delta": "0.57", "Gamma": "0.12", "Vega": "0.25", "MaxLong": "13", "MaxShort": "-12"}
+{"Option": "Opt_73", "Cost": "4", "Delta": "-0.36", "Gamma": "0.12", "Vega": "0.13", "MaxLong": "8", "MaxShort": "-8"}
+{"Option": "Opt_74", "Cost": "8", "Delta": "-0.5", "Gamma": "0.13", "Vega": "0.12", "MaxLong": "10", "MaxShort": "-12"}
+{"Option": "Opt_75", "Cost": "8", "Delta": "-0.01", "Gamma": "0.14", "Vega": "0.21", "MaxLong": "5", "MaxShort": "-13"}
+{"Option": "Opt_76", "Cost": "12", "Delta": "0.68", "Gamma": "0.08", "Vega": "0.12", "MaxLong": "13", "MaxShort": "-7"}
+{"Option": "Opt_77", "Cost": "6", "Delta": "-0.36", "Gamma": "0.08", "Vega": "0.24", "MaxLong": "5", "MaxShort": "-7"}
+{"Option": "Opt_78", "Cost": "8", "Delta": "0.24", "Gamma": "0.12", "Vega": "0.22", "MaxLong": "9", "MaxShort": "-6"}
+{"Option": "Opt_79", "Cost": "4", "Delta": "0.37", "Gamma": "0.1", "Vega": "0.14", "MaxLong": "8", "MaxShort": "-14"}
+{"Option": "Opt_80", "Cost": "12", "Delta": "-0.37", "Gamma": "0.11", "Vega": "0.2", "MaxLong": "7", "MaxShort": "-7"}
+{"Option": "Opt_81", "Cost": "14", "Delta": "0.32", "Gamma": "0.12", "Vega": "0.2", "MaxLong": "10", "MaxShort": "-7"}
+{"Option": "Opt_82", "Cost": "4", "Delta": "-0.19", "Gamma": "0.13", "Vega": "0.07", "MaxLong": "6", "MaxShort": "-9"}
+{"Option": "Opt_83", "Cost": "12", "Delta": "0.19", "Gamma": "0.06", "Vega": "0.23", "MaxLong": "7", "MaxShort": "-9"}
+{"Option": "Opt_84", "Cost": "6", "Delta": "0.19", "Gamma": "0.06", "Vega": "0.15", "MaxLong": "9", "MaxShort": "-6"}
+{"Option": "Opt_85", "Cost": "10", "Delta": "0.05", "Gamma": "0.02", "Vega": "0.22", "MaxLong": "13", "MaxShort": "-14"}
+{"Option": "Opt_86", "Cost": "9", "Delta": "-0.57", "Gamma": "0.09", "Vega": "0.11", "MaxLong": "6", "MaxShort": "-10"}
+{"Option": "Opt_87", "Cost": "14", "Delta": "0.47", "Gamma": "0.02", "Vega": "0.23", "MaxLong": "14", "MaxShort": "-9"}
+{"Option": "Opt_88", "Cost": "11", "Delta": "-0.25", "Gamma": "0.08", "Vega": "0.13", "MaxLong": "12", "MaxShort": "-10"}
+{"Option": "Opt_89", "Cost": "10", "Delta": "-0.44", "Gamma": "0.09", "Vega": "0.05", "MaxLong": "6", "MaxShort": "-5"}
+{"Option": "Opt_90", "Cost": "7", "Delta": "-0.64", "Gamma": "0.05", "Vega": "0.23", "MaxLong": "9", "MaxShort": "-9"}
+{"Option": "Opt_91", "Cost": "4", "Delta": "0.13", "Gamma": "0.09", "Vega": "0.07", "MaxLong": "11", "MaxShort": "-13"}
+{"Option": "Opt_92", "Cost": "7", "Delta": "0.25", "Gamma": "0.01", "Vega": "0.11", "MaxLong": "12", "MaxShort": "-14"}
+{"Option": "Opt_93", "Cost": "10", "Delta": "-0.68", "Gamma": "0.02", "Vega": "0.24", "MaxLong": "5", "MaxShort": "-6"}
+{"Option": "Opt_94", "Cost": "12", "Delta": "0.02", "Gamma": "0.13", "Vega": "0.24", "MaxLong": "10", "MaxShort": "-5"}
+{"Option": "Opt_95", "Cost": "11", "Delta": "-0.38", "Gamma": "0.06", "Vega": "0.16", "MaxLong": "5", "MaxShort": "-14"}
+{"Option": "Opt_96", "Cost": "14", "Delta": "0.2", "Gamma": "0.03", "Vega": "0.18", "MaxLong": "6", "MaxShort": "-13"}
+{"Option": "Opt_97", "Cost": "14", "Delta": "-0.46", "Gamma": "0.08", "Vega": "0.14", "MaxLong": "5", "MaxShort": "-14"}
+{"Option": "Opt_98", "Cost": "14", "Delta": "0.27", "Gamma": "0.12", "Vega": "0.11", "MaxLong": "9", "MaxShort": "-13"}
+{"Option": "Opt_99", "Cost": "11", "Delta": "-0.16", "Gamma": "0.04", "Vega": "0.12", "MaxLong": "14", "MaxShort": "-13"}
+{"Option": "Opt_100", "Cost": "3", "Delta": "0.61", "Gamma": "0.1", "Vega": "0.18", "MaxLong": "13", "MaxShort": "-10"}
+{"Option": "Opt_101", "Cost": "11", "Delta": "-0.51", "Gamma": "0.02", "Vega": "0.2", "MaxLong": "10", "MaxShort": "-12"}
+{"Option": "Opt_102", "Cost": "9", "Delta": "-0.22", "Gamma": "0.02", "Vega": "0.21", "MaxLong": "5", "MaxShort": "-5"}
+{"Option": "Opt_103", "Cost": "11", "Delta": "-0.54", "Gamma": "0.08", "Vega": "0.21", "MaxLong": "5", "MaxShort": "-14"}
+{"Option": "Opt_104", "Cost": "10", "Delta": "0.59", "Gamma": "0.09", "Vega": "0.07", "MaxLong": "6", "MaxShort": "-8"}
+{"Option": "Opt_105", "Cost": "3", "Delta": "0.53", "Gamma": "0.1", "Vega": "0.15", "MaxLong": "13", "MaxShort": "-5"}
+{"Option": "Opt_106", "Cost": "14", "Delta": "-0.34", "Gamma": "0.11", "Vega": "0.06", "MaxLong": "7", "MaxShort": "-12"}
+{"Option": "Opt_107", "Cost": "10", "Delta": "0.22", "Gamma": "0.15", "Vega": "0.16", "MaxLong": "5", "MaxShort": "-5"}
+{"Option": "Opt_108", "Cost": "10", "Delta": "0.44", "Gamma": "0.08", "Vega": "0.14", "MaxLong": "9", "MaxShort": "-7"}
+{"Option": "Opt_109", "Cost": "13", "Delta": "0.08", "Gamma": "0.06", "Vega": "0.23", "MaxLong": "11", "MaxShort": "-8"}
+{"Option": "Opt_110", "Cost": "5", "Delta": "0.04", "Gamma": "0.12", "Vega": "0.12", "MaxLong": "10", "MaxShort": "-12"}
+{"Option": "Opt_111", "Cost": "3", "Delta": "-0.36", "Gamma": "0.05", "Vega": "0.07", "MaxLong": "5", "MaxShort": "-10"}
+{"Option": "Opt_112", "Cost": "10", "Delta": "-0.57", "Gamma": "0.07", "Vega": "0.08", "MaxLong": "9", "MaxShort": "-14"}
+{"Option": "Opt_113", "Cost": "5", "Delta": "0.56", "Gamma": "0.02", "Vega": "0.2", "MaxLong": "9", "MaxShort": "-11"}
+{"Option": "Opt_114", "Cost": "5", "Delta": "0.56", "Gamma": "0.01", "Vega": "0.17", "MaxLong": "10", "MaxShort": "-12"}
+{"Option": "Opt_115", "Cost": "3", "Delta": "0.19", "Gamma": "0.14", "Vega": "0.07", "MaxLong": "7", "MaxShort": "-6"}
+{"Option": "Opt_116", "Cost": "13", "Delta": "-0.23", "Gamma": "0.13", "Vega": "0.07", "MaxLong": "9", "MaxShort": "-14"}
+{"Option": "Opt_117", "Cost": "7", "Delta": "-0.21", "Gamma": "0.11", "Vega": "0.19", "MaxLong": "11", "MaxShort": "-12"}
+{"Option": "Opt_118", "Cost": "12", "Delta": "0.32", "Gamma": "0.07", "Vega": "0.06", "MaxLong": "9", "MaxShort": "-7"}
+{"Option": "Opt_119", "Cost": "9", "Delta": "0.56", "Gamma": "0.03", "Vega": "0.21", "MaxLong": "9", "MaxShort": "-11"}
+{"Option": "Opt_120", "Cost": "12", "Delta": "0.54", "Gamma": "0.03", "Vega": "0.19", "MaxLong": "9", "MaxShort": "-7"}
+
+Option_AssetReferenceMatrix.csv
+
+{"Unnamed: 0": "Opt_1", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_2", "Asset_1": "1", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_3", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_4", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_5", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_6", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_7", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_8", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_9", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_10", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_11", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_12", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_13", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_14", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_15", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_16", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_17", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_18", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_19", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_20", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_21", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_22", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_23", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_24", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_25", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_26", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_27", "Asset_1": "0", "Asset_2": "1", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_28", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_29", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_30", "Asset_1": "0", "Asset_2": "1", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_31", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_32", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_33", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_34", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_35", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_36", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_37", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_38", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_39", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_40", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_41", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_42", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_43", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_44", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_45", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_46", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_47", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_48", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_49", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_50", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_51", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_52", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_53", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_54", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_55", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_56", "Asset_1": "1", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_57", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_58", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_59", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_60", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_61", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_62", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_63", "Asset_1": "0", "Asset_2": "1", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_64", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_65", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_66", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_67", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_68", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_69", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_70", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_71", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_72", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_73", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_74", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_75", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_76", "Asset_1": "1", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_77", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_78", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_79", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_80", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_81", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_82", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_83", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_84", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_85", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_86", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_87", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_88", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_89", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_90", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_91", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_92", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_93", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_94", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_95", "Asset_1": "0", "Asset_2": "1", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_96", "Asset_1": "1", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_97", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_98", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_99", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_100", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_101", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_102", "Asset_1": "1", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_103", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_104", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_105", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_106", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_107", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_108", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_109", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}
+{"Unnamed: 0": "Opt_110", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_111", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_112", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_113", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_114", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_115", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_116", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_117", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_118", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_119", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}
+{"Unnamed: 0": "Opt_120", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}[0m
+Thought:[32;1m[1;3mFinal Answer:
+
+Let $x_i$ be the integer number of contracts (positive for buy/long, negative for sell/short) for option $i$, $i=1,\dots,120$.
+
+Let $y_i \ge 0$ be an auxiliary variable representing $|x_i|$ for each $i$.
+
+Let $C_i$, $\Delta_i$, $\Gamma_i$, $\text{Vega}_i$, $\text{MaxLong}_i$, $\text{MaxShort}_i$ be the cost, delta, gamma, vega, max long, and max short for option $i$ (from OptionCharacteristics.csv).
+
+Let $A_{i,j}$ be the binary indicator that option $i$ references asset $j$ (from Option_AssetReferenceMatrix.csv), $j=1,\dots,6$.
+
+Let the initial net exposures be:
+- $\Delta_{\text{initial}} = 0.25$
+- $\Gamma_{\text{initial}} = 0.08$
+- $\text{Vega}_{\text{initial}} = 0.17$
+
+Let the risk tolerances be:
+- $|\Delta| \le 0.06$
+- $|\Gamma| \le 0.05$
+- $|\text{Vega}| \le 0.07$
+
+The complete model is:
+
+Minimize total hedging cost:
+$$
+\min \sum_{i=1}^{120} C_i \cdot y_i
+$$
+
+Subject to:
+
+For all $i=1,\dots,120$:
+\[
+\begin{align*}
+& y_i \ge x_i \\
+& y_i \ge -x_i \\
+& \text{MaxShort}_i \le x_i \le \text{MaxLong}_i \\
+& x_i \in \mathbb{Z}
+\end{align*}
+\]
+
+Risk constraints (for each Greek $G \in \{\Delta, \Gamma, \text{Vega}\}$):
+
+Let $G_{\text{initial}}$ be the initial exposure for Greek $G$.
+
+Let $G_i$ be the per-contract Greek exposure for option $i$.
+
+Let $\text{Tolerance}_G$ be the risk band for Greek $G$.
+
+For each Greek $G$:
+\[
+\left| G_{\text{initial}} + \sum_{i=1}^{120} \sum_{j=1}^{6} G_i \cdot A_{i,j} \cdot x_i \right| \leq \text{Tolerance}_G
+\]
+
+Explicitly, for the three Greeks:
+
+Delta:
+\[
+-0.06 \leq 0.25 + \sum_{i=1}^{120} \sum_{j=1}^{6} \Delta_i \cdot A_{i,j} \cdot x_i \leq 0.06
+\]
+
+Gamma:
+\[
+-0.05 \leq 0.08 + \sum_{i=1}^{120} \sum_{j=1}^{6} \Gamma_i \cdot A_{i,j} \cdot x_i \leq 0.05
+\]
+
+Vega:
+\[
+-0.07 \leq 0.17 + \sum_{i=1}^{120} \sum_{j=1}^{6} \text{Vega}_i \cdot A_{i,j} \cdot x_i \leq 0.07
+\]
+
+Where all coefficients $C_i$, $\Delta_i$, $\Gamma_i$, $\text{Vega}_i$, $\text{MaxLong}_i$, $\text{MaxShort}_i$ and $A_{i,j}$ are taken directly from the retrieved OptionCharacteristics.csv and Option_AssetReferenceMatrix.csv, preserving their original order and identifiers.
+
+All variables $x_i$ are integer, and $y_i$ are continuous and nonnegative.
+
+This model uses all retrieved data and enforces all constraints as described.[0m
+
+[1m> Finished chain.[0m
+LEGACY_OBSERVATION = 'OptionCharacteristics.csv\n\n{"Option": "Opt_1", "Cost": "9", "Delta": "-0.54", "Gamma": "0.12", "Vega": "0.1", "MaxLong": "9", "MaxShort": "-14"}\n{"Option": "Opt_2", "Cost": "6", "Delta": "0.51", "Gamma": "0.1", "Vega": "0.16", "MaxLong": "9", "MaxShort": "-14"}\n{"Option": "Opt_3", "Cost": "13", "Delta": "0.17", "Gamma": "0.02", "Vega": "0.19", "MaxLong": "10", "MaxShort": "-7"}\n{"Option": "Opt_4", "Cost": "10", "Delta": "-0.24", "Gamma": "0.03", "Vega": "0.18", "MaxLong": "7", "MaxShort": "-5"}\n{"Option": "Opt_5", "Cost": "7", "Delta": "-0.61", "Gamma": "0.14", "Vega": "0.11", "MaxLong": "12", "MaxShort": "-9"}\n{"Option": "Opt_6", "Cost": "9", "Delta": "-0.26", "Gamma": "0.09", "Vega": "0.24", "MaxLong": "5", "MaxShort": "-13"}\n{"Option": "Opt_7", "Cost": "12", "Delta": "-0.24", "Gamma": "0.01", "Vega": "0.2", "MaxLong": "10", "MaxShort": "-5"}\n{"Option": "Opt_8", "Cost": "5", "Delta": "0.32", "Gamma": "0.02", "Vega": "0.16", "MaxLong": "8", "MaxShort": "-7"}\n{"Option": "Opt_9", "Cost": "9", "Delta": "0.19", "Gamma": "0.1", "Vega": "0.17", "MaxLong": "5", "MaxShort": "-8"}\n{"Option": "Opt_10", "Cost": "13", "Delta": "0.54", "Gamma": "0.01", "Vega": "0.13", "MaxLong": "11", "MaxShort": "-5"}\n{"Option": "Opt_11", "Cost": "13", "Delta": "-0.04", "Gamma": "0.03", "Vega": "0.1", "MaxLong": "13", "MaxShort": "-5"}\n{"Option": "Opt_12", "Cost": "10", "Delta": "-0.53", "Gamma": "0.09", "Vega": "0.12", "MaxLong": "8", "MaxShort": "-12"}\n{"Option": "Opt_13", "Cost": "7", "Delta": "0.3", "Gamma": "0.11", "Vega": "0.2", "MaxLong": "8", "MaxShort": "-6"}\n{"Option": "Opt_14", "Cost": "6", "Delta": "0.37", "Gamma": "0.1", "Vega": "0.05", "MaxLong": "10", "MaxShort": "-12"}\n{"Option": "Opt_15", "Cost": "10", "Delta": "0.09", "Gamma": "0.04", "Vega": "0.07", "MaxLong": "7", "MaxShort": "-11"}\n{"Option": "Opt_16", "Cost": "10", "Delta": "0.38", "Gamma": "0.11", "Vega": "0.06", "MaxLong": "10", "MaxShort": "-14"}\n{"Option": "Opt_17", "Cost": "5", "Delta": "-0.01", "Gamma": "0.04", "Vega": "0.06", "MaxLong": "11", "MaxShort": "-14"}\n{"Option": "Opt_18", "Cost": "8", "Delta": "0.03", "Gamma": "0.06", "Vega": "0.22", "MaxLong": "14", "MaxShort": "-6"}\n{"Option": "Opt_19", "Cost": "7", "Delta": "-0.1", "Gamma": "0.11", "Vega": "0.19", "MaxLong": "14", "MaxShort": "-10"}\n{"Option": "Opt_20", "Cost": "4", "Delta": "-0.66", "Gamma": "0.1", "Vega": "0.14", "MaxLong": "7", "MaxShort": "-10"}\n{"Option": "Opt_21", "Cost": "10", "Delta": "-0.55", "Gamma": "0.13", "Vega": "0.07", "MaxLong": "11", "MaxShort": "-7"}\n{"Option": "Opt_22", "Cost": "14", "Delta": "-0.66", "Gamma": "0.1", "Vega": "0.15", "MaxLong": "7", "MaxShort": "-6"}\n{"Option": "Opt_23", "Cost": "8", "Delta": "0.19", "Gamma": "0.09", "Vega": "0.14", "MaxLong": "6", "MaxShort": "-5"}\n{"Option": "Opt_24", "Cost": "4", "Delta": "-0.26", "Gamma": "0.02", "Vega": "0.08", "MaxLong": "14", "MaxShort": "-10"}\n{"Option": "Opt_25", "Cost": "14", "Delta": "0.01", "Gamma": "0.06", "Vega": "0.14", "MaxLong": "8", "MaxShort": "-9"}\n{"Option": "Opt_26", "Cost": "7", "Delta": "0.57", "Gamma": "0.05", "Vega": "0.13", "MaxLong": "12", "MaxShort": "-13"}\n{"Option": "Opt_27", "Cost": "3", "Delta": "-0.35", "Gamma": "0.04", "Vega": "0.17", "MaxLong": "13", "MaxShort": "-5"}\n{"Option": "Opt_28", "Cost": "14", "Delta": "-0.13", "Gamma": "0.15", "Vega": "0.18", "MaxLong": "11", "MaxShort": "-11"}\n{"Option": "Opt_29", "Cost": "12", "Delta": "0.36", "Gamma": "0.07", "Vega": "0.06", "MaxLong": "5", "MaxShort": "-9"}\n{"Option": "Opt_30", "Cost": "8", "Delta": "-0.38", "Gamma": "0.13", "Vega": "0.12", "MaxLong": "7", "MaxShort": "-9"}\n{"Option": "Opt_31", "Cost": "14", "Delta": "-0.59", "Gamma": "0.1", "Vega": "0.18", "MaxLong": "13", "MaxShort": "-6"}\n{"Option": "Opt_32", "Cost": "11", "Delta": "-0.29", "Gamma": "0.12", "Vega": "0.15", "MaxLong": "5", "MaxShort": "-7"}\n{"Option": "Opt_33", "Cost": "3", "Delta": "-0.47", "Gamma": "0.08", "Vega": "0.22", "MaxLong": "13", "MaxShort": "-11"}\n{"Option": "Opt_34", "Cost": "13", "Delta": "0.6", "Gamma": "0.09", "Vega": "0.18", "MaxLong": "12", "MaxShort": "-10"}\n{"Option": "Opt_35", "Cost": "13", "Delta": "0.43", "Gamma": "0.08", "Vega": "0.08", "MaxLong": "5", "MaxShort": "-6"}\n{"Option": "Opt_36", "Cost": "12", "Delta": "0.19", "Gamma": "0.04", "Vega": "0.06", "MaxLong": "10", "MaxShort": "-10"}\n{"Option": "Opt_37", "Cost": "14", "Delta": "0.52", "Gamma": "0.11", "Vega": "0.18", "MaxLong": "9", "MaxShort": "-6"}\n{"Option": "Opt_38", "Cost": "14", "Delta": "0.43", "Gamma": "0.05", "Vega": "0.06", "MaxLong": "10", "MaxShort": "-6"}\n{"Option": "Opt_39", "Cost": "5", "Delta": "-0.44", "Gamma": "0.01", "Vega": "0.17", "MaxLong": "14", "MaxShort": "-6"}\n{"Option": "Opt_40", "Cost": "14", "Delta": "0.55", "Gamma": "0.1", "Vega": "0.24", "MaxLong": "9", "MaxShort": "-7"}\n{"Option": "Opt_41", "Cost": "9", "Delta": "0.06", "Gamma": "0.03", "Vega": "0.17", "MaxLong": "10", "MaxShort": "-6"}\n{"Option": "Opt_42", "Cost": "6", "Delta": "0.43", "Gamma": "0.14", "Vega": "0.13", "MaxLong": "9", "MaxShort": "-8"}\n{"Option": "Opt_43", "Cost": "11", "Delta": "0.55", "Gamma": "0.14", "Vega": "0.18", "MaxLong": "9", "MaxShort": "-13"}\n{"Option": "Opt_44", "Cost": "5", "Delta": "-0.25", "Gamma": "0.14", "Vega": "0.14", "MaxLong": "8", "MaxShort": "-10"}\n{"Option": "Opt_45", "Cost": "7", "Delta": "-0.55", "Gamma": "0.06", "Vega": "0.16", "MaxLong": "7", "MaxShort": "-5"}\n{"Option": "Opt_46", "Cost": "5", "Delta": "-0.38", "Gamma": "0.01", "Vega": "0.24", "MaxLong": "7", "MaxShort": "-12"}\n{"Option": "Opt_47", "Cost": "9", "Delta": "-0.1", "Gamma": "0.14", "Vega": "0.13", "MaxLong": "8", "MaxShort": "-11"}\n{"Option": "Opt_48", "Cost": "7", "Delta": "0.45", "Gamma": "0.07", "Vega": "0.24", "MaxLong": "13", "MaxShort": "-14"}\n{"Option": "Opt_49", "Cost": "11", "Delta": "0.51", "Gamma": "0.15", "Vega": "0.23", "MaxLong": "6", "MaxShort": "-7"}\n{"Option": "Opt_50", "Cost": "9", "Delta": "-0.69", "Gamma": "0.14", "Vega": "0.09", "MaxLong": "13", "MaxShort": "-5"}\n{"Option": "Opt_51", "Cost": "4", "Delta": "0.02", "Gamma": "0.13", "Vega": "0.06", "MaxLong": "5", "MaxShort": "-9"}\n{"Option": "Opt_52", "Cost": "6", "Delta": "-0.12", "Gamma": "0.05", "Vega": "0.07", "MaxLong": "5", "MaxShort": "-8"}\n{"Option": "Opt_53", "Cost": "11", "Delta": "-0.39", "Gamma": "0.06", "Vega": "0.05", "MaxLong": "9", "MaxShort": "-14"}\n{"Option": "Opt_54", "Cost": "14", "Delta": "-0.53", "Gamma": "0.13", "Vega": "0.07", "MaxLong": "10", "MaxShort": "-12"}\n{"Option": "Opt_55", "Cost": "4", "Delta": "-0.23", "Gamma": "0.05", "Vega": "0.19", "MaxLong": "10", "MaxShort": "-5"}\n{"Option": "Opt_56", "Cost": "12", "Delta": "0.62", "Gamma": "0.03", "Vega": "0.06", "MaxLong": "7", "MaxShort": "-14"}\n{"Option": "Opt_57", "Cost": "11", "Delta": "-0.25", "Gamma": "0.09", "Vega": "0.11", "MaxLong": "11", "MaxShort": "-5"}\n{"Option": "Opt_58", "Cost": "12", "Delta": "0.03", "Gamma": "0.14", "Vega": "0.22", "MaxLong": "13", "MaxShort": "-8"}\n{"Option": "Opt_59", "Cost": "7", "Delta": "0.28", "Gamma": "0.11", "Vega": "0.05", "MaxLong": "14", "MaxShort": "-12"}\n{"Option": "Opt_60", "Cost": "4", "Delta": "-0.19", "Gamma": "0.09", "Vega": "0.21", "MaxLong": "12", "MaxShort": "-9"}\n{"Option": "Opt_61", "Cost": "6", "Delta": "0.66", "Gamma": "0.02", "Vega": "0.11", "MaxLong": "10", "MaxShort": "-6"}\n{"Option": "Opt_62", "Cost": "14", "Delta": "0.65", "Gamma": "0.1", "Vega": "0.07", "MaxLong": "12", "MaxShort": "-10"}\n{"Option": "Opt_63", "Cost": "14", "Delta": "-0.35", "Gamma": "0.15", "Vega": "0.19", "MaxLong": "9", "MaxShort": "-9"}\n{"Option": "Opt_64", "Cost": "9", "Delta": "0", "Gamma": "0.03", "Vega": "0.18", "MaxLong": "12", "MaxShort": "-6"}\n{"Option": "Opt_65", "Cost": "14", "Delta": "-0.28", "Gamma": "0.08", "Vega": "0.23", "MaxLong": "14", "MaxShort": "-7"}\n{"Option": "Opt_66", "Cost": "10", "Delta": "-0.3", "Gamma": "0.13", "Vega": "0.2", "MaxLong": "8", "MaxShort": "-13"}\n{"Option": "Opt_67", "Cost": "5", "Delta": "-0.65", "Gamma": "0.11", "Vega": "0.21", "MaxLong": "14", "MaxShort": "-11"}\n{"Option": "Opt_68", "Cost": "3", "Delta": "0.15", "Gamma": "0.11", "Vega": "0.11", "MaxLong": "12", "MaxShort": "-11"}\n{"Option": "Opt_69", "Cost": "6", "Delta": "0", "Gamma": "0.11", "Vega": "0.09", "MaxLong": "14", "MaxShort": "-10"}\n{"Option": "Opt_70", "Cost": "4", "Delta": "-0.63", "Gamma": "0.06", "Vega": "0.2", "MaxLong": "6", "MaxShort": "-12"}\n{"Option": "Opt_71", "Cost": "10", "Delta": "-0.31", "Gamma": "0.05", "Vega": "0.21", "MaxLong": "9", "MaxShort": "-8"}\n{"Option": "Opt_72", "Cost": "6", "Delta": "0.57", "Gamma": "0.12", "Vega": "0.25", "MaxLong": "13", "MaxShort": "-12"}\n{"Option": "Opt_73", "Cost": "4", "Delta": "-0.36", "Gamma": "0.12", "Vega": "0.13", "MaxLong": "8", "MaxShort": "-8"}\n{"Option": "Opt_74", "Cost": "8", "Delta": "-0.5", "Gamma": "0.13", "Vega": "0.12", "MaxLong": "10", "MaxShort": "-12"}\n{"Option": "Opt_75", "Cost": "8", "Delta": "-0.01", "Gamma": "0.14", "Vega": "0.21", "MaxLong": "5", "MaxShort": "-13"}\n{"Option": "Opt_76", "Cost": "12", "Delta": "0.68", "Gamma": "0.08", "Vega": "0.12", "MaxLong": "13", "MaxShort": "-7"}\n{"Option": "Opt_77", "Cost": "6", "Delta": "-0.36", "Gamma": "0.08", "Vega": "0.24", "MaxLong": "5", "MaxShort": "-7"}\n{"Option": "Opt_78", "Cost": "8", "Delta": "0.24", "Gamma": "0.12", "Vega": "0.22", "MaxLong": "9", "MaxShort": "-6"}\n{"Option": "Opt_79", "Cost": "4", "Delta": "0.37", "Gamma": "0.1", "Vega": "0.14", "MaxLong": "8", "MaxShort": "-14"}\n{"Option": "Opt_80", "Cost": "12", "Delta": "-0.37", "Gamma": "0.11", "Vega": "0.2", "MaxLong": "7", "MaxShort": "-7"}\n{"Option": "Opt_81", "Cost": "14", "Delta": "0.32", "Gamma": "0.12", "Vega": "0.2", "MaxLong": "10", "MaxShort": "-7"}\n{"Option": "Opt_82", "Cost": "4", "Delta": "-0.19", "Gamma": "0.13", "Vega": "0.07", "MaxLong": "6", "MaxShort": "-9"}\n{"Option": "Opt_83", "Cost": "12", "Delta": "0.19", "Gamma": "0.06", "Vega": "0.23", "MaxLong": "7", "MaxShort": "-9"}\n{"Option": "Opt_84", "Cost": "6", "Delta": "0.19", "Gamma": "0.06", "Vega": "0.15", "MaxLong": "9", "MaxShort": "-6"}\n{"Option": "Opt_85", "Cost": "10", "Delta": "0.05", "Gamma": "0.02", "Vega": "0.22", "MaxLong": "13", "MaxShort": "-14"}\n{"Option": "Opt_86", "Cost": "9", "Delta": "-0.57", "Gamma": "0.09", "Vega": "0.11", "MaxLong": "6", "MaxShort": "-10"}\n{"Option": "Opt_87", "Cost": "14", "Delta": "0.47", "Gamma": "0.02", "Vega": "0.23", "MaxLong": "14", "MaxShort": "-9"}\n{"Option": "Opt_88", "Cost": "11", "Delta": "-0.25", "Gamma": "0.08", "Vega": "0.13", "MaxLong": "12", "MaxShort": "-10"}\n{"Option": "Opt_89", "Cost": "10", "Delta": "-0.44", "Gamma": "0.09", "Vega": "0.05", "MaxLong": "6", "MaxShort": "-5"}\n{"Option": "Opt_90", "Cost": "7", "Delta": "-0.64", "Gamma": "0.05", "Vega": "0.23", "MaxLong": "9", "MaxShort": "-9"}\n{"Option": "Opt_91", "Cost": "4", "Delta": "0.13", "Gamma": "0.09", "Vega": "0.07", "MaxLong": "11", "MaxShort": "-13"}\n{"Option": "Opt_92", "Cost": "7", "Delta": "0.25", "Gamma": "0.01", "Vega": "0.11", "MaxLong": "12", "MaxShort": "-14"}\n{"Option": "Opt_93", "Cost": "10", "Delta": "-0.68", "Gamma": "0.02", "Vega": "0.24", "MaxLong": "5", "MaxShort": "-6"}\n{"Option": "Opt_94", "Cost": "12", "Delta": "0.02", "Gamma": "0.13", "Vega": "0.24", "MaxLong": "10", "MaxShort": "-5"}\n{"Option": "Opt_95", "Cost": "11", "Delta": "-0.38", "Gamma": "0.06", "Vega": "0.16", "MaxLong": "5", "MaxShort": "-14"}\n{"Option": "Opt_96", "Cost": "14", "Delta": "0.2", "Gamma": "0.03", "Vega": "0.18", "MaxLong": "6", "MaxShort": "-13"}\n{"Option": "Opt_97", "Cost": "14", "Delta": "-0.46", "Gamma": "0.08", "Vega": "0.14", "MaxLong": "5", "MaxShort": "-14"}\n{"Option": "Opt_98", "Cost": "14", "Delta": "0.27", "Gamma": "0.12", "Vega": "0.11", "MaxLong": "9", "MaxShort": "-13"}\n{"Option": "Opt_99", "Cost": "11", "Delta": "-0.16", "Gamma": "0.04", "Vega": "0.12", "MaxLong": "14", "MaxShort": "-13"}\n{"Option": "Opt_100", "Cost": "3", "Delta": "0.61", "Gamma": "0.1", "Vega": "0.18", "MaxLong": "13", "MaxShort": "-10"}\n{"Option": "Opt_101", "Cost": "11", "Delta": "-0.51", "Gamma": "0.02", "Vega": "0.2", "MaxLong": "10", "MaxShort": "-12"}\n{"Option": "Opt_102", "Cost": "9", "Delta": "-0.22", "Gamma": "0.02", "Vega": "0.21", "MaxLong": "5", "MaxShort": "-5"}\n{"Option": "Opt_103", "Cost": "11", "Delta": "-0.54", "Gamma": "0.08", "Vega": "0.21", "MaxLong": "5", "MaxShort": "-14"}\n{"Option": "Opt_104", "Cost": "10", "Delta": "0.59", "Gamma": "0.09", "Vega": "0.07", "MaxLong": "6", "MaxShort": "-8"}\n{"Option": "Opt_105", "Cost": "3", "Delta": "0.53", "Gamma": "0.1", "Vega": "0.15", "MaxLong": "13", "MaxShort": "-5"}\n{"Option": "Opt_106", "Cost": "14", "Delta": "-0.34", "Gamma": "0.11", "Vega": "0.06", "MaxLong": "7", "MaxShort": "-12"}\n{"Option": "Opt_107", "Cost": "10", "Delta": "0.22", "Gamma": "0.15", "Vega": "0.16", "MaxLong": "5", "MaxShort": "-5"}\n{"Option": "Opt_108", "Cost": "10", "Delta": "0.44", "Gamma": "0.08", "Vega": "0.14", "MaxLong": "9", "MaxShort": "-7"}\n{"Option": "Opt_109", "Cost": "13", "Delta": "0.08", "Gamma": "0.06", "Vega": "0.23", "MaxLong": "11", "MaxShort": "-8"}\n{"Option": "Opt_110", "Cost": "5", "Delta": "0.04", "Gamma": "0.12", "Vega": "0.12", "MaxLong": "10", "MaxShort": "-12"}\n{"Option": "Opt_111", "Cost": "3", "Delta": "-0.36", "Gamma": "0.05", "Vega": "0.07", "MaxLong": "5", "MaxShort": "-10"}\n{"Option": "Opt_112", "Cost": "10", "Delta": "-0.57", "Gamma": "0.07", "Vega": "0.08", "MaxLong": "9", "MaxShort": "-14"}\n{"Option": "Opt_113", "Cost": "5", "Delta": "0.56", "Gamma": "0.02", "Vega": "0.2", "MaxLong": "9", "MaxShort": "-11"}\n{"Option": "Opt_114", "Cost": "5", "Delta": "0.56", "Gamma": "0.01", "Vega": "0.17", "MaxLong": "10", "MaxShort": "-12"}\n{"Option": "Opt_115", "Cost": "3", "Delta": "0.19", "Gamma": "0.14", "Vega": "0.07", "MaxLong": "7", "MaxShort": "-6"}\n{"Option": "Opt_116", "Cost": "13", "Delta": "-0.23", "Gamma": "0.13", "Vega": "0.07", "MaxLong": "9", "MaxShort": "-14"}\n{"Option": "Opt_117", "Cost": "7", "Delta": "-0.21", "Gamma": "0.11", "Vega": "0.19", "MaxLong": "11", "MaxShort": "-12"}\n{"Option": "Opt_118", "Cost": "12", "Delta": "0.32", "Gamma": "0.07", "Vega": "0.06", "MaxLong": "9", "MaxShort": "-7"}\n{"Option": "Opt_119", "Cost": "9", "Delta": "0.56", "Gamma": "0.03", "Vega": "0.21", "MaxLong": "9", "MaxShort": "-11"}\n{"Option": "Opt_120", "Cost": "12", "Delta": "0.54", "Gamma": "0.03", "Vega": "0.19", "MaxLong": "9", "MaxShort": "-7"}\n\nOption_AssetReferenceMatrix.csv\n\n{"Unnamed: 0": "Opt_1", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_2", "Asset_1": "1", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_3", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_4", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_5", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_6", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_7", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_8", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_9", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_10", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_11", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_12", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_13", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_14", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_15", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_16", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_17", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_18", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_19", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_20", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_21", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_22", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_23", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_24", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_25", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_26", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_27", "Asset_1": "0", "Asset_2": "1", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_28", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_29", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_30", "Asset_1": "0", "Asset_2": "1", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_31", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_32", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_33", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_34", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_35", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_36", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_37", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_38", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_39", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_40", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_41", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_42", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_43", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_44", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_45", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_46", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_47", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_48", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_49", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_50", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_51", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_52", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_53", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_54", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_55", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_56", "Asset_1": "1", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_57", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_58", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_59", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_60", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_61", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_62", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_63", "Asset_1": "0", "Asset_2": "1", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_64", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_65", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_66", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_67", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_68", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_69", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_70", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_71", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_72", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_73", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_74", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_75", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_76", "Asset_1": "1", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_77", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_78", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_79", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_80", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_81", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_82", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_83", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_84", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_85", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_86", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_87", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_88", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_89", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_90", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_91", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_92", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_93", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_94", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_95", "Asset_1": "0", "Asset_2": "1", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_96", "Asset_1": "1", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_97", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_98", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_99", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_100", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_101", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_102", "Asset_1": "1", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_103", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_104", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_105", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_106", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_107", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_108", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_109", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "1"}\n{"Unnamed: 0": "Opt_110", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_111", "Asset_1": "0", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_112", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_113", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_114", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_115", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_116", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_117", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_118", "Asset_1": "1", "Asset_2": "0", "Asset_3": "0", "Asset_4": "1", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_119", "Asset_1": "0", "Asset_2": "0", "Asset_3": "1", "Asset_4": "0", "Asset_5": "0", "Asset_6": "0"}\n{"Unnamed: 0": "Opt_120", "Asset_1": "0", "Asset_2": "1", "Asset_3": "0", "Asset_4": "0", "Asset_5": "1", "Asset_6": "0"}'
+LEGACY_RECORDS = [{'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_1', 'Cost': '9', 'Delta': '-0.54', 'Gamma': '0.12', 'Vega': '0.1', 'MaxLong': '9', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_2', 'Cost': '6', 'Delta': '0.51', 'Gamma': '0.1', 'Vega': '0.16', 'MaxLong': '9', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_3', 'Cost': '13', 'Delta': '0.17', 'Gamma': '0.02', 'Vega': '0.19', 'MaxLong': '10', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_4', 'Cost': '10', 'Delta': '-0.24', 'Gamma': '0.03', 'Vega': '0.18', 'MaxLong': '7', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_5', 'Cost': '7', 'Delta': '-0.61', 'Gamma': '0.14', 'Vega': '0.11', 'MaxLong': '12', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_6', 'Cost': '9', 'Delta': '-0.26', 'Gamma': '0.09', 'Vega': '0.24', 'MaxLong': '5', 'MaxShort': '-13'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_7', 'Cost': '12', 'Delta': '-0.24', 'Gamma': '0.01', 'Vega': '0.2', 'MaxLong': '10', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_8', 'Cost': '5', 'Delta': '0.32', 'Gamma': '0.02', 'Vega': '0.16', 'MaxLong': '8', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_9', 'Cost': '9', 'Delta': '0.19', 'Gamma': '0.1', 'Vega': '0.17', 'MaxLong': '5', 'MaxShort': '-8'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_10', 'Cost': '13', 'Delta': '0.54', 'Gamma': '0.01', 'Vega': '0.13', 'MaxLong': '11', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_11', 'Cost': '13', 'Delta': '-0.04', 'Gamma': '0.03', 'Vega': '0.1', 'MaxLong': '13', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_12', 'Cost': '10', 'Delta': '-0.53', 'Gamma': '0.09', 'Vega': '0.12', 'MaxLong': '8', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_13', 'Cost': '7', 'Delta': '0.3', 'Gamma': '0.11', 'Vega': '0.2', 'MaxLong': '8', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_14', 'Cost': '6', 'Delta': '0.37', 'Gamma': '0.1', 'Vega': '0.05', 'MaxLong': '10', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_15', 'Cost': '10', 'Delta': '0.09', 'Gamma': '0.04', 'Vega': '0.07', 'MaxLong': '7', 'MaxShort': '-11'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_16', 'Cost': '10', 'Delta': '0.38', 'Gamma': '0.11', 'Vega': '0.06', 'MaxLong': '10', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_17', 'Cost': '5', 'Delta': '-0.01', 'Gamma': '0.04', 'Vega': '0.06', 'MaxLong': '11', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_18', 'Cost': '8', 'Delta': '0.03', 'Gamma': '0.06', 'Vega': '0.22', 'MaxLong': '14', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_19', 'Cost': '7', 'Delta': '-0.1', 'Gamma': '0.11', 'Vega': '0.19', 'MaxLong': '14', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_20', 'Cost': '4', 'Delta': '-0.66', 'Gamma': '0.1', 'Vega': '0.14', 'MaxLong': '7', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_21', 'Cost': '10', 'Delta': '-0.55', 'Gamma': '0.13', 'Vega': '0.07', 'MaxLong': '11', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_22', 'Cost': '14', 'Delta': '-0.66', 'Gamma': '0.1', 'Vega': '0.15', 'MaxLong': '7', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_23', 'Cost': '8', 'Delta': '0.19', 'Gamma': '0.09', 'Vega': '0.14', 'MaxLong': '6', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_24', 'Cost': '4', 'Delta': '-0.26', 'Gamma': '0.02', 'Vega': '0.08', 'MaxLong': '14', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_25', 'Cost': '14', 'Delta': '0.01', 'Gamma': '0.06', 'Vega': '0.14', 'MaxLong': '8', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_26', 'Cost': '7', 'Delta': '0.57', 'Gamma': '0.05', 'Vega': '0.13', 'MaxLong': '12', 'MaxShort': '-13'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_27', 'Cost': '3', 'Delta': '-0.35', 'Gamma': '0.04', 'Vega': '0.17', 'MaxLong': '13', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_28', 'Cost': '14', 'Delta': '-0.13', 'Gamma': '0.15', 'Vega': '0.18', 'MaxLong': '11', 'MaxShort': '-11'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_29', 'Cost': '12', 'Delta': '0.36', 'Gamma': '0.07', 'Vega': '0.06', 'MaxLong': '5', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_30', 'Cost': '8', 'Delta': '-0.38', 'Gamma': '0.13', 'Vega': '0.12', 'MaxLong': '7', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_31', 'Cost': '14', 'Delta': '-0.59', 'Gamma': '0.1', 'Vega': '0.18', 'MaxLong': '13', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_32', 'Cost': '11', 'Delta': '-0.29', 'Gamma': '0.12', 'Vega': '0.15', 'MaxLong': '5', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_33', 'Cost': '3', 'Delta': '-0.47', 'Gamma': '0.08', 'Vega': '0.22', 'MaxLong': '13', 'MaxShort': '-11'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_34', 'Cost': '13', 'Delta': '0.6', 'Gamma': '0.09', 'Vega': '0.18', 'MaxLong': '12', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_35', 'Cost': '13', 'Delta': '0.43', 'Gamma': '0.08', 'Vega': '0.08', 'MaxLong': '5', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_36', 'Cost': '12', 'Delta': '0.19', 'Gamma': '0.04', 'Vega': '0.06', 'MaxLong': '10', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_37', 'Cost': '14', 'Delta': '0.52', 'Gamma': '0.11', 'Vega': '0.18', 'MaxLong': '9', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_38', 'Cost': '14', 'Delta': '0.43', 'Gamma': '0.05', 'Vega': '0.06', 'MaxLong': '10', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_39', 'Cost': '5', 'Delta': '-0.44', 'Gamma': '0.01', 'Vega': '0.17', 'MaxLong': '14', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_40', 'Cost': '14', 'Delta': '0.55', 'Gamma': '0.1', 'Vega': '0.24', 'MaxLong': '9', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_41', 'Cost': '9', 'Delta': '0.06', 'Gamma': '0.03', 'Vega': '0.17', 'MaxLong': '10', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_42', 'Cost': '6', 'Delta': '0.43', 'Gamma': '0.14', 'Vega': '0.13', 'MaxLong': '9', 'MaxShort': '-8'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_43', 'Cost': '11', 'Delta': '0.55', 'Gamma': '0.14', 'Vega': '0.18', 'MaxLong': '9', 'MaxShort': '-13'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_44', 'Cost': '5', 'Delta': '-0.25', 'Gamma': '0.14', 'Vega': '0.14', 'MaxLong': '8', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_45', 'Cost': '7', 'Delta': '-0.55', 'Gamma': '0.06', 'Vega': '0.16', 'MaxLong': '7', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_46', 'Cost': '5', 'Delta': '-0.38', 'Gamma': '0.01', 'Vega': '0.24', 'MaxLong': '7', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_47', 'Cost': '9', 'Delta': '-0.1', 'Gamma': '0.14', 'Vega': '0.13', 'MaxLong': '8', 'MaxShort': '-11'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_48', 'Cost': '7', 'Delta': '0.45', 'Gamma': '0.07', 'Vega': '0.24', 'MaxLong': '13', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_49', 'Cost': '11', 'Delta': '0.51', 'Gamma': '0.15', 'Vega': '0.23', 'MaxLong': '6', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_50', 'Cost': '9', 'Delta': '-0.69', 'Gamma': '0.14', 'Vega': '0.09', 'MaxLong': '13', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_51', 'Cost': '4', 'Delta': '0.02', 'Gamma': '0.13', 'Vega': '0.06', 'MaxLong': '5', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_52', 'Cost': '6', 'Delta': '-0.12', 'Gamma': '0.05', 'Vega': '0.07', 'MaxLong': '5', 'MaxShort': '-8'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_53', 'Cost': '11', 'Delta': '-0.39', 'Gamma': '0.06', 'Vega': '0.05', 'MaxLong': '9', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_54', 'Cost': '14', 'Delta': '-0.53', 'Gamma': '0.13', 'Vega': '0.07', 'MaxLong': '10', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_55', 'Cost': '4', 'Delta': '-0.23', 'Gamma': '0.05', 'Vega': '0.19', 'MaxLong': '10', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_56', 'Cost': '12', 'Delta': '0.62', 'Gamma': '0.03', 'Vega': '0.06', 'MaxLong': '7', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_57', 'Cost': '11', 'Delta': '-0.25', 'Gamma': '0.09', 'Vega': '0.11', 'MaxLong': '11', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_58', 'Cost': '12', 'Delta': '0.03', 'Gamma': '0.14', 'Vega': '0.22', 'MaxLong': '13', 'MaxShort': '-8'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_59', 'Cost': '7', 'Delta': '0.28', 'Gamma': '0.11', 'Vega': '0.05', 'MaxLong': '14', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_60', 'Cost': '4', 'Delta': '-0.19', 'Gamma': '0.09', 'Vega': '0.21', 'MaxLong': '12', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_61', 'Cost': '6', 'Delta': '0.66', 'Gamma': '0.02', 'Vega': '0.11', 'MaxLong': '10', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_62', 'Cost': '14', 'Delta': '0.65', 'Gamma': '0.1', 'Vega': '0.07', 'MaxLong': '12', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_63', 'Cost': '14', 'Delta': '-0.35', 'Gamma': '0.15', 'Vega': '0.19', 'MaxLong': '9', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_64', 'Cost': '9', 'Delta': '0', 'Gamma': '0.03', 'Vega': '0.18', 'MaxLong': '12', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_65', 'Cost': '14', 'Delta': '-0.28', 'Gamma': '0.08', 'Vega': '0.23', 'MaxLong': '14', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_66', 'Cost': '10', 'Delta': '-0.3', 'Gamma': '0.13', 'Vega': '0.2', 'MaxLong': '8', 'MaxShort': '-13'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_67', 'Cost': '5', 'Delta': '-0.65', 'Gamma': '0.11', 'Vega': '0.21', 'MaxLong': '14', 'MaxShort': '-11'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_68', 'Cost': '3', 'Delta': '0.15', 'Gamma': '0.11', 'Vega': '0.11', 'MaxLong': '12', 'MaxShort': '-11'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_69', 'Cost': '6', 'Delta': '0', 'Gamma': '0.11', 'Vega': '0.09', 'MaxLong': '14', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_70', 'Cost': '4', 'Delta': '-0.63', 'Gamma': '0.06', 'Vega': '0.2', 'MaxLong': '6', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_71', 'Cost': '10', 'Delta': '-0.31', 'Gamma': '0.05', 'Vega': '0.21', 'MaxLong': '9', 'MaxShort': '-8'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_72', 'Cost': '6', 'Delta': '0.57', 'Gamma': '0.12', 'Vega': '0.25', 'MaxLong': '13', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_73', 'Cost': '4', 'Delta': '-0.36', 'Gamma': '0.12', 'Vega': '0.13', 'MaxLong': '8', 'MaxShort': '-8'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_74', 'Cost': '8', 'Delta': '-0.5', 'Gamma': '0.13', 'Vega': '0.12', 'MaxLong': '10', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_75', 'Cost': '8', 'Delta': '-0.01', 'Gamma': '0.14', 'Vega': '0.21', 'MaxLong': '5', 'MaxShort': '-13'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_76', 'Cost': '12', 'Delta': '0.68', 'Gamma': '0.08', 'Vega': '0.12', 'MaxLong': '13', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_77', 'Cost': '6', 'Delta': '-0.36', 'Gamma': '0.08', 'Vega': '0.24', 'MaxLong': '5', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_78', 'Cost': '8', 'Delta': '0.24', 'Gamma': '0.12', 'Vega': '0.22', 'MaxLong': '9', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_79', 'Cost': '4', 'Delta': '0.37', 'Gamma': '0.1', 'Vega': '0.14', 'MaxLong': '8', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_80', 'Cost': '12', 'Delta': '-0.37', 'Gamma': '0.11', 'Vega': '0.2', 'MaxLong': '7', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_81', 'Cost': '14', 'Delta': '0.32', 'Gamma': '0.12', 'Vega': '0.2', 'MaxLong': '10', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_82', 'Cost': '4', 'Delta': '-0.19', 'Gamma': '0.13', 'Vega': '0.07', 'MaxLong': '6', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_83', 'Cost': '12', 'Delta': '0.19', 'Gamma': '0.06', 'Vega': '0.23', 'MaxLong': '7', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_84', 'Cost': '6', 'Delta': '0.19', 'Gamma': '0.06', 'Vega': '0.15', 'MaxLong': '9', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_85', 'Cost': '10', 'Delta': '0.05', 'Gamma': '0.02', 'Vega': '0.22', 'MaxLong': '13', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_86', 'Cost': '9', 'Delta': '-0.57', 'Gamma': '0.09', 'Vega': '0.11', 'MaxLong': '6', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_87', 'Cost': '14', 'Delta': '0.47', 'Gamma': '0.02', 'Vega': '0.23', 'MaxLong': '14', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_88', 'Cost': '11', 'Delta': '-0.25', 'Gamma': '0.08', 'Vega': '0.13', 'MaxLong': '12', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_89', 'Cost': '10', 'Delta': '-0.44', 'Gamma': '0.09', 'Vega': '0.05', 'MaxLong': '6', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_90', 'Cost': '7', 'Delta': '-0.64', 'Gamma': '0.05', 'Vega': '0.23', 'MaxLong': '9', 'MaxShort': '-9'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_91', 'Cost': '4', 'Delta': '0.13', 'Gamma': '0.09', 'Vega': '0.07', 'MaxLong': '11', 'MaxShort': '-13'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_92', 'Cost': '7', 'Delta': '0.25', 'Gamma': '0.01', 'Vega': '0.11', 'MaxLong': '12', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_93', 'Cost': '10', 'Delta': '-0.68', 'Gamma': '0.02', 'Vega': '0.24', 'MaxLong': '5', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_94', 'Cost': '12', 'Delta': '0.02', 'Gamma': '0.13', 'Vega': '0.24', 'MaxLong': '10', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_95', 'Cost': '11', 'Delta': '-0.38', 'Gamma': '0.06', 'Vega': '0.16', 'MaxLong': '5', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_96', 'Cost': '14', 'Delta': '0.2', 'Gamma': '0.03', 'Vega': '0.18', 'MaxLong': '6', 'MaxShort': '-13'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_97', 'Cost': '14', 'Delta': '-0.46', 'Gamma': '0.08', 'Vega': '0.14', 'MaxLong': '5', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_98', 'Cost': '14', 'Delta': '0.27', 'Gamma': '0.12', 'Vega': '0.11', 'MaxLong': '9', 'MaxShort': '-13'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_99', 'Cost': '11', 'Delta': '-0.16', 'Gamma': '0.04', 'Vega': '0.12', 'MaxLong': '14', 'MaxShort': '-13'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_100', 'Cost': '3', 'Delta': '0.61', 'Gamma': '0.1', 'Vega': '0.18', 'MaxLong': '13', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_101', 'Cost': '11', 'Delta': '-0.51', 'Gamma': '0.02', 'Vega': '0.2', 'MaxLong': '10', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_102', 'Cost': '9', 'Delta': '-0.22', 'Gamma': '0.02', 'Vega': '0.21', 'MaxLong': '5', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_103', 'Cost': '11', 'Delta': '-0.54', 'Gamma': '0.08', 'Vega': '0.21', 'MaxLong': '5', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_104', 'Cost': '10', 'Delta': '0.59', 'Gamma': '0.09', 'Vega': '0.07', 'MaxLong': '6', 'MaxShort': '-8'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_105', 'Cost': '3', 'Delta': '0.53', 'Gamma': '0.1', 'Vega': '0.15', 'MaxLong': '13', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_106', 'Cost': '14', 'Delta': '-0.34', 'Gamma': '0.11', 'Vega': '0.06', 'MaxLong': '7', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_107', 'Cost': '10', 'Delta': '0.22', 'Gamma': '0.15', 'Vega': '0.16', 'MaxLong': '5', 'MaxShort': '-5'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_108', 'Cost': '10', 'Delta': '0.44', 'Gamma': '0.08', 'Vega': '0.14', 'MaxLong': '9', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_109', 'Cost': '13', 'Delta': '0.08', 'Gamma': '0.06', 'Vega': '0.23', 'MaxLong': '11', 'MaxShort': '-8'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_110', 'Cost': '5', 'Delta': '0.04', 'Gamma': '0.12', 'Vega': '0.12', 'MaxLong': '10', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_111', 'Cost': '3', 'Delta': '-0.36', 'Gamma': '0.05', 'Vega': '0.07', 'MaxLong': '5', 'MaxShort': '-10'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_112', 'Cost': '10', 'Delta': '-0.57', 'Gamma': '0.07', 'Vega': '0.08', 'MaxLong': '9', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_113', 'Cost': '5', 'Delta': '0.56', 'Gamma': '0.02', 'Vega': '0.2', 'MaxLong': '9', 'MaxShort': '-11'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_114', 'Cost': '5', 'Delta': '0.56', 'Gamma': '0.01', 'Vega': '0.17', 'MaxLong': '10', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_115', 'Cost': '3', 'Delta': '0.19', 'Gamma': '0.14', 'Vega': '0.07', 'MaxLong': '7', 'MaxShort': '-6'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_116', 'Cost': '13', 'Delta': '-0.23', 'Gamma': '0.13', 'Vega': '0.07', 'MaxLong': '9', 'MaxShort': '-14'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_117', 'Cost': '7', 'Delta': '-0.21', 'Gamma': '0.11', 'Vega': '0.19', 'MaxLong': '11', 'MaxShort': '-12'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_118', 'Cost': '12', 'Delta': '0.32', 'Gamma': '0.07', 'Vega': '0.06', 'MaxLong': '9', 'MaxShort': '-7'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_119', 'Cost': '9', 'Delta': '0.56', 'Gamma': '0.03', 'Vega': '0.21', 'MaxLong': '9', 'MaxShort': '-11'}}, {'source': 'OptionCharacteristics.csv', 'values': {'Option': 'Opt_120', 'Cost': '12', 'Delta': '0.54', 'Gamma': '0.03', 'Vega': '0.19', 'MaxLong': '9', 'MaxShort': '-7'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_1', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_2', 'Asset_1': '1', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_3', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_4', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_5', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_6', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_7', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_8', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_9', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_10', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_11', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_12', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_13', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_14', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_15', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_16', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_17', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_18', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_19', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_20', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_21', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_22', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_23', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_24', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_25', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_26', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_27', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_28', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_29', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_30', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_31', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_32', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_33', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_34', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_35', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_36', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_37', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_38', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_39', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_40', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_41', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_42', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_43', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_44', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_45', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_46', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_47', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_48', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_49', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_50', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_51', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_52', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_53', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_54', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_55', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_56', 'Asset_1': '1', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_57', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_58', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_59', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_60', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_61', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_62', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_63', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_64', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_65', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_66', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_67', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_68', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_69', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_70', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_71', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_72', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_73', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_74', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_75', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_76', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_77', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_78', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_79', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_80', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_81', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_82', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_83', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_84', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_85', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_86', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_87', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_88', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_89', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_90', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_91', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_92', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_93', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_94', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_95', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_96', 'Asset_1': '1', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_97', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_98', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_99', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_100', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_101', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_102', 'Asset_1': '1', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_103', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_104', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_105', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_106', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_107', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_108', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_109', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '1'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_110', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_111', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_112', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_113', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_114', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_115', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_116', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_117', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_118', 'Asset_1': '1', 'Asset_2': '0', 'Asset_3': '0', 'Asset_4': '1', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_119', 'Asset_1': '0', 'Asset_2': '0', 'Asset_3': '1', 'Asset_4': '0', 'Asset_5': '0', 'Asset_6': '0'}}, {'source': 'Option_AssetReferenceMatrix.csv', 'values': {'Unnamed: 0': 'Opt_120', 'Asset_1': '0', 'Asset_2': '1', 'Asset_3': '0', 'Asset_4': '0', 'Asset_5': '1', 'Asset_6': '0'}}]
+import gurobipy as gp
+from gurobipy import GRB
+option_records = [r for r in LEGACY_RECORDS if r['source'] == 'OptionCharacteristics.csv']
+asset_records = [r for r in LEGACY_RECORDS if r['source'] == 'Option_AssetReferenceMatrix.csv']
+options = [r['values']['Option'] for r in option_records]
+if len(options) != 120:
+    raise ValueError('Expected 120 options, got %d' % len(options))
+asset_keys = ['Asset_1', 'Asset_2', 'Asset_3', 'Asset_4', 'Asset_5', 'Asset_6']
+assets = [k for k in asset_keys]
+if len(assets) != 6:
+    raise ValueError('Expected 6 assets, got %d' % len(assets))
+asset_ref = {}
+for r in asset_records:
+    opt = r['values']['Unnamed: 0']
+    asset_ref[opt] = {a: int(r['values'][a]) for a in assets}
+cost = {}
+delta = {}
+gamma = {}
+vega = {}
+maxlong = {}
+maxshort = {}
+for r in option_records:
+    v = r['values']
+    opt = v['Option']
+    cost[opt] = float(v['Cost'])
+    delta[opt] = float(v['Delta'])
+    gamma[opt] = float(v['Gamma'])
+    vega[opt] = float(v['Vega'])
+    maxlong[opt] = int(v['MaxLong'])
+    maxshort[opt] = int(v['MaxShort'])
+for opt in options:
+    if opt not in asset_ref:
+        raise ValueError(f'Missing asset reference for {opt}')
+greeks = ['Delta', 'Gamma', 'Vega']
+greek_initial = {'Delta': 0.25, 'Gamma': 0.08, 'Vega': 0.17}
+greek_tol = {'Delta': 0.06, 'Gamma': 0.05, 'Vega': 0.07}
+greek_coeff = {'Delta': delta, 'Gamma': gamma, 'Vega': vega}
+m = gp.Model('OptionHedge')
+m.setParam('MIPGap', 0.0001)
+x = m.addVars(options, lb={opt: maxshort[opt] for opt in options}, ub={opt: maxlong[opt] for opt in options}, vtype=GRB.INTEGER, name='')
+y = m.addVars(options, lb=0.0, vtype=GRB.CONTINUOUS, name='')
+for opt in options:
+    m.addConstr(y[opt] >= x[opt], name=f'y_ge_x_{opt}')
+    m.addConstr(y[opt] >= -x[opt], name=f'y_ge_negx_{opt}')
+m.setObjective(gp.quicksum((cost[opt] * y[opt] for opt in options)), GRB.MINIMIZE)
+for greek in greeks:
+    expr = greek_initial[greek]
+    for opt in options:
+        coeff = 0.0
+        for asset in assets:
+            coeff += greek_coeff[greek][opt] * asset_ref[opt][asset]
+        expr += coeff * x[opt]
+    tol = greek_tol[greek]
+    m.addConstr(expr <= tol, name=f'{greek}_upper')
+    m.addConstr(expr >= -tol, name=f'{greek}_lower')
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 246 rows, 240 columns and 1196 nonzeros
+Model fingerprint: 0x4d5c39cd
+Variable types: 120 continuous, 120 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e-02, 1e+00]
+  Objective range  [3e+00, 1e+01]
+  Bounds range     [5e+00, 1e+01]
+  RHS range        [3e-02, 3e-01]
+Found heuristic solution: objective 9245.0000000
+Presolve added 2 rows and 2 columns
+Presolve time: 0.00s
+Presolved: 248 rows, 242 columns, 1084 nonzeros
+Variable types: 0 continuous, 242 integer (0 binary)
+
+Root relaxation: objective 8.359328e-01, 170 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0    0.83593    0    6 9245.00000    0.83593   100%     -    0s
+H    0     0                      67.0000000    0.83593  98.8%     -    0s
+H    0     0                       8.0000000    0.83593  89.6%     -    0s
+     0     0    2.79875    0    8    8.00000    2.79875  65.0%     -    0s
+     0     0    2.79875    0    6    8.00000    2.79875  65.0%     -    0s
+     0     0    2.79875    0    8    8.00000    2.79875  65.0%     -    0s
+H    0     0                       7.0000000    2.88371  58.8%     -    0s
+     0     0    3.08088    0   10    7.00000    3.08088  56.0%     -    0s
+     0     0    4.35696    0   10    7.00000    4.35696  37.8%     -    0s
+     0     0    4.40278    0   10    7.00000    4.40278  37.1%     -    0s
+     0     0    4.40278    0    4    7.00000    4.40278  37.1%     -    0s
+H    0     0                       6.0000000    4.40278  26.6%     -    0s
+     0     0    4.40278    0    8    6.00000    4.40278  26.6%     -    0s
+     0     0    4.40278    0   10    6.00000    4.40278  26.6%     -    0s
+
+Cutting planes:
+  Gomory: 4
+  Zero half: 1
+
+Explored 1 nodes (416 simplex iterations) in 0.18 seconds (0.02 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 7: 6 7 8 ... 9245
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.000000000000e+00, best bound 6.000000000000e+00, gap 0.0000%
+ObjVal: 6.0
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 0.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 0.0
+C31: 0.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 0.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 0.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: -0.0
+C67: 0.0
+C68: 0.0
+C69: 0.0
+C70: 0.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 0.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: -0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 0.0
+C83: -1.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: 0.0
+C95: 0.0
+C96: 0.0
+C97: 0.0
+C98: 0.0
+C99: 0.0
+C100: 0.0
+C101: 0.0
+C102: 0.0
+C103: 0.0
+C104: 0.0
+C105: 0.0
+C106: 0.0
+C107: 0.0
+C108: 0.0
+C109: 0.0
+C110: 0.0
+C111: 0.0
+C112: 0.0
+C113: 0.0
+C114: 0.0
+C115: 0.0
+C116: 0.0
+C117: 0.0
+C118: 0.0
+C119: 0.0
+C120: 0.0
+C121: -0.0
+C122: 0.0
+C123: 0.0
+C124: 0.0
+C125: 0.0
+C126: 0.0
+C127: -0.0
+C128: 0.0
+C129: 0.0
+C130: 0.0
+C131: 0.0
+C132: 0.0
+C133: 0.0
+C134: 0.0
+C135: 0.0
+C136: -0.0
+C137: 0.0
+C138: 0.0
+C139: -0.0
+C140: 0.0
+C141: 0.0
+C142: 0.0
+C143: -0.0
+C144: 0.0
+C145: 0.0
+C146: -0.0
+C147: 0.0
+C148: 0.0
+C149: 0.0
+C150: 0.0
+C151: 0.0
+C152: -0.0
+C153: 0.0
+C154: 0.0
+C155: 0.0
+C156: 0.0
+C157: 0.0
+C158: -0.0
+C159: 0.0
+C160: 0.0
+C161: 0.0
+C162: 0.0
+C163: -0.0
+C164: 0.0
+C165: -0.0
+C166: 0.0
+C167: 0.0
+C168: 0.0
+C169: 0.0
+C170: -0.0
+C171: 0.0
+C172: 0.0
+C173: 0.0
+C174: -0.0
+C175: 0.0
+C176: 0.0
+C177: 0.0
+C178: 0.0
+C179: -0.0
+C180: 0.0
+C181: 0.0
+C182: 0.0
+C183: 0.0
+C184: 0.0
+C185: 0.0
+C186: -0.0
+C187: 0.0
+C188: 0.0
+C189: -0.0
+C190: 0.0
+C191: -0.0
+C192: -0.0
+C193: 0.0
+C194: 0.0
+C195: 0.0
+C196: 0.0
+C197: 0.0
+C198: 0.0
+C199: 0.0
+C200: 0.0
+C201: -0.0
+C202: 0.0
+C203: 1.0
+C204: 0.0
+C205: 0.0
+C206: 0.0
+C207: 0.0
+C208: 0.0
+C209: 0.0
+C210: -0.0
+C211: 0.0
+C212: 0.0
+C213: 0.0
+C214: 0.0
+C215: 0.0
+C216: 0.0
+C217: 0.0
+C218: 0.0
+C219: -0.0
+C220: 0.0
+C221: 0.0
+C222: 0.0
+C223: 0.0
+C224: -0.0
+C225: 0.0
+C226: 0.0
+C227: 0.0
+C228: 0.0
+C229: -0.0
+C230: -0.0
+C231: 0.0
+C232: -0.0
+C233: -0.0
+C234: -0.0
+C235: 0.0
+C236: 0.0
+C237: 0.0
+C238: 0.0
+C239: 0.0
+Optimal objective: 6.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', -0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', -0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', -1.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 0.0), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0), ('C111', 0.0), ('C112', 0.0), ('C113', 0.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 0.0), ('C118', 0.0), ('C119', 0.0), ('C120', 0.0), ('C121', -0.0), ('C122', 0.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', -0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0), ('C132', 0.0), ('C133', 0.0), ('C134', 0.0), ('C135', 0.0), ('C136', -0.0), ('C137', 0.0), ('C138', 0.0), ('C139', -0.0), ('C140', 0.0), ('C141', 0.0), ('C142', 0.0), ('C143', -0.0), ('C144', 0.0), ('C145', 0.0), ('C146', -0.0), ('C147', 0.0), ('C148', 0.0), ('C149', 0.0), ('C150', 0.0), ('C151', 0.0), ('C152', -0.0), ('C153', 0.0), ('C154', 0.0), ('C155', 0.0), ('C156', 0.0), ('C157', 0.0), ('C158', -0.0), ('C159', 0.0), ('C160', 0.0), ('C161', 0.0), ('C162', 0.0), ('C163', -0.0), ('C164', 0.0), ('C165', -0.0), ('C166', 0.0), ('C167', 0.0), ('C168', 0.0), ('C169', 0.0), ('C170', -0.0), ('C171', 0.0), ('C172', 0.0), ('C173', 0.0), ('C174', -0.0), ('C175', 0.0), ('C176', 0.0), ('C177', 0.0), ('C178', 0.0), ('C179', -0.0), ('C180', 0.0), ('C181', 0.0), ('C182', 0.0), ('C183', 0.0), ('C184', 0.0), ('C185', 0.0), ('C186', -0.0), ('C187', 0.0), ('C188', 0.0), ('C189', -0.0), ('C190', 0.0), ('C191', -0.0), ('C192', -0.0), ('C193', 0.0), ('C194', 0.0), ('C195', 0.0), ('C196', 0.0), ('C197', 0.0), ('C198', 0.0), ('C199', 0.0), ('C200', 0.0), ('C201', -0.0), ('C202', 0.0), ('C203', 1.0), ('C204', 0.0), ('C205', 0.0), ('C206', 0.0), ('C207', 0.0), ('C208', 0.0), ('C209', 0.0), ('C210', -0.0), ('C211', 0.0), ('C212', 0.0), ('C213', 0.0), ('C214', 0.0), ('C215', 0.0), ('C216', 0.0), ('C217', 0.0), ('C218', 0.0), ('C219', -0.0), ('C220', 0.0), ('C221', 0.0), ('C222', 0.0), ('C223', 0.0), ('C224', -0.0), ('C225', 0.0), ('C226', 0.0), ('C227', 0.0), ('C228', 0.0), ('C229', -0.0), ('C230', -0.0), ('C231', 0.0), ('C232', -0.0), ('C233', -0.0), ('C234', -0.0), ('C235', 0.0), ('C236', 0.0), ('C237', 0.0), ('C238', 0.0), ('C239', 0.0)]

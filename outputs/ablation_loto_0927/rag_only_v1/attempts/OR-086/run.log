@@ -1,0 +1,183 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal daily allocation of three grades of raw wine to three wine brands, maximizing total net profit (sales revenue minus raw material cost), subject to blending requirements, raw material supply limits, and a minimum production level for the Red brand.
+2.  **Identify Model Type:** Based on the query, this is a Blending Linear Programming (LP) problem.
+3.  **Define Index Sets:** The primary indices are:
+    - Grades of raw wine material (from 30-1.csv): {I, II, III}
+    - Wine brands (from 30-2.csv): {Red, Yellow, Blue}
+4.  **Define Decision Variables:**
+    -   `x[g, b]` = Amount (kg) of raw grade `g` used in brand `b`. Type: GRB.CONTINUOUS (non-negative real numbers).
+5.  **Identify Parameters (from Schema):**
+    -   Raw material supply limits: 'Daily Supply (kg)' from 30-1.csv, indexed by Grade.
+    -   Raw material costs: 'Cost (CNY/kg)' from 30-1.csv, indexed by Grade.
+    -   Selling prices: 'Selling Price (CNY/kg)' from 30-2.csv, indexed by Brand.
+    -   Blending requirements: 'Blending Requirements' from 30-2.csv, parsed into lower and upper bounds for the proportion of certain grades in each brand.
+    -   Minimum production requirement: Red brand must have at least 2,000 kg produced per day.
+6.  **Formulate Objective:** Maximize total net profit, calculated as:
+    -   Total sales revenue: sum over all brands of (total kg produced of brand b) × (selling price of brand b)
+    -   Minus total raw material cost: sum over all grades and brands of (kg of grade g used in brand b) × (cost per kg of grade g)
+    -   In formula: Maximize sum_b [ (sum_g x[g, b]) × price[b] ] - sum_g sum_b [ x[g, b] × cost[g] ]
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Blending Requirements): For each brand and each specified grade, the proportion of that grade in the brand’s blend must satisfy the lower and/or upper bounds as specified in 'Blending Requirements'. For example, for Red: proportion of I < 10%, proportion of II > 50%, etc. This is implemented as:
+        -   For each (brand b, grade g) with a requirement:  
+            -   Lower bound: x[g, b] ≥ lower_bound × total_production_of_b  
+            -   Upper bound: x[g, b] ≤ upper_bound × total_production_of_b  
+            where total_production_of_b = sum_g x[g, b]
+    -   Constraint 2 (Raw Material Supply): For each grade, the total amount used across all brands cannot exceed its daily supply limit:
+        -   For each grade g: sum_b x[g, b] ≤ supply_limit[g]
+    -   Constraint 3 (Minimum Production for Red): The total production of the Red brand must be at least 2,000 kg:
+        -   sum_g x[g, 'Red'] ≥ 2,000
+    -   Constraint 4 (Non-negativity): All x[g, b] ≥ 0
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+import re
+from gurobipy import Model, GRB
+
+# --- Read Data ---
+
+# File paths
+grades_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-1.csv'
+brands_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-2.csv'
+
+# Read grades data
+grades_df = pd.read_csv(grades_path, sep=',')
+# Normalize Grade identifiers (strip, preserve case as in data)
+grades_df['Grade'] = grades_df['Grade'].astype(str).str.strip()
+grades = list(grades_df['Grade'])
+
+# Build supply and cost dictionaries
+supply_limit = dict(zip(grades_df['Grade'], grades_df['Daily Supply (kg)']))
+cost = dict(zip(grades_df['Grade'], grades_df['Cost (CNY/kg)']))
+
+# Read brands data
+brands_df = pd.read_csv(brands_path, sep=',')
+brands_df['Brand'] = brands_df['Brand'].astype(str).str.strip()
+brands = list(brands_df['Brand'])
+
+# Build selling price dictionary
+price = dict(zip(brands_df['Brand'], brands_df['Selling Price (CNY/kg)']))
+
+# --- Parse Blending Requirements ---
+
+# For each brand, parse the blending requirements into lower/upper bounds for each grade
+# Structure: blending_bounds[brand][grade] = {'lb': float or None, 'ub': float or None}
+blending_bounds = {b: {g: {'lb': None, 'ub': None} for g in grades} for b in brands}
+
+# Helper regex patterns
+less_than_pat = re.compile(r'(\w+)\s+less\s+than\s+(\d+)%', re.IGNORECASE)
+more_than_pat = re.compile(r'(\w+)\s+more\s+than\s+(\d+)%', re.IGNORECASE)
+
+for idx, row in brands_df.iterrows():
+    brand = row['Brand']
+    reqs = row['Blending Requirements']
+    # There may be multiple requirements separated by spaces or double spaces
+    # We'll split on two or more spaces, or on '  ' (double space)
+    reqs_split = re.split(r'\s{2,}', reqs.strip())
+    for req in reqs_split:
+        req = req.strip()
+        # Try less than
+        m = less_than_pat.match(req)
+        if m:
+            grade = m.group(1).strip()
+            percent = float(m.group(2))
+            if grade not in grades:
+                raise ValueError(f"Unknown grade '{grade}' in blending requirements for brand '{brand}'")
+            # Upper bound: strictly less than, but in LP we use ≤, so use percent/100
+            blending_bounds[brand][grade]['ub'] = percent / 100.0
+            continue
+        # Try more than
+        m = more_than_pat.match(req)
+        if m:
+            grade = m.group(1).strip()
+            percent = float(m.group(2))
+            if grade not in grades:
+                raise ValueError(f"Unknown grade '{grade}' in blending requirements for brand '{brand}'")
+            # Lower bound: strictly more than, but in LP we use ≥, so use percent/100
+            blending_bounds[brand][grade]['lb'] = percent / 100.0
+            continue
+        # If not matched, ignore (could be empty)
+        if req != '':
+            raise ValueError(f"Unrecognized blending requirement: '{req}' for brand '{brand}'")
+
+# --- Model ---
+
+m = Model("wine_blending")
+
+# Decision variables: x[g, b] = amount (kg) of grade g used in brand b
+x = m.addVars(grades, brands, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+# --- Constraints ---
+
+# 1. Blending Requirements
+for b in brands:
+    # Total production of brand b
+    total_prod = x.sum('*', b)
+    for g in grades:
+        bounds = blending_bounds[b][g]
+        # Lower bound: x[g, b] ≥ lb * total_prod
+        if bounds['lb'] is not None:
+            m.addConstr(x[g, b] >= bounds['lb'] * total_prod)
+        # Upper bound: x[g, b] ≤ ub * total_prod
+        if bounds['ub'] is not None:
+            m.addConstr(x[g, b] <= bounds['ub'] * total_prod)
+
+# 2. Raw Material Supply: For each grade, total used ≤ supply limit
+for g in grades:
+    m.addConstr(x.sum(g, '*') <= supply_limit[g])
+
+# 3. Minimum Production for Red: sum_g x[g, 'Red'] ≥ 2000
+if 'Red' not in brands:
+    raise ValueError("Brand 'Red' not found in brands list")
+m.addConstr(x.sum('*', 'Red') >= 2000)
+
+# 4. Non-negativity is handled by lb=0 in variable definition
+
+# --- Objective: Maximize total net profit ---
+
+# Total sales revenue: sum_b [ (sum_g x[g, b]) × price[b] ]
+sales_revenue = sum(x.sum('*', b) * price[b] for b in brands)
+# Total raw material cost: sum_g sum_b [ x[g, b] × cost[g] ]
+raw_material_cost = sum(x[g, b] * cost[g] for g in grades for b in brands)
+# Net profit
+net_profit = sales_revenue - raw_material_cost
+
+m.setObjective(net_profit, GRB.MAXIMIZE)
+
+# --- Optimize ---
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 10 rows, 9 columns and 30 nonzeros
+Model fingerprint: 0x92efa660
+Coefficient statistics:
+  Matrix range     [1e-01, 1e+00]
+  Objective range  [3e-01, 2e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 2e+03]
+Presolve removed 4 rows and 3 columns
+Presolve time: 0.00s
+Presolved: 6 rows, 6 columns, 23 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    6.1518018e+04   8.689877e+03   0.000000e+00      0s
+       3    4.5000000e+03   0.000000e+00   0.000000e+00      0s
+
+Solved in 3 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  4.500000000e+03
+Optimal objective: 4500.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 2000.0), ('C4', 0.0), ('C5', 0.0), ('C6', 1000.0), ('C7', 0.0), ('C8', 0.0)]

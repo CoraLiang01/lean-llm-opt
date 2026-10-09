@@ -1,0 +1,71 @@
+{
+  "problem_id": "OR-030",
+  "query": "A car dealership manages the sales of various car models with revenue data provided in the ‘Revenue’ column. The dealership aims to maximize total revenue using the initial inventory of car models classified under ‘FDK57’. Inventory levels are detailed in the ‘Initial Inventory’ column. Demand quantities are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. Decision variables x_i represent the quantity of each ‘FDK57’ car model i that the dealership plans to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM21/BigMartSales.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 34856.76,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal fulfillment plan for each car model classified as ‘FDK57’ to maximize total revenue, given deterministic demand and initial inventory constraints for each model.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem (single-period, deterministic, bounded by inventory and demand).\n3.  **Define Index Sets:** The primary index is the set of car models with ‘Product Name’ exactly equal to ‘FDK57’.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Quantity of ‘FDK57’ car model i to fulfill (i.e., to sell). Type: GRB.INTEGER (since quantities are counts of cars).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: ‘Revenue’ column (per-unit revenue for each ‘FDK57’ model).\n    -   Constraint coefficients: ‘Demand’ (maximum units that can be fulfilled per model), ‘Initial Inventory’ (maximum available units per model).\n    -   Constraint RHS: For each model, the minimum of ‘Demand’ and ‘Initial Inventory’ sets the upper bound for fulfillment.\n6.  **Formulate Objective:** Maximize total revenue, i.e., maximize the sum over all ‘FDK57’ models of (`Revenue[i]` * `x[i]`).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand Satisfaction): For each ‘FDK57’ model i, `x[i]` ≤ `Demand[i]` (cannot fulfill more than demand).\n    -   Constraint 2 (Inventory Limit): For each ‘FDK57’ model i, `x[i]` ≤ `Initial Inventory[i]` (cannot fulfill more than available inventory).\n    -   Constraint 3 (Non-negativity and Integrality): For each ‘FDK57’ model i, `x[i]` ≥ 0 and integer (cannot fulfill negative or fractional cars).\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM21/BigMartSales.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 5681\nColumns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product Name': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'int64'}\nPreview only (first 10 rows):\nProduct Name  Revenue Demand Initial Inventory\n       FDW58 107.8622     10               150\n       FDW14  87.3198     20               100\n       NCN55 241.7538     10               300\n       FDQ58  155.034     40               100\n       FDY38   234.23     30               300\n       FDH56 117.1492     30                50\n       FDL48  50.1034     30               200\n       FDC48  81.0592     40               300\n       FDN33  95.7436     20               100\n       FDA36 186.8924     50               250\nFull-file column statistics: {\"Product Name\": {\"missing\": 0, \"unique_nonempty\": 1543}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 4402, \"numeric_range\": [31.99, 266.5884]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 5, \"numeric_range\": [10.0, 50.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 6, \"numeric_range\": [50.0, 300.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"fdk57\", \"matching_columns\": [{\"column\": \"Product Name\", \"exact\": 8, \"prefix\": 8, \"contains\": 8, \"examples\": [\"FDK57\"]}], \"exact_matching_columns\": 1}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"3fd44433ba698e5acd5fdea80c0dc9d7be4e5b3e835c5567db1d922adc72c716\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM21/BigMartSales.csv'\ndf = pd.read_csv(csv_path, dtype=str, keep_default_na=False)\nproduct_name_col = 'Product Name'\nfdk57_mask = df[product_name_col].str.strip().str.casefold() == 'fdk57'\ndf_fdk57 = df[fdk57_mask].copy()\nif df_fdk57.empty:\n    raise ValueError(\"No car models with 'Product Name' exactly 'FDK57' found in the data.\")\nfdk57_indices = df_fdk57.index.tolist()\n\ndef to_float(val, row_idx, col):\n    try:\n        return float(val)\n    except Exception:\n        raise ValueError(f\"Invalid float in column '{col}' at row {row_idx}: {val}\")\n\ndef to_int(val, row_idx, col):\n    try:\n        return int(val)\n    except Exception:\n        raise ValueError(f\"Invalid int in column '{col}' at row {row_idx}: {val}\")\nrevenue_col = 'Revenue'\ndemand_col = 'Demand'\ninventory_col = 'Initial Inventory'\nrevenue = {idx: to_float(df_fdk57.at[idx, revenue_col], idx, revenue_col) for idx in fdk57_indices}\ndemand = {idx: to_int(df_fdk57.at[idx, demand_col], idx, demand_col) for idx in fdk57_indices}\ninitial_inventory = {idx: to_int(df_fdk57.at[idx, inventory_col], idx, inventory_col) for idx in fdk57_indices}\nm = gp.Model('FDK57_Fulfillment')\nx_vars = m.addVars(fdk57_indices, vtype=gp.GRB.INTEGER, lb=0, name='')\nfor idx in fdk57_indices:\n    m.addConstr(x_vars[idx] <= demand[idx], name=f'demand_{idx}')\n    m.addConstr(x_vars[idx] <= initial_inventory[idx], name=f'inventory_{idx}')\nm.setObjective(gp.quicksum((revenue[idx] * x_vars[idx] for idx in fdk57_indices)), gp.GRB.MAXIMIZE)\nm.optimize()\nif m.status == gp.GRB.OPTIMAL:\n    print(f'Optimal total revenue: {m.objVal:.2f}')\n    print('--- Fulfillment Plan for FDK57 Models ---')\n    for idx in fdk57_indices:\n        fulfilled = int(round(x_vars[idx].X))\n        print(f'Row {idx}: FDK57 | Revenue/unit: {revenue[idx]:.2f} | Demand: {demand[idx]} | Inventory: {initial_inventory[idx]} | Fulfilled: {fulfilled}')\nelse:\n    print(f'No optimal solution found. Status: {m.status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 34856.759999999995,
+  "final_solution": [
+    [
+      "C0",
+      30.0
+    ],
+    [
+      "C1",
+      40.0
+    ],
+    [
+      "C2",
+      30.0
+    ],
+    [
+      "C3",
+      50.0
+    ],
+    [
+      "C4",
+      10.0
+    ],
+    [
+      "C5",
+      30.0
+    ],
+    [
+      "C6",
+      50.0
+    ],
+    [
+      "C7",
+      50.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 10.022,
+  "evaluated_utc": "2026-10-06T08:50:40.775999+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

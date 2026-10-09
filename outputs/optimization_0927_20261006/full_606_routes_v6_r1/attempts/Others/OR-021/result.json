@@ -1,0 +1,311 @@
+{
+  "problem_id": "OR-021",
+  "query": "An e-commerce platform has access to detailed revenue data for clothing products recorded in the ‘Revenue’ column. Each type of clothing has its own demand level influenced by factors such as seasonality and promotions. The retailer aims to maximize total revenue using the initial inventory provided in the ‘Initial Inventory’ column. Demand quantities are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. Decision variables x_i represent the number of units of each product that will be fulfilled.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM12/Salesofsummerclothes.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 6020981.48,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal number of units to fulfill for each clothing product, given known demand and initial inventory, in order to maximize total revenue. Each product has a specific revenue per unit, and the number fulfilled cannot exceed either its demand or its initial inventory.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) problem.\n3.  **Define Index Sets:** The primary index is the set of clothing products (indexed by i), as listed in the 'Product Name' column.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of product i to fulfill. Type: GRB.INTEGER (since units are discrete).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Revenue' column (revenue per unit for each product).\n    -   Constraint coefficients: 'Demand' column (maximum possible units to fulfill per product), 'Initial Inventory' column (available stock per product).\n    -   Constraint RHS: For each product, the minimum of its demand and initial inventory.\n6.  **Formulate Objective:** Maximize total revenue, i.e., maximize sum over all products of ('Revenue'[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Demand Limit): For each product i, x[i] ≤ 'Demand'[i] (cannot fulfill more than demand).\n    -   Constraint 2 (Inventory Limit): For each product i, x[i] ≤ 'Initial Inventory'[i] (cannot fulfill more than available inventory).\n    -   Constraint 3 (Non-negativity and Integrality): For each product i, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM12/Salesofsummerclothes.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 68\nColumns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nParsed column types: {'Product Name': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'int64'}\nPreview only (first 10 rows):\n                                                                                                                               Product Name Revenue Demand Initial Inventory\n                                                       3 Colors New Fashion Summer Ladies Casual Jumpsuit Long Suspender Overalls Bib Pants      11   1357              5000\n     Men's Casual Workout Athletic Gym Jersey Shorts Elastic Waist Drawstring Summer Training Running Knee Length Shorts with Zipper Pocket       8   1363              5000\n New Fashion Autumn Summer Women's Long Sleeve V Neck Long Dress Floral Print Split Maxi Dress Holiday Party Beach Sundress Evening Dresses      19   1269              5000\n                                                                         New The New Men's Stitching Design Jogging Sports Cropped Trousers       9   6500             25000\n          Plus Size S-5XL Women Summer Tops Casual V-Neck Short Sleeve Shirts Ladies Cotton Loose T Shirt Candy Color Lady Pullovers Blouse       5   6335             25000\n                                                      Plus Size Women Halter Striped Wide Leg Pants Casual Jumpsuit Rompers Fashion Shorts        8   1283              5000\n        Spring/Summer Fashion Women \"honey\"Letter Print Sleeveless Shirt Sexy Embroidered Bodycon Vest Knitted Cotton Vest Casual Tank Top     5.65  27327            100000\n             Summer Students Style Bodycon Rompers Womens Slim Fit Jumpsuit Chest Zipper Contrast Color Short Sleeve V-neck Shorts Bodysuit      11  25600            100000\n                                                    Summer Women s Fashion Lace Up Tie Pants Plus Size Casual High Waist Short Pants(S-5XL)    4.93    264              1000\n                                     Women's Fashion Graphic \\Don't Flatter Yourself....\\Tee for Women Summer Casual Tee T Shirts for Girls       7     14                50\nFull-file column statistics: {\"Product Name\": {\"missing\": 0, \"unique_nonempty\": 68}, \"Revenue\": {\"missing\": 0, \"unique_nonempty\": 27, \"numeric_range\": [1.7, 19.0]}, \"Demand\": {\"missing\": 0, \"unique_nonempty\": 65, \"numeric_range\": [14.0, 144944.0]}, \"Initial Inventory\": {\"missing\": 0, \"unique_nonempty\": 10, \"numeric_range\": [50.0, 500000.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"demand\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"initial inventory\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"revenue\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"23aefd43976db977d04ece6a4ddc0f94963e85f14da796177f9b97b9d5771f63\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\ncsv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM12/Salesofsummerclothes.csv'\ndf = pd.read_csv(csv_path, sep=',', dtype=str, keep_default_na=False)\nrequired_columns = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']\nfor col in required_columns:\n    if col not in df.columns:\n        raise KeyError(f\"Required column '{col}' not found in CSV.\")\ndf['Product Name'] = df['Product Name'].astype(str)\ndf = df.set_index('Product Name', drop=False)\nfor col in ['Revenue', 'Demand', 'Initial Inventory']:\n    df[col] = df[col].str.strip()\n    if col == 'Revenue':\n        df[col] = df[col].astype(float)\n    else:\n        df[col] = df[col].astype(int)\nproducts = list(df.index)\nrevenue = df['Revenue'].to_dict()\ndemand = df['Demand'].to_dict()\ninventory = df['Initial Inventory'].to_dict()\nfor i in products:\n    if not (np.isfinite(revenue[i]) and isinstance(demand[i], (int, np.integer)) and isinstance(inventory[i], (int, np.integer))):\n        raise ValueError(f\"Non-numeric or missing parameter for product '{i}'.\")\nm = gp.Model('MaximizeRevenue')\nx_vars = m.addVars(products, vtype=gp.GRB.INTEGER, lb=0, name='')\ndemand_constrs = m.addConstrs((x_vars[i] <= demand[i] for i in products), name='')\ninventory_constrs = m.addConstrs((x_vars[i] <= inventory[i] for i in products), name='')\nm.setObjective(gp.quicksum((revenue[i] * x_vars[i] for i in products)), gp.GRB.MAXIMIZE)\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 6020981.48,
+  "final_solution": [
+    [
+      "C0",
+      1357.0
+    ],
+    [
+      "C1",
+      1363.0
+    ],
+    [
+      "C2",
+      1269.0
+    ],
+    [
+      "C3",
+      6500.0
+    ],
+    [
+      "C4",
+      6335.0
+    ],
+    [
+      "C5",
+      1283.0
+    ],
+    [
+      "C6",
+      27327.0
+    ],
+    [
+      "C7",
+      25600.0
+    ],
+    [
+      "C8",
+      264.0
+    ],
+    [
+      "C9",
+      14.0
+    ],
+    [
+      "C10",
+      1484.0
+    ],
+    [
+      "C11",
+      13124.0
+    ],
+    [
+      "C12",
+      123.0
+    ],
+    [
+      "C13",
+      1430.0
+    ],
+    [
+      "C14",
+      130.0
+    ],
+    [
+      "C15",
+      14.0
+    ],
+    [
+      "C16",
+      293.0
+    ],
+    [
+      "C17",
+      6770.0
+    ],
+    [
+      "C18",
+      1325.0
+    ],
+    [
+      "C19",
+      1377.0
+    ],
+    [
+      "C20",
+      139.0
+    ],
+    [
+      "C21",
+      1350.0
+    ],
+    [
+      "C22",
+      138.0
+    ],
+    [
+      "C23",
+      122.0
+    ],
+    [
+      "C24",
+      6577.0
+    ],
+    [
+      "C25",
+      1455.0
+    ],
+    [
+      "C26",
+      72.0
+    ],
+    [
+      "C27",
+      135.0
+    ],
+    [
+      "C28",
+      6531.0
+    ],
+    [
+      "C29",
+      26650.0
+    ],
+    [
+      "C30",
+      27115.0
+    ],
+    [
+      "C31",
+      12486.0
+    ],
+    [
+      "C32",
+      12367.0
+    ],
+    [
+      "C33",
+      6194.0
+    ],
+    [
+      "C34",
+      14307.0
+    ],
+    [
+      "C35",
+      6321.0
+    ],
+    [
+      "C36",
+      13833.0
+    ],
+    [
+      "C37",
+      144944.0
+    ],
+    [
+      "C38",
+      6319.0
+    ],
+    [
+      "C39",
+      13849.0
+    ],
+    [
+      "C40",
+      6875.0
+    ],
+    [
+      "C41",
+      29273.0
+    ],
+    [
+      "C42",
+      1207.0
+    ],
+    [
+      "C43",
+      62890.0
+    ],
+    [
+      "C44",
+      14465.0
+    ],
+    [
+      "C45",
+      25467.0
+    ],
+    [
+      "C46",
+      24105.0
+    ],
+    [
+      "C47",
+      25594.0
+    ],
+    [
+      "C48",
+      1229.0
+    ],
+    [
+      "C49",
+      1459.0
+    ],
+    [
+      "C50",
+      13071.0
+    ],
+    [
+      "C51",
+      13056.0
+    ],
+    [
+      "C52",
+      6170.0
+    ],
+    [
+      "C53",
+      24746.0
+    ],
+    [
+      "C54",
+      27118.0
+    ],
+    [
+      "C55",
+      29149.0
+    ],
+    [
+      "C56",
+      1459.0
+    ],
+    [
+      "C57",
+      136.0
+    ],
+    [
+      "C58",
+      130.0
+    ],
+    [
+      "C59",
+      6720.0
+    ],
+    [
+      "C60",
+      14932.0
+    ],
+    [
+      "C61",
+      25913.0
+    ],
+    [
+      "C62",
+      27066.0
+    ],
+    [
+      "C63",
+      7453.0
+    ],
+    [
+      "C64",
+      142.0
+    ],
+    [
+      "C65",
+      270.0
+    ],
+    [
+      "C66",
+      1418.0
+    ],
+    [
+      "C67",
+      28189.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 11.966,
+  "evaluated_utc": "2026-10-06T08:47:30.406282+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

@@ -1,0 +1,2 @@
+{"Product Name": "27in 4K Gaming Monitor", "Revenue": "261.2933", "Demand": "12474", "Initial Inventory": "62440"}
+{"Product Name": "27in FHD Monitor", "Revenue": "52.4965", "Demand": "15057", "Initial Inventory": "75500"}

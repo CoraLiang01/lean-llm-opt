@@ -1,0 +1,233 @@
+{
+  "problem_id": "OR-070",
+  "query": "In the construction industry, there are multiple managers and construction projects, with each manager incurring different costs for different projects based on their expertise and experience. This cost data is recorded in the “manager_project_costs.csv” file, where each row represents a manager and each column indicates the cost for that manager to complete a specific project. The objective is to determine the most cost-effective assignment of managers to projects, ensuring that each project is assigned to a single manager and each manager is responsible for only one project. The goal is to minimize the total cost while satisfying these assignment constraints.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP5/manager_project_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "AP",
+  "true_route": "AP",
+  "label_objective": 8809.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "AP",
+  "assigned_route": "AP",
+  "generated_model": "Let:\n- M = {1, 2, 3, 4, 5, 6, 7} be the set of managers, corresponding to Manager 1 through Manager 7.\n- P = {1, 2, 3, 4, 5, 6, 7} be the set of projects, corresponding to Project 1 through Project 7.\n- c_{ij} be the cost for manager i to complete project j, as given in the cost matrix below.\n- x_{ij} ∈ {0,1} be a binary variable, where x_{ij} = 1 if manager i is assigned to project j, 0 otherwise.\n\nCost matrix C = [c_{ij}]:\n\n\\[\nC = \\begin{bmatrix}\n2972 & 2727 & 2795 & 2922 & 1302 & 2489 & 1533 \\\\\n1094 & 2158 & 2990 & 1844 & 2887 & 2021 & 2288 \\\\\n2133 & 1675 & 2422 & 2639 & 1033 & 2261 & 1695 \\\\\n1951 & 2309 & 2070 & 2802 & 2328 & 1313 & 2434 \\\\\n1269 & 2153 & 1296 & 2685 & 2627 & 1610 & 1641 \\\\\n1220 & 1192 & 2907 & 2622 & 2595 & 1261 & 2384 \\\\\n1286 & 1659 & 1179 & 1348 & 1420 & 2862 & 1959 \\\\\n\\end{bmatrix}\n\\]\n\nMathematical Model:\n\nDecision variables:\n\\[\nx_{ij} = \n\\begin{cases}\n1 & \\text{if manager } i \\text{ is assigned to project } j \\\\\n0 & \\text{otherwise}\n\\end{cases}\n\\]\nfor all \\( i \\in M, j \\in P \\).\n\nObjective:\n\\[\n\\min \\sum_{i=1}^{7} \\sum_{j=1}^{7} c_{ij} x_{ij}\n\\]\nwhere \\( c_{ij} \\) are as given in the matrix above.\n\nSubject to:\n1. Each manager is assigned to exactly one project:\n\\[\n\\sum_{j=1}^{7} x_{ij} = 1 \\quad \\forall i \\in M\n\\]\n\n2. Each project is assigned to exactly one manager:\n\\[\n\\sum_{i=1}^{7} x_{ij} = 1 \\quad \\forall j \\in P\n\\]\n\n3. Binary constraints:\n\\[\nx_{ij} \\in \\{0, 1\\} \\quad \\forall i \\in M, j \\in P\n\\]\n\nWhere:\n- \\( c_{ij} \\) is the cost for Manager \\( i \\) to complete Project \\( j \\), as specified in the cost matrix above.\n- \\( x_{ij} \\) are the assignment decision variables.\n\nThis model ensures a one-to-one assignment of managers to projects that minimizes the total cost, using the exact cost data from the CSV file.",
+  "csvqa_observation": "Here is the full cost matrix from \"manager_project_costs.csv\", including manager names (rows) and project names (columns):\n\n| Manager    | Project 1 Cost | Project 2 Cost | Project 3 Cost | Project 4 Cost | Project 5 Cost | Project 6 Cost | Project 7 Cost |\n|------------|---------------|---------------|---------------|---------------|---------------|---------------|---------------|\n| Manager 1  | 2972          | 2727          | 2795          | 2922          | 1302          | 2489          | 1533          |\n| Manager 2  | 1094          | 2158          | 2990          | 1844          | 2887          | 2021          | 2288          |\n| Manager 3  | 2133          | 1675          | 2422          | 2639          | 1033          | 2261          | 1695          |\n| Manager 4  | 1951          | 2309          | 2070          | 2802          | 2328          | 1313          | 2434          |\n| Manager 5  | 1269          | 2153          | 1296          | 2685          | 2627          | 1610          | 1641          |\n| Manager 6  | 1220          | 1192          | 2907          | 2622          | 2595          | 1261          | 2384          |\n| Manager 7  | 1286          | 1659          | 1179          | 1348          | 1420          | 2862          | 1959          |",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_FULL_DATA",
+  "solve_code": "import gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_assignment():\n    managers = [1, 2, 3, 4, 5, 6, 7]\n    projects = [1, 2, 3, 4, 5, 6, 7]\n    cost_matrix = [[2972, 2727, 2795, 2922, 1302, 2489, 1533], [1094, 2158, 2990, 1844, 2887, 2021, 2288], [2133, 1675, 2422, 2639, 1033, 2261, 1695], [1951, 2309, 2070, 2802, 2328, 1313, 2434], [1269, 2153, 1296, 2685, 2627, 1610, 1641], [1220, 1192, 2907, 2622, 2595, 1261, 2384], [1286, 1659, 1179, 1348, 1420, 2862, 1959]]\n    if len(cost_matrix) != len(managers):\n        raise ValueError('Cost matrix row count does not match number of managers.')\n    for row in cost_matrix:\n        if len(row) != len(projects):\n            raise ValueError('Cost matrix column count does not match number of projects.')\n    c = {}\n    for (i_idx, i) in enumerate(managers):\n        for (j_idx, j) in enumerate(projects):\n            c[i, j] = cost_matrix[i_idx][j_idx]\n    m = gp.Model()\n    m.Params.MIPGap = 0.0001\n    x = m.addVars(managers, projects, vtype=GRB.BINARY, lb=0, ub=1, name='')\n    for i in managers:\n        m.addConstr(gp.quicksum((x[i, j] for j in projects)) == 1, name='cm')\n    for j in projects:\n        m.addConstr(gp.quicksum((x[i, j] for i in managers)) == 1, name='cp')\n    m.setObjective(gp.quicksum((c[i, j] * x[i, j] for i in managers for j in projects)), GRB.MINIMIZE)\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal: {m.ObjVal}')\n        for i in managers:\n            for j in projects:\n                var = x[i, j]\n                print(f'{var.VarName} {var.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_assignment()",
+  "final_objective": 8809.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      1.0
+    ],
+    [
+      "C7",
+      1.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      -0.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      1.0
+    ],
+    [
+      "C19",
+      -0.0
+    ],
+    [
+      "C20",
+      -0.0
+    ],
+    [
+      "C21",
+      -0.0
+    ],
+    [
+      "C22",
+      -0.0
+    ],
+    [
+      "C23",
+      -0.0
+    ],
+    [
+      "C24",
+      -0.0
+    ],
+    [
+      "C25",
+      -0.0
+    ],
+    [
+      "C26",
+      1.0
+    ],
+    [
+      "C27",
+      -0.0
+    ],
+    [
+      "C28",
+      0.0
+    ],
+    [
+      "C29",
+      -0.0
+    ],
+    [
+      "C30",
+      1.0
+    ],
+    [
+      "C31",
+      -0.0
+    ],
+    [
+      "C32",
+      -0.0
+    ],
+    [
+      "C33",
+      -0.0
+    ],
+    [
+      "C34",
+      -0.0
+    ],
+    [
+      "C35",
+      -0.0
+    ],
+    [
+      "C36",
+      1.0
+    ],
+    [
+      "C37",
+      -0.0
+    ],
+    [
+      "C38",
+      -0.0
+    ],
+    [
+      "C39",
+      -0.0
+    ],
+    [
+      "C40",
+      -0.0
+    ],
+    [
+      "C41",
+      -0.0
+    ],
+    [
+      "C42",
+      -0.0
+    ],
+    [
+      "C43",
+      -0.0
+    ],
+    [
+      "C44",
+      0.0
+    ],
+    [
+      "C45",
+      1.0
+    ],
+    [
+      "C46",
+      -0.0
+    ],
+    [
+      "C47",
+      -0.0
+    ],
+    [
+      "C48",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "rag_only",
+  "seconds": 12.432,
+  "classification_source": "final_101_V2_cache",
+  "classification_cache_sha256": "8b17fda06001ff4ebea07809838119bc81b6f49cb453b600aa87d5dc73881435",
+  "base_notebook_sha256": "a155d54c6df32abc8dfe263e03d00138848cfcca32422dff3c286f3b8c67f6b1",
+  "notebook_source_sha256": "46fee06fc332e35e0be1dfa22ffcc26af19505ba077e31214fd8b688913561e8",
+  "cache_fingerprint": "0fea43147c12c7e2b09224d3981d09575e2955f8718b1bc65f73b1477f52affb",
+  "evaluated_utc": "2026-10-06T02:58:33.514857+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

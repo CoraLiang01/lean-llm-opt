@@ -1,0 +1,209 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+#### Symbolic Model
+
+**Index Sets:**
+- $F$: set of all products with 'Fashion' in their 'Product Name' (from the source table).
+
+**Parameters:**
+- $A_i$: revenue per unit of product $i \in F$ (from column 'Revenue').
+- $d_i$: total demand for product $i \in F$ (from column 'Demand').
+- $I_i$: initial inventory for product $i \in F$ (from column 'Initial Inventory').
+
+**Decision Variables:**
+- $x_i$: number of units of product $i \in F$ to fulfill, $x_i \in \mathbb{Z}_+$.
+
+**Objective:**
+\[
+\max \sum_{i \in F} A_i x_i
+\]
+
+**Constraints:**
+1. **Inventory Bound:** 
+   \[
+   x_i \leq I_i \quad \forall i \in F
+   \]
+2. **Demand Bound:** 
+   \[
+   x_i \leq d_i \quad \forall i \in F
+   \]
+3. **Nonnegativity and Integrality:** 
+   \[
+   x_i \in \mathbb{Z}_+, \quad \forall i \in F
+   \]
+
+#### Data Mapping
+
+- Table: `/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM17/SupermarketSales.csv`
+    - Index set $F$: rows where `Product Name` contains 'Fashion'
+    - $A_i$: column `Revenue`
+    - $d_i$: column `Demand`
+    - $I_i$: column `Initial Inventory`[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with fallback encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM17/SupermarketSales.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False, encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        raise RuntimeError(f"Could not decode {csv_path} with tried encodings.")
+
+    # Check required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Filter for 'Fashion' products (case-insensitive, substring match)
+    # If there is a 'Category' or similar column, use that; otherwise, use 'Product Name'
+    # Since only 'Product Name' is present, filter by name
+    fashion_mask = df['Product Name'].str.casefold().str.contains('fashion')
+    df_fashion = df[fashion_mask].copy()
+
+    if df_fashion.empty:
+        raise ValueError("No 'Fashion' products found in the source data.")
+
+    # Prepare index set and parameters
+    items = df_fashion['Product Name'].tolist()
+
+    # Convert numeric columns
+    def to_numeric(series, name):
+        try:
+            return pd.to_numeric(series, errors='raise')
+        except Exception:
+            raise ValueError(f"Non-numeric value found in column '{name}' for filtered products.")
+
+    revenue_series = to_numeric(df_fashion['Revenue'], 'Revenue')
+    demand_series = to_numeric(df_fashion['Demand'], 'Demand')
+    inventory_series = to_numeric(df_fashion['Initial Inventory'], 'Initial Inventory')
+
+    # Build parameter dictionaries
+    revenue = dict(zip(items, revenue_series))
+    demand = dict(zip(items, demand_series))
+    inventory = dict(zip(items, inventory_series))
+
+    # Validate all items have coefficients
+    for i in items:
+        if i not in revenue or i not in demand or i not in inventory:
+            raise ValueError(f"Missing coefficient for product: {i}")
+
+    # Model
+    m = gp.Model('Supermarket_Fashion_Fulfillment')
+
+    # Decision variables: x_i >= 0, integer
+    quantity_vars = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total revenue
+    m.setObjective(gp.quicksum(revenue[i] * quantity_vars[i] for i in items), GRB.MAXIMIZE)
+
+    # Constraints
+    m.addConstrs((quantity_vars[i] <= inventory[i] for i in items), name='inv')
+    m.addConstrs((quantity_vars[i] <= demand[i] for i in items), name='dem')
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 98 rows, 49 columns and 98 nonzeros
+Model fingerprint: 0x299094d3
+Variable types: 0 continuous, 49 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+01, 4e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+00, 1e+02]
+Found heuristic solution: objective 8851.7500000
+Presolve removed 98 rows and 49 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 8851.75 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 8.851750000000e+03, best bound 8.851750000000e+03, gap 0.0000%
+ObjVal: 8851.75
+C0: 12.0
+C1: 2.0
+C2: 10.0
+C3: 2.0
+C4: 2.0
+C5: 5.0
+C6: 2.0
+C7: 2.0
+C8: 11.0
+C9: 2.0
+C10: 6.0
+C11: 9.0
+C12: 14.0
+C13: 6.0
+C14: 8.0
+C15: 6.0
+C16: 14.0
+C17: 2.0
+C18: 14.0
+C19: 11.0
+C20: 2.0
+C21: 3.0
+C22: 8.0
+C23: 10.0
+C24: 10.0
+C25: 7.0
+C26: 11.0
+C27: 11.0
+C28: 5.0
+C29: 3.0
+C30: 8.0
+C31: 13.0
+C32: 7.0
+C33: 14.0
+C34: 4.0
+C35: 2.0
+C36: 2.0
+C37: 14.0
+C38: 2.0
+C39: 6.0
+C40: 2.0
+C41: 2.0
+C42: 3.0
+C43: 14.0
+C44: 12.0
+C45: 7.0
+C46: 6.0
+C47: 13.0
+C48: 14.0
+Optimal objective: 8851.75
+Optimal solution: [('C0', 12.0), ('C1', 2.0), ('C2', 10.0), ('C3', 2.0), ('C4', 2.0), ('C5', 5.0), ('C6', 2.0), ('C7', 2.0), ('C8', 11.0), ('C9', 2.0), ('C10', 6.0), ('C11', 9.0), ('C12', 14.0), ('C13', 6.0), ('C14', 8.0), ('C15', 6.0), ('C16', 14.0), ('C17', 2.0), ('C18', 14.0), ('C19', 11.0), ('C20', 2.0), ('C21', 3.0), ('C22', 8.0), ('C23', 10.0), ('C24', 10.0), ('C25', 7.0), ('C26', 11.0), ('C27', 11.0), ('C28', 5.0), ('C29', 3.0), ('C30', 8.0), ('C31', 13.0), ('C32', 7.0), ('C33', 14.0), ('C34', 4.0), ('C35', 2.0), ('C36', 2.0), ('C37', 14.0), ('C38', 2.0), ('C39', 6.0), ('C40', 2.0), ('C41', 2.0), ('C42', 3.0), ('C43', 14.0), ('C44', 12.0), ('C45', 7.0), ('C46', 6.0), ('C47', 13.0), ('C48', 14.0)]

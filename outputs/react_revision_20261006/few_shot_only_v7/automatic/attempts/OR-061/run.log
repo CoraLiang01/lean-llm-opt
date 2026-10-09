@@ -1,0 +1,221 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+##### Decision Variables
+
+$x_{ij} \geq 0$: quantity shipped from supplier $i \in I$ to branch $j \in J$ (continuous).  
+$y_i \in \{0,1\}$: whether supplier $i$ is activated.
+
+##### Objective Function
+
+\[
+\min \sum_{i\in I}\sum_{j\in J} c_{ij} x_{ij} + \sum_{i\in I} f_i y_i
+\]
+
+##### Constraints
+
+1. **Branch demand:**  
+   $\sum_{i\in I} x_{ij} = d_j,\quad \forall j\in J$
+
+2. **Supplier activation (unconditional bounds):**  
+   $x_{ij} \geq 0,\quad \forall i\in I,\, j\in J$  
+   $y_i \in \{0,1\},\quad \forall i\in I$
+
+##### Data Mapping
+
+- $I = \{\text{S1}, \text{S2}, \text{S3}, \text{S4}, \text{S5}\}$ (suppliers, from fixed_cost.csv and transportation_costs.csv)
+- $J = \{\text{C1}, \text{C2}, \text{C3}, \text{C4}, \text{C5}\}$ (branches/customers, from demand.csv and transportation_costs.csv)
+- $d_j$ (demand for branch $j$), from demand.csv:
+  - $d_{\text{C1}} = 143$
+  - $d_{\text{C2}} = 6$
+  - $d_{\text{C3}} = 10$
+  - $d_{\text{C4}} = 25$
+  - $d_{\text{C5}} = 3$
+- $f_i$ (fixed cost for supplier $i$), from fixed_cost.csv:
+  - $f_{\text{S1}} = 97.65$
+  - $f_{\text{S2}} = 99.76$
+  - $f_{\text{S3}} = 100.76$
+  - $f_{\text{S4}} = 105.32$
+  - $f_{\text{S5}} = 98.88$
+- $c_{ij}$ (transportation cost per unit from supplier $i$ to branch $j$), from transportation_costs.csv:
+  - $c_{\text{S1},\text{C1}} = 150.74$, $c_{\text{S1},\text{C2}} = 0.02$, $c_{\text{S1},\text{C3}} = 49.13$, $c_{\text{S1},\text{C4}} = 2080.15$, $c_{\text{S1},\text{C5}} = 426.4$
+  - $c_{\text{S2},\text{C1}} = 233.05$, $c_{\text{S2},\text{C2}} = 97.73$, $c_{\text{S2},\text{C3}} = 49.84$, $c_{\text{S2},\text{C4}} = 1982.39$, $c_{\text{S2},\text{C5}} = 23.96$
+  - $c_{\text{S3},\text{C1}} = 55.68$, $c_{\text{S3},\text{C2}} = 935.61$, $c_{\text{S3},\text{C3}} = 4.03$, $c_{\text{S3},\text{C4}} = 73.09$, $c_{\text{S3},\text{C5}} = 525.32$
+  - $c_{\text{S4},\text{C1}} = 1483.82$, $c_{\text{S4},\text{C2}} = 1801.08$, $c_{\text{S4},\text{C3}} = 112.16$, $c_{\text{S4},\text{C4}} = 816.05$, $c_{\text{S4},\text{C5}} = 107.01$
+  - $c_{\text{S5},\text{C1}} = 1119.47$, $c_{\text{S5},\text{C2}} = 884.31$, $c_{\text{S5},\text{C3}} = 0.08$, $c_{\text{S5},\text{C4}} = 1544.95$, $c_{\text{S5},\text{C5}} = 543.67$
+
+##### Source-Column Data Mapping
+
+- demand.csv: customer $\to$ $j$, demand $\to$ $d_j$
+- fixed_cost.csv: Unnamed: 0 $\to$ $i$, fixed_costs $\to$ $f_i$
+- transportation_costs.csv: Unnamed: 0 $\to$ $i$, $Ck$ columns $\to$ $c_{ij}$ for $j = Ck$[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    csv_paths = {
+        "demand": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP5/demand.csv",
+        "fixed_cost": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP5/fixed_cost.csv",
+        "transportation_costs": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP5/transportation_costs.csv"
+    }
+    def read_csv(path):
+        for enc in ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']:
+            try:
+                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with supported encodings.")
+
+    demand_df = read_csv(csv_paths["demand"])
+    fixed_cost_df = read_csv(csv_paths["fixed_cost"])
+    trans_cost_df = read_csv(csv_paths["transportation_costs"])
+
+    # Prepare sets
+    branches = list(demand_df['customer'])
+    suppliers = list(fixed_cost_df['Unnamed: 0'])
+
+    # Demand: {branch: demand_value}
+    try:
+        demand = {row['customer']: float(row['demand']) for _, row in demand_df.iterrows()}
+    except Exception as e:
+        raise ValueError(f"Error parsing demand.csv: {e}")
+
+    # Fixed costs: {supplier: fixed_cost}
+    try:
+        fixed_cost = {row['Unnamed: 0']: float(row['fixed_costs']) for _, row in fixed_cost_df.iterrows()}
+    except Exception as e:
+        raise ValueError(f"Error parsing fixed_cost.csv: {e}")
+
+    # Transportation costs: {supplier: {branch: cost}}
+    # The first column is supplier id, the rest are branch columns
+    cost = {}
+    branch_cols = [col for col in trans_cost_df.columns if col != 'Unnamed: 0']
+    for _, row in trans_cost_df.iterrows():
+        supplier = row['Unnamed: 0']
+        cost[supplier] = {}
+        for branch in branch_cols:
+            if branch in branches:
+                try:
+                    cost[supplier][branch] = float(row[branch])
+                except Exception as e:
+                    raise ValueError(f"Error parsing transportation_costs.csv for supplier {supplier}, branch {branch}: {e}")
+
+    # Validate all indices are covered
+    for s in suppliers:
+        if s not in fixed_cost:
+            raise ValueError(f"Missing fixed cost for supplier {s}")
+        if s not in cost:
+            raise ValueError(f"Missing transportation cost row for supplier {s}")
+        for b in branches:
+            if b not in cost[s]:
+                raise ValueError(f"Missing transportation cost for supplier {s}, branch {b}")
+    for b in branches:
+        if b not in demand:
+            raise ValueError(f"Missing demand for branch {b}")
+
+    # Model
+    m = gp.Model('Superstore_FLP')
+
+    # Decision variables
+    quantity_keys = [(s, b) for s in suppliers for b in branches]
+    quantity_vars = m.addVars(quantity_keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    activation_vars = m.addVars(suppliers, vtype=GRB.BINARY, name='y')
+
+    # Objective
+    m.setObjective(
+        gp.quicksum(cost[s][b] * quantity_vars[s, b] for s in suppliers for b in branches) +
+        gp.quicksum(fixed_cost[s] * activation_vars[s] for s in suppliers),
+        GRB.MINIMIZE
+    )
+
+    # Constraints
+    # 1. Branch demand: sum_{i} x_{ij} == d_j for all j
+    m.addConstrs(
+        (gp.quicksum(quantity_vars[s, b] for s in suppliers) == demand[b] for b in branches),
+        name='demand'
+    )
+
+    # 2. Domains are already enforced by variable types and bounds
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 5 rows, 30 columns and 25 nonzeros
+Model fingerprint: 0x50b2ac5d
+Variable types: 25 continuous, 5 integer (5 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e-02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [3e+00, 1e+02]
+Presolve removed 5 rows and 30 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 9862.29 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 9.862290000000e+03, best bound 9.862290000000e+03, gap 0.0000%
+ObjVal: 9862.289999999999
+C0: 0.0
+C1: 6.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 0.0
+C7: 0.0
+C8: 0.0
+C9: 3.0
+C10: 143.0
+C11: 0.0
+C12: 0.0
+C13: 25.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 0.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 10.0
+C23: 0.0
+C24: 0.0
+C25: 0.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+Optimal objective: 9862.289999999999
+Optimal solution: [('C0', 0.0), ('C1', 6.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 3.0), ('C10', 143.0), ('C11', 0.0), ('C12', 0.0), ('C13', 25.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 10.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0)]

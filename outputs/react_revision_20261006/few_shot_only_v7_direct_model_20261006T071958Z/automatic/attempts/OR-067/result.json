@@ -1,0 +1,79 @@
+{
+  "problem_id": "OR-067",
+  "query": "In the construction industry, we have a set of managers and a set of construction projects. Each manager incurs different costs for each project, based on their experience and expertise. The cost information for each manager and project is saved in the CSV file \"manager_project_costs.csv\", where each row represents a manager, and each column represents the cost for that manager to complete a specific project. The objective is to find the optimal assignment that minimizes the total cost of completing all projects. Each manager must be assigned to exactly one project, and each project must be managed by exactly one manager. The goal is to minimize the total cost while satisfying these one-to-one assignment constraints.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP2/manager_project_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "AP",
+  "true_route": "AP",
+  "label_objective": 9000.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "AP",
+  "assigned_route": "AP",
+  "generated_model": "##### Objective Function:\n\n$\\quad \\min \\sum_{m \\in M} \\sum_{p \\in P} c_{mp} \\, x_{mp}$\n\n##### Constraints:\n\n1. **Each manager is assigned to exactly one project:**\n\n$\\sum_{p \\in P} x_{mp} = 1 \\quad \\forall m \\in M$\n\n2. **Each project is assigned to exactly one manager:**\n\n$\\sum_{m \\in M} x_{mp} = 1 \\quad \\forall p \\in P$\n\n3. **Variable domains:**\n\n$x_{mp} \\in \\{0,1\\} \\quad \\forall m \\in M,\\, p \\in P$\n\n##### Data Mapping\n\n- $M$ (Managers): All values in column \"Unnamed: 0\" of table_id \"file_0_view_0\"\n- $P$ (Projects): All columns except \"Unnamed: 0\" in table_id \"file_0_view_0\"\n- $c_{mp}$: Value at row with \"Unnamed: 0\" = $m$, column = $p$ in table_id \"file_0_view_0\"\n- $x_{mp}$: Binary decision variable, 1 if manager $m$ is assigned to project $p$, 0 otherwise",
+  "csvqa_observation": "{\"tables\": [{\"table_id\": \"file_0_view_0\", \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP2/manager_project_costs.csv\", \"columns\": [\"Unnamed: 0\", \"P1\", \"P2\", \"P3\"], \"records\": [{\"Unnamed: 0\": \"MA\", \"P1\": \"3000\", \"P2\": \"3200\", \"P3\": \"3100\"}, {\"Unnamed: 0\": \"MB\", \"P1\": \"2800\", \"P2\": \"3300\", \"P3\": \"2900\"}, {\"Unnamed: 0\": \"MC\", \"P1\": \"2900\", \"P2\": \"3100\", \"P3\": \"3000\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "DIRECT_FULL_SOURCE",
+  "csvqa_trace": "{\"status\": \"DIRECT_FULL_SOURCE\", \"formulation_protocol\": \"ReAct\", \"csvqa_call_count\": 0, \"planner_attempt_count\": 0, \"repair_count\": 0, \"fallback_count\": 0, \"retry_count\": 0, \"protocol_retry_count\": 0, \"protocol_retry_events\": \"[]\"}",
+  "solve_code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_problem():\n    csv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP2/manager_project_costs.csv'\n    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']\n    for enc in encodings:\n        try:\n            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False, encoding=enc)\n            break\n        except Exception:\n            continue\n    else:\n        raise RuntimeError(f'Could not read CSV at {csv_path} with tried encodings.')\n    if 'Unnamed: 0' not in df.columns:\n        raise ValueError(\"Missing 'Unnamed: 0' column for managers in CSV.\")\n    managers = df['Unnamed: 0'].tolist()\n    projects = [col for col in df.columns if col != 'Unnamed: 0']\n    cost = {}\n    for (idx, row) in df.iterrows():\n        m = row['Unnamed: 0']\n        cost[m] = {}\n        for p in projects:\n            val = row[p]\n            try:\n                c_val = float(val)\n            except Exception:\n                raise ValueError(f\"Non-numeric or missing cost for manager '{m}', project '{p}': '{val}'\")\n            cost[m][p] = c_val\n    if set(cost.keys()) != set(managers):\n        raise ValueError('Mismatch in manager keys.')\n    for m in managers:\n        if set(cost[m].keys()) != set(projects):\n            raise ValueError(f\"Manager '{m}' missing project costs.\")\n    m_model = gp.Model('ManagerProjectAssignment')\n    m_model.Params.MIPGap = 0.0001\n    assignment_keys = [(m, p) for m in managers for p in projects]\n    x_vars = m_model.addVars(assignment_keys, vtype=GRB.BINARY, name='')\n    m_model.setObjective(gp.quicksum((cost[m][p] * x_vars[m, p] for m in managers for p in projects)), GRB.MINIMIZE)\n    m_model.addConstrs((gp.quicksum((x_vars[m, p] for p in projects)) == 1 for m in managers), name='')\n    m_model.addConstrs((gp.quicksum((x_vars[m, p] for m in managers)) == 1 for p in projects), name='')\n    m_model.optimize()\n    if m_model.Status == GRB.OPTIMAL:\n        print(f'ObjVal: {m_model.ObjVal}')\n        for var in m_model.getVars():\n            print(f'{var.VarName}: {var.X}')\n    else:\n        print(f'Solver status: {m_model.Status}')\n    return m_model\nm = solve_problem()",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 9000.0,
+  "final_solution": [
+    [
+      "C0",
+      1.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      1.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      1.0
+    ],
+    [
+      "C8",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 12.647,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "5ddad9b79a56ba8572d74f743afee427e23d6237567f19eb1ea2dfbd1fc32a81",
+  "cache_fingerprint": "002008af8a820cb5fdb6a809014101bb643486fc9306f25330fb805168d98484",
+  "evaluated_utc": "2026-10-06T07:59:31.326581+00:00"
+}

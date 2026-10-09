@@ -1,0 +1,132 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to select a subset of university courses from the "Operations Research" discipline such that the total number of credits does not exceed 20, and the sum of their "interest points" is maximized.
+2.  **Identify Model Type:** Based on the query, this is a 0-1 Knapsack Problem (a type of Mixed Integer Programming, MIP).
+3.  **Define Index Sets:** The primary index is the set of all courses in the "Operations Research" discipline (filtered from the full course list).
+4.  **Define Decision Variables:**
+    -   `x[i]` = 1 if Operations Research course i is selected, 0 otherwise. Type: GRB.BINARY.
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'interest_points' column (for each Operations Research course).
+    -   Constraint coefficients: 'credits' column (for each Operations Research course).
+    -   Constraint RHS: The total credit limit is 20 (given in the query).
+6.  **Formulate Objective:** Maximize the sum of 'interest_points' for selected Operations Research courses, i.e., maximize sum over i of (interest_points[i] * x[i]).
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Credit Limit): The total credits of selected Operations Research courses must not exceed 20, i.e., sum over i of (credits[i] * x[i]) ≤ 20.
+    -   Constraint 2 (Selection Binary): For each Operations Research course i, x[i] ∈ {0, 1}.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+# Read the CSV file with explicit dtypes and no NA conversion
+courses_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture11/courses_42.csv',
+    dtype=str,
+    keep_default_na=False
+)
+
+# Normalize discipline column for case-insensitive matching and trim whitespace
+discipline_col = courses_df['discipline'].str.casefold().str.strip()
+or_mask = discipline_col == 'operations research'
+
+# Filter to only Operations Research courses
+or_courses_df = courses_df[or_mask].copy()
+
+# Validate that at least one Operations Research course is present
+if or_courses_df.empty:
+    raise ValueError("No courses found in the 'Operations Research' discipline.")
+
+# Extract business identifiers and parameters
+or_course_ids = list(or_courses_df['course_id'])
+# Map course_id to credits and interest_points, converting to int
+try:
+    credits = {cid: int(c) for cid, c in zip(or_courses_df['course_id'], or_courses_df['credits'])}
+    interest_points = {cid: int(ip) for cid, ip in zip(or_courses_df['course_id'], or_courses_df['interest_points'])}
+except Exception as e:
+    raise ValueError(f"Error converting credits or interest_points to int: {e}")
+
+# Validate that all required parameters are present for each course_id
+if set(credits.keys()) != set(or_course_ids) or set(interest_points.keys()) != set(or_course_ids):
+    raise ValueError("Mismatch in course_id keys for credits or interest_points.")
+
+# Model creation
+m = gp.Model("or_course_selection")
+
+# Decision variables: x[cid] = 1 if course cid is selected, 0 otherwise
+x_vars = m.addVars(or_course_ids, vtype=GRB.BINARY, name='', lb=0, ub=1)
+
+# Constraint: total credits of selected courses <= 20
+m.addConstr(
+    gp.quicksum(credits[cid] * x_vars[cid] for cid in or_course_ids) <= 20,
+    name='credit_limit'
+)
+
+# Objective: maximize total interest points of selected courses
+m.setObjective(
+    gp.quicksum(interest_points[cid] * x_vars[cid] for cid in or_course_ids),
+    GRB.MAXIMIZE
+)
+
+# Set MIPGap as required
+m.Params.MIPGap = 1e-4
+
+# Optimize
+m.optimize()
+
+# Output as required
+if m.Status == GRB.OPTIMAL:
+    print(f"ObjVal: {m.ObjVal}")
+    for cid in or_course_ids:
+        print(f"{x_vars[cid].VarName} {x_vars[cid].X}")
+else:
+    print(f"Solver status: {m.Status}")
+```
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 1 rows, 7 columns and 7 nonzeros
+Model fingerprint: 0x0c31a556
+Variable types: 0 continuous, 7 integer (7 binary)
+Coefficient statistics:
+  Matrix range     [4e+00, 5e+00]
+  Objective range  [8e+01, 1e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [2e+01, 2e+01]
+Found heuristic solution: objective 355.0000000
+Presolve removed 1 rows and 7 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 421 355 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.210000000000e+02, best bound 4.210000000000e+02, gap 0.0000%
+ObjVal: 421.0
+C0 0.0
+C1 0.0
+C2 1.0
+C3 1.0
+C4 1.0
+C5 1.0
+C6 1.0
+Optimal objective: 421.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 1.0), ('C3', 1.0), ('C4', 1.0), ('C5', 1.0), ('C6', 1.0)]

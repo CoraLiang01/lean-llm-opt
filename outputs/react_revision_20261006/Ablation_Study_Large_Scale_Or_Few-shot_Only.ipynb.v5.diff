@@ -1,0 +1,216 @@
+--- v4/Ablation_Study_Large_Scale_Or_Few-shot_Only.ipynb
++++ v5/Ablation_Study_Large_Scale_Or_Few-shot_Only.ipynb
+@@ -48,7 +48,7 @@
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/react_revision_20261006/few_shot_only_v4"
++RESULTS_DIR = PROJECT_ROOT / "outputs/react_revision_20261006/few_shot_only_v5"
+ # Edit this one value when the notebook file is renamed.
+ NOTEBOOK_FILENAME = "Ablation_Study_Large_Scale_Or_Few-shot_Only.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+@@ -62,7 +62,7 @@
+ load_dotenv(PROJECT_ROOT / ".env", override=False)
+ user_api_key = os.environ.get("OPENAI_API_KEY")
+ 
+-VERSION = "react-source-data-v4"
++VERSION = "react-source-data-v5"
+ MODEL_SNAPSHOT = "gpt-4.1-2025-04-14"
+ NRM_RETRY_ON_TRUNCATION = False  # Single attempt; truncation remains a failed case.
+ EMBEDDING_MODEL = "text-embedding-ada-002"
+@@ -76,11 +76,12 @@
+ RAG_EXAMPLES_ALL_PATH = "Large_Scale_Or_Files/RAG_Examples_All.csv"
+ CACHE_SCHEMA_VERSION = VERSION
+ 
+-API_MAX_RETRIES = 2  # Original SDK transport setting; no pipeline/model retry.
++API_MAX_RETRIES = 2  # Unchanged SDK transport retry setting.
++REACT_PROTOCOL_TIMEOUT_SECONDS = 1800  # User-authorized protocol restarts share the case deadline.
+ 
+ METHOD = "few_shot_only"
+-CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/react_revision_20261006/full_v4/automatic/results.csv"
+-BASE_NOTEBOOK_SHA256 = "48d453ebb5355df18260e26f6a8cda803833edceaafe3bd200d825ee8a7f03ac"
++CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/react_revision_20261006/full_v5/automatic/results.csv"
++BASE_NOTEBOOK_SHA256 = "29acd328cfa975d28a9ac7d938f655d3a6c68982de71993d1cd72493b6256045"
+ 
+ CSVQA_MODE_BY_ROUTE = {route: "direct" for route in WORKFLOW_ROUTES}
+ 
+@@ -207,15 +208,63 @@
+     "Get complete source-ordered CSV evidence needed to formulate the optimization problem."
+ )
+ 
+-def invoke_react_with_required_csvqa(agent, query, route):
+-    """Validate tool use after one agent invocation; never correct or rerun it."""
+-    result = agent.invoke(query)
+-    calls = sum(isinstance(step, tuple) and len(step) >= 2
+-                and getattr(step[0], "tool", None) == "CSVQA"
+-                for step in result.get("intermediate_steps", []))
+-    if calls != 1:
+-        raise RuntimeError(f"{route} ReAct must call CSVQA exactly once; observed {calls}")
+-    return result
++REACT_PROTOCOL_EVENTS = []
++REACT_PROTOCOL_DEADLINE = None
++
++
++class ReActProtocolError(RuntimeError):
++    """A discarded protocol attempt, not a completed benchmark outcome."""
++
++
++def react_protocol_record_fields():
++    return {"retry_count": len(REACT_PROTOCOL_EVENTS),
++            "protocol_retry_count": len(REACT_PROTOCOL_EVENTS),
++            "protocol_retry_events": json.dumps(REACT_PROTOCOL_EVENTS, ensure_ascii=False)}
++
++
++def invoke_react_protocol(agent_factory, query, route, *, required_tool=None):
++    """Restart only malformed ReAct output or a missing required CSVQA call."""
++    import time
++    from langchain_core.exceptions import OutputParserException
++    deadline = REACT_PROTOCOL_DEADLINE or (time.monotonic() + REACT_PROTOCOL_TIMEOUT_SECONDS)
++    while True:
++        if time.monotonic() >= deadline:
++            raise TimeoutError("ReAct protocol remained incomplete at the common case deadline")
++        try:
++            agent = agent_factory()
++            if REACT_PROTOCOL_EVENTS:
++                prompt = agent.agent.llm_chain.prompt
++                marker = "PROTOCOL RESTART REMINDER:"
++                if marker not in prompt.template:
++                    prompt.template += ("\n" + marker + " Use exact Thought/Action/Action Input or "
++                                        "Thought/Final Answer labels. Do not output a bare model." +
++                                        (" Call CSVQA before the Final Answer." if required_tool else ""))
++            result = agent.invoke(query)
++            output = str(result.get("output", "") or "").strip()
++            calls = sum(getattr(step[0], "tool", None) == required_tool
++                        for step in result.get("intermediate_steps", [])
++                        if isinstance(step, tuple) and step) if required_tool else 0
++            if required_tool and calls < 1:
++                raise ReActProtocolError("missing_required_csvqa")
++            if not output or "agent stopped due to" in output.lower():
++                raise ReActProtocolError("incomplete_final_answer")
++            return result
++        except (OutputParserException, ValueError, ReActProtocolError) as exc:
++            cause, parser_error = exc, False
++            while cause is not None:
++                parser_error = parser_error or isinstance(cause, OutputParserException)
++                cause = cause.__cause__
++            if not parser_error and not isinstance(exc, ReActProtocolError):
++                raise
++            reason = "react_output_format" if parser_error else str(exc)
++            REACT_PROTOCOL_EVENTS.append({"route": str(route), "reason": reason,
++                                          "error_type": type(exc).__name__, "error": str(exc)[:2000]})
++            print(f"[ReAct protocol restart] {route}: {reason}; discard this attempt and restart the agent.")
++
++
++def invoke_react_with_required_csvqa(agent_factory, query, route):
++    """Return the first valid ReAct result with at least one actual CSVQA call."""
++    return invoke_react_protocol(agent_factory, query, route, required_tool="CSVQA")
+ 
+ 
+ CSVQA_PLANNED_PROMPTS = {'NRM': 'Select every source row and column needed to define the revenue-management objective, decision entities, demand limits, inventory or capacity limits, and query-specific bounds. Infer exact columns from the query and schema. Filter only an explicit subset.'}
+@@ -266,18 +315,23 @@
+     return frame
+ 
+ 
+-def _load_tables(dataset_address):
+-    """Resolve one-or-more newline-separated CSV paths in source order."""
++def _load_tables(dataset_address, file_indices=None):
++    """Read requested CSV files, retaining their original zero-based source indices."""
++    paths = [raw.strip() for raw in str(dataset_address or "").splitlines() if raw.strip()]
++    if file_indices is not None:
++        if (not isinstance(file_indices, list) or not file_indices
++                or any(isinstance(i, bool) or not isinstance(i, int) or i < 0 or i >= len(paths)
++                       for i in file_indices)):
++            raise ValueError("CSVQA file_indices must be nonempty valid zero-based source indices")
+     tables = []
+-    for raw in str(dataset_address or "").splitlines():
+-        raw = raw.strip()
+-        if not raw:
++    for index, raw in enumerate(paths):
++        if file_indices is not None and index not in file_indices:
+             continue
+         path = Path(raw).expanduser()
+         path = path if path.is_absolute() else (PROJECT_ROOT / path).resolve()
+         if not path.is_file():
+             raise FileNotFoundError(f"CSVQA cannot find dataset file: {path}")
+-        tables.append({"file_index": len(tables), "path": path, "frame": _read_csv(path)})
++        tables.append({"file_index": index, "path": path, "frame": _read_csv(path)})
+     if not tables:
+         raise ValueError("CSVQA requires at least one CSV path")
+     return tables
+@@ -791,7 +845,7 @@
+     Raises:
+         RuntimeError: If the classifier violates the one-FileQA-call contract or emits an invalid label.
+     """
+-    response = _get_classification_agent().invoke(str(query))
++    response = invoke_react_protocol(_get_classification_agent, str(query), "classification")
+     steps = response.get("intermediate_steps", []) if isinstance(response, dict) else []
+     fileqa_calls = sum(
+         getattr(step[0], "tool", None) == "FileQA"
+@@ -809,7 +863,7 @@
+ 
+ ## 7. ReAct formulation
+ 
+-The original ReAct agent receives a complete Python Observation and has no data tools. CSVQA/planning remain removed; full source data is never sent to code generation.
++Complete Python Observation, no CSVQA or planner. ReAct format errors restart the agent.
+ 
+ def formulate_with_csvqa(query, dataset_address, route, system_prompt, tool_description, prefix, suffix):
+     """ReAct with a complete Python Observation; no CSVQA tool or extraction planner."""
+@@ -844,13 +898,13 @@
+         agent=reasoning_agent, tools=[], verbose=True, handle_parsing_errors=False,
+         return_intermediate_steps=True, early_stopping_method="force",
+     )
+-    result = agent.invoke(query)
++    result = invoke_react_protocol(lambda: agent, query, route)
+     if result.get("intermediate_steps"):
+         raise RuntimeError("Few-shot Only requested an unavailable tool; no repair or rerun")
+     return {"formulation": result["output"], "observation": observation,
+             "trace": {"status": "DIRECT_FULL_SOURCE", "formulation_protocol": "ReAct",
+                       "csvqa_call_count": 0, "planner_attempt_count": 0,
+-                      "repair_count": 0, "retry_count": 0, "fallback_count": 0}}
++                      "repair_count": 0, "fallback_count": 0, **react_protocol_record_fields()}}
+ 
+ 
+ @lru_cache(maxsize=1)
+@@ -1467,7 +1521,7 @@
+ 
+     openai.api_request_timeout = 60  
+     query = query.replace('{','{{').replace('}','}}')
+-    output = agent.run({"input": query})
++    output = invoke_react_protocol(lambda: agent, {"input": query}, "Others_without_CSV")["output"]
+ 
+     return output
+ 
+@@ -1844,6 +1898,10 @@
+     record = {**case_fields(case), "forced_route": forced_route,
+               "experiment_mode": "forced" if forced_route else "automatic",
+               "repair_count": 0, "retry_count": 0, "fallback_count": 0}
++    global REACT_PROTOCOL_DEADLINE
++    import time
++    REACT_PROTOCOL_EVENTS.clear()
++    REACT_PROTOCOL_DEADLINE = time.monotonic() + REACT_PROTOCOL_TIMEOUT_SECONDS
+     HTTP_RETRY_EVENTS.clear()
+     global _CURRENT_DATASET_ADDRESS
+     query, address = record["query"], record["dataset_address"]
+@@ -1887,11 +1945,13 @@
+         record["solve_code"] = source
+         record["pipeline_stage"] = "solve"
+         objective, solution = execute_code(record["solve_code"])
++        record.update(**react_protocol_record_fields())
+         record.update(api_retry_count=len(HTTP_RETRY_EVENTS), api_retry_events=json.dumps(HTTP_RETRY_EVENTS))
+         record.update(final_objective=objective, final_solution=solution, final_ok=True,
+                       record_status="completed", cache_source="computed", pipeline_stage="completed")
+         return record
+     except Exception as exc:
++        record.update(**react_protocol_record_fields())
+         record.update(api_retry_count=len(HTTP_RETRY_EVENTS), api_retry_events=json.dumps(HTTP_RETRY_EVENTS))
+         evidence = getattr(exc, "csvqa_result", {})
+         if evidence:
+@@ -2169,7 +2229,7 @@
+         "solve_code": getattr(exc, "pipeline_context", {}).get("solve_code", ""),
+         "csvqa_observation": getattr(exc, "pipeline_context", {}).get("csvqa_observation", ""),
+         "csvqa_trace": getattr(exc, "pipeline_context", {}).get("csvqa_trace", "{}"),
+-        "repair_count": 0, "retry_count": 0,
++        "repair_count": 0, **react_protocol_record_fields(),
+         "fallback_count": getattr(exc, "pipeline_context", {}).get("fallback_count", 0),
+     }
+ 

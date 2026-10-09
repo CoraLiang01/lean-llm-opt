@@ -1,0 +1,40 @@
+{
+  "problem_id": "OR-018",
+  "query": "The supermarket offers a variety of top-selling products, with associated data provided in the ‘Revenue’ column. Each product has its own demand level. The retailer aims to maximize total revenue by focusing on the initial inventory of products classified under ‘Baby’. Inventory levels are detailed in the ‘Initial Inventory’ column. During the sales horizon, no restocking is allowed. Demand quantities for ‘Baby’ products are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. The decision variables x_i represent the number of units of each ‘Baby’ product i that the retailer plans to fulfill.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv",
+  "input_kind": "external_csv",
+  "true_label": "NRM",
+  "true_route": "NRM",
+  "label_objective": 782819438.6,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "NRM",
+  "assigned_route": "NRM",
+  "generated_model": "Abstract Mathematical Model\n\nIndex Sets:\n- $I$: Set of all products classified under ‘Baby’ (indexed by $i$).\n\nParameters:\n- $A_i$: Revenue per unit of product $i$ (from column ‘Revenue’ in table_id file_0_view_0).\n- $d_i$: Total demand for product $i$ over the sales horizon (from column ‘Demand’ in table_id file_0_view_0).\n- $I_i$: Initial inventory of product $i$ (from column ‘Initial Inventory’ in table_id file_0_view_0).\n\nDecision Variables:\n- $x_i$: Number of units of product $i$ to fulfill, $x_i \\in \\mathbb{Z}_+$ (non-negative integers), for all $i \\in I$.\n\nObjective:\n\\[\n\\max \\sum_{i \\in I} A_i \\cdot x_i\n\\]\n\nConstraints:\n1. Inventory constraint:\n   \\[\n   x_i \\leq I_i, \\quad \\forall i \\in I\n   \\]\n2. Demand constraint:\n   \\[\n   x_i \\leq d_i, \\quad \\forall i \\in I\n   \\]\n3. Non-negativity and integrality:\n   \\[\n   x_i \\in \\mathbb{Z}_+, \\quad \\forall i \\in I\n   \\]\n\nData Mapping:\n- Table: Salesdata.csv (table_id: file_0_view_0)\n    - Product identifier: ‘Product Name’\n    - Revenue parameter: ‘Revenue’\n    - Demand parameter: ‘Demand’\n    - Initial inventory parameter: ‘Initial Inventory’\n    - Filter: Only rows where ‘Product Name’ has prefix ‘Baby’ (i.e., products classified under ‘Baby’).",
+  "csvqa_observation": "{\"ignored_file_indices\": [], \"query\": \"The supermarket offers a variety of top-selling products, with associated data provided in the ‘Revenue’ column. Each product has its own demand level. The retailer aims to maximize total revenue by focusing on the initial inventory of products classified under ‘Baby’. Inventory levels are detailed in the ‘Initial Inventory’ column. During the sales horizon, no restocking is allowed. Demand quantities for ‘Baby’ products are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. The decision variables x_i represent the number of units of each ‘Baby’ product i that the retailer plans to fulfill.\", \"relationships\": [], \"route\": \"NRM\", \"tables\": [{\"columns\": [\"Product Name\", \"Revenue\", \"Demand\", \"Initial Inventory\"], \"file_index\": 0, \"file_name\": \"Salesdata.csv\", \"filters\": {\"conditions\": [{\"column\": \"Product Name\", \"dtype\": \"string\", \"evidence\": \"\\\"Baby\\\"\", \"inclusive\": \"both\", \"operator\": \"prefix\", \"value\": \"Baby\"}], \"logic\": \"and\"}, \"original_rows\": 12, \"records\": [{\"source_row\": 0, \"values\": {\"Demand\": \"3066513\", \"Initial Inventory\": \"22749210\", \"Product Name\": \"Baby Food_255.28\", \"Revenue\": \"255.28\"}}], \"returned_rows\": 1, \"role\": \"product demand, revenue, and inventory\", \"table_id\": \"file_0_view_0\"}], \"validation\": {\"matrix_checks\": [], \"status\": \"OK\"}}",
+  "csvqa_mode": "planned",
+  "csvqa_status": "PLANNED",
+  "solve_code": "CSVQA_DATA = {'ignored_file_indices': [],\n 'query': 'The supermarket offers a variety of top-selling products, with associated data provided in the ‘Revenue’ '\n          'column. Each product has its own demand level. The retailer aims to maximize total revenue by focusing on '\n          'the initial inventory of products classified under ‘Baby’. Inventory levels are detailed in the ‘Initial '\n          'Inventory’ column. During the sales horizon, no restocking is allowed. Demand quantities for ‘Baby’ '\n          'products are specified in the ‘Demand’ column and are assumed to be deterministic and known in advance. The '\n          'decision variables x_i represent the number of units of each ‘Baby’ product i that the retailer plans to '\n          'fulfill.',\n 'relationships': [],\n 'route': 'NRM',\n 'tables': [{'columns': ['Product Name', 'Revenue', 'Demand', 'Initial Inventory'],\n             'file_index': 0,\n             'file_name': 'Salesdata.csv',\n             'filters': {'conditions': [{'column': 'Product Name',\n                                         'dtype': 'string',\n                                         'evidence': '\"Baby\"',\n                                         'inclusive': 'both',\n                                         'operator': 'prefix',\n                                         'value': 'Baby'}],\n                         'logic': 'and'},\n             'original_rows': 12,\n             'records': [{'source_row': 0,\n                          'values': {'Demand': '3066513',\n                                     'Initial Inventory': '22749210',\n                                     'Product Name': 'Baby Food_255.28',\n                                     'Revenue': '255.28'}}],\n             'returned_rows': 1,\n             'role': 'product demand, revenue, and inventory',\n             'table_id': 'file_0_view_0'}],\n 'validation': {'matrix_checks': [], 'status': 'OK'}}\nimport gurobipy as gp\nfrom gurobipy import GRB\ntable = None\nfor t in CSVQA_DATA['tables']:\n    if t['table_id'] == 'file_0_view_0':\n        table = t\n        break\nif table is None:\n    raise ValueError('Required table_id file_0_view_0 not found in CSVQA_DATA.')\nrecords = table['records']\nproducts = []\nrevenue = {}\ndemand = {}\ninventory = {}\nfor rec in records:\n    vals = rec['values']\n    prod = vals['Product Name']\n    try:\n        rev = float(vals['Revenue'])\n        dem = int(vals['Demand'])\n        inv = int(vals['Initial Inventory'])\n    except Exception as e:\n        raise ValueError(f'Invalid data for product {prod}: {e}')\n    products.append(prod)\n    revenue[prod] = rev\n    demand[prod] = dem\n    inventory[prod] = inv\nfor prod in products:\n    if prod not in revenue or prod not in demand or prod not in inventory:\n        raise ValueError(f'Missing parameter for product {prod}')\nm = gp.Model('Baby_Product_Revenue_Maximization')\nx_vars = m.addVars(products, lb=0, vtype=GRB.INTEGER, name='')\nm.setObjective(gp.quicksum((revenue[prod] * x_vars[prod] for prod in products)), GRB.MAXIMIZE)\nm.addConstrs((x_vars[prod] <= inventory[prod] for prod in products), name='')\nm.addConstrs((x_vars[prod] <= demand[prod] for prod in products), name='')\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for var in m.getVars():\n        print(f'{var.VarName}: {var.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 782819438.64,
+  "final_solution": [
+    [
+      "C0",
+      3066513.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 18.192,
+  "evaluated_utc": "2026-10-06T03:20:27.199157+00:00",
+  "notebook_source_sha256": "d2f4f72fc2d67baab041f2440fa4fd866be06a4defd180fc5edce65637dce7d9",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

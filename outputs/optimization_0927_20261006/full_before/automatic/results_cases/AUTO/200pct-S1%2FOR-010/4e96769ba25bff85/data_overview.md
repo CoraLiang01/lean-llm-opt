@@ -1,0 +1,21 @@
+**capacity.csv**
+{"reference_document_page_count": "6", "archive_audit_note_count": "5", "SectionID": "1", "archived_attachment_count": "1", "archive_revision_number": "3", "Capacity": "100"}
+{"reference_document_page_count": "8", "archive_audit_note_count": "3", "SectionID": "2", "archived_attachment_count": "1", "archive_revision_number": "7", "Capacity": "150"}
+{"reference_document_page_count": "2", "archive_audit_note_count": "1", "SectionID": "3", "archived_attachment_count": "3", "archive_revision_number": "3", "Capacity": "120"}
+{"reference_document_page_count": "12", "archive_audit_note_count": "4", "SectionID": "4", "archived_attachment_count": "2", "archive_revision_number": "4", "Capacity": "130"}
+{"reference_document_page_count": "2", "archive_audit_note_count": "4", "SectionID": "5", "archived_attachment_count": "3", "archive_revision_number": "6", "Capacity": "90"}
+{"reference_document_page_count": "6", "archive_audit_note_count": "2", "SectionID": "6", "archived_attachment_count": "3", "archive_revision_number": "4", "Capacity": "110"}
+{"reference_document_page_count": "12", "archive_audit_note_count": "3", "SectionID": "7", "archived_attachment_count": "1", "archive_revision_number": "3", "Capacity": "160"}
+{"reference_document_page_count": "4", "archive_audit_note_count": "1", "SectionID": "8", "archived_attachment_count": "3", "archive_revision_number": "8", "Capacity": "140"}
+
+**products.csv**
+{"record_keeper_group": "Team B", "reference_document_page_count": "2", "archive_storage_medium": "Digital", "ProductName": "1", "Value": "10", "archive_revision_number": "1", "record_index_style": "Numeric", "Weight": "2", "archived_attachment_count": "4"}
+{"record_keeper_group": "Team A", "reference_document_page_count": "4", "archive_storage_medium": "Hybrid", "ProductName": "2", "Value": "15", "archive_revision_number": "4", "record_index_style": "Numeric", "Weight": "3", "archived_attachment_count": "3"}
+{"record_keeper_group": "Team C", "reference_document_page_count": "8", "archive_storage_medium": "Digital", "ProductName": "3", "Value": "8", "archive_revision_number": "2", "record_index_style": "Alphabetic", "Weight": "1", "archived_attachment_count": "2"}
+{"record_keeper_group": "Team A", "reference_document_page_count": "8", "archive_storage_medium": "Paper", "ProductName": "4", "Value": "12", "archive_revision_number": "9", "record_index_style": "Numeric", "Weight": "2", "archived_attachment_count": "2"}
+{"record_keeper_group": "Team A", "reference_document_page_count": "12", "archive_storage_medium": "Paper", "ProductName": "5", "Value": "20", "archive_revision_number": "3", "record_index_style": "Numeric", "Weight": "4", "archived_attachment_count": "2"}
+{"record_keeper_group": "Team C", "reference_document_page_count": "6", "archive_storage_medium": "Paper", "ProductName": "6", "Value": "25", "archive_revision_number": "7", "record_index_style": "Chronological", "Weight": "5", "archived_attachment_count": "2"}
+{"record_keeper_group": "Team A", "reference_document_page_count": "12", "archive_storage_medium": "Paper", "ProductName": "7", "Value": "5", "archive_revision_number": "2", "record_index_style": "Alphabetic", "Weight": "1", "archived_attachment_count": "3"}
+{"record_keeper_group": "Team C", "reference_document_page_count": "2", "archive_storage_medium": "Hybrid", "ProductName": "8", "Value": "30", "archive_revision_number": "3", "record_index_style": "Numeric", "Weight": "6", "archived_attachment_count": "3"}
+{"record_keeper_group": "Team C", "reference_document_page_count": "8", "archive_storage_medium": "Digital", "ProductName": "9", "Value": "18", "archive_revision_number": "7", "record_index_style": "Chronological", "Weight": "3", "archived_attachment_count": "1"}
+{"record_keeper_group": "Team A", "reference_document_page_count": "8", "archive_storage_medium": "Hybrid", "ProductName": "10", "Value": "22", "archive_revision_number": "5", "record_index_style": "Alphabetic", "Weight": "4", "archived_attachment_count": "2"}

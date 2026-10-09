@@ -1,0 +1,97 @@
+--- before
++++ nrm_direct_formulation
+@@ -2,6 +2,10 @@
+ # few_shot_only — 最终全量的组件移除实验
+ 
+ 派生自通过整体比较的 full_review_v6_completed；全量源码 SHA-256：be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33。共享模型、求解参数、匹配容差、数据及执行机制；结果全部保留，不按单题选择重跑。
++
++## NRM 流程调整（2026-10-06）
++按用户要求，NRM 改为完整 Python Observation → 数值 Formulation → 自包含代码 → 求解。代码生成提示不直接接收完整 Observation，运行时不注入 CSVQA_DATA。
++此前 92/101 Objective match、96/101 Solved 属于调整前版本，本版本尚未重新运行；新结果目录与历史记录分离。
+ 
+ 
+ # CELL 1
+@@ -52,7 +56,7 @@
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/review_0927_20261006/manual_few_shot_only_full_review_v6_completed"
++RESULTS_DIR = PROJECT_ROOT / "outputs/review_0927_20261006/manual_few_shot_only_nrm_direct_full_review_v6_completed"
+ # Edit this one value when the notebook file is renamed.
+ NOTEBOOK_FILENAME = "Ablation_Study_Large_Scale_Or_Few-shot_Only_0927.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+@@ -73,8 +77,8 @@
+ CLASS_LABELS = ["TP", "NRM", "RA", "FLP", "AP", "Mixture", "Others"]
+ WORKFLOW_ROUTES = ["TP", "NRM", "FLP", "AP", "RA", "Others"]
+ CSVQA_MODE_BY_ROUTE = {
+-    # Preserve the original route behavior: only NRM uses planned extraction.
+-    "NRM": "planned", "RA": "legacy", "TP": "legacy",
++    # Few-shot CSV routes generate self-contained code from numerical formulations.
++    "NRM": "legacy", "RA": "legacy", "TP": "legacy",
+     "AP": "legacy", "FLP": "legacy", "Others": "legacy",
+ }
+ RAG_EXAMPLES_ALL_PATH = "Large_Scale_Or_Files/RAG_Examples_All.csv"
+@@ -160,8 +164,7 @@
+ # CELL 6
+ ## 3. CSV loading and route modes
+ 
+-Read CSV files, normalize routes, and select the fixed data-access mode. NRM uses planned extraction; the other routes use the legacy path.
+-
++Python supplies complete CSV Observation for modeling. NRM/RA/TP/AP/FLP use numerical formulations and self-contained code, without runtime data injection.
+ 
+ # CELL 7
+ def normalize_route(value: Any) -> str:
+@@ -734,8 +737,7 @@
+ # CELL 14
+ ## 7. Route retrieval and NRM formulation
+ 
+-Cache route-example retrievers and formulate network revenue management problems using planned CSV data.
+-
++Retain reference examples. NRM produces a complete numerical formulation from the Python Observation, then generates code directly like the other numerical routes.
+ 
+ # CELL 15
+ QUERY_SEMANTICS_GUIDANCE = '\nThe original query is authoritative when a reference example or intermediate plan conflicts with it.\nEligibility or authorization permits a choice; it does not force selection. When an integer\nquantity may be zero or within [L,U], use a binary selected flag with L*selected <= quantity\n<= U*selected, and enforce positive quantity iff selected (quantity >= selected when L is zero).\nAn activation flag means iff its stated condition holds: an item flag iff positive quantity;\na group flag iff at least one member is selected (member_flag <= group_flag for every member,\ngroup_flag <= sum(member_flags)); a pair flag iff both members are selected (the two upper\nbounds and the lower bound). Enforce both directions regardless of fee/bonus signs.\nKeep unconditional aggregate bounds unconditional. Do not add restrictions, lazy constraints,\nfixed-zero decisions, or mandatory selections without support in the current query.\n'
+@@ -880,13 +882,17 @@
+ 
+ def get_NRM_response(query, dataset_address):
+     few_shot_examples = build_formulation_examples("NRM", query, k=1)
+-    csvqa_system_prompt = CSVQA_PLANNED_PROMPTS["NRM"]
+-    csvqa_tool_description = CSVQA_TOOL_DESCRIPTIONS["NRM"]
+-
+-    route_instruction = """Use the complete Python Observation and return an ABSTRACT model. Define
+-index sets, parameters, variables, objective, and constraints symbolically. Include a short Data
+-Mapping that identifies every source by exact table_id and exact column name. Do not copy record
+-values or literal record counts. Python has supplied all source records without filtering; state and implement the query-supported selection explicitly in Data Mapping."""
++    csvqa_system_prompt = CSVQA_LEGACY_SYSTEM_PROMPT
++    csvqa_tool_description = CSVQA_LEGACY_TOOL_DESCRIPTION
++
++    route_instruction = """Use the complete Python Observation and return a complete numerical formulation.
++Define index sets, parameters, variables, objective, and constraints. Retrieved Information
++must include every query-required product/resource identifier, objective coefficient,
++resource-consumption coefficient, capacity, bound, and any additional parameter, with complete
++vectors and matrices and explicit axis labels. Preserve exact identifiers, source order, values,
++and matrix orientation. Apply only the selection rules stated in the query; do not invent,
++aggregate, abbreviate, or silently omit required data. The formulation must contain all data
++needed to generate self-contained code; no CSVQA_DATA or external CSV will be supplied to it."""
+     prefix = f"""You are an assistant that formulates mathematical optimization models.
+ 
+     The examples below illustrate model structure only; never copy their data.
+@@ -917,7 +923,7 @@
+             if attempt or not NRM_RETRY_ON_TRUNCATION:
+                 raise
+             truncated_usage = getattr(exc, "llm_usage", {})
+-            prefix += "\nReturn a concise symbolic model and Data Mapping only; never enumerate data rows or repeat examples."
++            prefix += "\nReturn a concise numerical model with all required identifiers and coefficients; omit explanations and repeated examples, never required data."
+             print("NRM formulation truncated; retrying once.", truncated_usage)
+ 
+ 
+@@ -1503,8 +1509,7 @@
+ # CELL 26
+ ## 13. Generate Python code
+ 
+-get_code preserves the original query-only workflow. get_csv_code uses structured NRM data or the numerical formulation from CSVQA. Others with CSV already generates code in section 12. All prompt examples are defined in this notebook.
+-
++NRM/RA/TP/AP/FLP generate self-contained code from the numerical formulation and original query. Complete source Observation is not appended to code-generation prompts. Others with CSV generates code in section 12.
+ 
+ # CELL 27
+ def _legacy_records_from_observation(legacy_observation):

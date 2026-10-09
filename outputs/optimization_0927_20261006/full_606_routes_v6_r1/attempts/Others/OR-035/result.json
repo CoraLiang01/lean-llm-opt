@@ -1,0 +1,79 @@
+{
+  "problem_id": "OR-035",
+  "query": "A small bakery in South Korea, and each day need to stock up on various types of bread. For each type of bread, we have an expected profit, which can be found in \"products.csv.\" However, the shop has limited storage capacity, with details provided in \"capacity.csv.\".Therefore, we must decide which types of bread to order each day to maximize our total expected profit while staying within our storage limits. The decision variables x_i represents the number of units of bread type i to be ordered each day.The decision variables must be integers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 150660.0,
+  "forced_route": "Others",
+  "experiment_mode": "forced",
+  "pipeline_stage": "completed",
+  "predicted_label": null,
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal daily order quantities for each type of bread to maximize total expected profit, subject to a storage capacity constraint. Each bread type has an associated expected profit and storage weight per unit.\n2.  **Identify Model Type:** Based on the query, this is a Mixed Integer Programming (MIP) problem (specifically, a 0-1 or bounded integer knapsack problem).\n3.  **Define Index Sets:** The primary index is the set of bread types (Products), as listed in products.csv.\n4.  **Define Decision Variables:**\n    -   `x[i]` = Number of units of bread type `i` to order each day. Type: GRB.INTEGER (must be integer-valued).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Value' column from products.csv (expected profit per unit for each bread type).\n    -   Constraint coefficients: 'Weight' column from products.csv (storage weight per unit for each bread type).\n    -   Constraint RHS: 'Capacity' value from capacity.csv (total available storage space per day).\n6.  **Formulate Objective:** Maximize the total expected profit, i.e., maximize sum over all bread types of (Value[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Storage Capacity): The total storage used by all ordered bread must not exceed the available capacity, i.e., sum over all bread types of (Weight[i] * x[i]) ≤ Capacity.\n    -   Constraint 2 (Non-negativity and Integrality): For all bread types, x[i] ≥ 0 and integer.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/capacity.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 1\nColumns: ['Capacity']\nParsed column types: {'Capacity': 'int64'}\nPreview only (first 10 rows):\nCapacity\n     180\nFull-file column statistics: {\"Capacity\": {\"missing\": 0, \"unique_nonempty\": 1, \"numeric_range\": [180.0, 180.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"capacity\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"capacity.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/products.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 10\nColumns: ['ProductName', 'Value', 'Weight']\nParsed column types: {'ProductName': 'object', 'Value': 'int64', 'Weight': 'int64'}\nPreview only (first 10 rows):\n   ProductName Value Weight\n      Baguette   888      4\n     Croissant   134      2\n     Sourdough   129      4\n     Rye Bread   370      3\n       Brioche   921      2\n      Focaccia   765      1\n      Ciabatta   154      2\n          Pita   837      1\n         Bagel   584      3\nEnglish Muffin   365      3\nFull-file column statistics: {\"ProductName\": {\"missing\": 0, \"unique_nonempty\": 10}, \"Value\": {\"missing\": 0, \"unique_nonempty\": 10, \"numeric_range\": [129.0, 921.0]}, \"Weight\": {\"missing\": 0, \"unique_nonempty\": 4, \"numeric_range\": [1.0, 4.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"capacity.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv.\", \"matching_columns\": [], \"exact_matching_columns\": 0}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "csvqa_trace": "{\"status\": \"LEGACY_SCHEMA\", \"planner_attempt_count\": 0, \"payload_hash\": \"af4e9a99abd278cb424106066cdbc09247ddead88d986b2c05be92e2e980a8ac\"}",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nimport re\nproducts_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/products.csv'\ncapacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA1/BakerySales1/capacity.csv'\nproducts_df = pd.read_csv(products_path, sep=',', dtype=str, keep_default_na=False)\nrequired_product_cols = ['ProductName', 'Value', 'Weight']\nfor col in required_product_cols:\n    if col not in products_df.columns:\n        raise KeyError(f\"Column '{col}' not found in products.csv\")\nproducts_df['ProductName'] = products_df['ProductName'].astype(str)\nproduct_ids = products_df['ProductName'].tolist()\ntry:\n    products_df['Value'] = products_df['Value'].astype(int)\n    products_df['Weight'] = products_df['Weight'].astype(int)\nexcept Exception as e:\n    raise ValueError(f'Failed to convert Value or Weight to int: {e}')\nvalue_dict = dict(zip(products_df['ProductName'], products_df['Value']))\nweight_dict = dict(zip(products_df['ProductName'], products_df['Weight']))\ncapacity_df = pd.read_csv(capacity_path, sep=',', dtype=str, keep_default_na=False)\nif 'Capacity' not in capacity_df.columns:\n    raise KeyError(\"Column 'Capacity' not found in capacity.csv\")\nif len(capacity_df) != 1:\n    raise ValueError('capacity.csv must have exactly one row')\ntry:\n    capacity = int(capacity_df.iloc[0]['Capacity'])\nexcept Exception as e:\n    raise ValueError(f'Failed to convert Capacity to int: {e}')\nif set(value_dict.keys()) != set(product_ids) or set(weight_dict.keys()) != set(product_ids):\n    raise ValueError('Mismatch in product identifiers between Value/Weight and ProductName')\nm = gp.Model('BakeryBreadOrder')\nx_vars = m.addVars(product_ids, vtype=gp.GRB.INTEGER, lb=0, name='')\nm.setObjective(gp.quicksum((value_dict[i] * x_vars[i] for i in product_ids)), gp.GRB.MAXIMIZE)\nm.addConstr(gp.quicksum((weight_dict[i] * x_vars[i] for i in product_ids)) <= capacity, name='storage_capacity')\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 150660.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      180.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": null,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "main",
+  "seconds": 11.146,
+  "evaluated_utc": "2026-10-06T08:52:48.847615+00:00",
+  "notebook_source_sha256": "be8e63e5a205d0c524c02cbc04d9ae098bf881e4e302e65f119e52079d094c33",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "route_result_source": "new_forced_execution",
+  "reused": false
+}

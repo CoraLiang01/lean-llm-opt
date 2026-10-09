@@ -1,0 +1,335 @@
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/react_revision_20261006/few_shot_only_v7/frozen_notebook.ipynb:cell15:29: LangChainDeprecationWarning: The class `LLMChain` was deprecated in LangChain 0.1.17 and will be removed in 1.0. Use `RunnableSequence, e.g., `prompt | llm`` instead.
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/react_revision_20261006/few_shot_only_v7/frozen_notebook.ipynb:cell15:28: LangChainDeprecationWarning: LangChain agents will continue to be supported, but it is recommended for new use cases to be built with LangGraph. LangGraph offers a more flexible and full-featured framework for building agents, including support for tool-calling, persistence of state, and human-in-the-loop workflows. For details, refer to the [LangGraph documentation](https://langchain-ai.github.io/langgraph/) as well as guides for [Migrating from AgentExecutor](https://python.langchain.com/docs/how_to/migrate_agent/) and LangGraph's [Pre-built ReAct agent](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent/).
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+##### Decision Variables
+
+$x_{ij} \geq 0$: quantity shipped from store $i \in I$ to customer group $j \in J$ (continuous).
+
+##### Sets
+
+$I = \{\text{S1}, \text{S2}, \text{S3}, \text{S4}, \text{S5}, \text{S6}, \text{S7}, \text{S8}, \text{S9}, \text{S10}, \text{S11}\}$ (stores)  
+$J = \{\text{C1}, \text{C2}, \text{C3}, \text{C4}, \text{C5}, \text{C6}, \text{C7}, \text{C8}, \text{C9}, \text{C10}, \text{C11}, \text{C12}\}$ (customer groups)
+
+##### Parameters
+
+- $d_j$: demand of customer group $j$ (from customer_demand.csv)
+- $s_i$: supply capacity of store $i$ (from supply_capacity.csv)
+- $c_{ij}$: transportation cost per unit from store $i$ to customer group $j$ (from transportation_costs.csv)
+
+##### Objective Function
+
+$\min \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij}$
+
+##### Constraints
+
+1. **Demand satisfaction:**  
+   $\sum_{i \in I} x_{ij} \geq d_j \quad \forall j \in J$
+
+2. **Supply capacity:**  
+   $\sum_{j \in J} x_{ij} \leq s_i \quad \forall i \in I$
+
+3. **Non-negativity:**  
+   $x_{ij} \geq 0 \quad \forall i \in I,\, j \in J$
+
+---
+
+#### Data Mapping
+
+- $d_j$:  
+  From "customer_demand.csv", column "customer" gives $j$, column "demand" gives $d_j$.
+
+- $s_i$:  
+  From "supply_capacity.csv", column "Unnamed: 0" gives $i$, column "supply_capacity" gives $s_i$.
+
+- $c_{ij}$:  
+  From "transportation_costs.csv", row "Unnamed: 0" gives $i$, columns "C1"–"C12" give $c_{ij}$ for each $j$.
+
+All identifiers and coefficients are to be used exactly as in the source data.[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    csv_paths = {
+        "customer_demand": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP2/customer_demand.csv",
+        "supply_capacity": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP2/supply_capacity.csv",
+        "transportation_costs": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP2/transportation_costs.csv"
+    }
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    def read_csv_with_encodings(path):
+        for enc in encodings:
+            try:
+                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with tried encodings.")
+    # Read customer demand
+    df_demand = read_csv_with_encodings(csv_paths["customer_demand"])
+    if "customer" not in df_demand.columns or "demand" not in df_demand.columns:
+        raise ValueError("customer_demand.csv must have columns: customer, demand")
+    customers = df_demand["customer"].tolist()
+    demand = {}
+    for _, row in df_demand.iterrows():
+        cust = row["customer"]
+        try:
+            val = float(row["demand"])
+        except Exception:
+            raise ValueError(f"Non-numeric demand for customer {cust}: {row['demand']}")
+        if cust in demand:
+            demand[cust] += val
+        else:
+            demand[cust] = val
+    # Read supply capacity
+    df_supply = read_csv_with_encodings(csv_paths["supply_capacity"])
+    # Accept either 'Unnamed: 0' or 'store' as store identifier
+    store_col = "Unnamed: 0" if "Unnamed: 0" in df_supply.columns else "store"
+    if store_col not in df_supply.columns or "supply_capacity" not in df_supply.columns:
+        raise ValueError("supply_capacity.csv must have columns: Unnamed: 0 (or store), supply_capacity")
+    suppliers = df_supply[store_col].tolist()
+    supply_capacity = {}
+    for _, row in df_supply.iterrows():
+        store = row[store_col]
+        try:
+            val = float(row["supply_capacity"])
+        except Exception:
+            raise ValueError(f"Non-numeric supply_capacity for store {store}: {row['supply_capacity']}")
+        if store in supply_capacity:
+            supply_capacity[store] += val
+        else:
+            supply_capacity[store] = val
+    # Read transportation costs
+    df_cost = read_csv_with_encodings(csv_paths["transportation_costs"])
+    # Accept either 'Unnamed: 0' or 'store' as store identifier
+    cost_store_col = "Unnamed: 0" if "Unnamed: 0" in df_cost.columns else "store"
+    if cost_store_col not in df_cost.columns:
+        raise ValueError("transportation_costs.csv must have a store identifier column")
+    # Columns for customer groups
+    cost_customer_cols = [col for col in df_cost.columns if col != cost_store_col]
+    # Validate all customers in demand are present in cost columns
+    missing_customers = set(customers) - set(cost_customer_cols)
+    if missing_customers:
+        raise ValueError(f"Customers missing in transportation_costs.csv: {missing_customers}")
+    # Validate all suppliers in supply are present in cost rows
+    missing_suppliers = set(suppliers) - set(df_cost[cost_store_col])
+    if missing_suppliers:
+        raise ValueError(f"Suppliers missing in transportation_costs.csv: {missing_suppliers}")
+    # Build cost dictionary
+    cost = {}
+    for _, row in df_cost.iterrows():
+        store = row[cost_store_col]
+        if store not in suppliers:
+            continue
+        cost[store] = {}
+        for cust in customers:
+            val = row[cust]
+            try:
+                costval = float(val)
+            except Exception:
+                raise ValueError(f"Non-numeric cost for store {store}, customer {cust}: {val}")
+            cost[store][cust] = costval
+    # Validate all cost entries present
+    for i in suppliers:
+        if i not in cost:
+            raise ValueError(f"Missing cost row for supplier {i}")
+        for j in customers:
+            if j not in cost[i]:
+                raise ValueError(f"Missing cost for supplier {i}, customer {j}")
+    # Build model
+    m = gp.Model("Walmart_Transportation")
+    quantity_keys = [(i, j) for i in suppliers for j in customers]
+    quantity_vars = m.addVars(quantity_keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+    # Objective
+    m.setObjective(
+        gp.quicksum(cost[i][j] * quantity_vars[i, j] for i, j in quantity_keys),
+        GRB.MINIMIZE
+    )
+    # Demand satisfaction: sum over i of x_{ij} >= d_j for all j
+    for j in customers:
+        m.addConstr(
+            gp.quicksum(quantity_vars[i, j] for i in suppliers) >= demand[j],
+            name=f"demand_{j}"
+        )
+    # Supply capacity: sum over j of x_{ij} <= s_i for all i
+    for i in suppliers:
+        m.addConstr(
+            gp.quicksum(quantity_vars[i, j] for j in customers) <= supply_capacity[i],
+            name=f"supply_{i}"
+        )
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 23 rows, 132 columns and 264 nonzeros
+Model fingerprint: 0xb7e6f39a
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e-03, 3e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e+00, 1e+04]
+Presolve time: 0.00s
+Presolved: 23 rows, 132 columns, 264 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   1.084300e+04   0.000000e+00      0s
+      44    6.4644207e+06   0.000000e+00   0.000000e+00      0s
+
+Solved in 44 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  6.464420700e+06
+ObjVal: 6464420.6996351
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 4.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 575.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 1148.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 315.0
+C31: 41.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 178.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 228.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 35.0
+C68: 0.0
+C69: 0.0
+C70: 15.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 3.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 0.0
+C83: 0.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 5607.0
+C91: 0.0
+C92: 66.0
+C93: 0.0
+C94: 0.0
+C95: 475.0
+C96: 0.0
+C97: 0.0
+C98: 6.0
+C99: 0.0
+C100: 0.0
+C101: 0.0
+C102: 0.0
+C103: 0.0
+C104: 0.0
+C105: 0.0
+C106: 0.0
+C107: 0.0
+C108: 11.0
+C109: 0.0
+C110: 45.0
+C111: 833.0
+C112: 154.0
+C113: 551.0
+C114: 0.0
+C115: 0.0
+C116: 0.0
+C117: 174.0
+C118: 0.0
+C119: 205.0
+C120: 0.0
+C121: 0.0
+C122: 0.0
+C123: 0.0
+C124: 0.0
+C125: 0.0
+C126: 174.0
+C127: 0.0
+C128: 0.0
+C129: 0.0
+C130: 0.0
+C131: 0.0
+Optimal objective: 6464420.6996351
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 4.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 575.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 1148.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 315.0), ('C31', 41.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 178.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 228.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 35.0), ('C68', 0.0), ('C69', 0.0), ('C70', 15.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 3.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 5607.0), ('C91', 0.0), ('C92', 66.0), ('C93', 0.0), ('C94', 0.0), ('C95', 475.0), ('C96', 0.0), ('C97', 0.0), ('C98', 6.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 0.0), ('C108', 11.0), ('C109', 0.0), ('C110', 45.0), ('C111', 833.0), ('C112', 154.0), ('C113', 551.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 174.0), ('C118', 0.0), ('C119', 205.0), ('C120', 0.0), ('C121', 0.0), ('C122', 0.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 174.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0)]

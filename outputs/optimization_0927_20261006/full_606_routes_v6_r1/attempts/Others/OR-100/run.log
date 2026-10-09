@@ -1,0 +1,299 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A product consists of three components, which are produced by four workshops. The total number of production hours available for each workshop is limited. 31.csv shows the productivity of the three components. The objective is to determine how many hours should be allocated to each component in each workshop in order to maximize the number of completed products. Represent this problem as a linear programming problem. Each completed product requires one unit of each of the three components. Production hours and the completed-product quantity are modeled as nonnegative continuous variables in this linear programming instance.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Maximize**
+
+$$
+N
+$$
+
+**subject to**
+
+$$
+x_{A1} + x_{A2} + x_{A3} \leq 100 
+\quad (\text{workshop A hours})
+$$
+
+$$
+x_{B1} + x_{B2} + x_{B3} \leq 150 
+\quad (\text{workshop B hours})
+$$
+
+$$
+x_{C1} + x_{C2} + x_{C3} \leq 80 
+\quad (\text{workshop C hours})
+$$
+
+$$
+x_{D1} + x_{D2} + x_{D3} \leq 200 
+\quad (\text{workshop D hours})
+$$
+
+**component requirements**
+
+$$
+10\, x_{A1} + 15\, x_{B1} + 20\, x_{C1} + 10\, x_{D1} \geq N 
+\quad (\text{component 1})
+$$
+
+$$
+15\, x_{A2} + 10\, x_{B2} + 5\, x_{C2} + 15\, x_{D2} \geq N 
+\quad (\text{component 2})
+$$
+
+$$
+5\, x_{A3} + 5\, x_{B3} + 10\, x_{C3} + 20\, x_{D3} \geq N 
+\quad (\text{component 3})
+$$
+
+**where**
+
+$$
+x_{wc} \geq 0 
+\quad \text{for all } 
+w \in \{A,B,C,D\},\, 
+c \in \{1,2,3\}
+$$
+
+$$
+N \geq 0 
+\quad (\text{number of completed products})
+$$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+#### Decision Variables
+- $x_1$: Quantity of Product A to produce
+- $x_2$: Quantity of Product B to produce
+
+#### Objective Function
+Maximize total profit: 
+$\quad \quad \max \ 80x_1 + 125x_2$
+
+#### Constraints
+**1. Steel Constraint** 
+$\quad \quad 8x_1 + 5x_2 \leq 3500$ 
+
+**2. Iron Constraint** 
+$\quad \quad 6x_1 + 4x_2 \leq 1800$ 
+
+**3. Machine Hours Constraint** 
+$\quad \quad 4x_1 + 5x_2 \leq 2800$ 
+
+**4. Non-negativity** 
+$\quad \quad x_1 \geq 0, x_2 \geq 0$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal production quantities for 111 types of components, given the unit processing times in five workshops, the unit price of each component, and the total available working hours per workshop, in order to maximize the total output value (i.e., total revenue from produced components).
+2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) resource allocation problem.
+3.  **Define Index Sets:** The primary indices are:
+    - Components: \( i \in \{C1, C2, ..., C111\} \)
+    - Workshops: \( w \in \{\text{Casting}, \text{Milling}, \text{Finishing}, \text{Assembly}, \text{QA \& Packaging}\} \)
+4.  **Define Decision Variables:**
+    - \( x[i] \) = Quantity of component \( i \) to produce. Type: GRB.CONTINUOUS (nonnegative).
+5.  **Identify Parameters (from Schema):**
+    - Objective coefficients: 'unit_price' from unit_price.csv, mapped by component \( i \).
+    - Constraint coefficients: Processing time per unit for each component in each workshop, from processing_time_unit.csv (row for workshop \( w \), column for component \( i \)).
+    - Constraint RHS: 'total_hours' for each workshop \( w \) from total_working_hours.csv.
+6.  **Formulate Objective:** Maximize the total output value, i.e., maximize \( \sum_{i} \text{unit\_price}[i] \times x[i] \).
+7.  **Formulate Constraints:**
+    - For each workshop \( w \): The total processing time used in workshop \( w \) across all components cannot exceed its available hours:
+        \( \sum_{i} \text{processing\_time\_unit}[w, i] \times x[i] \leq \text{total\_hours}[w] \).
+    - Non-negativity: \( x[i] \geq 0 \) for all components \( i \).
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+
+# 1. Read all required CSVs with dtype=str and keep_default_na=False
+processing_time_unit_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others8/processing_time_unit.csv'
+unit_price_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others8/unit_price.csv'
+total_working_hours_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Others_example/Others8/total_working_hours.csv'
+
+# Read processing_time_unit.csv
+ptu_df = pd.read_csv(processing_time_unit_path, dtype=str, keep_default_na=False)
+# The first column is workshop name, the rest are component IDs
+workshop_col = 'Unnamed: 0'
+component_ids = [col for col in ptu_df.columns if col != workshop_col]
+workshop_ids = ptu_df[workshop_col].tolist()
+
+# Read unit_price.csv
+unit_price_df = pd.read_csv(unit_price_path, dtype=str, keep_default_na=False)
+# Set index to component ID for fast lookup
+unit_price_df['unit_price'] = unit_price_df['unit_price'].astype(float)
+unit_price_df.set_index('Unnamed: 0', inplace=True)
+unit_price_dict = unit_price_df['unit_price'].to_dict()
+
+# Read total_working_hours.csv
+twh_df = pd.read_csv(total_working_hours_path, dtype=str, keep_default_na=False)
+twh_df['total_hours'] = twh_df['total_hours'].astype(float)
+# Map workshop name to total hours
+workshop_name_map = {w: w for w in workshop_ids}
+# Normalize workshop names for matching
+def norm_ws(s):
+    return s.strip().casefold()
+workshop_norm_to_id = {norm_ws(w): w for w in workshop_ids}
+twh_dict = {}
+for idx, row in twh_df.iterrows():
+    ws_norm = norm_ws(row['workshop'])
+    if ws_norm not in workshop_norm_to_id:
+        raise KeyError(f"Workshop '{row['workshop']}' in total_working_hours.csv not found in processing_time_unit.csv")
+    ws_id = workshop_norm_to_id[ws_norm]
+    twh_dict[ws_id] = float(row['total_hours'])
+
+# 2. Build processing_time_unit as a dict-of-dicts: [workshop][component] = float
+processing_time_unit = {}
+for i, ws in enumerate(workshop_ids):
+    processing_time_unit[ws] = {}
+    for comp in component_ids:
+        val = ptu_df.loc[i, comp]
+        try:
+            processing_time_unit[ws][comp] = float(val)
+        except Exception:
+            raise ValueError(f"Invalid processing time for workshop '{ws}', component '{comp}': '{val}'")
+
+# 3. Validate all required keys are present
+for comp in component_ids:
+    if comp not in unit_price_dict:
+        raise KeyError(f"Component '{comp}' missing from unit_price.csv")
+for ws in workshop_ids:
+    if ws not in twh_dict:
+        raise KeyError(f"Workshop '{ws}' missing from total_working_hours.csv")
+
+# 4. Build Gurobi model
+m = gp.Model("MaximizeTotalOutputValue")
+
+# 5. Decision variables: x_vars[comp] = quantity of component comp to produce (continuous, >=0)
+x_vars = m.addVars(component_ids, lb=0.0, vtype=gp.GRB.CONTINUOUS, name="x")
+
+# 6. Objective: maximize total output value
+m.setObjective(
+    gp.quicksum(unit_price_dict[comp] * x_vars[comp] for comp in component_ids),
+    gp.GRB.MAXIMIZE
+)
+
+# 7. Constraints: For each workshop, total processing time used <= available hours
+for ws in workshop_ids:
+    m.addConstr(
+        gp.quicksum(processing_time_unit[ws][comp] * x_vars[comp] for comp in component_ids) <= twh_dict[ws],
+        name=f"workshop_{ws}_hours"
+    )
+
+# 8. Solve
+m.optimize()
+
+# 9. Print results
+if m.status == gp.GRB.OPTIMAL:
+    print(f"Optimal total output value: {m.objVal:.2f}")
+    print("--- Production Plan (component: quantity) ---")
+    for comp in component_ids:
+        qty = x_vars[comp].X
+        if qty > 1e-6:
+            print(f"{comp}: {qty:.2f}")
+    print("--- Workshop Utilization ---")
+    for ws in workshop_ids:
+        used = sum(processing_time_unit[ws][comp] * x_vars[comp].X for comp in component_ids)
+        print(f"{ws}: {used:.2f} / {twh_dict[ws]:.2f} hours used")
+else:
+    print(f"No optimal solution found. Status: {m.status}")
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 5 rows, 111 columns and 459 nonzeros
+Model fingerprint: 0x52c11e61
+Coefficient statistics:
+  Matrix range     [5e-01, 5e+00]
+  Objective range  [5e+01, 2e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [6e+03, 8e+03]
+Presolve removed 0 rows and 43 columns
+Presolve time: 0.00s
+Presolved: 5 rows, 68 columns, 269 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    7.1398451e+06   1.916483e+04   0.000000e+00      0s
+      11    1.3822007e+06   0.000000e+00   0.000000e+00      0s
+
+Solved in 11 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  1.382200722e+06
+Optimal total output value: 1382200.72
+--- Production Plan (component: quantity) ---
+C78: 4882.79
+C84: 3025.08
+C91: 1290.91
+C110: 105.82
+--- Workshop Utilization ---
+Casting: 7650.00 / 7650.00 hours used
+Milling: 2366.00 / 6320.00 hours used
+Finishing: 5538.00 / 5538.00 hours used
+Assembly: 5957.00 / 5957.00 hours used
+QA & Packaging: 6988.00 / 6988.00 hours used
+Optimal objective: 1382200.7222841426
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 0.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 0.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 0.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 0.0), ('C31', 0.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 0.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 0.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 0.0), ('C68', 0.0), ('C69', 0.0), ('C70', 0.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 0.0), ('C75', 0.0), ('C76', 0.0), ('C77', 4882.786885245901), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 3025.0807200143045), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 1290.909090909091), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', 0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', 0.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 0.0), ('C108', 0.0), ('C109', 105.82447642952395), ('C110', 0.0)]

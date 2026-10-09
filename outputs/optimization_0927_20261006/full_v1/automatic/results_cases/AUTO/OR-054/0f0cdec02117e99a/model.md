@@ -1,0 +1,75 @@
+Let $x_{ij}$ be the number of units of product $j$ placed on shelf $i$, where $i \in \{1,2,\ldots,10\}$ (ShelfID from capacity.csv) and $j \in \{1,2,\ldots,20\}$ (ProductName from products.csv).
+
+Parameters:
+
+- $v_j$: Value of product $j$ (from products.csv)
+- $w_j$: Weight of product $j$ (from products.csv)
+- $C_i$: Capacity of shelf $i$ (from capacity.csv)
+
+Data:
+
+From capacity.csv (in source order):
+
+| ShelfID | Capacity |
+|---------|----------|
+| 1       | 750      |
+| 2       | 820      |
+| 3       | 570      |
+| 4       | 800      |
+| 5       | 550      |
+| 6       | 900      |
+| 7       | 650      |
+| 8       | 800      |
+| 9       | 850      |
+| 10      | 900      |
+
+From products.csv (in source order):
+
+| ProductName | Value | Weight |
+|-------------|-------|--------|
+| 1           | 55    | 10     |
+| 2           | 75    | 20     |
+| 3           | 65    | 5      |
+| 4           | 60    | 15     |
+| 5           | 80    | 25     |
+| 6           | 90    | 35     |
+| 7           | 40    | 45     |
+| 8           | 100   | 55     |
+| 9           | 55    | 65     |
+| 10          | 75    | 20     |
+| 11          | 110   | 18     |
+| 12          | 50    | 28     |
+| 13          | 60    | 8      |
+| 14          | 120   | 28     |
+| 15          | 70    | 25     |
+| 16          | 110   | 40     |
+| 17          | 50    | 55     |
+| 18          | 60    | 70     |
+| 19          | 120   | 85     |
+| 20          | 100   | 100    |
+
+Mathematical Model:
+
+Objective:
+$$
+\max \sum_{i=1}^{10} \sum_{j=1}^{20} v_j \cdot x_{ij}
+$$
+
+Subject to (for each shelf $i$):
+
+Capacity constraints:
+$$
+\sum_{j=1}^{20} w_j \cdot x_{ij} \leq C_i, \quad \forall i \in \{1,2,\ldots,10\}
+$$
+
+Nonnegativity and integrality:
+$$
+x_{ij} \in \mathbb{Z}_{\geq 0}, \quad \forall i \in \{1,2,\ldots,10\},\ j \in \{1,2,\ldots,20\}
+$$
+
+Where:
+
+- $v_j$ and $w_j$ are as given in the products.csv table above, matched by ProductName $j$.
+- $C_i$ is as given in the capacity.csv table above, matched by ShelfID $i$.
+
+All variables and parameters use the original identifiers and coefficients as retrieved.

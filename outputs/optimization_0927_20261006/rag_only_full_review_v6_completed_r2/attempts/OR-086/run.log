@@ -1,0 +1,208 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal daily allocation of three raw wine grades to three wine brands, maximizing total net profit (sales revenue minus raw material cost), subject to blending proportion requirements, raw material supply limits, and a minimum production requirement for the Red brand.
+2.  **Identify Model Type:** Based on the query, this is a blending linear programming (LP) problem.
+3.  **Define Index Sets:** The primary indices are:
+    -   Grades of raw wine material (from 30-1.csv): \( G \)
+    -   Wine brands (from 30-2.csv): \( B \)
+4.  **Define Decision Variables:**
+    -   \( x_{g,b} \) = quantity (kg) of raw grade \( g \) allocated to brand \( b \). Type: GRB.CONTINUOUS, \( x_{g,b} \geq 0 \).
+5.  **Identify Parameters (from Schema):**
+    -   From 30-1.csv:
+        -   \( \text{Supply}_g \): 'Daily Supply (kg)' for grade \( g \)
+        -   \( \text{Cost}_g \): 'Cost (CNY/kg)' for grade \( g \)
+    -   From 30-2.csv:
+        -   \( \text{Price}_b \): 'Selling Price (CNY/kg)' for brand \( b \)
+        -   Blending requirements for each brand \( b \): lower and upper bounds on the proportion of certain grades in the blend (parsed from 'Blending Requirements')
+    -   Minimum production for Red brand: 2,000 kg (from query)
+6.  **Formulate Objective:** Maximize total net profit, calculated as:
+    -   Total sales revenue: sum over all brands of (total kg produced of brand \( b \)) × (selling price of brand \( b \))
+    -   Minus total raw material cost: sum over all grades and brands of (kg of grade \( g \) used in brand \( b \)) × (cost per kg of grade \( g \))
+    -   Objective: Maximize \( \sum_{b \in B} \left( \text{Price}_b \cdot \sum_{g \in G} x_{g,b} \right) - \sum_{g \in G} \sum_{b \in B} \left( \text{Cost}_g \cdot x_{g,b} \right) \)
+7.  **Formulate Constraints:**
+    -   **Blending Requirements:** For each brand \( b \) and each grade \( g \) with a specified lower or upper proportion bound, enforce:
+        -   Lower bound: \( \frac{x_{g,b}}{\sum_{g' \in G} x_{g',b}} \geq \text{LowerBound}_{g,b} \) (if specified)
+        -   Upper bound: \( \frac{x_{g,b}}{\sum_{g' \in G} x_{g',b}} \leq \text{UpperBound}_{g,b} \) (if specified)
+        -   These are implemented as linear constraints by cross-multiplying denominators.
+    -   **Raw Material Supply Constraints:** For each grade \( g \), the total amount used across all brands cannot exceed its daily supply:
+        -   \( \sum_{b \in B} x_{g,b} \leq \text{Supply}_g \)
+    -   **Minimum Production for Red Brand:** The total production of the Red brand must be at least 2,000 kg:
+        -   \( \sum_{g \in G} x_{g,\text{Red}} \geq 2000 \)
+    -   **Non-negativity:** All \( x_{g,b} \geq 0 \)
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+import re
+from gurobipy import Model, GRB, quicksum
+
+# Read 30-1.csv: Grades, supply, cost
+grades_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-1.csv',
+    dtype=str, keep_default_na=False
+)
+# Normalize and extract grades, supply, cost
+grades_df['Grade'] = grades_df['Grade'].str.strip()
+grades = list(grades_df['Grade'])
+supply_g = {}
+cost_g = {}
+for idx, row in grades_df.iterrows():
+    g = row['Grade']
+    try:
+        supply_g[g] = int(row['Daily Supply (kg)'])
+        cost_g[g] = float(row['Cost (CNY/kg)'])
+    except Exception as e:
+        raise ValueError(f"Invalid numeric value in 30-1.csv for grade {g}: {e}")
+
+# Read 30-2.csv: Brands, blending requirements, selling price
+brands_df = pd.read_csv(
+    '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture8/30-2.csv',
+    dtype=str, keep_default_na=False
+)
+brands_df['Brand'] = brands_df['Brand'].str.strip()
+brands = list(brands_df['Brand'])
+price_b = {}
+# For blending requirements: for each brand, for each grade, store (lower, upper) bounds on proportion
+# bounds[g][b] = (lower, upper), where lower/upper are floats or None if not specified
+bounds = {g: {b: (None, None) for b in brands} for g in grades}
+
+for idx, row in brands_df.iterrows():
+    b = row['Brand']
+    try:
+        price_b[b] = float(row['Selling Price (CNY/kg)'])
+    except Exception as e:
+        raise ValueError(f"Invalid selling price for brand {b}: {e}")
+    # Parse blending requirements
+    reqs = row['Blending Requirements']
+    # Each requirement is of the form: "I less than 10%" or "II more than 50%"
+    # There may be multiple requirements per brand, separated by spaces (as in preview)
+    # We'll split by double space or by regex for grade+requirement
+    # Use regex to find all patterns: (Grade) (less|more) than (\d+)% 
+    # Accept both "less than" and "more than" (case-insensitive)
+    reqs = reqs.strip()
+    # Find all matches
+    pattern = r'([^\s]+)\s+(less|more)\s+than\s+(\d+)%'
+    for match in re.finditer(pattern, reqs, flags=re.IGNORECASE):
+        grade = match.group(1).strip()
+        op = match.group(2).strip().casefold()
+        percent = float(match.group(3))
+        if grade not in grades:
+            raise ValueError(f"Unknown grade '{grade}' in blending requirements for brand '{b}'")
+        lower, upper = bounds[grade][b]
+        if op == 'less':
+            # Upper bound: proportion <= percent/100
+            upper = percent / 100.0
+        elif op == 'more':
+            # Lower bound: proportion >= percent/100
+            lower = percent / 100.0
+        else:
+            raise ValueError(f"Unknown operator '{op}' in blending requirements for brand '{b}'")
+        bounds[grade][b] = (lower, upper)
+
+# Validate that all brands and grades are covered
+if set(grades) != set(grades_df['Grade']):
+    raise ValueError("Mismatch in grades between data and parsed set.")
+if set(brands) != set(brands_df['Brand']):
+    raise ValueError("Mismatch in brands between data and parsed set.")
+
+# Create model
+m = Model("wine_blending")
+# Decision variables: x_{g,b} >= 0, continuous
+x_vars = m.addVars(
+    grades, brands, lb=0, vtype=GRB.CONTINUOUS, name='x'
+)
+
+# Objective: maximize total net profit
+# Total sales revenue: sum_b (price_b * total production of b)
+sales_revenue = quicksum(
+    price_b[b] * quicksum(x_vars[g, b] for g in grades)
+    for b in brands
+)
+# Total raw material cost: sum_g sum_b (cost_g * x_{g,b})
+raw_material_cost = quicksum(
+    cost_g[g] * x_vars[g, b]
+    for g in grades for b in brands
+)
+m.setObjective(sales_revenue - raw_material_cost, GRB.MAXIMIZE)
+
+# Constraints
+
+# 1. Blending requirements: for each brand b, for each grade g with a bound
+for b in brands:
+    total_prod_b = quicksum(x_vars[g, b] for g in grades)
+    for g in grades:
+        lower, upper = bounds[g][b]
+        # Only add constraint if bound is specified
+        if lower is not None:
+            # x_{g,b} >= lower * total_prod_b
+            # If total_prod_b == 0, this is 0 >= 0, which is fine
+            m.addConstr(
+                x_vars[g, b] >= lower * total_prod_b,
+                name=f"blend_lb_{g}_{b}"
+            )
+        if upper is not None:
+            # x_{g,b} <= upper * total_prod_b
+            m.addConstr(
+                x_vars[g, b] <= upper * total_prod_b,
+                name=f"blend_ub_{g}_{b}"
+            )
+
+# 2. Raw material supply constraints: for each grade g
+for g in grades:
+    m.addConstr(
+        quicksum(x_vars[g, b] for b in brands) <= supply_g[g],
+        name=f"supply_{g}"
+    )
+
+# 3. Minimum production for Red brand: sum_g x_{g,Red} >= 2000
+# Find the exact identifier for Red brand (case-insensitive match)
+red_brand = None
+for b in brands:
+    if b.strip().casefold() == 'red':
+        red_brand = b
+        break
+if red_brand is None:
+    raise ValueError("No brand named 'Red' found in brands list.")
+m.addConstr(
+    quicksum(x_vars[g, red_brand] for g in grades) >= 2000,
+    name="minprod_red"
+)
+
+# 4. Non-negativity is already enforced by lb=0 in variable definition
+
+# Optimize
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 10 rows, 9 columns and 30 nonzeros
+Model fingerprint: 0x92efa660
+Coefficient statistics:
+  Matrix range     [1e-01, 1e+00]
+  Objective range  [3e-01, 2e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 2e+03]
+Presolve removed 4 rows and 3 columns
+Presolve time: 0.00s
+Presolved: 6 rows, 6 columns, 23 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    6.1518018e+04   8.689877e+03   0.000000e+00      0s
+       3    4.5000000e+03   0.000000e+00   0.000000e+00      0s
+
+Solved in 3 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  4.500000000e+03
+Optimal objective: 4500.0
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 2000.0), ('C4', 0.0), ('C5', 0.0), ('C6', 1000.0), ('C7', 0.0), ('C8', 0.0)]

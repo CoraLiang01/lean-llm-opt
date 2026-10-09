@@ -1,0 +1,104 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Extract table records
+tables = CSVQA_DATA["tables"]
+table = None
+for t in tables:
+    if t["table_id"] == "file_0_view_0":
+        table = t
+        break
+if table is None:
+    raise ValueError("Required table_id 'file_0_view_0' not found in CSVQA_DATA.")
+
+records = table["records"]
+if not records:
+    raise ValueError("No records found in table 'file_0_view_0'.")
+
+# Identify products with "27in" in Product Name
+I = []
+A = {}
+d = {}
+Iinv = {}
+
+for rec in records:
+    pname = rec["values"]["Product Name"]
+    if not isinstance(pname, str):
+        continue
+    if re.search(r"27in", pname):
+        I.append(pname)
+        try:
+            revenue = rec["values"]["Revenue"]
+            demand = rec["values"]["Demand"]
+            initial_inventory = rec["values"]["Initial Inventory"]
+        except KeyError as e:
+            raise ValueError(f"Missing required column in record: {e}")
+        try:
+            A[pname] = float(revenue)
+            d[pname] = int(demand)
+            Iinv[pname] = int(initial_inventory)
+        except Exception as e:
+            raise ValueError(f"Error parsing numeric values for product '{pname}': {e}")
+
+if not I:
+    raise ValueError("No products with '27in' in 'Product Name' found.")
+
+# Validate all coefficients present
+for pname in I:
+    if pname not in A or pname not in d or pname not in Iinv:
+        raise ValueError(f"Missing coefficients for product '{pname}'.")
+
+# Build and solve the model
+m = gp.Model('27in_Product_Revenue_Max')
+x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Objective
+m.setObjective(gp.quicksum(A[i] * x[i] for i in I), GRB.MAXIMIZE)
+
+# Constraints
+m.addConstrs((x[i] <= d[i] for i in I), name='')
+m.addConstrs((x[i] <= Iinv[i] for i in I), name='')
+
+# Set MIPGap
+m.Params.MIPGap = 1e-4
+
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 4 rows, 2 columns and 4 nonzeros
+Model fingerprint: 0xa1935c1a
+Variable types: 0 continuous, 2 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [5e+01, 3e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+04, 8e+04]
+Found heuristic solution: objective 4049812.4247
+Presolve removed 4 rows and 2 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 4.04981e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.049812424700e+06, best bound 4.049812424700e+06, gap 0.0000%
+ObjVal: 4049812.4247
+C0: 12474.0
+C1: 15057.0
+Optimal objective: 4049812.4247
+Optimal solution: [('C0', 12474.0), ('C1', 15057.0)]

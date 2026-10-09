@@ -1,0 +1,119 @@
+--- Ablation_Study_Large_Scale_Or_RAG_Only.ipynb:v6
++++ Ablation_Study_Large_Scale_Or_RAG_Only.ipynb:v7
+@@ -37,7 +37,7 @@
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/react_revision_20261006/rag_only_v6"
++RESULTS_DIR = PROJECT_ROOT / "outputs/react_revision_20261006/rag_only_v7"
+ # Edit this one value when the notebook file is renamed.
+ NOTEBOOK_FILENAME = "Ablation_Study_Large_Scale_Or_RAG_Only.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+@@ -51,7 +51,7 @@
+ load_dotenv(PROJECT_ROOT / ".env", override=False)
+ user_api_key = os.environ.get("OPENAI_API_KEY")
+ 
+-VERSION = "react-source-data-v6"
++VERSION = "react-source-data-v7"
+ MODEL_SNAPSHOT = "gpt-4.1-2025-04-14"
+ NRM_RETRY_ON_TRUNCATION = False  # Single attempt; truncation remains a failed case.
+ EMBEDDING_MODEL = "text-embedding-ada-002"
+@@ -69,8 +69,8 @@
+ REACT_PROTOCOL_TIMEOUT_SECONDS = 1800  # User-authorized protocol restarts share the case deadline.
+ 
+ METHOD = "rag_only"
+-CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/react_revision_20261006/full_v6/automatic/results.csv"
+-BASE_NOTEBOOK_SHA256 = "265776089f25940c1ffb480d3511deb78b8afce0e7764e56c0ca3654b039fd95"
++CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/react_revision_20261006/full_v7/automatic/results.csv"
++BASE_NOTEBOOK_SHA256 = "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1"
+ 
+ 
+ HTTP_RETRY_EVENTS = []
+@@ -213,6 +213,7 @@
+             raise TimeoutError("ReAct protocol remained incomplete at the common case deadline")
+         try:
+             agent = agent_factory()
++            original_template = agent.agent.llm_chain.prompt.template
+             if REACT_PROTOCOL_EVENTS:
+                 prompt = agent.agent.llm_chain.prompt
+                 marker = "PROTOCOL RESTART REMINDER:"
+@@ -220,7 +221,10 @@
+                     prompt.template += ("\n" + marker + " Use exact Thought/Action/Action Input or "
+                                         "Thought/Final Answer labels. Do not output a bare model." +
+                                         (" Call CSVQA before the Final Answer." if required_tool else ""))
+-            result = agent.invoke(query)
++            try:
++                result = agent.invoke(query)
++            finally:
++                agent.agent.llm_chain.prompt.template = original_template
+             output = str(result.get("output", "") or "").strip()
+             calls = sum(getattr(step[0], "tool", None) == required_tool
+                         for step in result.get("intermediate_steps", [])
+@@ -368,6 +372,14 @@
+         "has no role in the query. Illustrative examples do not restrict the entity set."
+     )
+     CSVQA_TOOL_DESCRIPTIONS[_route] = "Return source-derived records, exact columns, filters and matrix axes."
++
++def source_csvqa_frames(payload):
++    """Create source-only DataFrames keyed by exact table_id; retain strings and row order."""
++    data = json.loads(payload) if isinstance(payload, str) else payload
++    return {table["table_id"]: pd.DataFrame(
++        [record["values"] for record in table["records"]], columns=table["columns"],
++        index=[record["source_row"] for record in table["records"]],
++    ) for table in data["tables"]}
+ 
+ 
+ def _ask_extraction_plan(llm, route, query, tables, route_prompt):
+@@ -682,7 +694,10 @@
+     def qa_wrapper(tool_query):
+         file_indices = None
+         if str(tool_query).lstrip().startswith("{"):
+-            request = json.loads(tool_query)
++            try:
++                request = json.loads(tool_query)
++            except json.JSONDecodeError as exc:
++                raise ReActProtocolError("csvqa_action_input_format") from exc
+             file_indices = request.get("file_indices")
+         plan, planner_outputs, errors, status, fallback_reason = None, [], [], "LEGACY_FULL_DATA", None
+         attempt_count = 0
+@@ -2037,25 +2052,7 @@
+     "Others": "Follow the formulation exactly; do not introduce unsupported assumptions.",
+ }
+ 
+-PLANNED_CODE_INSTRUCTIONS = """
+-Use the formulation for model structure and Data Mapping; use CSVQA_DATA for all data.
+-The complete payload below is provided at execution as CSVQA_DATA. Do not define
+-or overwrite it, copy its rows into literals, or read external files.
+-Select tables by the exact table_id in Data Mapping; roles may repeat.
+-Derive dimensions and identifiers from CSVQA_DATA["tables"][i]["records"], reading
+-fields through record["values"][column_name]. Preserve table mapping, record order,
+-identifiers, and matrix axes. Do not read CSVQA_DATA["plan"].
+-Without a continuous pre-horizon value, start change/ramp constraints at the second
+-period; an initial binary state does not supply a continuous period-zero value.
+-Optional row_id_mapping/column_id_mapping in a declared matrix relationship are
+-dictionaries from raw matrix label strings to entity ID strings. Apply them only when
+-present; otherwise use exact raw IDs. Obtain a row label from record['values'][row_id_column],
+-never from the record dictionary itself. Preserve every coefficient and both original IDs.
+-Derive complete index sets from current records; an example or a copied formulation's
+-literal entity list must not narrow them without an explicit original-query restriction.
+-Records are already structured dictionaries; do not reparse the payload as CSV text.
+-Only parse individual source fields when those fields themselves contain structured text.
+-"""
++PLANNED_CODE_INSTRUCTIONS = "\nUse the formulation for model structure and Data Mapping. At execution, CSVQA_FRAMES\nis a dictionary from exact table_id to a pandas DataFrame of the original source fields.\nRead every coefficient and entity field from CSVQA_FRAMES[table_id]. Values remain\noriginal strings, including empty fields; explicitly convert required numeric columns.\nDo not redefine these frames, copy coefficients into literals, or read external files.\nUse exact column names and source IDs. Do not guess table/record dictionary layouts.\nCSVQA_DATA remains available ONLY for metadata such as roles and matrix relationships.\nIts top-level table objects have records; values belongs to a record, not to a table.\nDo not access a table as a record or reparse structured source data as CSV text.\nPreserve source row order, complete entity sets and both matrix axes. Select the exact\ntable_id from Data Mapping; roles may repeat. A copied example's entity list never\ndefines the current set without an explicit original-query restriction.\nOptional row_id_mapping/column_id_mapping in matrix metadata maps raw labels to entity\nIDs. Apply it only when supplied; otherwise use exact raw IDs. Preserve all coefficients.\nWithout a continuous pre-horizon value, start change/ramp constraints at the second\nperiod; an initial binary state does not supply a continuous period-zero value.\nOnly parse individual source fields when those fields themselves contain structured text.\n"
+ 
+ LEGACY_CODE_INSTRUCTIONS = """
+ Build a self-contained program using the concrete coefficients and identifiers in
+@@ -2304,7 +2301,12 @@
+         if payload:
+             # Include NRM data so the saved program can run on its own.
+             data = json.loads(payload) if isinstance(payload, str) else payload
+-            source = f"CSVQA_DATA = {pprint.pformat(data, sort_dicts=False, width=120)}\n{source}"
++            source = (f"CSVQA_DATA = {pprint.pformat(data, sort_dicts=False, width=120)}\n"
++                      "import pandas as pd\n"
++                      "CSVQA_FRAMES = {t[\"table_id\"]: pd.DataFrame("
++                      "[r[\"values\"] for r in t[\"records\"]], columns=t[\"columns\"], "
++                      "index=[r[\"source_row\"] for r in t[\"records\"]]) "
++                      "for t in CSVQA_DATA[\"tables\"]}\n" + source)
+         record["solve_code"] = source
+         record["pipeline_stage"] = "solve"
+         objective, solution = execute_code(record["solve_code"])

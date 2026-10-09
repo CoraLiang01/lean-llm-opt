@@ -1,0 +1,604 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mFinal Answer:
+
+**Sets and Indices**
+
+- $T = \{1,2,3,4\}$: periods
+- $K = \{1,2,\dots,10\}$: trucks
+
+**Parameters** (from parameters.csv, for each truck $k$):
+
+- $cap_k$: maximum capacity of truck $k$ (kg)
+- $f_k$: startup cost of truck $k$
+- $c_k$: unit transportation cost of truck $k$ (per kg)
+- $d_t$: customer demand in period $t$ ($d_1=1500$, $d_2=2000$, $d_3=1800$, $d_4=1000$)
+
+**Decision Variables**
+
+- $y_{k,t} \in \{0,1\}$: 1 if truck $k$ is active in period $t$, 0 otherwise
+- $z_{k,t} \in \{0,1\}$: 1 if truck $k$ is started up at the beginning of period $t$, 0 otherwise
+- $x_{k,t} \geq 0$: weight transported by truck $k$ in period $t$ (kg)
+
+**Objective**
+
+Minimize total startup and transportation costs:
+$$
+\min \sum_{k\in K} \sum_{t\in T} f_k z_{k,t} + \sum_{k\in K} \sum_{t\in T} c_k x_{k,t}
+$$
+
+**Constraints**
+
+1. **Demand satisfaction (with buffer):**
+   $$
+   \sum_{k\in K} x_{k,t} \geq d_t \qquad \forall t\in T
+   $$
+
+2. **Spare-capacity buffer (no more than 90% of active capacity):**
+   $$
+   \sum_{k\in K} x_{k,t} \leq 0.9 \sum_{k\in K} cap_k y_{k,t} \qquad \forall t\in T
+   $$
+
+3. **Truck capacity and activity:**
+   $$
+   0 \leq x_{k,t} \leq cap_k y_{k,t} \qquad \forall k\in K,\, t\in T
+   $$
+
+4. **Startup logic:**
+   - All trucks are initially off: $y_{k,0} = 0$ for all $k$ (define $y_{k,0}=0$).
+   - Startup occurs if truck is off in $t-1$ and on in $t$:
+     $$
+     z_{k,t} \geq y_{k,t} - y_{k,t-1} \qquad \forall k\in K,\, t\in T
+     $$
+     $$
+     z_{k,t} \leq y_{k,t} \qquad \forall k\in K,\, t\in T
+     $$
+     $$
+     z_{k,t} \leq 1 - y_{k,t-1} \qquad \forall k\in K,\, t\in T
+     $$
+   - No startups allowed in period 4:
+     $$
+     z_{k,4} = 0 \qquad \forall k\in K
+     $$
+
+5. **Minimum up-time (once started, must stay on at least 2 consecutive periods):**
+   $$
+   y_{k,t} \geq y_{k,t-1} + z_{k,t} - 1 \qquad \forall k\in K,\, t=2,3,4
+   $$
+   $$
+   y_{k,t+1} \geq z_{k,t} \qquad \forall k\in K,\, t=1,2,3
+   $$
+   (If $z_{k,t}=1$, then $y_{k,t}=1$ and $y_{k,t+1}=1$.)
+
+6. **Minimum down-time (if shut down, must stay off for 2 periods):**
+   - Define shutdown: $s_{k,t} \geq y_{k,t-1} - y_{k,t}$ for $t=1,2,3,4$ (with $y_{k,0}=0$).
+   - If $s_{k,t}=1$ (truck shut down at $t$), then $y_{k,t+1}=0$ and $y_{k,t+2}=0$ (for $t=1,2$):
+     $$
+     y_{k,t+1} \leq 1 - s_{k,t} \qquad \forall k\in K,\, t=1,2
+     $$
+     $$
+     y_{k,t+2} \leq 1 - s_{k,t} \qquad \forall k\in K,\, t=1,2
+     $$
+   - For $t=3,4$, $y_{k,5}$ and $y_{k,6}$ are undefined and can be ignored.
+
+7. **No startup in period 4:**
+   $$
+   z_{k,4} = 0 \qquad \forall k\in K
+   $$
+
+8. **No restart before $t+2$ after shutdown:**
+   - Already enforced by minimum down-time constraints above.
+
+9. **Load change limit (between adjacent periods):**
+   $$
+   |x_{k,t} - x_{k,t-1}| \leq 300 \qquad \forall k\in K,\, t=1,2,3,4
+   $$
+   (Let $x_{k,0}=0$ for all $k$.)
+
+   This can be linearized as:
+   $$
+   x_{k,t} - x_{k,t-1} \leq 300 \qquad \forall k\in K,\, t=1,2,3,4
+   $$
+   $$
+   x_{k,t-1} - x_{k,t} \leq 300 \qquad \forall k\in K,\, t=1,2,3,4
+   $$
+   (Set $x_{k,0}=0$.)
+
+10. **Inactive truck must transport zero:**
+    $$
+    x_{k,t} \leq cap_k y_{k,t} \qquad \forall k\in K,\, t\in T
+    $$
+
+**Variable domains:**
+
+- $y_{k,t} \in \{0,1\}$, $z_{k,t} \in \{0,1\}$, $s_{k,t} \in \{0,1\}$, $x_{k,t} \geq 0$
+
+**Parameters from parameters.csv:**
+
+| truck | cap_k | f_k | c_k |
+|-------|-------|-----|-----|
+| 1     | ...   | ... | ... |
+| 2     | ...   | ... | ... |
+| ...   | ...   | ... | ... |
+| 10    | ...   | ... | ... |
+
+**Demands:**
+
+- $d_1 = 1500$
+- $d_2 = 2000$
+- $d_3 = 1800$
+- $d_4 = 1000$
+
+**Summary of variables and constraints:**
+
+- $y_{k,t}$: truck $k$ active in period $t$
+- $z_{k,t}$: truck $k$ started up at period $t$
+- $s_{k,t}$: truck $k$ shut down at period $t$
+- $x_{k,t}$: weight transported by truck $k$ in period $t$
+
+All constraints above must be enforced for all $k\in K$ and $t\in T$ (with appropriate handling of indices at boundaries).
+
+**All parameters $cap_k$, $f_k$, $c_k$ are as in parameters.csv, in source order.**[0m
+
+[1m> Finished chain.[0m
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mAction: CSVQA
+Action Input: Retrieve all data from parameters.csv in source order, preserving all identifiers and coefficients.
+[0m
+Observation: [36;1m[1;3m[{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"1","Q":"1000","S":"500","C":"2.0","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"2","Q":"800","S":"300","C":"3.0","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"3","Q":"1200","S":"400","C":"2.5","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"4","Q":"600","S":"250","C":"3.0","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"5","Q":"900","S":"450","C":"2.2","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"6","Q":"700","S":"280","C":"2.8","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"7","Q":"1100","S":"420","C":"2.4","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"8","Q":"500","S":"200","C":"3.2","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"9","Q":"1000","S":"480","C":"2.1","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}},{"source":"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv","values":{"truck_id":"10","Q":"650","S":"260","C":"2.9","d1":"1500","d2":"2000","d3":"1800","d4":"1000"}}][0m
+Thought:[32;1m[1;3mFinal Answer:
+
+##### Sets and Indices
+
+- $I = \{1,2,\ldots,10\}$: set of trucks, indexed by $i$
+- $T = \{1,2,3,4\}$: set of periods, indexed by $t$
+
+##### Parameters (from parameters.csv)
+
+For each truck $i$:
+
+| $i$ | $Q_i$ | $S_i$ | $C_i$ |
+|---|------|------|------|
+| 1 | 1000 | 500  | 2.0  |
+| 2 | 800  | 300  | 3.0  |
+| 3 | 1200 | 400  | 2.5  |
+| 4 | 600  | 250  | 3.0  |
+| 5 | 900  | 450  | 2.2  |
+| 6 | 700  | 280  | 2.8  |
+| 7 | 1100 | 420  | 2.4  |
+| 8 | 500  | 200  | 3.2  |
+| 9 | 1000 | 480  | 2.1  |
+|10 | 650  | 260  | 2.9  |
+
+Customer demand per period:
+
+- $d_1 = 1500$
+- $d_2 = 2000$
+- $d_3 = 1800$
+- $d_4 = 1000$
+
+##### Decision Variables
+
+- $y_{i,t} \in \{0,1\}$: 1 if truck $i$ is active in period $t$, 0 otherwise
+- $u_{i,t} \in \{0,1\}$: 1 if truck $i$ is started up in period $t$, 0 otherwise
+- $z_{i,t} \in \{0,1\}$: 1 if truck $i$ is shut down in period $t$, 0 otherwise
+- $x_{i,t} \geq 0$: weight transported by truck $i$ in period $t$ (kg)
+
+##### Objective Function
+
+Minimize total startup and transportation costs:
+$$
+\min \sum_{i=1}^{10} \sum_{t=1}^{4} S_i u_{i,t} + \sum_{i=1}^{10} \sum_{t=1}^{4} C_i x_{i,t}
+$$
+
+##### Constraints
+
+1. **Startup and shutdown logic** (initially off):
+
+   For all $i$ and $t=1$:
+   $$
+   y_{i,1} = u_{i,1}
+   $$
+   For all $i$ and $t=2,3,4$:
+   $$
+   y_{i,t} - y_{i,t-1} = u_{i,t} - z_{i,t}
+   $$
+
+2. **Minimum up-time (at least 2 consecutive periods if started):**
+
+   For all $i$ and $t=1,2,3$:
+   $$
+   y_{i,t+1} \geq u_{i,t}
+   $$
+   (If started in $t$, must be on in $t+1$.)
+
+   No startup allowed in period 4:
+   $$
+   u_{i,4} = 0 \quad \forall i
+   $$
+
+3. **Minimum down-time (if shut down, must stay off for 2 periods):**
+
+   For all $i$ and $t=1,2$:
+   $$
+   y_{i,t+1} \leq 1 - z_{i,t}
+   $$
+   $$
+   y_{i,t+2} \leq 1 - z_{i,t}
+   $$
+   (If shut down in $t$, must be off in $t+1$ and $t+2$.)
+
+   For $t=3$:
+   $$
+   y_{i,4} \leq 1 - z_{i,3}
+   $$
+   (No $t=5$.)
+
+4. **Inactive trucks transport zero:**
+
+   For all $i,t$:
+   $$
+   x_{i,t} \leq Q_i y_{i,t}
+   $$
+
+5. **Truck capacity:**
+
+   For all $i,t$:
+   $$
+   0 \leq x_{i,t} \leq Q_i y_{i,t}
+   $$
+
+6. **Load change limit (max 300 kg between adjacent periods):**
+
+   For all $i$ and $t=2,3,4$:
+   $$
+   x_{i,t} - x_{i,t-1} \leq 300
+   $$
+   $$
+   x_{i,t-1} - x_{i,t} \leq 300
+   $$
+
+   For $t=1$, define $x_{i,0}=0$.
+
+7. **Demand satisfaction:**
+
+   For all $t$:
+   $$
+   \sum_{i=1}^{10} x_{i,t} \geq d_t
+   $$
+
+8. **Spare-capacity buffer (total load $\leq$ 90% of active capacity):**
+
+   For all $t$:
+   $$
+   \sum_{i=1}^{10} x_{i,t} \leq 0.9 \sum_{i=1}^{10} Q_i y_{i,t}
+   $$
+
+9. **Variable domains:**
+
+   $$
+   y_{i,t} \in \{0,1\},\quad u_{i,t} \in \{0,1\},\quad z_{i,t} \in \{0,1\},\quad x_{i,t} \geq 0
+   $$
+
+##### Data Table
+
+| $i$ | $Q_i$ | $S_i$ | $C_i$ |
+|---|------|------|------|
+| 1 | 1000 | 500  | 2.0  |
+| 2 | 800  | 300  | 3.0  |
+| 3 | 1200 | 400  | 2.5  |
+| 4 | 600  | 250  | 3.0  |
+| 5 | 900  | 450  | 2.2  |
+| 6 | 700  | 280  | 2.8  |
+| 7 | 1100 | 420  | 2.4  |
+| 8 | 500  | 200  | 3.2  |
+| 9 | 1000 | 480  | 2.1  |
+|10 | 650  | 260  | 2.9  |
+
+Demands: $d_1=1500$, $d_2=2000$, $d_3=1800$, $d_4=1000$.
+
+##### Summary
+
+Minimize total startup and transportation costs, subject to truck activation, minimum up/down time, load change, demand, and spare-capacity constraints, using the parameters above.[0m
+
+[1m> Finished chain.[0m
+import gurobipy as gp
+from gurobipy import GRB
+
+# Sets and indices
+I = [1,2,3,4,5,6,7,8,9,10]
+T = [1,2,3,4]
+
+# Parameters
+Q = {1:1000, 2:800, 3:1200, 4:600, 5:900, 6:700, 7:1100, 8:500, 9:1000, 10:650}
+S = {1:500, 2:300, 3:400, 4:250, 5:450, 6:280, 7:420, 8:200, 9:480, 10:260}
+C = {1:2.0, 2:3.0, 3:2.5, 4:3.0, 5:2.2, 6:2.8, 7:2.4, 8:3.2, 9:2.1, 10:2.9}
+d = {1:1500, 2:2000, 3:1800, 4:1000}
+
+# Validate parameter coverage
+for i in I:
+    if i not in Q or i not in S or i not in C:
+        raise ValueError(f"Missing parameter for truck {i}")
+for t in T:
+    if t not in d:
+        raise ValueError(f"Missing demand for period {t}")
+
+m = gp.Model('Truck_Scheduling')
+
+# Decision variables
+y_vars = m.addVars(I, T, vtype=GRB.BINARY, name='y')      # active
+u_vars = m.addVars(I, T, vtype=GRB.BINARY, name='u')      # startup
+z_vars = m.addVars(I, T, vtype=GRB.BINARY, name='z')      # shutdown
+x_vars = m.addVars(I, T, lb=0, vtype=GRB.CONTINUOUS, name='x')  # transported weight
+
+# Objective: Minimize total startup and transportation costs
+m.setObjective(
+    gp.quicksum(S[i]*u_vars[i,t] for i in I for t in T) +
+    gp.quicksum(C[i]*x_vars[i,t] for i in I for t in T),
+    GRB.MINIMIZE
+)
+
+# 1. Startup and shutdown logic (initially off)
+for i in I:
+    # t=1
+    m.addConstr(y_vars[i,1] == u_vars[i,1], name=f'startup_logic1_{i}')
+    # t=2,3,4
+    for t in [2,3,4]:
+        m.addConstr(y_vars[i,t] - y_vars[i,t-1] == u_vars[i,t] - z_vars[i,t], name=f'startup_logic2_{i}_{t}')
+
+# 2. Minimum up-time (at least 2 consecutive periods if started)
+for i in I:
+    for t in [1,2,3]:
+        m.addConstr(y_vars[i,t+1] >= u_vars[i,t], name=f'min_up_{i}_{t}')
+    m.addConstr(u_vars[i,4] == 0, name=f'no_startup_4_{i}')
+
+# 3. Minimum down-time (if shut down, must stay off for 2 periods)
+for i in I:
+    for t in [1,2]:
+        m.addConstr(y_vars[i,t+1] <= 1 - z_vars[i,t], name=f'min_down1_{i}_{t}')
+        m.addConstr(y_vars[i,t+2] <= 1 - z_vars[i,t], name=f'min_down2_{i}_{t}')
+    # t=3
+    m.addConstr(y_vars[i,4] <= 1 - z_vars[i,3], name=f'min_down3_{i}')
+
+# 4. Inactive trucks transport zero (redundant with 5, but included for clarity)
+for i in I:
+    for t in T:
+        m.addConstr(x_vars[i,t] <= Q[i]*y_vars[i,t], name=f'inactive_zero_{i}_{t}')
+
+# 5. Truck capacity (already enforced above)
+# (No additional constraint needed; already x_vars[i,t] <= Q[i]*y_vars[i,t])
+
+# 6. Load change limit (max 300 kg between adjacent periods)
+for i in I:
+    # For t=1, define x_{i,0}=0
+    m.addConstr(x_vars[i,1] - 0 <= 300, name=f'loadchg1_{i}')
+    m.addConstr(0 - x_vars[i,1] <= 300, name=f'loadchg2_{i}')
+    for t in [2,3,4]:
+        m.addConstr(x_vars[i,t] - x_vars[i,t-1] <= 300, name=f'loadchg3_{i}_{t}')
+        m.addConstr(x_vars[i,t-1] - x_vars[i,t] <= 300, name=f'loadchg4_{i}_{t}')
+
+# 7. Demand satisfaction
+for t in T:
+    m.addConstr(gp.quicksum(x_vars[i,t] for i in I) >= d[t], name=f'demand_{t}')
+
+# 8. Spare-capacity buffer (total load <= 90% of active capacity)
+for t in T:
+    m.addConstr(
+        gp.quicksum(x_vars[i,t] for i in I) <= 0.9 * gp.quicksum(Q[i]*y_vars[i,t] for i in I),
+        name=f'sparecap_{t}'
+    )
+
+# 9. Variable domains (already set in addVars)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 258 rows, 160 columns and 650 nonzeros
+Model fingerprint: 0x5b334009
+Variable types: 40 continuous, 120 integer (120 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+03]
+  Objective range  [2e+00, 5e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 2e+03]
+Found heuristic solution: objective 19650.000000
+Presolve removed 121 rows and 70 columns
+Presolve time: 0.00s
+Presolved: 137 rows, 90 columns, 458 nonzeros
+Variable types: 40 continuous, 50 integer (50 binary)
+
+Root relaxation: objective 1.558667e+04, 44 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 15586.6667    0    4 19650.0000 15586.6667  20.7%     -    0s
+H    0     0                    15850.000000 15586.6667  1.66%     -    0s
+H    0     0                    15590.000000 15586.6667  0.02%     -    0s
+
+Explored 1 nodes (44 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 3: 15590 15850 19650 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.559000000000e+04, best bound 1.559000000000e+04, gap 0.0000%
+ObjVal: 15590.0
+C0: 1.0
+C1: 1.0
+C2: 1.0
+C3: 1.0
+C4: 0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: 0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: 0.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: 1.0
+C17: 1.0
+C18: 1.0
+C19: -0.0
+C20: 1.0
+C21: 1.0
+C22: -0.0
+C23: -0.0
+C24: 1.0
+C25: 1.0
+C26: -0.0
+C27: -0.0
+C28: 0.0
+C29: -0.0
+C30: -0.0
+C31: -0.0
+C32: 1.0
+C33: 1.0
+C34: 1.0
+C35: 1.0
+C36: 0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: 1.0
+C41: 0.0
+C42: -0.0
+C43: 0.0
+C44: 0.0
+C45: -0.0
+C46: -0.0
+C47: 0.0
+C48: 0.0
+C49: -0.0
+C50: -0.0
+C51: 0.0
+C52: 0.0
+C53: -0.0
+C54: -0.0
+C55: 0.0
+C56: 1.0
+C57: 0.0
+C58: -0.0
+C59: 0.0
+C60: 1.0
+C61: 0.0
+C62: -0.0
+C63: 0.0
+C64: 1.0
+C65: 0.0
+C66: -0.0
+C67: 0.0
+C68: 0.0
+C69: -0.0
+C70: -0.0
+C71: 0.0
+C72: 1.0
+C73: 0.0
+C74: -0.0
+C75: 0.0
+C76: 0.0
+C77: -0.0
+C78: -0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: -0.0
+C83: 0.0
+C84: 0.0
+C85: 0.0
+C86: -0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: -0.0
+C91: 0.0
+C92: 0.0
+C93: 0.0
+C94: -0.0
+C95: 0.0
+C96: 0.0
+C97: 0.0
+C98: -0.0
+C99: 1.0
+C100: 0.0
+C101: 0.0
+C102: 1.0
+C103: 0.0
+C104: 0.0
+C105: 0.0
+C106: 1.0
+C107: 0.0
+C108: 0.0
+C109: 0.0
+C110: -0.0
+C111: 0.0
+C112: 0.0
+C113: 0.0
+C114: -0.0
+C115: 0.0
+C116: 0.0
+C117: 0.0
+C118: -0.0
+C119: 0.0
+C120: 300.0
+C121: 600.0
+C122: 900.0
+C123: 700.0
+C124: 0.0
+C125: 0.0
+C126: 0.0
+C127: 0.0
+C128: 0.0
+C129: 0.0
+C130: 0.0
+C131: 0.0
+C132: 0.0
+C133: 0.0
+C134: 0.0
+C135: 0.0
+C136: 300.0
+C137: 600.0
+C138: 300.0
+C139: 0.0
+C140: 300.0
+C141: 0.0
+C142: 0.0
+C143: 0.0
+C144: 300.0
+C145: 200.0
+C146: 0.0
+C147: 0.0
+C148: 0.0
+C149: 0.0
+C150: 0.0
+C151: 0.0
+C152: 300.0
+C153: 600.0
+C154: 600.0
+C155: 300.0
+C156: 0.0
+C157: 0.0
+C158: 0.0
+C159: 0.0
+Optimal objective: 15590.0
+Optimal solution: [('C0', 1.0), ('C1', 1.0), ('C2', 1.0), ('C3', 1.0), ('C4', 0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', 0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', 0.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', 1.0), ('C17', 1.0), ('C18', 1.0), ('C19', -0.0), ('C20', 1.0), ('C21', 1.0), ('C22', -0.0), ('C23', -0.0), ('C24', 1.0), ('C25', 1.0), ('C26', -0.0), ('C27', -0.0), ('C28', 0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', 1.0), ('C33', 1.0), ('C34', 1.0), ('C35', 1.0), ('C36', 0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', 1.0), ('C41', 0.0), ('C42', -0.0), ('C43', 0.0), ('C44', 0.0), ('C45', -0.0), ('C46', -0.0), ('C47', 0.0), ('C48', 0.0), ('C49', -0.0), ('C50', -0.0), ('C51', 0.0), ('C52', 0.0), ('C53', -0.0), ('C54', -0.0), ('C55', 0.0), ('C56', 1.0), ('C57', 0.0), ('C58', -0.0), ('C59', 0.0), ('C60', 1.0), ('C61', 0.0), ('C62', -0.0), ('C63', 0.0), ('C64', 1.0), ('C65', 0.0), ('C66', -0.0), ('C67', 0.0), ('C68', 0.0), ('C69', -0.0), ('C70', -0.0), ('C71', 0.0), ('C72', 1.0), ('C73', 0.0), ('C74', -0.0), ('C75', 0.0), ('C76', 0.0), ('C77', -0.0), ('C78', -0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', -0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', -0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', -0.0), ('C91', 0.0), ('C92', 0.0), ('C93', 0.0), ('C94', -0.0), ('C95', 0.0), ('C96', 0.0), ('C97', 0.0), ('C98', -0.0), ('C99', 1.0), ('C100', 0.0), ('C101', 0.0), ('C102', 1.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 1.0), ('C107', 0.0), ('C108', 0.0), ('C109', 0.0), ('C110', -0.0), ('C111', 0.0), ('C112', 0.0), ('C113', 0.0), ('C114', -0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 0.0), ('C118', -0.0), ('C119', 0.0), ('C120', 300.0), ('C121', 600.0), ('C122', 900.0), ('C123', 700.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0), ('C132', 0.0), ('C133', 0.0), ('C134', 0.0), ('C135', 0.0), ('C136', 300.0), ('C137', 600.0), ('C138', 300.0), ('C139', 0.0), ('C140', 300.0), ('C141', 0.0), ('C142', 0.0), ('C143', 0.0), ('C144', 300.0), ('C145', 200.0), ('C146', 0.0), ('C147', 0.0), ('C148', 0.0), ('C149', 0.0), ('C150', 0.0), ('C151', 0.0), ('C152', 300.0), ('C153', 600.0), ('C154', 600.0), ('C155', 300.0), ('C156', 0.0), ('C157', 0.0), ('C158', 0.0), ('C159', 0.0)]

@@ -1,0 +1,452 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F1",
+      "fixed_opening_cost": "11250",
+      "facility_capacity": "101",
+      "transportation_cost_to_C1": "7.8",
+      "transportation_cost_to_C2": "7.6",
+      "transportation_cost_to_C3": "6.7",
+      "transportation_cost_to_C4": "7.9",
+      "transportation_cost_to_C5": "8.1",
+      "transportation_cost_to_C6": "8.3",
+      "transportation_cost_to_C7": "7.3",
+      "transportation_cost_to_C8": "8.2",
+      "transportation_cost_to_C9": "8.1",
+      "transportation_cost_to_C10": "8.2",
+      "transportation_cost_to_C11": "7.3",
+      "transportation_cost_to_C12": "7.7",
+      "transportation_cost_to_C13": "6.7",
+      "transportation_cost_to_C14": "7.1",
+      "transportation_cost_to_C15": "7.9"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F2",
+      "fixed_opening_cost": "13480",
+      "facility_capacity": "124",
+      "transportation_cost_to_C1": "5.3",
+      "transportation_cost_to_C2": "6",
+      "transportation_cost_to_C3": "5",
+      "transportation_cost_to_C4": "6.4",
+      "transportation_cost_to_C5": "5.9",
+      "transportation_cost_to_C6": "6.2",
+      "transportation_cost_to_C7": "5.6",
+      "transportation_cost_to_C8": "6.1",
+      "transportation_cost_to_C9": "6.3",
+      "transportation_cost_to_C10": "6.1",
+      "transportation_cost_to_C11": "5",
+      "transportation_cost_to_C12": "5.6",
+      "transportation_cost_to_C13": "5.3",
+      "transportation_cost_to_C14": "4.9",
+      "transportation_cost_to_C15": "6.3"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F3",
+      "fixed_opening_cost": "14870",
+      "facility_capacity": "139",
+      "transportation_cost_to_C1": "7.2",
+      "transportation_cost_to_C2": "8.1",
+      "transportation_cost_to_C3": "7.4",
+      "transportation_cost_to_C4": "8.8",
+      "transportation_cost_to_C5": "8.5",
+      "transportation_cost_to_C6": "8.7",
+      "transportation_cost_to_C7": "7.7",
+      "transportation_cost_to_C8": "8.7",
+      "transportation_cost_to_C9": "8.9",
+      "transportation_cost_to_C10": "8.5",
+      "transportation_cost_to_C11": "7.2",
+      "transportation_cost_to_C12": "7.7",
+      "transportation_cost_to_C13": "7.1",
+      "transportation_cost_to_C14": "7.6",
+      "transportation_cost_to_C15": "8.4"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F4",
+      "fixed_opening_cost": "10290",
+      "facility_capacity": "86",
+      "transportation_cost_to_C1": "7",
+      "transportation_cost_to_C2": "7.1",
+      "transportation_cost_to_C3": "6.5",
+      "transportation_cost_to_C4": "7.9",
+      "transportation_cost_to_C5": "7.4",
+      "transportation_cost_to_C6": "7.7",
+      "transportation_cost_to_C7": "6.7",
+      "transportation_cost_to_C8": "7.9",
+      "transportation_cost_to_C9": "7.8",
+      "transportation_cost_to_C10": "7.3",
+      "transportation_cost_to_C11": "6.8",
+      "transportation_cost_to_C12": "7",
+      "transportation_cost_to_C13": "6.5",
+      "transportation_cost_to_C14": "6.7",
+      "transportation_cost_to_C15": "7.6"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F5",
+      "fixed_opening_cost": "16740",
+      "facility_capacity": "157",
+      "transportation_cost_to_C1": "3.5",
+      "transportation_cost_to_C2": "3.8",
+      "transportation_cost_to_C3": "2.9",
+      "transportation_cost_to_C4": "4.3",
+      "transportation_cost_to_C5": "3.6",
+      "transportation_cost_to_C6": "3.9",
+      "transportation_cost_to_C7": "3.2",
+      "transportation_cost_to_C8": "4.3",
+      "transportation_cost_to_C9": "4.5",
+      "transportation_cost_to_C10": "4",
+      "transportation_cost_to_C11": "3.2",
+      "transportation_cost_to_C12": "4",
+      "transportation_cost_to_C13": "2.9",
+      "transportation_cost_to_C14": "3.4",
+      "transportation_cost_to_C15": "3.9"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F6",
+      "fixed_opening_cost": "13960",
+      "facility_capacity": "133",
+      "transportation_cost_to_C1": "8.2",
+      "transportation_cost_to_C2": "8.6",
+      "transportation_cost_to_C3": "7.9",
+      "transportation_cost_to_C4": "9.5",
+      "transportation_cost_to_C5": "8.5",
+      "transportation_cost_to_C6": "9.3",
+      "transportation_cost_to_C7": "8.5",
+      "transportation_cost_to_C8": "9.4",
+      "transportation_cost_to_C9": "9",
+      "transportation_cost_to_C10": "9.2",
+      "transportation_cost_to_C11": "8.1",
+      "transportation_cost_to_C12": "8.7",
+      "transportation_cost_to_C13": "7.9",
+      "transportation_cost_to_C14": "8.5",
+      "transportation_cost_to_C15": "9"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F7",
+      "fixed_opening_cost": "12680",
+      "facility_capacity": "118",
+      "transportation_cost_to_C1": "6.9",
+      "transportation_cost_to_C2": "7.6",
+      "transportation_cost_to_C3": "6.8",
+      "transportation_cost_to_C4": "8.4",
+      "transportation_cost_to_C5": "8",
+      "transportation_cost_to_C6": "8",
+      "transportation_cost_to_C7": "7.6",
+      "transportation_cost_to_C8": "8",
+      "transportation_cost_to_C9": "8.1",
+      "transportation_cost_to_C10": "7.8",
+      "transportation_cost_to_C11": "6.9",
+      "transportation_cost_to_C12": "7.1",
+      "transportation_cost_to_C13": "7",
+      "transportation_cost_to_C14": "6.9",
+      "transportation_cost_to_C15": "7.5"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F8",
+      "fixed_opening_cost": "17890",
+      "facility_capacity": "162",
+      "transportation_cost_to_C1": "6.9",
+      "transportation_cost_to_C2": "7.8",
+      "transportation_cost_to_C3": "7.1",
+      "transportation_cost_to_C4": "8.7",
+      "transportation_cost_to_C5": "8.6",
+      "transportation_cost_to_C6": "8.2",
+      "transportation_cost_to_C7": "7.2",
+      "transportation_cost_to_C8": "7.9",
+      "transportation_cost_to_C9": "8.4",
+      "transportation_cost_to_C10": "7.9",
+      "transportation_cost_to_C11": "7",
+      "transportation_cost_to_C12": "7.4",
+      "transportation_cost_to_C13": "6.8",
+      "transportation_cost_to_C14": "7.3",
+      "transportation_cost_to_C15": "8"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F9",
+      "fixed_opening_cost": "10950",
+      "facility_capacity": "92",
+      "transportation_cost_to_C1": "3.5",
+      "transportation_cost_to_C2": "3.8",
+      "transportation_cost_to_C3": "2.8",
+      "transportation_cost_to_C4": "4.4",
+      "transportation_cost_to_C5": "4.2",
+      "transportation_cost_to_C6": "4.8",
+      "transportation_cost_to_C7": "3.8",
+      "transportation_cost_to_C8": "5",
+      "transportation_cost_to_C9": "4.5",
+      "transportation_cost_to_C10": "4.1",
+      "transportation_cost_to_C11": "3.2",
+      "transportation_cost_to_C12": "3.7",
+      "transportation_cost_to_C13": "3.7",
+      "transportation_cost_to_C14": "3.2",
+      "transportation_cost_to_C15": "4.5"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F10",
+      "fixed_opening_cost": "15320",
+      "facility_capacity": "144",
+      "transportation_cost_to_C1": "5.2",
+      "transportation_cost_to_C2": "6.1",
+      "transportation_cost_to_C3": "5.1",
+      "transportation_cost_to_C4": "6.3",
+      "transportation_cost_to_C5": "6.1",
+      "transportation_cost_to_C6": "6",
+      "transportation_cost_to_C7": "5.6",
+      "transportation_cost_to_C8": "6.5",
+      "transportation_cost_to_C9": "6.2",
+      "transportation_cost_to_C10": "5.9",
+      "transportation_cost_to_C11": "5.3",
+      "transportation_cost_to_C12": "6.1",
+      "transportation_cost_to_C13": "5.1",
+      "transportation_cost_to_C14": "5.2",
+      "transportation_cost_to_C15": "6.2"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F11",
+      "fixed_opening_cost": "11830",
+      "facility_capacity": "107",
+      "transportation_cost_to_C1": "5.2",
+      "transportation_cost_to_C2": "5.5",
+      "transportation_cost_to_C3": "4.5",
+      "transportation_cost_to_C4": "6.2",
+      "transportation_cost_to_C5": "5.7",
+      "transportation_cost_to_C6": "6.1",
+      "transportation_cost_to_C7": "5.1",
+      "transportation_cost_to_C8": "5.8",
+      "transportation_cost_to_C9": "5.7",
+      "transportation_cost_to_C10": "6.2",
+      "transportation_cost_to_C11": "5.2",
+      "transportation_cost_to_C12": "5.2",
+      "transportation_cost_to_C13": "4.5",
+      "transportation_cost_to_C14": "5.1",
+      "transportation_cost_to_C15": "5.4"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F12",
+      "fixed_opening_cost": "14110",
+      "facility_capacity": "129",
+      "transportation_cost_to_C1": "7.8",
+      "transportation_cost_to_C2": "8.7",
+      "transportation_cost_to_C3": "7.6",
+      "transportation_cost_to_C4": "9",
+      "transportation_cost_to_C5": "8.6",
+      "transportation_cost_to_C6": "9",
+      "transportation_cost_to_C7": "8.5",
+      "transportation_cost_to_C8": "9.3",
+      "transportation_cost_to_C9": "9.3",
+      "transportation_cost_to_C10": "8.4",
+      "transportation_cost_to_C11": "7.9",
+      "transportation_cost_to_C12": "8.2",
+      "transportation_cost_to_C13": "7.4",
+      "transportation_cost_to_C14": "7.6",
+      "transportation_cost_to_C15": "8.7"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F13",
+      "fixed_opening_cost": "15970",
+      "facility_capacity": "151",
+      "transportation_cost_to_C1": "6.7",
+      "transportation_cost_to_C2": "6.6",
+      "transportation_cost_to_C3": "6.1",
+      "transportation_cost_to_C4": "7.3",
+      "transportation_cost_to_C5": "7.1",
+      "transportation_cost_to_C6": "7.5",
+      "transportation_cost_to_C7": "6.7",
+      "transportation_cost_to_C8": "8",
+      "transportation_cost_to_C9": "7.6",
+      "transportation_cost_to_C10": "7.2",
+      "transportation_cost_to_C11": "6.3",
+      "transportation_cost_to_C12": "6.9",
+      "transportation_cost_to_C13": "6.2",
+      "transportation_cost_to_C14": "6",
+      "transportation_cost_to_C15": "7.2"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F14",
+      "fixed_opening_cost": "13140",
+      "facility_capacity": "113",
+      "transportation_cost_to_C1": "7.5",
+      "transportation_cost_to_C2": "8.6",
+      "transportation_cost_to_C3": "7.6",
+      "transportation_cost_to_C4": "8.2",
+      "transportation_cost_to_C5": "8",
+      "transportation_cost_to_C6": "7.9",
+      "transportation_cost_to_C7": "7.5",
+      "transportation_cost_to_C8": "8.7",
+      "transportation_cost_to_C9": "8.8",
+      "transportation_cost_to_C10": "8.1",
+      "transportation_cost_to_C11": "7.2",
+      "transportation_cost_to_C12": "7.3",
+      "transportation_cost_to_C13": "7",
+      "transportation_cost_to_C14": "7",
+      "transportation_cost_to_C15": "8"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/cost.csv",
+    "values": {
+      "facility_id": "F15",
+      "fixed_opening_cost": "10580",
+      "facility_capacity": "85",
+      "transportation_cost_to_C1": "5.1",
+      "transportation_cost_to_C2": "5.8",
+      "transportation_cost_to_C3": "4.6",
+      "transportation_cost_to_C4": "5.9",
+      "transportation_cost_to_C5": "6.5",
+      "transportation_cost_to_C6": "5.9",
+      "transportation_cost_to_C7": "5.2",
+      "transportation_cost_to_C8": "7",
+      "transportation_cost_to_C9": "7.1",
+      "transportation_cost_to_C10": "5.9",
+      "transportation_cost_to_C11": "5.1",
+      "transportation_cost_to_C12": "5.8",
+      "transportation_cost_to_C13": "5.4",
+      "transportation_cost_to_C14": "4.9",
+      "transportation_cost_to_C15": "6"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C1",
+      "demand_units": "83"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C2",
+      "demand_units": "76"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C3",
+      "demand_units": "91"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C4",
+      "demand_units": "68"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C5",
+      "demand_units": "104"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C6",
+      "demand_units": "97"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C7",
+      "demand_units": "88"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C8",
+      "demand_units": "73"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C9",
+      "demand_units": "109"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C10",
+      "demand_units": "95"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C11",
+      "demand_units": "82"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C12",
+      "demand_units": "67"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C13",
+      "demand_units": "113"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C14",
+      "demand_units": "79"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP12/demand.csv",
+    "values": {
+      "customer_id": "C15",
+      "demand_units": "92"
+    }
+  }
+]

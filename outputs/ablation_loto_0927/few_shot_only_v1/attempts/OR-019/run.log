@@ -1,0 +1,105 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Extract table records
+table_id = "file_0_view_0"
+tables = CSVQA_DATA["tables"]
+table = None
+for t in tables:
+    if t["table_id"] == table_id:
+        table = t
+        break
+if table is None:
+    raise ValueError(f"Table {table_id} not found in CSVQA_DATA.")
+
+records = table["records"]
+if records is None or len(records) == 0:
+    raise ValueError("No records found in the specified table.")
+
+# Identify products whose "Product Name" contains "27in"
+pattern = re.compile(r"27in", re.IGNORECASE)
+items = []
+revenue = {}
+demand = {}
+inventory = {}
+
+for rec in records:
+    pname = rec["values"]["Product Name"]
+    if pattern.search(str(pname)):
+        items.append(pname)
+        try:
+            rev = rec["values"]["Revenue"]
+            dem = rec["values"]["Demand"]
+            inv = rec["values"]["Initial Inventory"]
+        except KeyError as e:
+            raise ValueError(f"Missing required column in record: {e}")
+        # Try to convert to numeric
+        try:
+            revenue[pname] = float(rev)
+            demand[pname] = int(float(dem))
+            inventory[pname] = int(float(inv))
+        except Exception as e:
+            raise ValueError(f"Non-numeric value in record for '{pname}': {e}")
+
+# Validate that all items have required data
+if not items:
+    raise ValueError("No products found with '27in' in the Product Name.")
+for i in items:
+    if i not in revenue or i not in demand or i not in inventory:
+        raise ValueError(f"Missing data for product '{i}'.")
+
+# Build and solve the model
+m = gp.Model('27in_Product_Revenue_Max')
+x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Objective: Maximize total revenue
+m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+# Constraints: Demand and Inventory
+m.addConstrs((x[i] <= demand[i] for i in items), name='')
+m.addConstrs((x[i] <= inventory[i] for i in items), name='')
+
+# Set MIPGap
+m.Params.MIPGap = 1e-4
+
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for variable in m.getVars():
+        print(f'{variable.VarName}: {variable.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 4 rows, 2 columns and 4 nonzeros
+Model fingerprint: 0x7b4585bd
+Variable types: 0 continuous, 2 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+02, 4e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+04, 8e+04]
+Found heuristic solution: objective 7123134.6900
+Presolve removed 4 rows and 2 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 7.12313e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.123134690000e+06, best bound 7.123134690000e+06, gap 0.0000%
+ObjVal: 7123134.6899999995
+C0: 12474.0
+C1: 15057.0
+Optimal objective: 7123134.6899999995
+Optimal solution: [('C0', 12474.0), ('C1', 15057.0)]

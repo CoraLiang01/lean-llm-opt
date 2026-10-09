@@ -1,0 +1,31 @@
+capacity.csv
+archive_revision_number,Capacity
+4,1576
+
+products.csv
+record_keeper_group,ProductName,Value,archive_revision_number,Weight
+Team B,Sedan,1752,4,15
+Team A,SUV,1856,7,87
+Team C,Truck,8372,6,36
+Team C,Convertible,6168,8,30
+Team C,Minivan,9681,2,33
+Team A,Coupe,8062,6,72
+Team A,Hatchback,3895,3,75
+Team C,Station Wagon,3254,7,71
+Team B,Electric Car,1701,9,51
+Team C,Hybrid Car,6799,5,21
+Team C,Luxury Sedan,2724,5,97
+Team B,Sports Car,6304,5,52
+Team A,Crossover,3255,8,25
+Team A,Diesel Truck,1923,9,15
+Team C,Compact SUV,4103,5,54
+Team B,Luxury SUV,4429,5,57
+Team A,Cargo Van,2663,2,18
+Team C,Pickup Truck,1691,3,69
+Team C,Roadster,5632,4,26
+Team C,Muscle Car,4793,5,38
+Team C,Off-road Vehicle,1343,6,31
+Team B,Camper Van,9124,8,74
+Team B,Compact Car,3652,7,82
+Team C,Motorcycle,8842,8,49
+Team C,Electric SUV,9176,7,64

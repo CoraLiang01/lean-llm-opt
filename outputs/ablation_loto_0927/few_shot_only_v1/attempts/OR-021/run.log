@@ -1,0 +1,185 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Extract data from CSVQA_DATA
+table_id = "file_0_view_0"
+tables = CSVQA_DATA["tables"]
+table = None
+for t in tables:
+    if t["table_id"] == table_id:
+        table = t
+        break
+if table is None:
+    raise ValueError(f"Table {table_id} not found in CSVQA_DATA.")
+
+records = table["records"]
+columns = table["columns"]
+
+# Required columns
+col_product = "Product Name"
+col_revenue = "Revenue"
+col_demand = "Demand"
+col_inventory = "Initial Inventory"
+
+# Regex for parsing numeric values (allowing for commas, decimals, negatives)
+num_re = re.compile(r"^\s*-?\d+(?:,\d{3})*(?:\.\d+)?\s*$")
+
+# Parse data
+items = []
+revenue = {}
+demand = {}
+inventory = {}
+
+for rec in records:
+    vals = rec["values"]
+    # Get product name
+    if col_product not in vals:
+        raise ValueError(f"Missing '{col_product}' in record.")
+    prod = vals[col_product]
+    items.append(prod)
+    # Parse revenue
+    if col_revenue not in vals:
+        raise ValueError(f"Missing '{col_revenue}' for product '{prod}'.")
+    rev_str = vals[col_revenue]
+    if not isinstance(rev_str, str) or not num_re.match(rev_str.replace(',', '')):
+        raise ValueError(f"Revenue value '{rev_str}' for product '{prod}' is not a valid number.")
+    revenue[prod] = float(rev_str.replace(',', ''))
+    # Parse demand
+    if col_demand not in vals:
+        raise ValueError(f"Missing '{col_demand}' for product '{prod}'.")
+    dem_str = vals[col_demand]
+    if not isinstance(dem_str, str) or not num_re.match(dem_str.replace(',', '')):
+        raise ValueError(f"Demand value '{dem_str}' for product '{prod}' is not a valid number.")
+    demand[prod] = int(float(dem_str.replace(',', '')))
+    # Parse inventory
+    if col_inventory not in vals:
+        raise ValueError(f"Missing '{col_inventory}' for product '{prod}'.")
+    inv_str = vals[col_inventory]
+    if not isinstance(inv_str, str) or not num_re.match(inv_str.replace(',', '')):
+        raise ValueError(f"Initial Inventory value '{inv_str}' for product '{prod}' is not a valid number.")
+    inventory[prod] = int(float(inv_str.replace(',', '')))
+
+# Validate dimensions
+if not (set(revenue.keys()) == set(demand.keys()) == set(inventory.keys()) == set(items)):
+    raise ValueError("Mismatch in product keys among revenue, demand, and inventory.")
+
+# Build and solve the model
+m = gp.Model('Revenue_Maximization')
+x = m.addVars(items, lb=0, vtype=GRB.INTEGER, name='x')
+
+# Objective
+m.setObjective(gp.quicksum(revenue[i] * x[i] for i in items), GRB.MAXIMIZE)
+
+# Constraints
+m.addConstrs((x[i] <= inventory[i] for i in items), name='')
+m.addConstrs((x[i] <= demand[i] for i in items), name='')
+
+# Set MIPGap
+m.setParam('MIPGap', 1e-4)
+
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 136 rows, 68 columns and 136 nonzeros
+Model fingerprint: 0xb7e012cc
+Variable types: 0 continuous, 68 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+00, 2e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+01, 5e+05]
+Found heuristic solution: objective 6020981.4800
+Presolve removed 136 rows and 68 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 6.02098e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 6.020981480000e+06, best bound 6.020981480000e+06, gap 0.0000%
+ObjVal: 6020981.48
+C0: 1357.0
+C1: 1363.0
+C2: 1269.0
+C3: 6500.0
+C4: 6335.0
+C5: 1283.0
+C6: 27327.0
+C7: 25600.0
+C8: 264.0
+C9: 14.0
+C10: 1484.0
+C11: 13124.0
+C12: 123.0
+C13: 1430.0
+C14: 130.0
+C15: 14.0
+C16: 293.0
+C17: 6770.0
+C18: 1325.0
+C19: 1377.0
+C20: 139.0
+C21: 1350.0
+C22: 138.0
+C23: 122.0
+C24: 6577.0
+C25: 1455.0
+C26: 72.0
+C27: 135.0
+C28: 6531.0
+C29: 26650.0
+C30: 27115.0
+C31: 12486.0
+C32: 12367.0
+C33: 6194.0
+C34: 14307.0
+C35: 6321.0
+C36: 13833.0
+C37: 144944.0
+C38: 6319.0
+C39: 13849.0
+C40: 6875.0
+C41: 29273.0
+C42: 1207.0
+C43: 62890.0
+C44: 14465.0
+C45: 25467.0
+C46: 24105.0
+C47: 25594.0
+C48: 1229.0
+C49: 1459.0
+C50: 13071.0
+C51: 13056.0
+C52: 6170.0
+C53: 24746.0
+C54: 27118.0
+C55: 29149.0
+C56: 1459.0
+C57: 136.0
+C58: 130.0
+C59: 6720.0
+C60: 14932.0
+C61: 25913.0
+C62: 27066.0
+C63: 7453.0
+C64: 142.0
+C65: 270.0
+C66: 1418.0
+C67: 28189.0
+Optimal objective: 6020981.48
+Optimal solution: [('C0', 1357.0), ('C1', 1363.0), ('C2', 1269.0), ('C3', 6500.0), ('C4', 6335.0), ('C5', 1283.0), ('C6', 27327.0), ('C7', 25600.0), ('C8', 264.0), ('C9', 14.0), ('C10', 1484.0), ('C11', 13124.0), ('C12', 123.0), ('C13', 1430.0), ('C14', 130.0), ('C15', 14.0), ('C16', 293.0), ('C17', 6770.0), ('C18', 1325.0), ('C19', 1377.0), ('C20', 139.0), ('C21', 1350.0), ('C22', 138.0), ('C23', 122.0), ('C24', 6577.0), ('C25', 1455.0), ('C26', 72.0), ('C27', 135.0), ('C28', 6531.0), ('C29', 26650.0), ('C30', 27115.0), ('C31', 12486.0), ('C32', 12367.0), ('C33', 6194.0), ('C34', 14307.0), ('C35', 6321.0), ('C36', 13833.0), ('C37', 144944.0), ('C38', 6319.0), ('C39', 13849.0), ('C40', 6875.0), ('C41', 29273.0), ('C42', 1207.0), ('C43', 62890.0), ('C44', 14465.0), ('C45', 25467.0), ('C46', 24105.0), ('C47', 25594.0), ('C48', 1229.0), ('C49', 1459.0), ('C50', 13071.0), ('C51', 13056.0), ('C52', 6170.0), ('C53', 24746.0), ('C54', 27118.0), ('C55', 29149.0), ('C56', 1459.0), ('C57', 136.0), ('C58', 130.0), ('C59', 6720.0), ('C60', 14932.0), ('C61', 25913.0), ('C62', 27066.0), ('C63', 7453.0), ('C64', 142.0), ('C65', 270.0), ('C66', 1418.0), ('C67', 28189.0)]

@@ -1,0 +1,82 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'A small bakery in South Korea, and each day need to stock up on various types of bread. For each type of '
+          'bread, we have an expected profit, which can be found in "products.csv." However, the shop has limited '
+          'storage capacity, with details provided in "capacity.csv.".Therefore, we must decide which types of bread '
+          'to order each day to maximize our total expected profit while staying within our storage limits. The '
+          'decision variables x_i represents the number of units of bread type i to be ordered each day.The decision '
+          'variables must be integers.',
+ 'relationships': [],
+ 'route': 'RA',
+ 'tables': [{'columns': ['Capacity'],
+             'file_index': 0,
+             'file_name': 'capacity.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 1,
+             'records': [{'source_row': 0, 'values': {'Capacity': '180'}}],
+             'returned_rows': 1,
+             'role': 'storage capacity constraint',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['ProductName', 'Value', 'Weight'],
+             'file_index': 1,
+             'file_name': 'products.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 10,
+             'records': [{'source_row': 0, 'values': {'ProductName': 'Baguette', 'Value': '888', 'Weight': '4'}},
+                         {'source_row': 1, 'values': {'ProductName': 'Croissant', 'Value': '134', 'Weight': '2'}},
+                         {'source_row': 2, 'values': {'ProductName': 'Sourdough', 'Value': '129', 'Weight': '4'}},
+                         {'source_row': 3, 'values': {'ProductName': 'Rye Bread', 'Value': '370', 'Weight': '3'}},
+                         {'source_row': 4, 'values': {'ProductName': 'Brioche', 'Value': '921', 'Weight': '2'}},
+                         {'source_row': 5, 'values': {'ProductName': 'Focaccia', 'Value': '765', 'Weight': '1'}},
+                         {'source_row': 6, 'values': {'ProductName': 'Ciabatta', 'Value': '154', 'Weight': '2'}},
+                         {'source_row': 7, 'values': {'ProductName': 'Pita', 'Value': '837', 'Weight': '1'}},
+                         {'source_row': 8, 'values': {'ProductName': 'Bagel', 'Value': '584', 'Weight': '3'}},
+                         {'source_row': 9, 'values': {'ProductName': 'English Muffin', 'Value': '365', 'Weight': '3'}}],
+             'returned_rows': 10,
+             'role': 'bread products and profit/weight parameters',
+             'table_id': 'file_1_view_0'}],
+ 'validation': {'matrix_checks': [], 'status': 'OK'}}
+import pandas as pd
+CSVQA_FRAMES = {t["table_id"]: pd.DataFrame([r["values"] for r in t["records"]], columns=t["columns"], index=[r["source_row"] for r in t["records"]]) for t in CSVQA_DATA["tables"]}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem(CSVQA_FRAMES):
+    import pandas as pd
+    products_df = CSVQA_FRAMES['file_1_view_0']
+    capacity_df = CSVQA_FRAMES['file_0_view_0']
+    P = list(products_df['ProductName'])
+    v = {}
+    w = {}
+    for (idx, row) in products_df.iterrows():
+        key = row['ProductName']
+        try:
+            v[key] = float(row['Value'])
+        except Exception:
+            raise ValueError(f'Missing or invalid Value for product {key}')
+        try:
+            w[key] = float(row['Weight'])
+        except Exception:
+            raise ValueError(f'Missing or invalid Weight for product {key}')
+    if len(capacity_df) != 1:
+        raise ValueError('Expected exactly one row in capacity.csv')
+    try:
+        C = float(capacity_df.iloc[0]['Capacity'])
+    except Exception:
+        raise ValueError('Missing or invalid Capacity value')
+    for key in P:
+        if key not in v or key not in w:
+            raise ValueError(f'Missing parameter for product {key}')
+    m = gp.Model('bakery_bread_order')
+    quantity_vars = m.addVars(P, lb=0, vtype=GRB.INTEGER, name='')
+    m.setObjective(gp.quicksum((v[i] * quantity_vars[i] for i in P)), GRB.MAXIMIZE)
+    m.addConstr(gp.quicksum((w[i] * quantity_vars[i] for i in P)) <= C, name='storage_capacity')
+    m.Params.MIPGap = 0.0001
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for i in P:
+            print(quantity_vars[i].VarName, quantity_vars[i].X)
+    else:
+        print(m.Status)
+    return m
+m = solve_problem(CSVQA_FRAMES)

@@ -1,0 +1,1 @@
+I do not have access to the contents of cost_12x12.csv. To proceed, please upload or paste the contents of cost_12x12.csv. Once I have the data, I will retrieve all cost values, preserve machine and task identifiers, and formulate the complete mathematical model as requested.

@@ -1,0 +1,465 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'A retail company wants to decide where to open warehouses to minimize total costs while meeting the demands '
+          'of several stores in a region. Each potential warehouse has an opening cost, and there is a known '
+          'transportation cost for supplying goods to each store from each warehouse. Each warehouse has a capacity, '
+          'and each store has a specific demand. The potential warehouses costs are in PotentialWarehouses_Costs.csv, '
+          'demand for each store is in Stores_Demands.csv and the transportation costs c_ij from warehouse i to store '
+          'j is in TransportationCost.csv\n'
+          '\n'
+          '    You are to determine which warehouses to open and how to assign the demand of each store to the '
+          'warehouses such that all store demands are met, warehouse capacities are not exceeded, and the total cost '
+          '(opening + transportation) is minimized.',
+ 'relationships': [],
+ 'route': 'FLP',
+ 'tables': [{'columns': ['warehouse_inspection_count_2025_q4',
+                         'Warehouse (i)',
+                         'Opening Cost (fi)',
+                         'warehouse_roof_material',
+                         'Capacity (units)'],
+             'file_index': 0,
+             'file_name': 'PotentialWarehouses_Costs.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 11,
+             'records': [{'source_row': 0,
+                          'values': {'Capacity (units)': '180',
+                                     'Opening Cost (fi)': '3000',
+                                     'Warehouse (i)': '1',
+                                     'warehouse_inspection_count_2025_q4': '6',
+                                     'warehouse_roof_material': 'Concrete'}},
+                         {'source_row': 1,
+                          'values': {'Capacity (units)': '160',
+                                     'Opening Cost (fi)': '3200',
+                                     'Warehouse (i)': '2',
+                                     'warehouse_inspection_count_2025_q4': '4',
+                                     'warehouse_roof_material': 'Concrete'}},
+                         {'source_row': 2,
+                          'values': {'Capacity (units)': '200',
+                                     'Opening Cost (fi)': '3100',
+                                     'Warehouse (i)': '3',
+                                     'warehouse_inspection_count_2025_q4': '4',
+                                     'warehouse_roof_material': 'Steel'}},
+                         {'source_row': 3,
+                          'values': {'Capacity (units)': '150',
+                                     'Opening Cost (fi)': '2800',
+                                     'Warehouse (i)': '4',
+                                     'warehouse_inspection_count_2025_q4': '2',
+                                     'warehouse_roof_material': 'Composite'}},
+                         {'source_row': 4,
+                          'values': {'Capacity (units)': '170',
+                                     'Opening Cost (fi)': '3500',
+                                     'Warehouse (i)': '5',
+                                     'warehouse_inspection_count_2025_q4': '6',
+                                     'warehouse_roof_material': 'Composite'}},
+                         {'source_row': 5,
+                          'values': {'Capacity (units)': '190',
+                                     'Opening Cost (fi)': '2700',
+                                     'Warehouse (i)': '6',
+                                     'warehouse_inspection_count_2025_q4': '3',
+                                     'warehouse_roof_material': 'Composite'}},
+                         {'source_row': 6,
+                          'values': {'Capacity (units)': '160',
+                                     'Opening Cost (fi)': '2900',
+                                     'Warehouse (i)': '7',
+                                     'warehouse_inspection_count_2025_q4': '1',
+                                     'warehouse_roof_material': 'Steel'}},
+                         {'source_row': 7,
+                          'values': {'Capacity (units)': '175',
+                                     'Opening Cost (fi)': '3050',
+                                     'Warehouse (i)': '8',
+                                     'warehouse_inspection_count_2025_q4': '2',
+                                     'warehouse_roof_material': 'Steel'}},
+                         {'source_row': 8,
+                          'values': {'Capacity (units)': '170',
+                                     'Opening Cost (fi)': '3100',
+                                     'Warehouse (i)': '9',
+                                     'warehouse_inspection_count_2025_q4': '1',
+                                     'warehouse_roof_material': 'Steel'}},
+                         {'source_row': 9,
+                          'values': {'Capacity (units)': '180',
+                                     'Opening Cost (fi)': '2200',
+                                     'Warehouse (i)': '10',
+                                     'warehouse_inspection_count_2025_q4': '1',
+                                     'warehouse_roof_material': 'Concrete'}},
+                         {'source_row': 10,
+                          'values': {'Capacity (units)': '190',
+                                     'Opening Cost (fi)': '2890',
+                                     'Warehouse (i)': '11',
+                                     'warehouse_inspection_count_2025_q4': '3',
+                                     'warehouse_roof_material': 'Steel'}}],
+             'returned_rows': 11,
+             'role': 'file_0',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['Store (j)', 'store_staff_training_hours_2025_q4', 'Demand (units, dj)'],
+             'file_index': 1,
+             'file_name': 'Stores_Demands.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 11,
+             'records': [{'source_row': 0,
+                          'values': {'Demand (units, dj)': '30',
+                                     'Store (j)': '1',
+                                     'store_staff_training_hours_2025_q4': '12'}},
+                         {'source_row': 1,
+                          'values': {'Demand (units, dj)': '40',
+                                     'Store (j)': '2',
+                                     'store_staff_training_hours_2025_q4': '48'}},
+                         {'source_row': 2,
+                          'values': {'Demand (units, dj)': '20',
+                                     'Store (j)': '3',
+                                     'store_staff_training_hours_2025_q4': '18'}},
+                         {'source_row': 3,
+                          'values': {'Demand (units, dj)': '35',
+                                     'Store (j)': '4',
+                                     'store_staff_training_hours_2025_q4': '48'}},
+                         {'source_row': 4,
+                          'values': {'Demand (units, dj)': '20',
+                                     'Store (j)': '5',
+                                     'store_staff_training_hours_2025_q4': '18'}},
+                         {'source_row': 5,
+                          'values': {'Demand (units, dj)': '25',
+                                     'Store (j)': '6',
+                                     'store_staff_training_hours_2025_q4': '36'}},
+                         {'source_row': 6,
+                          'values': {'Demand (units, dj)': '45',
+                                     'Store (j)': '7',
+                                     'store_staff_training_hours_2025_q4': '18'}},
+                         {'source_row': 7,
+                          'values': {'Demand (units, dj)': '38',
+                                     'Store (j)': '8',
+                                     'store_staff_training_hours_2025_q4': '48'}},
+                         {'source_row': 8,
+                          'values': {'Demand (units, dj)': '32',
+                                     'Store (j)': '9',
+                                     'store_staff_training_hours_2025_q4': '12'}},
+                         {'source_row': 9,
+                          'values': {'Demand (units, dj)': '41',
+                                     'Store (j)': '10',
+                                     'store_staff_training_hours_2025_q4': '18'}},
+                         {'source_row': 10,
+                          'values': {'Demand (units, dj)': '44',
+                                     'Store (j)': '11',
+                                     'store_staff_training_hours_2025_q4': '36'}}],
+             'returned_rows': 11,
+             'role': 'file_1',
+             'table_id': 'file_1_view_0'},
+            {'columns': ['cost_record_route_survey_count_2025_q4',
+                         'Unnamed: 1',
+                         'W1',
+                         'cost_record_dispatch_coordination_meeting_count_2025_q4',
+                         'W2',
+                         'W3',
+                         'cost_record_logistics_training_hours_2025_q4',
+                         'cost_record_carrier_briefing_count_2025_q4',
+                         'W4',
+                         'W5',
+                         'cost_record_carrier_contact_channel',
+                         'W6',
+                         'cost_record_tariff_review_meeting_count_2025_q4',
+                         'W7',
+                         'W8',
+                         'W9',
+                         'W10',
+                         'W11'],
+             'file_index': 2,
+             'file_name': 'TransportationCost.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 11,
+             'records': [{'source_row': 0,
+                          'values': {'Unnamed: 1': 'W1',
+                                     'W1': '12',
+                                     'W10': '14',
+                                     'W11': '15',
+                                     'W2': '11',
+                                     'W3': '14',
+                                     'W4': '15',
+                                     'W5': '17',
+                                     'W6': '13',
+                                     'W7': '12',
+                                     'W8': '16',
+                                     'W9': '16',
+                                     'cost_record_carrier_briefing_count_2025_q4': '3',
+                                     'cost_record_carrier_contact_channel': 'Email',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '6',
+                                     'cost_record_logistics_training_hours_2025_q4': '12',
+                                     'cost_record_route_survey_count_2025_q4': '3',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '8'}},
+                         {'source_row': 1,
+                          'values': {'Unnamed: 1': 'W2',
+                                     'W1': '17',
+                                     'W10': '15',
+                                     'W11': '16',
+                                     'W2': '19',
+                                     'W3': '15',
+                                     'W4': '20',
+                                     'W5': '18',
+                                     'W6': '14',
+                                     'W7': '17',
+                                     'W8': '15',
+                                     'W9': '13',
+                                     'cost_record_carrier_briefing_count_2025_q4': '2',
+                                     'cost_record_carrier_contact_channel': 'Telephone',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '2',
+                                     'cost_record_logistics_training_hours_2025_q4': '12',
+                                     'cost_record_route_survey_count_2025_q4': '7',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '4'}},
+                         {'source_row': 2,
+                          'values': {'Unnamed: 1': 'W3',
+                                     'W1': '13',
+                                     'W10': '18',
+                                     'W11': '17',
+                                     'W2': '14',
+                                     'W3': '12',
+                                     'W4': '14',
+                                     'W5': '16',
+                                     'W6': '15',
+                                     'W7': '11',
+                                     'W8': '14',
+                                     'W9': '16',
+                                     'cost_record_carrier_briefing_count_2025_q4': '1',
+                                     'cost_record_carrier_contact_channel': 'Telephone',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '6',
+                                     'cost_record_logistics_training_hours_2025_q4': '30',
+                                     'cost_record_route_survey_count_2025_q4': '5',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '6'}},
+                         {'source_row': 3,
+                          'values': {'Unnamed: 1': 'W4',
+                                     'W1': '18',
+                                     'W10': '13',
+                                     'W11': '18',
+                                     'W2': '16',
+                                     'W3': '17',
+                                     'W4': '13',
+                                     'W5': '18',
+                                     'W6': '17',
+                                     'W7': '14',
+                                     'W8': '19',
+                                     'W9': '16',
+                                     'cost_record_carrier_briefing_count_2025_q4': '4',
+                                     'cost_record_carrier_contact_channel': 'Telephone',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '2',
+                                     'cost_record_logistics_training_hours_2025_q4': '24',
+                                     'cost_record_route_survey_count_2025_q4': '2',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '6'}},
+                         {'source_row': 4,
+                          'values': {'Unnamed: 1': 'W5',
+                                     'W1': '10',
+                                     'W10': '15',
+                                     'W11': '17',
+                                     'W2': '13',
+                                     'W3': '12',
+                                     'W4': '19',
+                                     'W5': '15',
+                                     'W6': '11',
+                                     'W7': '12',
+                                     'W8': '14',
+                                     'W9': '12',
+                                     'cost_record_carrier_briefing_count_2025_q4': '4',
+                                     'cost_record_carrier_contact_channel': 'Email',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '4',
+                                     'cost_record_logistics_training_hours_2025_q4': '18',
+                                     'cost_record_route_survey_count_2025_q4': '7',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '4'}},
+                         {'source_row': 5,
+                          'values': {'Unnamed: 1': 'W6',
+                                     'W1': '15',
+                                     'W10': '18',
+                                     'W11': '19',
+                                     'W2': '12',
+                                     'W3': '14',
+                                     'W4': '16',
+                                     'W5': '13',
+                                     'W6': '17',
+                                     'W7': '16',
+                                     'W8': '16',
+                                     'W9': '14',
+                                     'cost_record_carrier_briefing_count_2025_q4': '1',
+                                     'cost_record_carrier_contact_channel': 'Portal',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '2',
+                                     'cost_record_logistics_training_hours_2025_q4': '12',
+                                     'cost_record_route_survey_count_2025_q4': '3',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '1'}},
+                         {'source_row': 6,
+                          'values': {'Unnamed: 1': 'W7',
+                                     'W1': '14',
+                                     'W10': '16',
+                                     'W11': '14',
+                                     'W2': '13',
+                                     'W3': '15',
+                                     'W4': '17',
+                                     'W5': '12',
+                                     'W6': '13',
+                                     'W7': '14',
+                                     'W8': '15',
+                                     'W9': '12',
+                                     'cost_record_carrier_briefing_count_2025_q4': '3',
+                                     'cost_record_carrier_contact_channel': 'Telephone',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '2',
+                                     'cost_record_logistics_training_hours_2025_q4': '18',
+                                     'cost_record_route_survey_count_2025_q4': '2',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '1'}},
+                         {'source_row': 7,
+                          'values': {'Unnamed: 1': 'W8',
+                                     'W1': '19',
+                                     'W10': '15',
+                                     'W11': '18',
+                                     'W2': '16',
+                                     'W3': '18',
+                                     'W4': '20',
+                                     'W5': '17',
+                                     'W6': '19',
+                                     'W7': '16',
+                                     'W8': '18',
+                                     'W9': '15',
+                                     'cost_record_carrier_briefing_count_2025_q4': '1',
+                                     'cost_record_carrier_contact_channel': 'Email',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '4',
+                                     'cost_record_logistics_training_hours_2025_q4': '24',
+                                     'cost_record_route_survey_count_2025_q4': '7',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '4'}},
+                         {'source_row': 8,
+                          'values': {'Unnamed: 1': 'W9',
+                                     'W1': '17',
+                                     'W10': '15',
+                                     'W11': '18',
+                                     'W2': '18',
+                                     'W3': '12',
+                                     'W4': '14',
+                                     'W5': '16',
+                                     'W6': '15',
+                                     'W7': '14',
+                                     'W8': '17',
+                                     'W9': '21',
+                                     'cost_record_carrier_briefing_count_2025_q4': '4',
+                                     'cost_record_carrier_contact_channel': 'Portal',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '4',
+                                     'cost_record_logistics_training_hours_2025_q4': '18',
+                                     'cost_record_route_survey_count_2025_q4': '1',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '8'}},
+                         {'source_row': 9,
+                          'values': {'Unnamed: 1': 'W10',
+                                     'W1': '14',
+                                     'W10': '17',
+                                     'W11': '19',
+                                     'W2': '13',
+                                     'W3': '15',
+                                     'W4': '17',
+                                     'W5': '16',
+                                     'W6': '18',
+                                     'W7': '14',
+                                     'W8': '19',
+                                     'W9': '15',
+                                     'cost_record_carrier_briefing_count_2025_q4': '2',
+                                     'cost_record_carrier_contact_channel': 'Portal',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '10',
+                                     'cost_record_logistics_training_hours_2025_q4': '12',
+                                     'cost_record_route_survey_count_2025_q4': '1',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '8'}},
+                         {'source_row': 10,
+                          'values': {'Unnamed: 1': 'W11',
+                                     'W1': '15',
+                                     'W10': '21',
+                                     'W11': '13',
+                                     'W2': '13',
+                                     'W3': '16',
+                                     'W4': '17',
+                                     'W5': '11',
+                                     'W6': '13',
+                                     'W7': '14',
+                                     'W8': '15',
+                                     'W9': '19',
+                                     'cost_record_carrier_briefing_count_2025_q4': '1',
+                                     'cost_record_carrier_contact_channel': 'Portal',
+                                     'cost_record_dispatch_coordination_meeting_count_2025_q4': '10',
+                                     'cost_record_logistics_training_hours_2025_q4': '36',
+                                     'cost_record_route_survey_count_2025_q4': '2',
+                                     'cost_record_tariff_review_meeting_count_2025_q4': '4'}}],
+             'returned_rows': 11,
+             'role': 'file_2',
+             'table_id': 'file_2_view_0'}],
+ 'validation': {'fallback_reason': "Matrix reference IDs must be non-empty and unique: ['12', '17', '13', '18', '10', "
+                                   "'15', '14', '19', '17', '14', '15']",
+                'planner_errors': ["Matrix reference IDs must be non-empty and unique: ['12', '17', '13', '18', '10', "
+                                   "'15', '14', '19', '17', '14', '15']"],
+                'status': 'FALLBACK_FULL_DATA'}}
+import pandas as pd
+CSVQA_FRAMES = {t["table_id"]: pd.DataFrame([r["values"] for r in t["records"]], columns=t["columns"], index=[r["source_row"] for r in t["records"]]) for t in CSVQA_DATA["tables"]}
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    warehouses_df = CSVQA_FRAMES['file_0_view_0']
+    stores_df = CSVQA_FRAMES['file_1_view_0']
+    cost_df = CSVQA_FRAMES['file_2_view_0']
+    warehouses = []
+    opening_cost = {}
+    capacity = {}
+    for (_, row) in warehouses_df.iterrows():
+        i = row['Warehouse (i)']
+        warehouses.append(i)
+        try:
+            opening_cost[i] = float(row['Opening Cost (fi)'])
+        except Exception:
+            raise ValueError(f'Missing or invalid Opening Cost (fi) for warehouse {i}')
+        try:
+            capacity[i] = float(row['Capacity (units)'])
+        except Exception:
+            raise ValueError(f'Missing or invalid Capacity (units) for warehouse {i}')
+    stores = []
+    demand = {}
+    for (_, row) in stores_df.iterrows():
+        j = row['Store (j)']
+        stores.append(j)
+        try:
+            demand[j] = float(row['Demand (units, dj)'])
+        except Exception:
+            raise ValueError(f'Missing or invalid Demand (units, dj) for store {j}')
+    store_to_Wk = {}
+    for (idx, j) in enumerate(stores):
+        store_to_Wk[j] = f'W{j}'
+    warehouse_to_Wk = {}
+    for (idx, i) in enumerate(warehouses):
+        warehouse_to_Wk[i] = f'W{i}'
+    c_ij = {}
+    Wk_to_warehouse = {}
+    for (_, row) in cost_df.iterrows():
+        Wk = row['Unnamed: 1']
+        found = False
+        for i in warehouses:
+            if warehouse_to_Wk[i] == Wk:
+                Wk_to_warehouse[Wk] = i
+                found = True
+                break
+        if not found:
+            raise ValueError(f'Warehouse label {Wk} in cost matrix not found in warehouse list.')
+    for (_, row) in cost_df.iterrows():
+        Wk_row = row['Unnamed: 1']
+        if Wk_row not in Wk_to_warehouse:
+            raise ValueError(f'Warehouse label {Wk_row} in cost matrix not mapped to warehouse ID.')
+        i = Wk_to_warehouse[Wk_row]
+        for j in stores:
+            Wk_col = store_to_Wk[j]
+            if Wk_col not in row or row[Wk_col] == '' or row[Wk_col] is None:
+                raise ValueError(f'Missing transportation cost for warehouse {i} to store {j}')
+            try:
+                c_ij[i, j] = float(row[Wk_col])
+            except Exception:
+                raise ValueError(f'Invalid transportation cost for warehouse {i} to store {j}: {row[Wk_col]}')
+    for i in warehouses:
+        for j in stores:
+            if (i, j) not in c_ij:
+                raise ValueError(f'Missing transportation cost for warehouse {i} to store {j}')
+    m = gp.Model('Facility_Location')
+    m.Params.MIPGap = 0.0001
+    x_vars = m.addVars([(i, j) for i in warehouses for j in stores], lb=0, vtype=GRB.CONTINUOUS, name='')
+    y_vars = m.addVars(warehouses, vtype=GRB.BINARY, name='')
+    m.setObjective(gp.quicksum((opening_cost[i] * y_vars[i] for i in warehouses)) + gp.quicksum((c_ij[i, j] * x_vars[i, j] for i in warehouses for j in stores)), GRB.MINIMIZE)
+    m.addConstrs((gp.quicksum((x_vars[i, j] for i in warehouses)) == demand[j] for j in stores), name='')
+    m.addConstrs((gp.quicksum((x_vars[i, j] for j in stores)) <= capacity[i] * y_vars[i] for i in warehouses), name='')
+    m.optimize()
+    return m
+m = solve_problem()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

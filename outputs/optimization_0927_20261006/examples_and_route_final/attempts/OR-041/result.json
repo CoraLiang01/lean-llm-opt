@@ -1,0 +1,126 @@
+{
+  "problem_id": "OR-041",
+  "query": "A property developer is planning to develop real estate in New York.There are several areas to choose from, such as Queens and Brooklyn.However, due to limited resources and focus, the developer is not able to develop all the real estate in all the areas and has to select a few for development.The development benefit data for real estate in each area is recorded in the ‘products.csv’ file.The developer has an overall development capacity limit, which is detailed in the ‘capacity.csv’ file.The goal is to decide how many real estate in each areas are to be developed, in order to maximise the overall benefits while adhering to the overall development capacity.The decision variable x_i represents the scale of development per day in area i.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 3912.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "Others",
+  "assigned_route": "Others",
+  "generated_model": "[Abstract Model Plan START]\n1.  **Analyze Query:** The user wants to determine the optimal scale of real estate development per day in each area of New York (e.g., Queens, Brooklyn, etc.) to maximize total development benefits, subject to an overall development capacity constraint.\n2.  **Identify Model Type:** Based on the query, this is a Linear Programming (LP) resource allocation/knapsack-type problem.\n3.  **Define Index Sets:** The primary indices are Areas (i), corresponding to each row in 'products.csv' (i.e., each unique 'ProductName').\n4.  **Define Decision Variables:**\n    -   `x[i]` = Scale of development per day in area i. Type: GRB.CONTINUOUS (unless otherwise specified; the query does not require integrality).\n5.  **Identify Parameters (from Schema):**\n    -   Objective coefficients: 'Value' column in 'products.csv' (development benefit per unit in area i).\n    -   Constraint coefficients: 'Weight' column in 'products.csv' (resource usage per unit in area i).\n    -   Constraint RHS: 'Capacity' value from 'capacity.csv' (total available development capacity).\n6.  **Formulate Objective:** Maximize the total development benefit, i.e., maximize sum over all areas i of (Value[i] * x[i]).\n7.  **Formulate Constraints:**\n    -   Constraint 1 (Overall Capacity Limit): sum over all areas i of (Weight[i] * x[i]) ≤ Capacity.\n    -   Constraint 2 (Non-negativity): x[i] ≥ 0 for all areas i.\n[Abstract Model Plan END]",
+  "csvqa_observation": "File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/capacity.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 1\nColumns: ['Capacity']\nParsed column types: {'Capacity': 'int64'}\nPreview only (first 10 rows):\nCapacity\n     586\nFull-file column statistics: {\"Capacity\": {\"missing\": 0, \"unique_nonempty\": 1, \"numeric_range\": [586.0, 586.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"capacity\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"capacity.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}]\n\n---\n\nFile: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/products.csv\nCSV delimiter: comma; first line consumed as header.\nTotal rows: 20\nColumns: ['ProductName', 'Value', 'Weight']\nParsed column types: {'ProductName': 'object', 'Value': 'int64', 'Weight': 'int64'}\nPreview only (first 10 rows):\n     ProductName Value Weight\n          Queens   469    954\n        Brooklyn   290    650\n       Manhattan   236    961\n           Bronx   235    950\n   Staten Island   745    379\n          Harlem   684    776\n Upper East Side   444    381\n Lower Manhattan   172    808\n         Midtown  1000    937\nLong Island City   336    608\nFull-file column statistics: {\"ProductName\": {\"missing\": 0, \"unique_nonempty\": 20}, \"Value\": {\"missing\": 0, \"unique_nonempty\": 20, \"numeric_range\": [139.0, 1000.0]}, \"Weight\": {\"missing\": 0, \"unique_nonempty\": 20, \"numeric_range\": [130.0, 961.0]}}\nMatching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.\nCounts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.\nQuery-name evidence: [{\"term\": \"brooklyn\", \"matching_columns\": [{\"column\": \"ProductName\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"Brooklyn\"]}], \"exact_matching_columns\": 1}, {\"term\": \"capacity.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"products.csv\", \"matching_columns\": [], \"exact_matching_columns\": 0}, {\"term\": \"queens\", \"matching_columns\": [{\"column\": \"ProductName\", \"exact\": 1, \"prefix\": 1, \"contains\": 1, \"examples\": [\"Queens\"]}], \"exact_matching_columns\": 1}]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_SCHEMA",
+  "solve_code": "import gurobipy as gp\nimport pandas as pd\nimport numpy as np\nproducts_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/products.csv', sep=',', dtype=str, keep_default_na=False)\ncapacity_df = pd.read_csv('/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA7/NYCPropertySales2/capacity.csv', sep=',', dtype=str, keep_default_na=False)\nareas = products_df['ProductName'].tolist()\ntry:\n    value_param = products_df.set_index('ProductName')['Value'].astype(float).to_dict()\nexcept Exception as e:\n    raise ValueError(f\"Error converting 'Value' column to float: {e}\")\ntry:\n    weight_param = products_df.set_index('ProductName')['Weight'].astype(float).to_dict()\nexcept Exception as e:\n    raise ValueError(f\"Error converting 'Weight' column to float: {e}\")\ntry:\n    if capacity_df.shape[0] != 1 or 'Capacity' not in capacity_df.columns:\n        raise ValueError(\"capacity.csv must have exactly one row and a 'Capacity' column.\")\n    capacity = float(capacity_df.iloc[0]['Capacity'])\nexcept Exception as e:\n    raise ValueError(f'Error reading capacity from capacity.csv: {e}')\nm = gp.Model('NYC_RealEstate_Development')\nx_vars = m.addVars(areas, lb=0.0, vtype=gp.GRB.CONTINUOUS, name='')\nm.setObjective(gp.quicksum((value_param[area] * x_vars[area] for area in areas)), gp.GRB.MAXIMIZE)\nm.addConstr(gp.quicksum((weight_param[area] * x_vars[area] for area in areas)) <= capacity, name='TotalCapacity')\nm.optimize()",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 4408.523076923077,
+  "final_solution": [
+    [
+      "C0",
+      0.0
+    ],
+    [
+      "C1",
+      0.0
+    ],
+    [
+      "C2",
+      0.0
+    ],
+    [
+      "C3",
+      0.0
+    ],
+    [
+      "C4",
+      0.0
+    ],
+    [
+      "C5",
+      0.0
+    ],
+    [
+      "C6",
+      0.0
+    ],
+    [
+      "C7",
+      0.0
+    ],
+    [
+      "C8",
+      0.0
+    ],
+    [
+      "C9",
+      0.0
+    ],
+    [
+      "C10",
+      0.0
+    ],
+    [
+      "C11",
+      0.0
+    ],
+    [
+      "C12",
+      0.0
+    ],
+    [
+      "C13",
+      0.0
+    ],
+    [
+      "C14",
+      0.0
+    ],
+    [
+      "C15",
+      0.0
+    ],
+    [
+      "C16",
+      0.0
+    ],
+    [
+      "C17",
+      0.0
+    ],
+    [
+      "C18",
+      0.0
+    ],
+    [
+      "C19",
+      4.507692307692308
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "loto_variant": "examples_and_route",
+  "held_out_type": "RA",
+  "disabled_workflow_route": "RA",
+  "allowed_labels": "TP,NRM,FLP,AP,Mixture,Others",
+  "reference_sha256": "6b2987f96aeacece9f458d55aca072436922aec963be16223ac30a8890f79097",
+  "reference_count_after": 14,
+  "route_allowed": true,
+  "classification_correct": false,
+  "solution_correct": false,
+  "experiment_method": "examples_and_route",
+  "seconds": 11.069,
+  "classification_source": "fold_agent",
+  "classification_cache_sha256": "52ec80ea04cf1b59e48c6b602023d28f0778e866bf7e176463a1ce3f3db6e2ee",
+  "base_notebook_sha256": "abae7197f1ecd8e16bdc642756e08db68374aeda38c3e803b595c7e0573fc448",
+  "notebook_source_sha256": "83c6ac1e07877bf63ffb7c28408cb0118055abeb17e2d8e8076bfe189adcabe7",
+  "cache_fingerprint": "bb8d331dac9935622aa3dd18afdf859603690a9ea6f948a9d274e65ec66cf9d5",
+  "evaluated_utc": "2026-10-06T04:04:04.602177+00:00",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

@@ -1,0 +1,40 @@
+Mathematical Model
+
+Index Sets:
+- $I$: set of storage areas (indexed by $i$), with StorageID from file_0_view_0.
+- $J$: set of air conditioner types (indexed by $j$), with ProductName from file_1_view_0.
+
+Parameters:
+- $c_i$: capacity of storage area $i$ (file_0_view_0, column Capacity, key StorageID).
+- $v_j$: value per unit of air conditioner type $j$ (file_1_view_0, column Value, key ProductName).
+- $w_j$: size (weight) per unit of air conditioner type $j$ (file_1_view_0, column Weight, key ProductName).
+
+Decision Variables:
+- $x_{ij}$: number of units of air conditioner type $j$ to place in storage area $i$; $x_{ij} \in \mathbb{Z}_{\geq 0}$.
+
+Objective:
+\[
+\max \sum_{i \in I} \sum_{j \in J} v_j x_{ij}
+\]
+
+Subject to:
+\[
+\sum_{j \in J} w_j x_{ij} \leq c_i \qquad \forall i \in I
+\]
+\[
+x_{ij} \in \mathbb{Z}_{\geq 0} \qquad \forall i \in I,\, j \in J
+\]
+
+Data Mapping
+
+Index Sets:
+- $I$: file_0_view_0, column StorageID
+- $J$: file_1_view_0, column ProductName
+
+Parameters:
+- $c_i$: file_0_view_0, column Capacity, key StorageID
+- $v_j$: file_1_view_0, column Value, key ProductName
+- $w_j$: file_1_view_0, column Weight, key ProductName
+
+Decision Variables:
+- $x_{ij}$: number of units of air conditioner type $j$ to place in storage area $i$ (indexed by StorageID and ProductName)

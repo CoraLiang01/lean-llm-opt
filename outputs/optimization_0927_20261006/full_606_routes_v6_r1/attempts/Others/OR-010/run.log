@@ -1,0 +1,784 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+<EXAMPLE>
+Question: A company plans to produce three products A_{1}, A_{2}, A_{3}. It can produce for 22 days in a month. The 36-1.csv file gives the maximum demand (in units of 100 kg), prices ($/100 kg), production costs (per 100 kg of product), and production quotas (the maximum number of units of 100 kg of product that can be produced in a day if all production lines are dedicated to that product).
+
+The fixed activation cost for each production line is shown in 36-2.csv.
+
+The minimum production batch sizes are shown in 36-3.csv.
+
+The objective is to determine the production plan that maximizes total profit, accounting for total revenue, production costs, fixed activation costs, and minimum batch size restrictions.
+
+Furthermore, we only consider integer decision variables, meaning the quantities of products produced are integer multiples of 100 kg. The binary decisions on whether to activate each production line are also integer (0 or 1).
+
+All three products share a common budget of 22 equivalent production days. Producing one unit of product i uses 1/q_i equivalent production days, where q_i is its daily production quota.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+Maximize
+39.62 x_1 - 178539 y_1 + 35.98 x_2 - 157708 y_2 + 37.96 x_3 - 85192 y_3
+
+Subject to
+x_1 <= 5732 (demand)
+x_1 <= 12892 (22-day individual production quota)
+x_1 >= 18 y_1 (minimum batch)
+x_1 <= 5732 y_1 (activation)
+x_2 <= 5607 (demand)
+x_2 <= 7238 (22-day individual production quota)
+x_2 >= 25 y_2 (minimum batch)
+x_2 <= 5607 y_2 (activation)
+x_3 <= 4653 (demand)
+x_3 <= 11902 (22-day individual production quota)
+x_3 >= 23 y_3 (minimum batch)
+x_3 <= 4653 y_3 (activation)
+x_1/586 + x_2/329 + x_3/541 <= 22 (shared production days)
+x_1, x_2, x_3 >= 0 integer; y_1, y_2, y_3 binary.
+
+###### Retrieved Information
+
+{
+  "daily_quota": {
+    "1": 586,
+    "2": 329,
+    "3": 541
+  },
+  "demand": {
+    "1": 5732,
+    "2": 5607,
+    "3": 4653
+  },
+  "fixed_cost": {
+    "1": 178539,
+    "2": 157708,
+    "3": 85192
+  },
+  "min_batch": {
+    "1": 18,
+    "2": 25,
+    "3": 23
+  },
+  "products": [
+    "A1",
+    "A2",
+    "A3"
+  ],
+  "profit": {
+    "1": 39.62,
+    "2": 35.98,
+    "3": 37.96
+  },
+  "quota": {
+    "1": 12892,
+    "2": 7238,
+    "3": 11902
+  }
+}
+</EXAMPLE>
+
+<EXAMPLE>
+Question: Production of a product may be split among any subset of the four devices A, B, C, or D. Each activated device incurs its setup cost once and may produce up to its processing capacity. The combined production across all devices must equal 2000 units; the entire order does not have to be processed on a single device. Production quantities are modeled as nonnegative continuous variables. The setup completion cost for each device when it is activated, the unit cost of production for the product, and the maximum processing capacity for each device are known as shown in 6.csv. How can the total cost be minimized to produce 2000 units of the product? Try to establish a mathematical model.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+## Mathematical Model
+
+**Minimize**
+
+$$
+1000\, y_A + 20\, x_A 
++ 920\, y_B + 24\, x_B 
++ 800\, y_C + 16\, x_C 
++ 700\, y_D + 28\, x_D
+$$
+
+**subject to**
+
+$$
+x_A + x_B + x_C + x_D = 2000
+$$
+
+$$
+x_A \leq 900\, y_A
+$$
+
+$$
+x_B \leq 1000\, y_B
+$$
+
+$$
+x_C \leq 1200\, y_C
+$$
+
+$$
+x_D \leq 1600\, y_D
+$$
+
+**where**
+
+$$
+x_A, x_B, x_C, x_D \geq 0 \quad (\text{continuous})
+$$
+
+$$
+y_A, y_B, y_C, y_D \in \{0,1\} \quad (\text{binary})
+$$
+</EXAMPLE>
+
+<EXAMPLE>
+Question: A factory plans to produce two products (A and B) using three limited resources: steel, iron, and machine hours. The resource consumption per unit of product and profit margins are shown in production_data.csv. Determine the optimal production quantities to maximize total profit while respecting resource constraints.
+Thought: I need to create an Abstract Model Plan based on the query and CSV schema.
+Final Answer:
+#### Decision Variables
+- $x_1$: Quantity of Product A to produce
+- $x_2$: Quantity of Product B to produce
+
+#### Objective Function
+Maximize total profit: 
+$\quad \quad \max \ 80x_1 + 125x_2$
+
+#### Constraints
+**1. Steel Constraint** 
+$\quad \quad 8x_1 + 5x_2 \leq 3500$ 
+
+**2. Iron Constraint** 
+$\quad \quad 6x_1 + 4x_2 \leq 1800$ 
+
+**3. Machine Hours Constraint** 
+$\quad \quad 4x_1 + 5x_2 \leq 2800$ 
+
+**4. Non-negativity** 
+$\quad \quad x_1 \geq 0, x_2 \geq 0$
+</EXAMPLE>...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to maximize total revenue from fulfilling customer orders for a set of mobile device products, given fixed initial inventories and deterministic, known demands for each product. No restocking or in-transit inventory is allowed during the sales cycle, and fulfillment for each product cannot exceed either its available inventory or its demand.
+2.  **Identify Model Type:** Based on the query, this is a Linear Integer Programming (ILP) problem (specifically, a bounded assignment/fulfillment problem).
+3.  **Define Index Sets:** The primary index is the set of Products, as identified by the 'Product Name' column in the CSV file.
+4.  **Define Decision Variables:**
+    -   `x[i]` = Number of units of product i to fulfill (i.e., quantity of orders fulfilled for product i). Type: GRB.INTEGER (non-negative).
+5.  **Identify Parameters (from Schema):**
+    -   Objective coefficients: 'Revenue' column (per-unit revenue for each product).
+    -   Constraint coefficients: Not applicable (each constraint applies directly to a single product).
+    -   Constraint RHS (limits): 'Demand' column (maximum possible fulfilled orders per product), 'Initial Inventory' column (maximum available units per product).
+6.  **Formulate Objective:** Maximize total revenue, i.e., maximize the sum over all products of (schema['Revenue'][i] * x[i]).
+7.  **Formulate Constraints:**
+    -   Constraint 1 (Demand Limit): For each product i, x[i] ≤ schema['Demand'][i] (cannot fulfill more than demand).
+    -   Constraint 2 (Inventory Limit): For each product i, x[i] ≤ schema['Initial Inventory'][i] (cannot fulfill more than available inventory).
+    -   Constraint 3 (Non-negativity and Integrality): For each product i, x[i] ≥ 0 and integer.
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import gurobipy as gp
+import pandas as pd
+import numpy as np
+
+# 1. Read the CSV file with explicit dtype and no NA conversion
+csv_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM1/MobileSalesDataset.csv'
+df = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
+
+# 2. Normalize and validate columns
+required_columns = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+for col in required_columns:
+    if col not in df.columns:
+        raise KeyError(f"Required column '{col}' not found in CSV.")
+
+# 3. Prepare index set and parameters
+# Use all products in the file
+product_ids = df['Product Name'].tolist()
+
+# Build parameter dictionaries with explicit type conversion
+def to_float_or_error(val, col, pid):
+    try:
+        return float(val)
+    except Exception:
+        raise ValueError(f"Invalid float in column '{col}' for product '{pid}': '{val}'")
+
+def to_int_or_error(val, col, pid):
+    try:
+        return int(val)
+    except Exception:
+        raise ValueError(f"Invalid int in column '{col}' for product '{pid}': '{val}'")
+
+revenue = {}
+demand = {}
+initial_inventory = {}
+
+for idx, row in df.iterrows():
+    pid = row['Product Name']
+    revenue[pid] = to_float_or_error(row['Revenue'], 'Revenue', pid)
+    demand[pid] = to_int_or_error(row['Demand'], 'Demand', pid)
+    initial_inventory[pid] = to_int_or_error(row['Initial Inventory'], 'Initial Inventory', pid)
+
+# 4. Build the Gurobi model
+m = gp.Model('MobileDeviceOrderFulfillment')
+
+# 5. Decision variables: x_vars[pid] = number of units fulfilled for product pid (integer, >=0)
+x_vars = m.addVars(
+    product_ids,
+    vtype=gp.GRB.INTEGER,
+    lb=0,
+    name='x'
+)
+
+# 6. Constraints
+# For each product: x[pid] <= demand[pid] and x[pid] <= initial_inventory[pid]
+for pid in product_ids:
+    m.addConstr(x_vars[pid] <= demand[pid], name=f'demand_limit_{pid}')
+    m.addConstr(x_vars[pid] <= initial_inventory[pid], name=f'inventory_limit_{pid}')
+
+# 7. Objective: maximize total revenue
+m.setObjective(
+    gp.quicksum(revenue[pid] * x_vars[pid] for pid in product_ids),
+    gp.GRB.MAXIMIZE
+)
+
+# 8. Optimize
+m.optimize()
+
+# 9. Output results
+if m.status == gp.GRB.OPTIMAL:
+    print(f"Optimal total revenue: {m.objVal:.2f}")
+    print("--- Fulfillment Plan ---")
+    for pid in product_ids:
+        fulfilled = int(round(x_vars[pid].X))
+        print(f"Product: {pid}")
+        print(f"  Fulfilled: {fulfilled} units")
+        print(f"  Demand: {demand[pid]}")
+        print(f"  Initial Inventory: {initial_inventory[pid]}")
+        print(f"  Per-unit Revenue: {revenue[pid]:.2f}")
+        print(f"  Revenue from this product: {revenue[pid] * fulfilled:.2f}")
+        print()
+else:
+    print(f"No optimal solution found. Status: {m.status}")
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 142 rows, 71 columns and 142 nonzeros
+Model fingerprint: 0xd603b9f0
+Variable types: 0 continuous, 71 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+02, 1e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [4e+00, 1e+03]
+Found heuristic solution: objective 4003445.2100
+Presolve removed 142 rows and 71 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 4.00345e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.003445210000e+06, best bound 4.003445210000e+06, gap 0.0000%
+Optimal total revenue: 4003445.21
+--- Fulfillment Plan ---
+Product: Adams Group_service
+  Fulfilled: 10 units
+  Demand: 10
+  Initial Inventory: 80
+  Per-unit Revenue: 1003.56
+  Revenue from this product: 10035.60
+
+Product: Anderson-Leach_against
+  Fulfilled: 6 units
+  Demand: 6
+  Initial Inventory: 40
+  Per-unit Revenue: 549.92
+  Revenue from this product: 3299.52
+
+Product: Anderson-Valdez_somebody
+  Fulfilled: 75 units
+  Demand: 75
+  Initial Inventory: 560
+  Per-unit Revenue: 169.70
+  Revenue from this product: 12727.50
+
+Product: Anderson-White_son
+  Fulfilled: 121 units
+  Demand: 121
+  Initial Inventory: 820
+  Per-unit Revenue: 1285.81
+  Revenue from this product: 155583.01
+
+Product: Andrews LLC_matter
+  Fulfilled: 130 units
+  Demand: 130
+  Initial Inventory: 960
+  Per-unit Revenue: 1269.71
+  Revenue from this product: 165062.30
+
+Product: Andrews PLC_enter
+  Fulfilled: 112 units
+  Demand: 112
+  Initial Inventory: 850
+  Per-unit Revenue: 805.82
+  Revenue from this product: 90251.84
+
+Product: Andrews-Martin_build
+  Fulfilled: 125 units
+  Demand: 125
+  Initial Inventory: 950
+  Per-unit Revenue: 1134.19
+  Revenue from this product: 141773.75
+
+Product: Arias-Mendoza_life
+  Fulfilled: 54 units
+  Demand: 54
+  Initial Inventory: 360
+  Per-unit Revenue: 1479.23
+  Revenue from this product: 79878.42
+
+Product: Bennett and Sons_down
+  Fulfilled: 75 units
+  Demand: 75
+  Initial Inventory: 580
+  Per-unit Revenue: 139.14
+  Revenue from this product: 10435.50
+
+Product: Bennett, Foster and Moreno_enter
+  Fulfilled: 102 units
+  Demand: 102
+  Initial Inventory: 800
+  Per-unit Revenue: 518.67
+  Revenue from this product: 52904.34
+
+Product: Fernandez, Long and Nelson_member
+  Fulfilled: 48 units
+  Demand: 48
+  Initial Inventory: 340
+  Per-unit Revenue: 1088.57
+  Revenue from this product: 52251.36
+
+Product: Fernandez-Fischer_million
+  Fulfilled: 4 units
+  Demand: 4
+  Initial Inventory: 30
+  Per-unit Revenue: 371.56
+  Revenue from this product: 1486.24
+
+Product: Ferrell Inc_prove
+  Fulfilled: 125 units
+  Demand: 125
+  Initial Inventory: 990
+  Per-unit Revenue: 956.78
+  Revenue from this product: 119597.50
+
+Product: Fields, Christensen and Daniels_nor
+  Fulfilled: 9 units
+  Demand: 9
+  Initial Inventory: 70
+  Per-unit Revenue: 1283.70
+  Revenue from this product: 11553.30
+
+Product: Figueroa LLC_involve
+  Fulfilled: 132 units
+  Demand: 132
+  Initial Inventory: 890
+  Per-unit Revenue: 1184.54
+  Revenue from this product: 156359.28
+
+Product: Finley Group_itself
+  Fulfilled: 29 units
+  Demand: 29
+  Initial Inventory: 240
+  Per-unit Revenue: 377.80
+  Revenue from this product: 10956.20
+
+Product: Fisher Ltd_speak
+  Fulfilled: 43 units
+  Demand: 43
+  Initial Inventory: 290
+  Per-unit Revenue: 701.97
+  Revenue from this product: 30184.71
+
+Product: Fisher-Marshall_cover
+  Fulfilled: 5 units
+  Demand: 5
+  Initial Inventory: 40
+  Per-unit Revenue: 875.91
+  Revenue from this product: 4379.55
+
+Product: Fuller-Torres_behavior
+  Fulfilled: 40 units
+  Demand: 40
+  Initial Inventory: 300
+  Per-unit Revenue: 951.85
+  Revenue from this product: 38074.00
+
+Product: Fuller-Walters_radio
+  Fulfilled: 48 units
+  Demand: 48
+  Initial Inventory: 350
+  Per-unit Revenue: 869.95
+  Revenue from this product: 41757.60
+
+Product: Gallagher-Campbell_dark
+  Fulfilled: 87 units
+  Demand: 87
+  Initial Inventory: 600
+  Per-unit Revenue: 887.06
+  Revenue from this product: 77174.22
+
+Product: Gallagher-Kirby_talk
+  Fulfilled: 79 units
+  Demand: 79
+  Initial Inventory: 610
+  Per-unit Revenue: 1318.33
+  Revenue from this product: 104148.07
+
+Product: Gallagher-Parker_recognize
+  Fulfilled: 20 units
+  Demand: 20
+  Initial Inventory: 160
+  Per-unit Revenue: 448.61
+  Revenue from this product: 8972.20
+
+Product: Gonzalez PLC_task
+  Fulfilled: 33 units
+  Demand: 33
+  Initial Inventory: 260
+  Per-unit Revenue: 167.99
+  Revenue from this product: 5543.67
+
+Product: Gonzalez, Coleman and Le_heavy
+  Fulfilled: 60 units
+  Demand: 60
+  Initial Inventory: 480
+  Per-unit Revenue: 1068.10
+  Revenue from this product: 64086.00
+
+Product: Gonzalez, Lowe and Robinson_education
+  Fulfilled: 25 units
+  Demand: 25
+  Initial Inventory: 200
+  Per-unit Revenue: 872.16
+  Revenue from this product: 21804.00
+
+Product: Gonzalez-Horn_light
+  Fulfilled: 42 units
+  Demand: 42
+  Initial Inventory: 290
+  Per-unit Revenue: 483.26
+  Revenue from this product: 20296.92
+
+Product: Good, Davis and Smith_station
+  Fulfilled: 52 units
+  Demand: 52
+  Initial Inventory: 350
+  Per-unit Revenue: 1279.24
+  Revenue from this product: 66520.48
+
+Product: Goodman, Hughes and White_realize
+  Fulfilled: 116 units
+  Demand: 116
+  Initial Inventory: 900
+  Per-unit Revenue: 894.34
+  Revenue from this product: 103743.44
+
+Product: Goodwin PLC_bad
+  Fulfilled: 95 units
+  Demand: 95
+  Initial Inventory: 760
+  Per-unit Revenue: 367.91
+  Revenue from this product: 34951.45
+
+Product: Gordon PLC_detail
+  Fulfilled: 66 units
+  Demand: 66
+  Initial Inventory: 440
+  Per-unit Revenue: 178.22
+  Revenue from this product: 11762.52
+
+Product: Graham LLC_stage
+  Fulfilled: 25 units
+  Demand: 25
+  Initial Inventory: 170
+  Per-unit Revenue: 1030.80
+  Revenue from this product: 25770.00
+
+Product: Graham Ltd_marriage
+  Fulfilled: 78 units
+  Demand: 78
+  Initial Inventory: 600
+  Per-unit Revenue: 479.44
+  Revenue from this product: 37396.32
+
+Product: Graham-Swanson_message
+  Fulfilled: 138 units
+  Demand: 138
+  Initial Inventory: 920
+  Per-unit Revenue: 973.62
+  Revenue from this product: 134359.56
+
+Product: Grant, Cross and Bennett_religious
+  Fulfilled: 32 units
+  Demand: 32
+  Initial Inventory: 240
+  Per-unit Revenue: 1211.35
+  Revenue from this product: 38763.20
+
+Product: Grant, Mcdonald and Watson_owner
+  Fulfilled: 28 units
+  Demand: 28
+  Initial Inventory: 190
+  Per-unit Revenue: 467.93
+  Revenue from this product: 13102.04
+
+Product: Graves, Turner and Crawford_wait
+  Fulfilled: 84 units
+  Demand: 84
+  Initial Inventory: 600
+  Per-unit Revenue: 678.72
+  Revenue from this product: 57012.48
+
+Product: Gray, Smith and Barnes_much
+  Fulfilled: 102 units
+  Demand: 102
+  Initial Inventory: 760
+  Per-unit Revenue: 478.36
+  Revenue from this product: 48792.72
+
+Product: Green Inc_direction
+  Fulfilled: 112 units
+  Demand: 112
+  Initial Inventory: 850
+  Per-unit Revenue: 1196.95
+  Revenue from this product: 134058.40
+
+Product: Green-Rogers_could
+  Fulfilled: 7 units
+  Demand: 7
+  Initial Inventory: 50
+  Per-unit Revenue: 1118.63
+  Revenue from this product: 7830.41
+
+Product: Greene-Baxter_them
+  Fulfilled: 62 units
+  Demand: 62
+  Initial Inventory: 470
+  Per-unit Revenue: 972.10
+  Revenue from this product: 60270.20
+
+Product: Greer and Sons_keep
+  Fulfilled: 109 units
+  Demand: 109
+  Initial Inventory: 790
+  Per-unit Revenue: 338.60
+  Revenue from this product: 36907.40
+
+Product: Griffin, Boyle and Dawson_anything
+  Fulfilled: 81 units
+  Demand: 81
+  Initial Inventory: 580
+  Per-unit Revenue: 178.52
+  Revenue from this product: 14460.12
+
+Product: Harper Inc_well
+  Fulfilled: 131 units
+  Demand: 131
+  Initial Inventory: 880
+  Per-unit Revenue: 992.14
+  Revenue from this product: 129970.34
+
+Product: Harper Ltd_off
+  Fulfilled: 26 units
+  Demand: 26
+  Initial Inventory: 170
+  Per-unit Revenue: 498.77
+  Revenue from this product: 12968.02
+
+Product: Harrington, Sosa and Mccarty_coach
+  Fulfilled: 109 units
+  Demand: 109
+  Initial Inventory: 790
+  Per-unit Revenue: 965.34
+  Revenue from this product: 105222.06
+
+Product: Harris Group_different
+  Fulfilled: 65 units
+  Demand: 65
+  Initial Inventory: 500
+  Per-unit Revenue: 321.11
+  Revenue from this product: 20872.15
+
+Product: Harris and Sons_audience
+  Fulfilled: 121 units
+  Demand: 121
+  Initial Inventory: 890
+  Per-unit Revenue: 287.36
+  Revenue from this product: 34770.56
+
+Product: Harris and Sons_fear
+  Fulfilled: 90 units
+  Demand: 90
+  Initial Inventory: 680
+  Per-unit Revenue: 462.26
+  Revenue from this product: 41603.40
+
+Product: Harris, Hamilton and Rose_contain
+  Fulfilled: 31 units
+  Demand: 31
+  Initial Inventory: 250
+  Per-unit Revenue: 641.22
+  Revenue from this product: 19877.82
+
+Product: Harris, Stevens and Hall_answer
+  Fulfilled: 24 units
+  Demand: 24
+  Initial Inventory: 170
+  Per-unit Revenue: 1136.87
+  Revenue from this product: 27284.88
+
+Product: Harris-Bell_painting
+  Fulfilled: 122 units
+  Demand: 122
+  Initial Inventory: 830
+  Per-unit Revenue: 1385.88
+  Revenue from this product: 169077.36
+
+Product: Harris-Melton_often
+  Fulfilled: 101 units
+  Demand: 101
+  Initial Inventory: 680
+  Per-unit Revenue: 867.30
+  Revenue from this product: 87597.30
+
+Product: Harris-Rogers_after
+  Fulfilled: 76 units
+  Demand: 76
+  Initial Inventory: 590
+  Per-unit Revenue: 1175.92
+  Revenue from this product: 89369.92
+
+Product: Hart Group_cold
+  Fulfilled: 100 units
+  Demand: 100
+  Initial Inventory: 700
+  Per-unit Revenue: 153.61
+  Revenue from this product: 15361.00
+
+Product: Hutchinson, Roberts and Mcbride_among
+  Fulfilled: 125 units
+  Demand: 125
+  Initial Inventory: 830
+  Per-unit Revenue: 753.55
+  Revenue from this product: 94193.75
+
+Product: Ibarra, Jackson and Potter_upon
+  Fulfilled: 45 units
+  Demand: 45
+  Initial Inventory: 360
+  Per-unit Revenue: 245.81
+  Revenue from this product: 11061.45
+
+Product: Jackson Inc_anyone
+  Fulfilled: 80 units
+  Demand: 80
+  Initial Inventory: 570
+  Per-unit Revenue: 507.13
+  Revenue from this product: 40570.40
+
+Product: Jackson LLC_report
+  Fulfilled: 64 units
+  Demand: 64
+  Initial Inventory: 510
+  Per-unit Revenue: 513.64
+  Revenue from this product: 32872.96
+
+Product: Jackson, Collier and Barber_result
+  Fulfilled: 98 units
+  Demand: 98
+  Initial Inventory: 690
+  Per-unit Revenue: 1316.82
+  Revenue from this product: 129048.36
+
+Product: Jackson, White and Brown_expect
+  Fulfilled: 102 units
+  Demand: 102
+  Initial Inventory: 760
+  Per-unit Revenue: 1409.21
+  Revenue from this product: 143739.42
+
+Product: Jackson-Carroll_six
+  Fulfilled: 40 units
+  Demand: 40
+  Initial Inventory: 270
+  Per-unit Revenue: 1237.37
+  Revenue from this product: 49494.80
+
+Product: Lee-Jones_soldier
+  Fulfilled: 110 units
+  Demand: 110
+  Initial Inventory: 880
+  Per-unit Revenue: 1042.66
+  Revenue from this product: 114692.60
+
+Product: Lewis, Sanchez and Turner_point
+  Fulfilled: 59 units
+  Demand: 59
+  Initial Inventory: 470
+  Per-unit Revenue: 156.02
+  Revenue from this product: 9205.18
+
+Product: Lin LLC_performance
+  Fulfilled: 97 units
+  Demand: 97
+  Initial Inventory: 670
+  Per-unit Revenue: 728.62
+  Revenue from this product: 70676.14
+
+Product: Lindsey, Avila and Brown_candidate
+  Fulfilled: 90 units
+  Demand: 90
+  Initial Inventory: 620
+  Per-unit Revenue: 971.93
+  Revenue from this product: 87473.70
+
+Product: Lindsey-Strickland_modern
+  Fulfilled: 43 units
+  Demand: 43
+  Initial Inventory: 310
+  Per-unit Revenue: 1128.07
+  Revenue from this product: 48507.01
+
+Product: Little-Perez_choice
+  Fulfilled: 96 units
+  Demand: 96
+  Initial Inventory: 670
+  Per-unit Revenue: 256.42
+  Revenue from this product: 24616.32
+
+Product: Lloyd, Stone and Mcguire_national
+  Fulfilled: 21 units
+  Demand: 21
+  Initial Inventory: 150
+  Per-unit Revenue: 1064.72
+  Revenue from this product: 22359.12
+
+Product: Long, Hughes and Gallegos_receive
+  Fulfilled: 55 units
+  Demand: 55
+  Initial Inventory: 440
+  Per-unit Revenue: 348.43
+  Revenue from this product: 19163.65
+
+Product: Lopez PLC_analysis
+  Fulfilled: 30 units
+  Demand: 30
+  Initial Inventory: 210
+  Per-unit Revenue: 1183.94
+  Revenue from this product: 35518.20
+
+Optimal objective: 4003445.2099999995
+Optimal solution: [('C0', 10.0), ('C1', 6.0), ('C2', 75.0), ('C3', 121.0), ('C4', 130.0), ('C5', 112.0), ('C6', 125.0), ('C7', 54.0), ('C8', 75.0), ('C9', 102.0), ('C10', 48.0), ('C11', 4.0), ('C12', 125.0), ('C13', 9.0), ('C14', 132.0), ('C15', 29.0), ('C16', 43.0), ('C17', 5.0), ('C18', 40.0), ('C19', 48.0), ('C20', 87.0), ('C21', 79.0), ('C22', 20.0), ('C23', 33.0), ('C24', 60.0), ('C25', 25.0), ('C26', 42.0), ('C27', 52.0), ('C28', 116.0), ('C29', 95.0), ('C30', 66.0), ('C31', 25.0), ('C32', 78.0), ('C33', 138.0), ('C34', 32.0), ('C35', 28.0), ('C36', 84.0), ('C37', 102.0), ('C38', 112.0), ('C39', 7.0), ('C40', 62.0), ('C41', 109.0), ('C42', 81.0), ('C43', 131.0), ('C44', 26.0), ('C45', 109.0), ('C46', 65.0), ('C47', 121.0), ('C48', 90.0), ('C49', 31.0), ('C50', 24.0), ('C51', 122.0), ('C52', 101.0), ('C53', 76.0), ('C54', 100.0), ('C55', 125.0), ('C56', 45.0), ('C57', 80.0), ('C58', 64.0), ('C59', 98.0), ('C60', 102.0), ('C61', 40.0), ('C62', 110.0), ('C63', 59.0), ('C64', 97.0), ('C65', 90.0), ('C66', 43.0), ('C67', 96.0), ('C68', 21.0), ('C69', 55.0), ('C70', 30.0)]

@@ -1,0 +1,16 @@
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal visiting order for a traveling salesman who must visit 15 customers (locations), starting and ending at location 1, such that the total travel distance is minimized. The pairwise (symmetric) distances between locations are provided in a CSV file.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem, specifically a Traveling Salesman Problem (TSP).
+3.  **Define Index Sets:** The primary indices are the set of locations/customers, indexed as \( i, j \in N \), where \( N = \{1, 2, ..., 15\} \).
+4.  **Define Decision Variables:**
+    -   `x[i, j]` = 1 if the route travels directly from location \( i \) to location \( j \); 0 otherwise. Type: GRB.BINARY.
+    -   `u[i]` = the position of location \( i \) in the visiting order (used for subtour elimination). Type: GRB.INTEGER, for \( i \in N \setminus \{1\} \).
+5.  **Identify Parameters (from Schema):**
+    -   Distance between locations \( i \) and \( j \) is given by the symmetric matrix in columns '1' through '15' of the CSV file, with row and column indices corresponding to location numbers.
+6.  **Formulate Objective:** Minimize the total travel distance, i.e., minimize the sum over all pairs \( (i, j) \) of `distance[i, j] * x[i, j]`, where `distance[i, j]` is the parameter from the CSV.
+7.  **Formulate Constraints:**
+    -   Each location is departed from exactly once: For all \( i \in N \), sum over \( j \neq i \) of `x[i, j]` = 1.
+    -   Each location is arrived at exactly once: For all \( j \in N \), sum over \( i \neq j \) of `x[i, j]` = 1.
+    -   Subtour elimination: For all \( i, j \in N \setminus \{1\}, i \neq j \), enforce `u[i] - u[j] + (n-1) * x[i, j] \leq n-2`, where \( n = 15 \).
+    -   Start and end at location 1: The tour must begin and end at location 1, enforced by the degree constraints above and the structure of the variables.
+[Abstract Model Plan END]

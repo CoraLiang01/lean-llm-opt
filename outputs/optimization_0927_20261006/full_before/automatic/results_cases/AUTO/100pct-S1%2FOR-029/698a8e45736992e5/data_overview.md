@@ -1,0 +1,30 @@
+{"values": {"ShelfID": "1", "ArchiveRevisionCount": "16", "Capacity": "5", "ArchivePageCount": "23"}}
+{"values": {"ShelfID": "2", "ArchiveRevisionCount": "17", "Capacity": "7", "ArchivePageCount": "20"}}
+{"values": {"ShelfID": "3", "ArchiveRevisionCount": "18", "Capacity": "6", "ArchivePageCount": "28"}}
+{"values": {"ShelfID": "4", "ArchiveRevisionCount": "12", "Capacity": "8", "ArchivePageCount": "18"}}
+{"values": {"ShelfID": "5", "ArchiveRevisionCount": "7", "Capacity": "5.5", "ArchivePageCount": "19"}}
+{"values": {"ShelfID": "6", "ArchiveRevisionCount": "1", "Capacity": "9", "ArchivePageCount": "29"}}
+{"values": {"ShelfID": "7", "ArchiveRevisionCount": "27", "Capacity": "6.5", "ArchivePageCount": "9"}}
+{"values": {"ShelfID": "8", "ArchiveRevisionCount": "20", "Capacity": "7.5", "ArchivePageCount": "14"}}
+{"values": {"ShelfID": "9", "ArchiveRevisionCount": "22", "Capacity": "8.2", "ArchivePageCount": "26"}}
+{"values": {"ShelfID": "10", "ArchiveRevisionCount": "28", "Capacity": "5.7", "ArchivePageCount": "12"}}
+{"values": {"ArchivePageCount": "4", "ArchiveRevisionCount": "15", "ArchiveFolder": "Folder_C", "ProductName": "Smartphone", "Value": "200", "Weight": "1"}}
+{"values": {"ArchivePageCount": "7", "ArchiveRevisionCount": "15", "ArchiveFolder": "Folder_B", "ProductName": "Laptop", "Value": "1500", "Weight": "5"}}
+{"values": {"ArchivePageCount": "25", "ArchiveRevisionCount": "5", "ArchiveFolder": "Folder_C", "ProductName": "Headphones", "Value": "100", "Weight": "0.5"}}
+{"values": {"ArchivePageCount": "25", "ArchiveRevisionCount": "8", "ArchiveFolder": "Folder_B", "ProductName": "Camera", "Value": "800", "Weight": "2"}}
+{"values": {"ArchivePageCount": "30", "ArchiveRevisionCount": "13", "ArchiveFolder": "Folder_A", "ProductName": "Smartwatch", "Value": "250", "Weight": "0.3"}}
+{"values": {"ArchivePageCount": "16", "ArchiveRevisionCount": "28", "ArchiveFolder": "Folder_C", "ProductName": "Tablet", "Value": "600", "Weight": "1.5"}}
+{"values": {"ArchivePageCount": "24", "ArchiveRevisionCount": "23", "ArchiveFolder": "Folder_B", "ProductName": "Bluetooth Speaker", "Value": "150", "Weight": "1"}}
+{"values": {"ArchivePageCount": "10", "ArchiveRevisionCount": "4", "ArchiveFolder": "Folder_B", "ProductName": "Keyboard", "Value": "80", "Weight": "0.8"}}
+{"values": {"ArchivePageCount": "23", "ArchiveRevisionCount": "22", "ArchiveFolder": "Folder_B", "ProductName": "Mouse", "Value": "50", "Weight": "0.2"}}
+{"values": {"ArchivePageCount": "9", "ArchiveRevisionCount": "16", "ArchiveFolder": "Folder_C", "ProductName": "Monitor", "Value": "300", "Weight": "3"}}
+{"values": {"ArchivePageCount": "11", "ArchiveRevisionCount": "29", "ArchiveFolder": "Folder_B", "ProductName": "Printer", "Value": "400", "Weight": "4"}}
+{"values": {"ArchivePageCount": "22", "ArchiveRevisionCount": "12", "ArchiveFolder": "Folder_B", "ProductName": "External Hard Drive", "Value": "120", "Weight": "0.5"}}
+{"values": {"ArchivePageCount": "28", "ArchiveRevisionCount": "19", "ArchiveFolder": "Folder_A", "ProductName": "Router", "Value": "60", "Weight": "0.3"}}
+{"values": {"ArchivePageCount": "5", "ArchiveRevisionCount": "14", "ArchiveFolder": "Folder_C", "ProductName": "Power Bank", "Value": "40", "Weight": "0.4"}}
+{"values": {"ArchivePageCount": "22", "ArchiveRevisionCount": "5", "ArchiveFolder": "Folder_B", "ProductName": "Memory Card", "Value": "30", "Weight": "0.05"}}
+{"values": {"ArchivePageCount": "7", "ArchiveRevisionCount": "29", "ArchiveFolder": "Folder_C", "ProductName": "USB Flash Drive", "Value": "25", "Weight": "0.02"}}
+{"values": {"ArchivePageCount": "29", "ArchiveRevisionCount": "20", "ArchiveFolder": "Folder_A", "ProductName": "Smart Home Hub", "Value": "100", "Weight": "0.6"}}
+{"values": {"ArchivePageCount": "8", "ArchiveRevisionCount": "30", "ArchiveFolder": "Folder_A", "ProductName": "Gaming Console", "Value": "500", "Weight": "4"}}
+{"values": {"ArchivePageCount": "19", "ArchiveRevisionCount": "16", "ArchiveFolder": "Folder_A", "ProductName": "Fitness Tracker", "Value": "90", "Weight": "0.2"}}
+{"values": {"ArchivePageCount": "21", "ArchiveRevisionCount": "18", "ArchiveFolder": "Folder_A", "ProductName": "E-Reader", "Value": "180", "Weight": "0.5"}}

@@ -1,0 +1,93 @@
+import gurobipy as gp
+from gurobipy import GRB
+
+# Data
+suppliers = ['S1', 'S2']
+supermarkets = ['C1', 'C2']
+
+demand = {'C1': 144, 'C2': 216}
+fixed_cost = {'S1': 105.97, 'S2': 85.31}
+cost = {
+    'S1': {'C1': 2358.39, 'C2': 1492.08},
+    'S2': {'C1': 0.07,    'C2': 52.32}
+}
+M = sum(demand.values())  # 360
+
+# Validate data coverage
+for i in suppliers:
+    if i not in fixed_cost:
+        raise ValueError(f"Missing fixed cost for supplier {i}")
+    if i not in cost:
+        raise ValueError(f"Missing cost row for supplier {i}")
+    for j in supermarkets:
+        if j not in cost[i]:
+            raise ValueError(f"Missing cost for supplier {i}, supermarket {j}")
+for j in supermarkets:
+    if j not in demand:
+        raise ValueError(f"Missing demand for supermarket {j}")
+
+# Model
+m = gp.Model('FLP_Concrete')
+x = m.addVars(suppliers, supermarkets, lb=0, vtype=GRB.CONTINUOUS, name='x')
+y = m.addVars(suppliers, vtype=GRB.BINARY, name='y')
+
+# Objective
+m.setObjective(
+    gp.quicksum(cost[i][j] * x[i, j] for i in suppliers for j in supermarkets) +
+    gp.quicksum(fixed_cost[i] * y[i] for i in suppliers),
+    GRB.MINIMIZE
+)
+
+# Constraints
+m.addConstrs(
+    (gp.quicksum(x[i, j] for i in suppliers) == demand[j] for j in supermarkets),
+    name='demand'
+)
+m.addConstrs(
+    (gp.quicksum(x[i, j] for j in supermarkets) <= M * y[i] for i in suppliers),
+    name='activation'
+)
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 4 rows, 6 columns and 10 nonzeros
+Model fingerprint: 0x85a718da
+Variable types: 4 continuous, 2 integer (2 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 4e+02]
+  Objective range  [7e-02, 2e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+02, 2e+02]
+Presolve removed 4 rows and 6 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 11396.5 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.139651000000e+04, best bound 1.139651000000e+04, gap 0.0000%
+ObjVal: 11396.51
+C0: 0.0
+C1: 0.0
+C2: 144.0
+C3: 216.0
+C4: 0.0
+C5: 1.0
+Optimal objective: 11396.51
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 144.0), ('C3', 216.0), ('C4', 0.0), ('C5', 1.0)]

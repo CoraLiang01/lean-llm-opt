@@ -1,0 +1,282 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "customer_id": "demand1",
+      "archive_revision_number": "4",
+      "demand": "9"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "customer_id": "demand2",
+      "archive_revision_number": "4",
+      "demand": "66"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "customer_id": "demand3",
+      "archive_revision_number": "3",
+      "demand": "56"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "customer_id": "demand4",
+      "archive_revision_number": "6",
+      "demand": "17"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "customer_id": "demand5",
+      "archive_revision_number": "3",
+      "demand": "43"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "customer_id": "demand6",
+      "archive_revision_number": "4",
+      "demand": "62"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "customer_id": "demand7",
+      "archive_revision_number": "4",
+      "demand": "10"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/customer_demand.csv",
+    "values": {
+      "customer_id": "demand8",
+      "archive_revision_number": "4",
+      "demand": "37"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "archive_revision_number": "4",
+      "supplier_id": "supplier1",
+      "supply_capacity": "60"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "archive_revision_number": "2",
+      "supplier_id": "supplier2",
+      "supply_capacity": "22"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "archive_revision_number": "6",
+      "supplier_id": "supplier3",
+      "supply_capacity": "16"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "archive_revision_number": "3",
+      "supplier_id": "supplier4",
+      "supply_capacity": "14"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "archive_revision_number": "1",
+      "supplier_id": "supplier5",
+      "supply_capacity": "19"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "archive_revision_number": "2",
+      "supplier_id": "supplier6",
+      "supply_capacity": "70"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "archive_revision_number": "5",
+      "supplier_id": "supplier7",
+      "supply_capacity": "60"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/supply_capacity.csv",
+    "values": {
+      "archive_revision_number": "2",
+      "supplier_id": "supplier8",
+      "supply_capacity": "39"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "supplier_id": "supply1",
+      "document_page_count": "2",
+      "transportation_cost_to_demand1": "0.03020736643461065",
+      "record_view_count": "76",
+      "transportation_cost_to_demand2": "229.50723504640203",
+      "transportation_cost_to_demand3": "198.62356558205792",
+      "record_display_theme": "Azure",
+      "transportation_cost_to_demand4": "12.995050640153751",
+      "archive_batch_number": "301",
+      "transportation_cost_to_demand5": "211.20732124396406",
+      "archive_revision_number": "6",
+      "transportation_cost_to_demand6": "134.9442985029274",
+      "transportation_cost_to_demand7": "9.822206398831067",
+      "transportation_cost_to_demand8": "11.394077543225675"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "supplier_id": "supply2",
+      "document_page_count": "6",
+      "transportation_cost_to_demand1": "232.34691308087835",
+      "record_view_count": "43",
+      "transportation_cost_to_demand2": "3.6258726438627473",
+      "transportation_cost_to_demand3": "0.28605434149404785",
+      "record_display_theme": "Azure",
+      "transportation_cost_to_demand4": "45.73127693242935",
+      "archive_batch_number": "303",
+      "transportation_cost_to_demand5": "2.8304796563034573",
+      "archive_revision_number": "4",
+      "transportation_cost_to_demand6": "107.05891033185472",
+      "transportation_cost_to_demand7": "299.96317913389305",
+      "transportation_cost_to_demand8": "23.79935436307657"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "supplier_id": "supply3",
+      "document_page_count": "6",
+      "transportation_cost_to_demand1": "11.061938334356302",
+      "record_view_count": "43",
+      "transportation_cost_to_demand2": "0.2041995326579051",
+      "transportation_cost_to_demand3": "0.2789447278030927",
+      "record_display_theme": "Olive",
+      "transportation_cost_to_demand4": "45.721912724349636",
+      "archive_batch_number": "303",
+      "transportation_cost_to_demand5": "59.54895565737313",
+      "archive_revision_number": "6",
+      "transportation_cost_to_demand6": "5.097536739581239",
+      "transportation_cost_to_demand7": "300.00118415135785",
+      "transportation_cost_to_demand8": "23.711282707746893"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "supplier_id": "supply4",
+      "document_page_count": "6",
+      "transportation_cost_to_demand1": "235.1794835706472",
+      "record_view_count": "91",
+      "transportation_cost_to_demand2": "43.794668963036194",
+      "transportation_cost_to_demand3": "40.709846782945924",
+      "record_display_theme": "Amber",
+      "transportation_cost_to_demand4": "0.07774496620087613",
+      "archive_batch_number": "305",
+      "transportation_cost_to_demand5": "4.237728183419554",
+      "archive_revision_number": "2",
+      "transportation_cost_to_demand6": "131.70915517494691",
+      "transportation_cost_to_demand7": "296.55587567706743",
+      "transportation_cost_to_demand8": "29.810940017561297"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "supplier_id": "supply5",
+      "document_page_count": "16",
+      "transportation_cost_to_demand1": "211.85808746383796",
+      "record_view_count": "58",
+      "transportation_cost_to_demand2": "47.60180876530328",
+      "transportation_cost_to_demand3": "50.04007716193931",
+      "record_display_theme": "Olive",
+      "transportation_cost_to_demand4": "86.14548807358399",
+      "archive_batch_number": "304",
+      "transportation_cost_to_demand5": "0.06197897916874956",
+      "archive_revision_number": "6",
+      "transportation_cost_to_demand6": "5.3345515296262205",
+      "transportation_cost_to_demand7": "270.06290423798396",
+      "transportation_cost_to_demand8": "3.853933133973331"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "supplier_id": "supply6",
+      "document_page_count": "8",
+      "transportation_cost_to_demand1": "6.45506633554524",
+      "record_view_count": "43",
+      "transportation_cost_to_demand2": "88.16323623354015",
+      "transportation_cost_to_demand3": "5.047091671641611",
+      "record_display_theme": "Amber",
+      "transportation_cost_to_demand4": "151.46120287365497",
+      "archive_batch_number": "301",
+      "transportation_cost_to_demand5": "5.290760161059401",
+      "archive_revision_number": "2",
+      "transportation_cost_to_demand6": "0.04602205335871525",
+      "transportation_cost_to_demand7": "9.93670660180487",
+      "transportation_cost_to_demand8": "103.75460989446313"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "supplier_id": "supply7",
+      "document_page_count": "12",
+      "transportation_cost_to_demand1": "174.27229047340035",
+      "record_view_count": "58",
+      "transportation_cost_to_demand2": "250.58223528739327",
+      "transportation_cost_to_demand3": "253.90413041857263",
+      "record_display_theme": "Amber",
+      "transportation_cost_to_demand4": "16.235467318386764",
+      "archive_batch_number": "303",
+      "transportation_cost_to_demand5": "12.643140514778086",
+      "archive_revision_number": "6",
+      "transportation_cost_to_demand6": "175.0672824108511",
+      "transportation_cost_to_demand7": "2.983839625303656",
+      "transportation_cost_to_demand8": "317.0655193866389"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/TP_testing/TP5/transportation_costs.csv",
+    "values": {
+      "supplier_id": "supply8",
+      "document_page_count": "6",
+      "transportation_cost_to_demand1": "207.87006253790491",
+      "record_view_count": "58",
+      "transportation_cost_to_demand2": "1.517168471518212",
+      "transportation_cost_to_demand3": "24.027239288137153",
+      "record_display_theme": "Amber",
+      "transportation_cost_to_demand4": "27.133999276450346",
+      "archive_batch_number": "302",
+      "transportation_cost_to_demand5": "73.20672468851855",
+      "archive_revision_number": "2",
+      "transportation_cost_to_demand6": "125.72910359893308",
+      "transportation_cost_to_demand7": "15.463103251642147",
+      "transportation_cost_to_demand8": "0.20164987511903337"
+    }
+  }
+]

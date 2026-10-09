@@ -1,0 +1,227 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/demand.csv",
+    "values": {
+      "customer_catalog_download_count_2025_q4": "1",
+      "customer_newsletter_open_count_2025_q4": "8",
+      "customer_id": "C1",
+      "customer_support_ticket_count": "8",
+      "customer_product_inquiry_count_2025_q4": "4",
+      "demand_units": "143"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/demand.csv",
+    "values": {
+      "customer_catalog_download_count_2025_q4": "7",
+      "customer_newsletter_open_count_2025_q4": "0",
+      "customer_id": "C2",
+      "customer_support_ticket_count": "5",
+      "customer_product_inquiry_count_2025_q4": "6",
+      "demand_units": "6"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/demand.csv",
+    "values": {
+      "customer_catalog_download_count_2025_q4": "7",
+      "customer_newsletter_open_count_2025_q4": "8",
+      "customer_id": "C3",
+      "customer_support_ticket_count": "12",
+      "customer_product_inquiry_count_2025_q4": "6",
+      "demand_units": "10"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/demand.csv",
+    "values": {
+      "customer_catalog_download_count_2025_q4": "2",
+      "customer_newsletter_open_count_2025_q4": "0",
+      "customer_id": "C4",
+      "customer_support_ticket_count": "17",
+      "customer_product_inquiry_count_2025_q4": "1",
+      "demand_units": "25"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/demand.csv",
+    "values": {
+      "customer_catalog_download_count_2025_q4": "1",
+      "customer_newsletter_open_count_2025_q4": "1",
+      "customer_id": "C5",
+      "customer_support_ticket_count": "8",
+      "customer_product_inquiry_count_2025_q4": "4",
+      "demand_units": "3"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/fixed_cost.csv",
+    "values": {
+      "facility_id": "S1",
+      "facility_staff_count": "8",
+      "facility_equipment_audit_count_2025_q4": "3",
+      "facility_reception_desk_count_2025_q4": "3",
+      "facility_staff_training_hours_2025_q4": "18",
+      "fixed_opening_cost": "97.65"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/fixed_cost.csv",
+    "values": {
+      "facility_id": "S2",
+      "facility_staff_count": "12",
+      "facility_equipment_audit_count_2025_q4": "6",
+      "facility_reception_desk_count_2025_q4": "2",
+      "facility_staff_training_hours_2025_q4": "18",
+      "fixed_opening_cost": "99.76"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/fixed_cost.csv",
+    "values": {
+      "facility_id": "S3",
+      "facility_staff_count": "50",
+      "facility_equipment_audit_count_2025_q4": "6",
+      "facility_reception_desk_count_2025_q4": "2",
+      "facility_staff_training_hours_2025_q4": "18",
+      "fixed_opening_cost": "100.76"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/fixed_cost.csv",
+    "values": {
+      "facility_id": "S4",
+      "facility_staff_count": "8",
+      "facility_equipment_audit_count_2025_q4": "4",
+      "facility_reception_desk_count_2025_q4": "4",
+      "facility_staff_training_hours_2025_q4": "18",
+      "fixed_opening_cost": "105.32"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/fixed_cost.csv",
+    "values": {
+      "facility_id": "S5",
+      "facility_staff_count": "20",
+      "facility_equipment_audit_count_2025_q4": "6",
+      "facility_reception_desk_count_2025_q4": "3",
+      "facility_staff_training_hours_2025_q4": "36",
+      "fixed_opening_cost": "98.88"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/transportation_costs.csv",
+    "values": {
+      "carrier_communication_channel": "Phone",
+      "dispatch_document_review_count_2025_q4": "30",
+      "facility_id": "S1",
+      "transportation_cost_to_C1": "150.74",
+      "dispatch_document_format": "Digital",
+      "transportation_cost_to_C2": "0.02",
+      "transport_training_format": "Workshop",
+      "annual_inspection_count": "1",
+      "customer_support_staff_count": "20",
+      "delivery_tracking_inquiry_count_2025_q4": "10",
+      "transportation_cost_to_C3": "49.13",
+      "transportation_cost_to_C4": "2080.15",
+      "transportation_cost_to_C5": "426.4",
+      "route_signage_inspection_count_2025_q4": "3",
+      "carrier_coordination_meeting_count_2025_q4": "8",
+      "driver_training_session_count_2025_q4": "1",
+      "shipping_label_reprint_count_2025_q4": "15",
+      "operations_region": "West"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/transportation_costs.csv",
+    "values": {
+      "carrier_communication_channel": "Portal",
+      "dispatch_document_review_count_2025_q4": "10",
+      "facility_id": "S2",
+      "transportation_cost_to_C1": "233.05",
+      "dispatch_document_format": "Paper",
+      "transportation_cost_to_C2": "97.73",
+      "transport_training_format": "Workshop",
+      "annual_inspection_count": "2",
+      "customer_support_staff_count": "12",
+      "delivery_tracking_inquiry_count_2025_q4": "15",
+      "transportation_cost_to_C3": "49.84",
+      "transportation_cost_to_C4": "1982.39",
+      "transportation_cost_to_C5": "23.96",
+      "route_signage_inspection_count_2025_q4": "3",
+      "carrier_coordination_meeting_count_2025_q4": "8",
+      "driver_training_session_count_2025_q4": "7",
+      "shipping_label_reprint_count_2025_q4": "15",
+      "operations_region": "West"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/transportation_costs.csv",
+    "values": {
+      "carrier_communication_channel": "Phone",
+      "dispatch_document_review_count_2025_q4": "10",
+      "facility_id": "S3",
+      "transportation_cost_to_C1": "55.68",
+      "dispatch_document_format": "Hybrid",
+      "transportation_cost_to_C2": "935.61",
+      "transport_training_format": "Workshop",
+      "annual_inspection_count": "3",
+      "customer_support_staff_count": "12",
+      "delivery_tracking_inquiry_count_2025_q4": "20",
+      "transportation_cost_to_C3": "4.03",
+      "transportation_cost_to_C4": "73.09",
+      "transportation_cost_to_C5": "525.32",
+      "route_signage_inspection_count_2025_q4": "1",
+      "carrier_coordination_meeting_count_2025_q4": "6",
+      "driver_training_session_count_2025_q4": "5",
+      "shipping_label_reprint_count_2025_q4": "7",
+      "operations_region": "East"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/transportation_costs.csv",
+    "values": {
+      "carrier_communication_channel": "Email",
+      "dispatch_document_review_count_2025_q4": "15",
+      "facility_id": "S4",
+      "transportation_cost_to_C1": "1483.82",
+      "dispatch_document_format": "Digital",
+      "transportation_cost_to_C2": "1801.08",
+      "transport_training_format": "Workshop",
+      "annual_inspection_count": "1",
+      "customer_support_staff_count": "5",
+      "delivery_tracking_inquiry_count_2025_q4": "5",
+      "transportation_cost_to_C3": "112.16",
+      "transportation_cost_to_C4": "816.05",
+      "transportation_cost_to_C5": "107.01",
+      "route_signage_inspection_count_2025_q4": "3",
+      "carrier_coordination_meeting_count_2025_q4": "3",
+      "driver_training_session_count_2025_q4": "2",
+      "shipping_label_reprint_count_2025_q4": "7",
+      "operations_region": "West"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/200pct/S2/Large-scale-or/UFLP_testing/UFLP5/transportation_costs.csv",
+    "values": {
+      "carrier_communication_channel": "Email",
+      "dispatch_document_review_count_2025_q4": "10",
+      "facility_id": "S5",
+      "transportation_cost_to_C1": "1119.47",
+      "dispatch_document_format": "Digital",
+      "transportation_cost_to_C2": "884.31",
+      "transport_training_format": "Classroom",
+      "annual_inspection_count": "1",
+      "customer_support_staff_count": "5",
+      "delivery_tracking_inquiry_count_2025_q4": "30",
+      "transportation_cost_to_C3": "0.08",
+      "transportation_cost_to_C4": "1544.95",
+      "transportation_cost_to_C5": "543.67",
+      "route_signage_inspection_count_2025_q4": "1",
+      "carrier_coordination_meeting_count_2025_q4": "8",
+      "driver_training_session_count_2025_q4": "7",
+      "shipping_label_reprint_count_2025_q4": "2",
+      "operations_region": "East"
+    }
+  }
+]

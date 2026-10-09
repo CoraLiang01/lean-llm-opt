@@ -1,0 +1,324 @@
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/react_revision_20261006/few_shot_only_v7_direct_model_20261006T071958Z/frozen_notebook.ipynb:cell15:50: LangChainDeprecationWarning: The class `LLMChain` was deprecated in LangChain 0.1.17 and will be removed in 1.0. Use `RunnableSequence, e.g., `prompt | llm`` instead.
+/Users/cora/Documents/GitHub/lean-llm-opt/outputs/react_revision_20261006/few_shot_only_v7_direct_model_20261006T071958Z/frozen_notebook.ipynb:cell15:49: LangChainDeprecationWarning: LangChain agents will continue to be supported, but it is recommended for new use cases to be built with LangGraph. LangGraph offers a more flexible and full-featured framework for building agents, including support for tool-calling, persistence of state, and human-in-the-loop workflows. For details, refer to the [LangGraph documentation](https://langchain-ai.github.io/langgraph/) as well as guides for [Migrating from AgentExecutor](https://python.langchain.com/docs/how_to/migrate_agent/) and LangGraph's [Pre-built ReAct agent](https://langchain-ai.github.io/langgraph/how-tos/create-react-agent/).
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I have the required current data and can formulate the model.
+Final Answer:
+##### Mathematical Model
+
+Let $I$ be the set of suppliers (stores) and $J$ the set of customer groups, as defined by the retrieved data.
+
+Decision variables:
+$$
+x_{ij} \geq 0 \quad \text{(continuous)}, \quad \forall i \in I,\, j \in J
+$$
+where $x_{ij}$ is the quantity shipped from supplier $i$ to customer $j$.
+
+Objective:
+$$
+\min \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij}
+$$
+
+Subject to:
+1. **Demand satisfaction** (each customer receives at least its demand):
+   $$
+   \sum_{i \in I} x_{ij} \geq d_j, \quad \forall j \in J
+   $$
+2. **Supply capacity** (each supplier does not exceed its capacity):
+   $$
+   \sum_{j \in J} x_{ij} \leq s_i, \quad \forall i \in I
+   $$
+3. **Non-negativity**:
+   $$
+   x_{ij} \geq 0, \quad \forall i \in I,\, j \in J
+   $$
+
+##### Data Mapping
+
+- $I$ (suppliers): all "Unnamed: 0" values from table_id file_1_view_0 (supply_capacity.csv)
+- $J$ (customers): all "customer" values from table_id file_0_view_0 (customer_demand.csv)
+- $d_j$: "demand" for customer $j$ from table_id file_0_view_0 (customer_demand.csv)
+- $s_i$: "supply_capacity" for supplier $i$ from table_id file_1_view_0 (supply_capacity.csv)
+- $c_{ij}$: value in column $j$ (customer) and row $i$ (supplier) from table_id file_2_view_0 (transportation_costs.csv), with supplier from "Unnamed: 0" and customer from column header
+
+All indices, parameters, and coefficients are to be taken exactly as listed in the current Observation, preserving all identifiers and source order.[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with fallback encodings
+    def read_csv_with_encodings(path):
+        encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+        for enc in encodings:
+            try:
+                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with tried encodings.")
+
+    # Source paths from schema
+    customer_demand_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP2/customer_demand.csv"
+    supply_capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP2/supply_capacity.csv"
+    transportation_costs_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP2/transportation_costs.csv"
+
+    # Read data
+    customer_demand_df = read_csv_with_encodings(customer_demand_path)
+    supply_capacity_df = read_csv_with_encodings(supply_capacity_path)
+    transportation_costs_df = read_csv_with_encodings(transportation_costs_path)
+
+    # Extract sets
+    suppliers = supply_capacity_df["Unnamed: 0"].tolist()
+    customers = customer_demand_df["customer"].tolist()
+
+    # Demand: {customer: demand}
+    try:
+        demand = {row["customer"]: float(row["demand"]) for _, row in customer_demand_df.iterrows()}
+    except Exception as e:
+        raise RuntimeError(f"Error parsing demand: {e}")
+
+    # Supply capacity: {supplier: supply_capacity}
+    try:
+        supply_capacity = {row["Unnamed: 0"]: float(row["supply_capacity"]) for _, row in supply_capacity_df.iterrows()}
+    except Exception as e:
+        raise RuntimeError(f"Error parsing supply_capacity: {e}")
+
+    # Transportation cost: {supplier: {customer: cost}}
+    cost = {}
+    for _, row in transportation_costs_df.iterrows():
+        supplier = row["Unnamed: 0"]
+        if supplier not in suppliers:
+            continue  # Only use suppliers in supply_capacity.csv
+        cost[supplier] = {}
+        for customer in customers:
+            if customer not in row:
+                # Try matching by column name case-insensitively
+                match_cols = [col for col in transportation_costs_df.columns if col.casefold() == customer.casefold()]
+                if match_cols:
+                    col = match_cols[0]
+                else:
+                    raise RuntimeError(f"Customer '{customer}' not found as column in transportation_costs.csv")
+            else:
+                col = customer
+            try:
+                val = row[col]
+                cost[supplier][customer] = float(val)
+            except Exception as e:
+                raise RuntimeError(f"Error parsing cost for supplier '{supplier}', customer '{customer}': {e}")
+
+    # Validate dimensions
+    for i in suppliers:
+        if i not in cost:
+            raise RuntimeError(f"Missing cost row for supplier '{i}'")
+        for j in customers:
+            if j not in cost[i]:
+                raise RuntimeError(f"Missing cost for supplier '{i}', customer '{j}'")
+    for j in customers:
+        if j not in demand:
+            raise RuntimeError(f"Missing demand for customer '{j}'")
+    for i in suppliers:
+        if i not in supply_capacity:
+            raise RuntimeError(f"Missing supply_capacity for supplier '{i}'")
+
+    # Model
+    m = gp.Model("Walmart_Transportation")
+    m.Params.MIPGap = 1e-4
+
+    # Decision variables: x_{ij} >= 0, continuous
+    quantity_keys = [(i, j) for i in suppliers for j in customers]
+    quantity_vars = m.addVars(quantity_keys, lb=0, vtype=GRB.CONTINUOUS, name='x')
+
+    # Objective: min sum_{i,j} c_{ij} x_{ij}
+    m.setObjective(
+        gp.quicksum(cost[i][j] * quantity_vars[i, j] for i in suppliers for j in customers),
+        GRB.MINIMIZE
+    )
+
+    # Demand satisfaction: sum_{i} x_{ij} >= d_j, for all j
+    m.addConstrs(
+        (gp.quicksum(quantity_vars[i, j] for i in suppliers) >= demand[j] for j in customers),
+        name='demand'
+    )
+
+    # Supply capacity: sum_{j} x_{ij} <= s_i, for all i
+    m.addConstrs(
+        (gp.quicksum(quantity_vars[i, j] for j in customers) <= supply_capacity[i] for i in suppliers),
+        name='supply'
+    )
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 23 rows, 132 columns and 264 nonzeros
+Model fingerprint: 0xb7e6f39a
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e-03, 3e+03]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e+00, 1e+04]
+Presolve time: 0.00s
+Presolved: 23 rows, 132 columns, 264 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    0.0000000e+00   1.084300e+04   0.000000e+00      0s
+      44    6.4644207e+06   0.000000e+00   0.000000e+00      0s
+
+Solved in 44 iterations and 0.00 seconds (0.00 work units)
+Optimal objective  6.464420700e+06
+ObjVal: 6464420.6996351
+C0: 0.0
+C1: 0.0
+C2: 0.0
+C3: 0.0
+C4: 0.0
+C5: 0.0
+C6: 4.0
+C7: 0.0
+C8: 0.0
+C9: 0.0
+C10: 0.0
+C11: 0.0
+C12: 0.0
+C13: 0.0
+C14: 0.0
+C15: 0.0
+C16: 0.0
+C17: 0.0
+C18: 575.0
+C19: 0.0
+C20: 0.0
+C21: 0.0
+C22: 0.0
+C23: 0.0
+C24: 0.0
+C25: 1148.0
+C26: 0.0
+C27: 0.0
+C28: 0.0
+C29: 0.0
+C30: 315.0
+C31: 41.0
+C32: 0.0
+C33: 0.0
+C34: 0.0
+C35: 0.0
+C36: 0.0
+C37: 0.0
+C38: 0.0
+C39: 0.0
+C40: 0.0
+C41: 0.0
+C42: 178.0
+C43: 0.0
+C44: 0.0
+C45: 0.0
+C46: 0.0
+C47: 0.0
+C48: 0.0
+C49: 0.0
+C50: 0.0
+C51: 0.0
+C52: 0.0
+C53: 0.0
+C54: 228.0
+C55: 0.0
+C56: 0.0
+C57: 0.0
+C58: 0.0
+C59: 0.0
+C60: 0.0
+C61: 0.0
+C62: 0.0
+C63: 0.0
+C64: 0.0
+C65: 0.0
+C66: 0.0
+C67: 35.0
+C68: 0.0
+C69: 0.0
+C70: 15.0
+C71: 0.0
+C72: 0.0
+C73: 0.0
+C74: 3.0
+C75: 0.0
+C76: 0.0
+C77: 0.0
+C78: 0.0
+C79: 0.0
+C80: 0.0
+C81: 0.0
+C82: 0.0
+C83: 0.0
+C84: 0.0
+C85: 0.0
+C86: 0.0
+C87: 0.0
+C88: 0.0
+C89: 0.0
+C90: 5607.0
+C91: 0.0
+C92: 66.0
+C93: 0.0
+C94: 0.0
+C95: 475.0
+C96: 0.0
+C97: 0.0
+C98: 6.0
+C99: 0.0
+C100: 0.0
+C101: 0.0
+C102: 0.0
+C103: 0.0
+C104: 0.0
+C105: 0.0
+C106: 0.0
+C107: 0.0
+C108: 11.0
+C109: 0.0
+C110: 45.0
+C111: 833.0
+C112: 154.0
+C113: 551.0
+C114: 0.0
+C115: 0.0
+C116: 0.0
+C117: 174.0
+C118: 0.0
+C119: 205.0
+C120: 0.0
+C121: 0.0
+C122: 0.0
+C123: 0.0
+C124: 0.0
+C125: 0.0
+C126: 174.0
+C127: 0.0
+C128: 0.0
+C129: 0.0
+C130: 0.0
+C131: 0.0
+Optimal objective: 6464420.6996351
+Optimal solution: [('C0', 0.0), ('C1', 0.0), ('C2', 0.0), ('C3', 0.0), ('C4', 0.0), ('C5', 0.0), ('C6', 4.0), ('C7', 0.0), ('C8', 0.0), ('C9', 0.0), ('C10', 0.0), ('C11', 0.0), ('C12', 0.0), ('C13', 0.0), ('C14', 0.0), ('C15', 0.0), ('C16', 0.0), ('C17', 0.0), ('C18', 575.0), ('C19', 0.0), ('C20', 0.0), ('C21', 0.0), ('C22', 0.0), ('C23', 0.0), ('C24', 0.0), ('C25', 1148.0), ('C26', 0.0), ('C27', 0.0), ('C28', 0.0), ('C29', 0.0), ('C30', 315.0), ('C31', 41.0), ('C32', 0.0), ('C33', 0.0), ('C34', 0.0), ('C35', 0.0), ('C36', 0.0), ('C37', 0.0), ('C38', 0.0), ('C39', 0.0), ('C40', 0.0), ('C41', 0.0), ('C42', 178.0), ('C43', 0.0), ('C44', 0.0), ('C45', 0.0), ('C46', 0.0), ('C47', 0.0), ('C48', 0.0), ('C49', 0.0), ('C50', 0.0), ('C51', 0.0), ('C52', 0.0), ('C53', 0.0), ('C54', 228.0), ('C55', 0.0), ('C56', 0.0), ('C57', 0.0), ('C58', 0.0), ('C59', 0.0), ('C60', 0.0), ('C61', 0.0), ('C62', 0.0), ('C63', 0.0), ('C64', 0.0), ('C65', 0.0), ('C66', 0.0), ('C67', 35.0), ('C68', 0.0), ('C69', 0.0), ('C70', 15.0), ('C71', 0.0), ('C72', 0.0), ('C73', 0.0), ('C74', 3.0), ('C75', 0.0), ('C76', 0.0), ('C77', 0.0), ('C78', 0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 0.0), ('C84', 0.0), ('C85', 0.0), ('C86', 0.0), ('C87', 0.0), ('C88', 0.0), ('C89', 0.0), ('C90', 5607.0), ('C91', 0.0), ('C92', 66.0), ('C93', 0.0), ('C94', 0.0), ('C95', 475.0), ('C96', 0.0), ('C97', 0.0), ('C98', 6.0), ('C99', 0.0), ('C100', 0.0), ('C101', 0.0), ('C102', 0.0), ('C103', 0.0), ('C104', 0.0), ('C105', 0.0), ('C106', 0.0), ('C107', 0.0), ('C108', 11.0), ('C109', 0.0), ('C110', 45.0), ('C111', 833.0), ('C112', 154.0), ('C113', 551.0), ('C114', 0.0), ('C115', 0.0), ('C116', 0.0), ('C117', 174.0), ('C118', 0.0), ('C119', 205.0), ('C120', 0.0), ('C121', 0.0), ('C122', 0.0), ('C123', 0.0), ('C124', 0.0), ('C125', 0.0), ('C126', 174.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0)]

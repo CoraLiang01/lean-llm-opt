@@ -1,0 +1,266 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I can formulate from the supplied current data.
+Final Answer:
+#### Symbolic Optimization Model
+
+**Index Sets:**
+- $I$: set of all pizza types (indexed by $i$)
+
+**Parameters:**
+- $A_i$: revenue per unit of pizza type $i$
+- $d_i$: total demand for pizza type $i$ over the sales horizon
+- $I_i$: initial inventory available for pizza type $i$
+
+**Decision Variables:**
+- $x_i \in \mathbb{Z}_+, \quad \forall i \in I$  
+  (number of units of pizza type $i$ to fulfill; non-negative integers)
+
+**Objective:**
+\[
+\max \sum_{i \in I} A_i \cdot x_i
+\]
+
+**Constraints:**
+1. **Inventory and Demand Fulfillment Bounds:**
+   \[
+   0 \leq x_i \leq \min\{I_i,\, d_i\}, \quad \forall i \in I
+   \]
+   (i.e., $x_i \leq I_i$ and $x_i \leq d_i$ for all $i$)
+
+2. **Integrality:**
+   \[
+   x_i \in \mathbb{Z}_+, \quad \forall i \in I
+   \]
+
+---
+
+#### Data Mapping
+
+- **Table:** `/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM5/PizzaSalesDataset.csv`
+    - **Product Name** $\rightarrow$ Index set $I$
+    - **Revenue** $\rightarrow$ Parameter $A_i$
+    - **Demand** $\rightarrow$ Parameter $d_i$
+    - **Initial Inventory** $\rightarrow$ Parameter $I_i$[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSV with fallback encodings
+    csv_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM5/PizzaSalesDataset.csv"
+    encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    for enc in encodings:
+        try:
+            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False, encoding=enc)
+            break
+        except Exception:
+            continue
+    else:
+        raise RuntimeError(f"Could not read CSV at {csv_path} with tried encodings.")
+
+    # Required columns
+    required_cols = ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Strip whitespace from column names and values
+    df = df.rename(columns={c: c.strip() for c in df.columns})
+    df['Product Name'] = df['Product Name'].str.strip()
+
+    # Build index set and parameter dictionaries
+    items = df['Product Name'].tolist()
+    if len(set(items)) != len(items):
+        raise ValueError("Duplicate Product Name entries found in source data.")
+
+    # Convert numeric columns
+    try:
+        revenue = pd.to_numeric(df['Revenue'], errors='raise')
+        demand = pd.to_numeric(df['Demand'], errors='raise')
+        inventory = pd.to_numeric(df['Initial Inventory'], errors='raise')
+    except Exception as e:
+        raise ValueError(f"Error converting numeric columns: {e}")
+
+    # Map business keys to coefficients
+    revenue_dict = dict(zip(items, revenue))
+    demand_dict = dict(zip(items, demand))
+    inventory_dict = dict(zip(items, inventory))
+
+    # Validate all coefficients are present and nonnegative
+    for i in items:
+        if i not in revenue_dict or i not in demand_dict or i not in inventory_dict:
+            raise ValueError(f"Missing coefficient for item {i}")
+        if demand_dict[i] < 0 or inventory_dict[i] < 0:
+            raise ValueError(f"Negative demand or inventory for item {i}")
+
+    # Compute upper bounds for each variable
+    upper_bounds = {i: min(inventory_dict[i], demand_dict[i]) for i in items}
+    for i in items:
+        if upper_bounds[i] < 0:
+            raise ValueError(f"Negative upper bound for item {i}")
+
+    # Build model
+    m = gp.Model("PizzaSalesOptimization")
+    quantity_vars = m.addVars(
+        items,
+        lb=0,
+        ub=[upper_bounds[i] for i in items],
+        vtype=GRB.INTEGER,
+        name='x'
+    )
+
+    # Objective: maximize total revenue
+    m.setObjective(
+        gp.quicksum(revenue_dict[i] * quantity_vars[i] for i in items),
+        GRB.MAXIMIZE
+    )
+
+    # Constraints: x_i <= inventory_i and x_i <= demand_i (already enforced by ub)
+    # Variable domain: x_i in Z_+, enforced by lb=0, vtype=GRB.INTEGER
+
+    m.Params.MIPGap = 1e-4
+    m.optimize()
+    return m
+
+m = solve_problem()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 0 rows, 100 columns and 0 nonzeros
+Model fingerprint: 0x03b27041
+Variable types: 0 continuous, 100 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [1e+01, 4e+01]
+  Bounds range     [6e+01, 4e+03]
+  RHS range        [0e+00, 0e+00]
+Found heuristic solution: objective 1794269.0000
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 1: 1.79427e+06 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.794269000000e+06, best bound 1.794269000000e+06, gap 0.0000%
+ObjVal: 1794269.0
+C0: 1960.0
+C1: 1884.0
+C2: 963.0
+C3: 3729.0
+C4: 970.0
+C5: 550.0
+C6: 1116.0
+C7: 198.0
+C8: 1823.0
+C9: 1858.0
+C10: 992.0
+C11: 375.0
+C12: 1400.0
+C13: 192.0
+C14: 791.0
+C15: 550.0
+C16: 593.0
+C17: 944.0
+C18: 2340.0
+C19: 1586.0
+C20: 2769.0
+C21: 2589.0
+C22: 1163.0
+C23: 189.0
+C24: 602.0
+C25: 1193.0
+C26: 1815.0
+C27: 956.0
+C28: 2021.0
+C29: 1447.0
+C30: 803.0
+C31: 602.0
+C32: 1482.0
+C33: 1861.0
+C34: 390.0
+C35: 380.0
+C36: 969.0
+C37: 607.0
+C38: 734.0
+C39: 546.0
+C40: 577.0
+C41: 1711.0
+C42: 907.0
+C43: 322.0
+C44: 1123.0
+C45: 853.0
+C46: 939.0
+C47: 765.0
+C48: 788.0
+C49: 1148.0
+C50: 1440.0
+C51: 1857.0
+C52: 1490.0
+C53: 1376.0
+C54: 852.0
+C55: 640.0
+C56: 858.0
+C57: 1183.0
+C58: 844.0
+C59: 1209.0
+C60: 1135.0
+C61: 1482.0
+C62: 806.0
+C63: 536.0
+C64: 576.0
+C65: 2009.0
+C66: 1060.0
+C67: 733.0
+C68: 2198.0
+C69: 808.0
+C70: 807.0
+C71: 563.0
+C72: 563.0
+C73: 801.0
+C74: 882.0
+C75: 1120.0
+C76: 876.0
+C77: 563.0
+C78: 533.0
+C79: 794.0
+C80: 2776.0
+C81: 955.0
+C82: 956.0
+C83: 510.0
+C84: 560.0
+C85: 604.0
+C86: 1096.0
+C87: 56.0
+C88: 850.0
+C89: 1265.0
+C90: 921.0
+C91: 733.0
+C92: 2198.0
+C93: 808.0
+C94: 563.0
+C95: 801.0
+C96: 882.0
+C97: 1120.0
+C98: 794.0
+C99: 2776.0
+Optimal objective: 1794269.0
+Optimal solution: [('C0', 1960.0), ('C1', 1884.0), ('C2', 963.0), ('C3', 3729.0), ('C4', 970.0), ('C5', 550.0), ('C6', 1116.0), ('C7', 198.0), ('C8', 1823.0), ('C9', 1858.0), ('C10', 992.0), ('C11', 375.0), ('C12', 1400.0), ('C13', 192.0), ('C14', 791.0), ('C15', 550.0), ('C16', 593.0), ('C17', 944.0), ('C18', 2340.0), ('C19', 1586.0), ('C20', 2769.0), ('C21', 2589.0), ('C22', 1163.0), ('C23', 189.0), ('C24', 602.0), ('C25', 1193.0), ('C26', 1815.0), ('C27', 956.0), ('C28', 2021.0), ('C29', 1447.0), ('C30', 803.0), ('C31', 602.0), ('C32', 1482.0), ('C33', 1861.0), ('C34', 390.0), ('C35', 380.0), ('C36', 969.0), ('C37', 607.0), ('C38', 734.0), ('C39', 546.0), ('C40', 577.0), ('C41', 1711.0), ('C42', 907.0), ('C43', 322.0), ('C44', 1123.0), ('C45', 853.0), ('C46', 939.0), ('C47', 765.0), ('C48', 788.0), ('C49', 1148.0), ('C50', 1440.0), ('C51', 1857.0), ('C52', 1490.0), ('C53', 1376.0), ('C54', 852.0), ('C55', 640.0), ('C56', 858.0), ('C57', 1183.0), ('C58', 844.0), ('C59', 1209.0), ('C60', 1135.0), ('C61', 1482.0), ('C62', 806.0), ('C63', 536.0), ('C64', 576.0), ('C65', 2009.0), ('C66', 1060.0), ('C67', 733.0), ('C68', 2198.0), ('C69', 808.0), ('C70', 807.0), ('C71', 563.0), ('C72', 563.0), ('C73', 801.0), ('C74', 882.0), ('C75', 1120.0), ('C76', 876.0), ('C77', 563.0), ('C78', 533.0), ('C79', 794.0), ('C80', 2776.0), ('C81', 955.0), ('C82', 956.0), ('C83', 510.0), ('C84', 560.0), ('C85', 604.0), ('C86', 1096.0), ('C87', 56.0), ('C88', 850.0), ('C89', 1265.0), ('C90', 921.0), ('C91', 733.0), ('C92', 2198.0), ('C93', 808.0), ('C94', 563.0), ('C95', 801.0), ('C96', 882.0), ('C97', 1120.0), ('C98', 794.0), ('C99', 2776.0)]

@@ -1,0 +1,251 @@
+
+[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...
+
+[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...
+[Few-Shot Abstract Examples]:
+...
+[Observation]:
+[Abstract Model Plan START]
+1.  **Analyze Query:** The user wants to determine the optimal activation, startup, and transported-weight schedule for 10 candidate trucks over four consecutive periods to meet period-specific customer demands (with a 10% spare-capacity buffer), while minimizing total startup and transportation costs. The solution must respect truck capacity, startup costs, minimum up/down time, ramping (change in load), and activation rules.
+2.  **Identify Model Type:** Based on the query, this is a Mixed-Integer Programming (MIP) problem with fixed-charge (startup) and ramping constraints.
+3.  **Define Index Sets:** The primary indices are:
+    - Trucks: \( i \in \text{Trucks} \) (from 'truck_id' in parameters.csv, 10 trucks)
+    - Periods: \( t \in \{1,2,3,4\} \)
+4.  **Define Decision Variables:**
+    - \( y_{i,t} \) = 1 if truck \( i \) is active (on) in period \( t \), 0 otherwise. Type: GRB.BINARY.
+    - \( u_{i,t} \) = 1 if truck \( i \) is started up (turned on from off) at the start of period \( t \), 0 otherwise. Type: GRB.BINARY.
+    - \( z_{i,t} \) = 1 if truck \( i \) is shut down (turned off from on) at the start of period \( t \), 0 otherwise. Type: GRB.BINARY.
+    - \( x_{i,t} \) = weight transported by truck \( i \) in period \( t \) (kg). Type: GRB.CONTINUOUS, \( \geq 0 \).
+5.  **Identify Parameters (from Schema):**
+    - Maximum capacity per truck: \( Q_i \) (from 'Q')
+    - Startup cost per truck: \( S_i \) (from 'S')
+    - Unit transportation cost per truck: \( C_i \) (from 'C')
+    - Period demands: \( d_t \) (from 'd1', 'd2', 'd3', 'd4'; same for all trucks)
+6.  **Formulate Objective:** Minimize total cost, which is the sum over all trucks and periods of:
+    - Startup costs: \( S_i \cdot u_{i,t} \)
+    - Transportation costs: \( C_i \cdot x_{i,t} \)
+    Thus, Objective = \( \sum_{i,t} S_i \cdot u_{i,t} + \sum_{i,t} C_i \cdot x_{i,t} \)
+7.  **Formulate Constraints:**
+    - **Demand Satisfaction:** For each period \( t \), \( \sum_{i} x_{i,t} \geq d_t \)
+    - **Spare-Capacity Buffer:** For each period \( t \), \( \sum_{i} x_{i,t} \leq 0.9 \cdot \sum_{i} Q_i \cdot y_{i,t} \)
+    - **Truck Capacity:** For all \( i, t \), \( 0 \leq x_{i,t} \leq Q_i \cdot y_{i,t} \)
+    - **Startup Logic:** For all \( i, t \), \( u_{i,t} \geq y_{i,t} - y_{i,t-1} \) (with \( y_{i,0} = 0 \) since all trucks are initially off)
+    - **No Startup in Last Period:** For all \( i \), \( u_{i,4} = 0 \)
+    - **Minimum Up-Time:** If a truck is started in period \( t \), it must remain on in period \( t \) and \( t+1 \): \( y_{i,t+1} \geq u_{i,t} \) for \( t = 1,2,3 \)
+    - **Shutdown Logic:** For all \( i, t \), \( z_{i,t} \geq y_{i,t-1} - y_{i,t} \) (with \( y_{i,0} = 0 \))
+    - **Minimum Down-Time:** If a truck is shut down in period \( t \), it must remain off in periods \( t \) and \( t+1 \): \( y_{i,t+1} \leq 1 - z_{i,t} \), \( y_{i,t+2} \leq 1 - z_{i,t} \) for applicable \( t \)
+    - **No Startup Before Allowed:** After shutdown at \( t \), \( u_{i,t+1} = 0 \)
+    - **Ramping Constraint:** For all \( i, t=2,3,4 \), \( |x_{i,t} - x_{i,t-1}| \leq 300 \)
+    - **Zero Load When Off:** For all \( i, t \), \( x_{i,t} = 0 \) if \( y_{i,t} = 0 \)
+[Abstract Model Plan END]
+
+[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...
+[Final Answer]:
+```python
+import pandas as pd
+import numpy as np
+from gurobipy import Model, GRB, quicksum
+
+# Read parameters.csv
+param_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/Mixture_testing/Mixture6/parameters.csv'
+df = pd.read_csv(param_path, dtype=str, keep_default_na=False)
+
+# Convert required columns to numeric types
+for col in ['truck_id', 'Q', 'S', 'C', 'd1', 'd2', 'd3', 'd4']:
+    df[col] = df[col].astype(float if col == 'C' else int)
+
+# Index sets
+truck_ids = df['truck_id'].tolist()  # business identifiers, int
+periods = [1, 2, 3, 4]
+
+# Parameters
+Q = {int(row['truck_id']): int(row['Q']) for _, row in df.iterrows()}
+S = {int(row['truck_id']): int(row['S']) for _, row in df.iterrows()}
+C = {int(row['truck_id']): float(row['C']) for _, row in df.iterrows()}
+
+# Demands per period (all trucks have same d1-d4)
+demand = {
+    1: int(df.iloc[0]['d1']),
+    2: int(df.iloc[0]['d2']),
+    3: int(df.iloc[0]['d3']),
+    4: int(df.iloc[0]['d4']),
+}
+
+# Model
+m = Model('truck_scheduling')
+
+# Decision variables
+# y_{i,t}: 1 if truck i is active in period t
+y_vars = m.addVars(truck_ids, periods, vtype=GRB.BINARY, name='y')
+# u_{i,t}: 1 if truck i is started up at start of period t
+u_vars = m.addVars(truck_ids, periods, vtype=GRB.BINARY, name='u')
+# z_{i,t}: 1 if truck i is shut down at start of period t
+z_vars = m.addVars(truck_ids, periods, vtype=GRB.BINARY, name='z')
+# x_{i,t}: weight transported by truck i in period t
+x_vars = m.addVars(truck_ids, periods, vtype=GRB.CONTINUOUS, lb=0.0, name='x')
+
+# Objective: Minimize total startup and transportation costs
+startup_cost = quicksum(S[i] * u_vars[i, t] for i in truck_ids for t in periods)
+transport_cost = quicksum(C[i] * x_vars[i, t] for i in truck_ids for t in periods)
+m.setObjective(startup_cost + transport_cost, GRB.MINIMIZE)
+
+# Constraints
+
+# 1. Demand satisfaction
+for t in periods:
+    m.addConstr(
+        quicksum(x_vars[i, t] for i in truck_ids) >= demand[t],
+        name=f'demand_{t}'
+    )
+
+# 2. Spare-capacity buffer: total transported <= 0.9 * sum of max capacities of active trucks
+for t in periods:
+    m.addConstr(
+        quicksum(x_vars[i, t] for i in truck_ids) <=
+        0.9 * quicksum(Q[i] * y_vars[i, t] for i in truck_ids),
+        name=f'spare_cap_{t}'
+    )
+
+# 3. Truck capacity and zero load when off
+for i in truck_ids:
+    for t in periods:
+        m.addConstr(
+            x_vars[i, t] <= Q[i] * y_vars[i, t],
+            name=f'cap_{i}_{t}'
+        )
+        m.addConstr(
+            x_vars[i, t] >= 0,
+            name=f'nonneg_{i}_{t}'
+        )
+
+# 4. Startup logic: u_{i,t} >= y_{i,t} - y_{i,t-1}, with y_{i,0} = 0
+for i in truck_ids:
+    for t in periods:
+        prev_y = 0 if t == 1 else y_vars[i, t-1]
+        m.addConstr(
+            u_vars[i, t] >= y_vars[i, t] - prev_y,
+            name=f'startup_logic_{i}_{t}'
+        )
+
+# 5. No startup in last period: u_{i,4} = 0
+for i in truck_ids:
+    m.addConstr(
+        u_vars[i, 4] == 0,
+        name=f'no_startup_last_{i}'
+    )
+
+# 6. Minimum up-time: if started at t, must be on at t and t+1
+for i in truck_ids:
+    for t in [1, 2, 3]:  # t=1,2,3 (since t+1 <= 4)
+        m.addConstr(
+            y_vars[i, t+1] >= u_vars[i, t],
+            name=f'min_up_{i}_{t}'
+        )
+
+# 7. Shutdown logic: z_{i,t} >= y_{i,t-1} - y_{i,t}, with y_{i,0} = 0
+for i in truck_ids:
+    for t in periods:
+        prev_y = 0 if t == 1 else y_vars[i, t-1]
+        m.addConstr(
+            z_vars[i, t] >= prev_y - y_vars[i, t],
+            name=f'shutdown_logic_{i}_{t}'
+        )
+
+# 8. Minimum down-time: if shut down at t, must be off at t+1 and t+2 (if in horizon)
+for i in truck_ids:
+    for t in periods:
+        if t + 1 in periods:
+            m.addConstr(
+                y_vars[i, t+1] <= 1 - z_vars[i, t],
+                name=f'min_down1_{i}_{t}'
+            )
+        if t + 2 in periods:
+            m.addConstr(
+                y_vars[i, t+2] <= 1 - z_vars[i, t],
+                name=f'min_down2_{i}_{t}'
+            )
+
+# 9. No startup immediately after shutdown: after shutdown at t, u_{i,t+1} = 0
+for i in truck_ids:
+    for t in periods:
+        if t + 1 in periods:
+            m.addConstr(
+                u_vars[i, t+1] <= 1 - z_vars[i, t],
+                name=f'no_startup_after_shutdown_{i}_{t}'
+            )
+
+# 10. Ramping constraint: |x_{i,t} - x_{i,t-1}| <= 300 for t=2,3,4
+for i in truck_ids:
+    for t in [2, 3, 4]:
+        m.addConstr(
+            x_vars[i, t] - x_vars[i, t-1] <= 300,
+            name=f'ramp_up_{i}_{t}'
+        )
+        m.addConstr(
+            x_vars[i, t-1] - x_vars[i, t] <= 300,
+            name=f'ramp_down_{i}_{t}'
+        )
+
+# 11. Zero load when off: x_{i,t} <= Q[i] * y_{i,t} already enforced above
+# But also, x_{i,t} >= 0 (already enforced)
+
+# Validate all trucks and periods are covered
+if set(truck_ids) != set(Q.keys()) or set(truck_ids) != set(S.keys()) or set(truck_ids) != set(C.keys()):
+    raise ValueError("Mismatch in truck identifiers between parameter sets.")
+
+if set(periods) != set(demand.keys()):
+    raise ValueError("Mismatch in period identifiers between demand and periods.")
+
+# Optimize
+m.optimize()
+```
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 348 rows, 160 columns and 810 nonzeros
+Model fingerprint: 0x0f326928
+Variable types: 40 continuous, 120 integer (120 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+03]
+  Objective range  [2e+00, 5e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 2e+03]
+Found heuristic solution: objective 19450.000000
+Presolve removed 200 rows and 70 columns
+Presolve time: 0.00s
+Presolved: 148 rows, 90 columns, 480 nonzeros
+Variable types: 40 continuous, 50 integer (50 binary)
+
+Root relaxation: objective 1.418000e+04, 68 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 14180.0000    0    8 19450.0000 14180.0000  27.1%     -    0s
+H    0     0                    15150.000000 14180.0000  6.40%     -    0s
+H    0     0                    14330.000000 14180.0000  1.05%     -    0s
+H    0     0                    14300.000000 14180.0000  0.84%     -    0s
+     0     0 14260.2777    0   17 14300.0000 14260.2777  0.28%     -    0s
+     0     0 14266.6667    0   17 14300.0000 14266.6667  0.23%     -    0s
+     0     0 14294.4444    0    9 14300.0000 14294.4444  0.04%     -    0s
+     0     0          -    0      14300.0000 14298.8889  0.01%     -    0s
+
+Cutting planes:
+  Learned: 2
+  Cover: 1
+  Implied bound: 2
+  MIR: 3
+  Flow cover: 4
+  Mod-K: 1
+
+Explored 1 nodes (107 simplex iterations) in 0.01 seconds (0.01 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 4: 14300 14330 15150 19450 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 1.430000000000e+04, best bound 1.429888887788e+04, gap 0.0078%
+Optimal objective: 14300.0
+Optimal solution: [('C0', 1.0), ('C1', 1.0), ('C2', 1.0), ('C3', 1.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', 0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', 0.0), ('C12', -0.0), ('C13', -0.0), ('C14', -0.0), ('C15', 0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', 0.0), ('C20', -0.0), ('C21', -0.0), ('C22', -0.0), ('C23', 0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', 0.0), ('C28', 1.0), ('C29', 1.0), ('C30', 1.0), ('C31', 1.0), ('C32', 1.0), ('C33', 1.0), ('C34', 1.0), ('C35', 1.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', 0.0), ('C40', 1.0), ('C41', -0.0), ('C42', -0.0), ('C43', 0.0), ('C44', 0.0), ('C45', -0.0), ('C46', -0.0), ('C47', 0.0), ('C48', 0.0), ('C49', -0.0), ('C50', -0.0), ('C51', 0.0), ('C52', 0.0), ('C53', -0.0), ('C54', -0.0), ('C55', 0.0), ('C56', 0.0), ('C57', -0.0), ('C58', -0.0), ('C59', 0.0), ('C60', 0.0), ('C61', -0.0), ('C62', -0.0), ('C63', 0.0), ('C64', 0.0), ('C65', -0.0), ('C66', -0.0), ('C67', 0.0), ('C68', 1.0), ('C69', -0.0), ('C70', -0.0), ('C71', 0.0), ('C72', 1.0), ('C73', -0.0), ('C74', -0.0), ('C75', 0.0), ('C76', 0.0), ('C77', -0.0), ('C78', -0.0), ('C79', 0.0), ('C80', 0.0), ('C81', 0.0), ('C82', 0.0), ('C83', 1.0), ('C84', 0.0), ('C85', 0.0), ('C86', 1.0), ('C87', 1.0), ('C88', 0.0), ('C89', 0.0), ('C90', 1.0), ('C91', 1.0), ('C92', 0.0), ('C93', 0.0), ('C94', 1.0), ('C95', 1.0), ('C96', 0.0), ('C97', 0.0), ('C98', 1.0), ('C99', 1.0), ('C100', 0.0), ('C101', 0.0), ('C102', 1.0), ('C103', 1.0), ('C104', 0.0), ('C105', 0.0), ('C106', 1.0), ('C107', 1.0), ('C108', 0.0), ('C109', 0.0), ('C110', 0.0), ('C111', 1.0), ('C112', 0.0), ('C113', 0.0), ('C114', 0.0), ('C115', 1.0), ('C116', 0.0), ('C117', 0.0), ('C118', 1.0), ('C119', 1.0), ('C120', 800.0), ('C121', 1000.0), ('C122', 900.0), ('C123', 600.0), ('C124', 0.0), ('C125', 0.0), ('C126', 0.0), ('C127', 0.0), ('C128', 0.0), ('C129', 0.0), ('C130', 0.0), ('C131', 0.0), ('C132', 0.0), ('C133', 0.0), ('C134', 0.0), ('C135', 0.0), ('C136', 0.0), ('C137', 0.0), ('C138', 0.0), ('C139', 0.0), ('C140', 0.0), ('C141', 0.0), ('C142', 0.0), ('C143', 0.0), ('C144', 0.0), ('C145', 0.0), ('C146', 0.0), ('C147', 0.0), ('C148', 0.0), ('C149', 0.0), ('C150', 200.0), ('C151', 0.0), ('C152', 700.0), ('C153', 1000.0), ('C154', 700.0), ('C155', 400.0), ('C156', 0.0), ('C157', 0.0), ('C158', 0.0), ('C159', 0.0)]

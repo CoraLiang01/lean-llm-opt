@@ -1,0 +1,88 @@
+**Retrieved Data:**
+
+---
+
+### 1. Fixed Cost Data (`fixed_cost.csv`)
+| Facility ID   | Facility Name | Facility Staff Count | Fixed Cost |
+|---------------|--------------|---------------------|------------|
+| 1             | MOUNT AYR    | 12                  | 96.58      |
+| 2             | WAUKEE       | 12                  | 94.06      |
+| 3             | WAVERLY      | 20                  | 94.37      |
+| 4             | PELLA        | 8                   | 82.88      |
+| 5             | DES MOINES   | 50                  | 94.96      |
+
+_Source: Rows 1–5 of fixed_cost.csv_
+
+---
+
+### 2. Transportation Cost Matrix (`transportation_costs.csv`)
+| Facility (Row) | Customer (Column) | CLARINDA | FORT MADISON | SIOUX CITY | TOLEDO | BANCROFT |
+|----------------|-------------------|----------|--------------|------------|--------|----------|
+| MOUNT AYR      | -                 | 694.68   | 17.48        | 20.07      | 199.02 | 1685.53  |
+| WAUKEE         | -                 | 15.13    | 1.5          | 1.43       | 27.88  | 90.69    |
+| WAVERLY        | -                 | 2.34     | 349.34       | 246.6      | 41.3   | 78.73    |
+| PELLA          | -                 | 1181.6   | 1458.53      | 1646.36    | 1924.55| 38.93    |
+| DES MOINES     | -                 | 1030.8   | 43.48        | 932.43     | 55.39  | 103.84   |
+
+_Orientation: Each row is a supplier (facility), each column is a customer (store location). Source: Rows 1–5 of transportation_costs.csv_
+
+---
+
+### 3. Demand Data (`demand.csv`)
+| Customer ID | Customer Name | Demand |
+|-------------|--------------|--------|
+| 1           | Customer_1   | 2397   |
+| 2           | Customer_2   | 1889   |
+| 3           | Customer_3   | 2518   |
+| 4           | Customer_4   | 3218   |
+| 5           | Customer_5   | 1813   |
+
+_Source: Rows 1–5 of demand.csv_
+
+---
+
+**Preserved Identifiers and Source Row Positions:**
+- Facility IDs: MOUNT AYR (1), WAUKEE (2), WAVERLY (3), PELLA (4), DES MOINES (5)
+- Customer IDs: Customer_1 (1), Customer_2 (2), Customer_3 (3), Customer_4 (4), Customer_5 (5)
+- Fixed costs and staff counts are matched to facility IDs.
+- Transportation cost matrix rows and columns explicitly match facilities and customers as per original orientation.
+- Demand values are matched to customer IDs.
+
+**No capacity data is present; capacity is unresolved.**
+
+**No product axis is present; all data is for a single product as per the query.**
+
+---
+
+**Summary Table for Modeling:**
+
+#### Facilities (Suppliers)
+| Facility ID | Name        | Fixed Cost | Staff Count |
+|-------------|-------------|------------|-------------|
+| 1           | MOUNT AYR   | 96.58      | 12          |
+| 2           | WAUKEE      | 94.06      | 12          |
+| 3           | WAVERLY     | 94.37      | 20          |
+| 4           | PELLA       | 82.88      | 8           |
+| 5           | DES MOINES  | 94.96      | 50          |
+
+#### Customers (Stores)
+| Customer ID | Name        | Demand |
+|-------------|-------------|--------|
+| 1           | Customer_1  | 2397   |
+| 2           | Customer_2  | 1889   |
+| 3           | Customer_3  | 2518   |
+| 4           | Customer_4  | 3218   |
+| 5           | Customer_5  | 1813   |
+
+#### Transportation Costs (per unit)
+| From \ To    | Customer_1 | Customer_2 | Customer_3 | Customer_4 | Customer_5 |
+|--------------|------------|------------|------------|------------|------------|
+| MOUNT AYR    | 694.68     | 17.48      | 20.07      | 199.02     | 1685.53    |
+| WAUKEE       | 15.13      | 1.5        | 1.43       | 27.88      | 90.69      |
+| WAVERLY      | 2.34       | 349.34     | 246.6      | 41.3       | 78.73      |
+| PELLA        | 1181.6     | 1458.53    | 1646.36    | 1924.55    | 38.93      |
+| DES MOINES   | 1030.8     | 43.48      | 932.43     | 55.39      | 103.84     |
+
+---
+
+**All data is preserved as per the original files and query requirements.**

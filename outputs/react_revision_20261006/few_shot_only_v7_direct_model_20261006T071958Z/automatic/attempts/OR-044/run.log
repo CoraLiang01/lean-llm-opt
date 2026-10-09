@@ -1,0 +1,246 @@
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mThought: I have the required current data and can formulate the model.
+Final Answer:
+ABSTRACT MATHEMATICAL MODEL
+
+**Index Sets:**
+- $S$: set of section IDs (from `file_0_view_0.SectionID`)
+- $P$: set of product names (from `file_1_view_0.ProductName`)
+
+**Parameters:**
+- $C_s$: capacity of section $s$ (from `file_0_view_0.Capacity`)
+- $v_p$: value (price) of product $p$ (from `file_1_view_0.Value`)
+- $w_p$: shelf space requirement of product $p$ (from `file_1_view_0.Weight`)
+
+**Decision Variables:**
+- $x_{sp} \in \mathbb{Z}_{\geq 0}$: number of units of product $p$ to stock in section $s$
+
+**Objective:**
+\[
+\max \sum_{s \in S} \sum_{p \in P} v_p \cdot x_{sp}
+\]
+
+**Constraints:**
+1. **Section Capacity Constraints:**  
+   For each section $s \in S$,
+   \[
+   \sum_{p \in P} w_p \cdot x_{sp} \leq C_s
+   \]
+2. **Integrality and Nonnegativity:**  
+   For all $s \in S$, $p \in P$,
+   \[
+   x_{sp} \in \mathbb{Z}_{\geq 0}
+   \]
+
+---
+
+**Data Mapping:**
+
+- $S$: All `SectionID` in `file_0_view_0`
+- $P$: All `ProductName` in `file_1_view_0`
+- $C_s$: `file_0_view_0.Capacity` for section $s$
+- $v_p$: `file_1_view_0.Value` for product $p$
+- $w_p$: `file_1_view_0.Weight` for product $p$
+- $x_{sp}$: Number of units of product $p$ in section $s$ (decision variable)[0m
+
+[1m> Finished chain.[0m
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
+
+def solve_problem():
+    # Read CSVs with robust encoding
+    csv_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']
+    def read_csv_with_encodings(path):
+        for enc in csv_encodings:
+            try:
+                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)
+            except UnicodeDecodeError:
+                continue
+        raise RuntimeError(f"Could not decode {path} with tried encodings.")
+
+    # Source schema paths
+    capacity_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv"
+    products_path = "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv"
+
+    # Read data
+    cap_df = read_csv_with_encodings(capacity_path)
+    prod_df = read_csv_with_encodings(products_path)
+
+    # Index sets
+    S = cap_df['SectionID'].tolist()
+    P = prod_df['ProductName'].tolist()
+
+    # Parameters
+    # Section capacities
+    if cap_df['SectionID'].duplicated().any():
+        raise ValueError("Duplicate SectionID found in capacity.csv")
+    C_s = dict(zip(cap_df['SectionID'], cap_df['Capacity'].astype(float)))
+
+    # Product values and weights
+    if prod_df['ProductName'].duplicated().any():
+        raise ValueError("Duplicate ProductName found in products.csv")
+    v_p = dict(zip(prod_df['ProductName'], prod_df['Value'].astype(float)))
+    w_p = dict(zip(prod_df['ProductName'], prod_df['Weight'].astype(float)))
+
+    # Validate all required coefficients are present
+    for s in S:
+        if s not in C_s:
+            raise ValueError(f"Missing capacity for section {s}")
+    for p in P:
+        if p not in v_p or p not in w_p:
+            raise ValueError(f"Missing value or weight for product {p}")
+
+    # Model
+    m = gp.Model('Supermarket_Section_Stocking')
+
+    # Decision variables: x_{sp} >= 0, integer
+    quantity_keys = [(s, p) for s in S for p in P]
+    quantity_vars = m.addVars(quantity_keys, lb=0, vtype=GRB.INTEGER, name='x')
+
+    # Objective: maximize total value
+    m.setObjective(
+        gp.quicksum(v_p[p] * quantity_vars[s, p] for s in S for p in P),
+        GRB.MAXIMIZE
+    )
+
+    # Section capacity constraints
+    for s in S:
+        m.addConstr(
+            gp.quicksum(w_p[p] * quantity_vars[s, p] for p in P) <= C_s[s],
+            name=f'cap_{s}'
+        )
+
+    # Set MIPGap
+    m.Params.MIPGap = 1e-4
+
+    m.optimize()
+
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+
+    return m
+
+m = solve_problem()
+Set parameter MIPGap to value 0.0001
+Gurobi Optimizer version 12.0.1 build v12.0.1rc0 (mac64[arm] - Darwin 24.6.0 24G90)
+
+CPU model: Apple M3
+Thread count: 8 physical cores, 8 logical processors, using up to 2 threads
+
+Non-default parameters:
+Threads  2
+
+Optimize a model with 8 rows, 80 columns and 80 nonzeros
+Model fingerprint: 0x0e5bd113
+Variable types: 0 continuous, 80 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 6e+00]
+  Objective range  [5e+00, 3e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [9e+01, 2e+02]
+Found heuristic solution: objective 5000.0000000
+Presolve removed 7 rows and 74 columns
+Presolve time: 0.00s
+Presolved: 1 rows, 6 columns, 6 nonzeros
+Found heuristic solution: objective 8000.0000000
+Variable types: 0 continuous, 6 integer (0 binary)
+
+Root relaxation: cutoff, 0 iterations, 0.00 seconds (0.00 work units)
+
+Explored 1 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 2 (of 8 available processors)
+
+Solution count 2: 8000 5000 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 8.000000000000e+03, best bound 8.000000000000e+03, gap 0.0000%
+ObjVal: 8000.0
+C0: -0.0
+C1: -0.0
+C2: 100.0
+C3: -0.0
+C4: -0.0
+C5: -0.0
+C6: -0.0
+C7: -0.0
+C8: -0.0
+C9: -0.0
+C10: -0.0
+C11: -0.0
+C12: 150.0
+C13: -0.0
+C14: -0.0
+C15: -0.0
+C16: -0.0
+C17: -0.0
+C18: -0.0
+C19: -0.0
+C20: -0.0
+C21: -0.0
+C22: 120.0
+C23: -0.0
+C24: -0.0
+C25: -0.0
+C26: -0.0
+C27: -0.0
+C28: -0.0
+C29: -0.0
+C30: -0.0
+C31: -0.0
+C32: 130.0
+C33: -0.0
+C34: -0.0
+C35: -0.0
+C36: -0.0
+C37: -0.0
+C38: -0.0
+C39: -0.0
+C40: -0.0
+C41: -0.0
+C42: 90.0
+C43: -0.0
+C44: -0.0
+C45: -0.0
+C46: -0.0
+C47: -0.0
+C48: -0.0
+C49: -0.0
+C50: -0.0
+C51: -0.0
+C52: 110.0
+C53: -0.0
+C54: -0.0
+C55: -0.0
+C56: -0.0
+C57: -0.0
+C58: -0.0
+C59: -0.0
+C60: -0.0
+C61: -0.0
+C62: 160.0
+C63: -0.0
+C64: -0.0
+C65: -0.0
+C66: -0.0
+C67: -0.0
+C68: -0.0
+C69: -0.0
+C70: -0.0
+C71: -0.0
+C72: 140.0
+C73: -0.0
+C74: -0.0
+C75: -0.0
+C76: -0.0
+C77: -0.0
+C78: -0.0
+C79: -0.0
+Optimal objective: 8000.0
+Optimal solution: [('C0', -0.0), ('C1', -0.0), ('C2', 100.0), ('C3', -0.0), ('C4', -0.0), ('C5', -0.0), ('C6', -0.0), ('C7', -0.0), ('C8', -0.0), ('C9', -0.0), ('C10', -0.0), ('C11', -0.0), ('C12', 150.0), ('C13', -0.0), ('C14', -0.0), ('C15', -0.0), ('C16', -0.0), ('C17', -0.0), ('C18', -0.0), ('C19', -0.0), ('C20', -0.0), ('C21', -0.0), ('C22', 120.0), ('C23', -0.0), ('C24', -0.0), ('C25', -0.0), ('C26', -0.0), ('C27', -0.0), ('C28', -0.0), ('C29', -0.0), ('C30', -0.0), ('C31', -0.0), ('C32', 130.0), ('C33', -0.0), ('C34', -0.0), ('C35', -0.0), ('C36', -0.0), ('C37', -0.0), ('C38', -0.0), ('C39', -0.0), ('C40', -0.0), ('C41', -0.0), ('C42', 90.0), ('C43', -0.0), ('C44', -0.0), ('C45', -0.0), ('C46', -0.0), ('C47', -0.0), ('C48', -0.0), ('C49', -0.0), ('C50', -0.0), ('C51', -0.0), ('C52', 110.0), ('C53', -0.0), ('C54', -0.0), ('C55', -0.0), ('C56', -0.0), ('C57', -0.0), ('C58', -0.0), ('C59', -0.0), ('C60', -0.0), ('C61', -0.0), ('C62', 160.0), ('C63', -0.0), ('C64', -0.0), ('C65', -0.0), ('C66', -0.0), ('C67', -0.0), ('C68', -0.0), ('C69', -0.0), ('C70', -0.0), ('C71', -0.0), ('C72', 140.0), ('C73', -0.0), ('C74', -0.0), ('C75', -0.0), ('C76', -0.0), ('C77', -0.0), ('C78', -0.0), ('C79', -0.0)]

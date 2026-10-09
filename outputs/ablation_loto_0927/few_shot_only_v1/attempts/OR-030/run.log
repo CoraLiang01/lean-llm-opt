@@ -1,0 +1,84 @@
+import gurobipy as gp
+from gurobipy import GRB
+import re
+
+# Extract data from CSVQA_DATA
+table_id = "file_0_view_0"
+if "CSVQA_DATA" not in globals():
+    raise RuntimeError("CSVQA_DATA not found in environment.")
+
+# Find the table
+table = None
+for t in CSVQA_DATA["tables"]:
+    if t["table_id"] == table_id:
+        table = t
+        break
+if table is None:
+    raise RuntimeError(f"Table {table_id} not found in CSVQA_DATA.")
+
+# Required columns
+required_columns = ["Product Name", "Revenue", "Demand", "Initial Inventory"]
+for col in required_columns:
+    if col not in table["columns"]:
+        raise RuntimeError(f"Column {col} not found in table {table_id}.")
+
+# Parse records for FDK57
+I = []
+A = {}
+d = {}
+Iinv = {}
+
+pattern = re.compile(r"^FDK57\s*$")
+for rec in table["records"]:
+    pname = rec["values"]["Product Name"]
+    if pattern.match(str(pname)):
+        idx = pname
+        # Parse and validate coefficients
+        try:
+            revenue = rec["values"]["Revenue"]
+            demand = rec["values"]["Demand"]
+            inventory = rec["values"]["Initial Inventory"]
+            # Try to convert to float/int
+            A_i = float(revenue)
+            d_i = int(float(demand))
+            I_i = int(float(inventory))
+        except Exception as e:
+            raise ValueError(f"Invalid data for FDK57 row: {e}")
+        I.append(idx)
+        A[idx] = A_i
+        d[idx] = d_i
+        Iinv[idx] = I_i
+
+if not I:
+    raise ValueError("No car models with Product Name 'FDK57' found in the data.")
+
+# Validate all indices have all coefficients
+for idx in I:
+    if idx not in A or idx not in d or idx not in Iinv:
+        raise ValueError(f"Missing coefficients for index {idx}.")
+
+# Build and solve the model
+m = gp.Model('FDK57_Car_Dealership')
+x = m.addVars(I, lb=0, vtype=GRB.INTEGER, name='x')
+m.setObjective(gp.quicksum(A[i] * x[i] for i in I), GRB.MAXIMIZE)
+m.addConstrs((x[i] <= Iinv[i] for i in I), name='')
+m.addConstrs((x[i] <= d[i] for i in I), name='')
+
+m.Params.MIPGap = 1e-4
+m.optimize()
+
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')
+
+Traceback (most recent call last):
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/scripts/evaluate_0927_experiments.py", line 62, in worker
+    record=ns['execute_pipeline_case'](case)
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/ablation_loto_0927/few_shot_only_v1/frozen_notebook.ipynb:cell29", line 93, in execute_pipeline_case
+  File "/Users/cora/Documents/GitHub/lean-llm-opt/outputs/ablation_loto_0927/few_shot_only_v1/frozen_notebook.ipynb:cell29", line 17, in execute_code
+  File "<string>", line 47, in <module>
+  File "src/gurobipy/_model.pyx", line 3269, in gurobipy._model.Model.addVars
+KeyError: 'Duplicate keys in Model.addVars()'

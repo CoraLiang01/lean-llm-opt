@@ -1,0 +1,431 @@
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell3
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell3
+@@ -2,7 +2,7 @@
+ PROJECT_ROOT = Path(os.environ.get("LEAN_LLM_OPT_ROOT", Path.cwd())).expanduser().resolve()
+ BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Large-scale-or/Large-scale-or-101.csv"
+ OTHER_BENCHMARK_PATH = PROJECT_ROOT / "Test_Dataset/Small-scale/IndustryOR_fixedV2.csv"
+-RESULTS_DIR = PROJECT_ROOT / "outputs/react_revision_20261006/rag_only_v7"
++RESULTS_DIR = PROJECT_ROOT / "outputs/react_revision_20261006/rag_only_v9"
+ # Edit this one value when the notebook file is renamed.
+ NOTEBOOK_FILENAME = "Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb"
+ _NOTEBOOK_CANDIDATE = Path(NOTEBOOK_FILENAME).expanduser()
+@@ -16,16 +16,16 @@
+ load_dotenv(PROJECT_ROOT / ".env", override=False)
+ user_api_key = os.environ.get("OPENAI_API_KEY")
+ 
+-VERSION = "react-source-data-v7"
++VERSION = "react-source-data-v9"
+ MODEL_SNAPSHOT = "gpt-4.1-2025-04-14"
+ NRM_RETRY_ON_TRUNCATION = False  # Single attempt; truncation remains a failed case.
+ EMBEDDING_MODEL = "text-embedding-ada-002"
+ CLASS_LABELS = ["TP", "NRM", "RA", "FLP", "AP", "Mixture", "Others"]
+ WORKFLOW_ROUTES = ["TP", "NRM", "FLP", "AP", "RA", "Others"]
+ CSVQA_MODE_BY_ROUTE = {
+-    # Canonical CSV routes use source-derived records; Others retains its original flow.
++    # Every CSV route uses the shared source-derived CSVQA workflow.
+     "NRM": "planned", "RA": "planned", "TP": "planned",
+-    "AP": "planned", "FLP": "planned", "Others": "legacy",
++    "AP": "planned", "FLP": "planned", "Others": "planned",
+ }
+ RAG_EXAMPLES_ALL_PATH = "Large_Scale_Or_Files/RAG_Examples_All.csv"
+ CACHE_SCHEMA_VERSION = VERSION
+@@ -34,5 +34,5 @@
+ REACT_PROTOCOL_TIMEOUT_SECONDS = 1800  # User-authorized protocol restarts share the case deadline.
+ 
+ METHOD = "rag_only"
+-CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/react_revision_20261006/full_v7/automatic/results.csv"
+-BASE_NOTEBOOK_SHA256 = "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1"
++CLASSIFICATION_RESULTS_PATH = PROJECT_ROOT / "outputs/react_revision_20261006/full_v9/automatic/results.csv"
++BASE_NOTEBOOK_SHA256 = "b747bbb0f7a1dcfa348baef31aab6ff8c6a7e938bbf5ef08fd25c6df07e38950"
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell5
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell5
+@@ -28,6 +28,8 @@
+                 if reason in {"length", "max_tokens", "max_output_tokens"}:
+                     error = ModelOutputTruncated(f"Model output is incomplete: finish_reason={reason}")
+                     error.llm_usage = (response.llm_output or {}).get("token_usage", {})
++                    print("[Truncated response retained for diagnosis; never accepted or regenerated]")
++                    print(getattr(getattr(generation, "message", None), "content", generation.text))
+                     raise error
+ 
+ 
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell6
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell6
+@@ -1,3 +1,3 @@
+ ## 3. CSV loading and route modes
+ 
+-NRM, RA, TP, AP and FLP use the existing declarative planner and deterministic source-data extraction. Others keeps its CSV-schema workflow and its query-only formulation route. Only user-authorized ReAct protocol restarts are available; code and solver repair remain disabled.
++All six CSV workflows use shared ReAct and planned source extraction. Few-shot Only deliberately substitutes a complete Python Observation without CSVQA. The original query-only route remains.
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell7
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell7
+@@ -212,7 +212,7 @@
+     return profile
+ 
+ 
+-for _route in ("TP", "AP", "FLP"):
++for _route in ("TP", "AP", "FLP", "Others"):
+     CSVQA_PLANNED_PROMPTS[_route] = (
+         "Select every source row and column required by the original query, including entity IDs, "
+         "matrix coefficients and axes, costs, capacities, demands and additional restrictions. "
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell11
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell11
+@@ -51,7 +51,10 @@
+         plan, planner_outputs, errors, status, fallback_reason = None, [], [], "LEGACY_FULL_DATA", None
+         attempt_count = 0
+         if planned:
+-            tables = _load_tables(dataset_address, file_indices=file_indices)
++            try:
++                tables = _load_tables(dataset_address, file_indices=file_indices)
++            except ValueError as exc:
++                raise ReActProtocolError("csvqa_action_input_format") from exc
+             attempt_count = 1
+             raw_output = ""
+             try:
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell15
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell15
+@@ -195,7 +195,7 @@
+     csvqa_system_prompt = CSVQA_PLANNED_PROMPTS["NRM"]
+     csvqa_tool_description = CSVQA_TOOL_DESCRIPTIONS["NRM"]
+ 
+-    route_instruction = """Call CSVQA exactly once and return an ABSTRACT model. Define
++    route_instruction = """Return an ABSTRACT model. Define
+ index sets, parameters, variables, objective, and constraints symbolically. Include a short Data
+ Mapping that identifies every source by exact table_id and exact column name. Do not copy record
+ values or literal record counts."""
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell17
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell17
+@@ -3,7 +3,7 @@
+     csvqa_system_prompt = CSVQA_PLANNED_PROMPTS["RA"]
+     csvqa_tool_description = CSVQA_TOOL_DESCRIPTIONS["RA"]
+ 
+-    route_instruction = """You MUST call CSVQA exactly once before the Final Answer and use all returned rows.
++    route_instruction = """Use all current returned rows required by the original query.
+ Keep the supplied file order and original row order. Never sort or reset an index.
+ Use an explicit business ID column when present; never synthesize business IDs from row numbers.
+ Do not infer a file's semantic role only from its filename or position.
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell19
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell19
+@@ -3,8 +3,8 @@
+     csvqa_system_prompt = CSVQA_LEGACY_SYSTEM_PROMPT
+     csvqa_tool_description = CSVQA_LEGACY_TOOL_DESCRIPTION
+ 
+-    route_instruction = """Call CSVQA at least once and return a complete numerical formulation. Retrieved
+-Information must contain every identifier and coefficient required by downstream code. Preserve
++    route_instruction = """Return an ABSTRACT symbolic formulation and exact source Data Mapping. Keep
++numerical identifiers and coefficients in the current Observation for downstream code. Preserve
+ source order and do not invent, aggregate, or silently omit data."""
+     prefix = f"""You are an assistant that formulates mathematical optimization models.
+ 
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell24
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell24
+@@ -1,3 +1,3 @@
+ ## 12. Other and mixed problems
+ 
+-CSV cases use full-file statistics and query-name evidence alongside the first 10 rows, then generate an Abstract Model Plan and code that reads complete files. Evidence does not select rows automatically. Query-only modeling keeps the original notebook workflow.
++CSV cases use the same required-CSVQA ReAct agent, source interfaces and code generator as the canonical routes. Query-only cases retain the original ORLM_QA workflow.
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell25
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell25
+@@ -66,207 +66,26 @@
+ 
+ 
+ def get_Others_response(user_query: str, dataset_address: str):
+-    examples = retrieve_rag_examples("Others", user_query, k=3)
+-    llm2 = make_llm()
+-
+-    try:
+-        print("\n[Gurobi Pipeline Step 1/3]: Getting CSV Scheme...")
+-
+-        schema = csv_schema_preview(dataset_address, query=user_query)
+-        if re.search(r"\bsymmetric\b", user_query, re.I):
+-            schema += ("\nWhen the query explicitly states symmetry, align matrix axes by entity ID. "
+-                       "Fill a missing off-diagonal entry from its present transpose; preserve zeros. "
+-                       "Reject pairs with both entries missing or conflicting values beyond numeric tolerance. "
+-                       "Without explicit symmetry, preserve direction and never mirror or zero-fill entries.")
+-        if re.search(r"\bshut(?:down| down)\b", user_query, re.I):
+-            schema += "\nMinimum-down-time restrictions activate only on an on-to-off transition; down-time constraints alone must never forbid an always-on sequence."
+-        if "\\sum" in user_query:
+-            schema += "\nPreserve the query's explicit summation scope: aggregate every summed index inside the expression; never replace a summed index with a separate family of constraints."
+-        if re.search(r"\bworkers?\b", user_query, re.I) and re.search(r"\btasks?\b", user_query, re.I):
+-            schema += "\nIn a worker-task matrix, distinguish embedded row/column-axis captions from actual workers. Select workers by their identifiers, exclude label rows, then validate worker counts; never truncate by position."
+-        print("\n[Gurobi Pipeline Step 2/3]: Constructing Abstract Model...")
+-
+-        few_shot_block_abstract = build_few_shot_Other(examples, t='Model')
+-        print(f"[Few-Shot Abstract Examples]:\n{few_shot_block_abstract}...")
+-        
+-        abstract_model_template = """
+-You are an expert optimization modeler.
+-Your task is to create an "Abstract Model Plan" based on the user's query and the CSV Schema (data structure).
+-This plan is *not* Gurobi code or mathematical formulas, but a clear, step-by-step reasoning process in English.
+-
+-[Examples]
+-{few_shot_examples}
+-
+-[Current Task]
+-User Query: {query}
+-
+-CSV Schema:
+-{schema}
+-
+-An explicitly enumerated complete entity set in the query is authoritative: extra CSV entities
+-must not enlarge that set unless the query explicitly delegates its definition to the data.
+-For a one-off finite-horizon schedule, change/ramp constraints compare consecutive modeled periods. An initial
+-binary on/off state is not a pre-horizon continuous quantity: do not invent an initial continuous
+-level or a first-period ramp limit unless the query explicitly supplies that continuous boundary.
+-For recurring daily/cyclic operation, preserve wrap-around coverage across the last/first period
+-when a working shift spans the boundary; do not impose a fictitious empty start to a recurring day.
+-State and implement the original objective sense and complete value expression, including constants.
+-Do not offer sign-reversed or constant-shifted optimizer-equivalent objectives as alternatives.
+-Examples illustrate style; the current query and schema determine the actual scope, indices and boundaries.
+-
+-Data selection: state for each entity table whether all rows or a subset is required; name the
+-filter column, exact condition, entity key, and joins. Preserve shared resource/parameter tables.
+-Without a query-requested filter, use the complete entity set. A preview is never the selected set.
+-Matching statistics are evidence, not instructions: do not broaden a zero-match condition to
+-substring matching or all rows. Check selected keys and applicable counts at runtime; recompute
+-combined conditions rather than treating individual counts as intersection counts.
+-
+-[Your Output]
+-You must strictly follow this format for your "Abstract Model Plan" output:
+-
+-[Abstract Model Plan START]
+-1.  **Analyze Query:** The user wants to {{{{Your analysis}}}}.
+-2.  **Identify Model Type:** Based on the query, this is a {{{{e.g., LP, MIP, Fixed-Charge, Blending}}}} problem.
+-3.  **Define Index Sets:** The primary indices are {{{{e.g., Products, Workers, Sources, Destinations}}}}.
+-4.  **Define Decision Variables:**
+-    -   `x[i]` = {{{{Describe first variable, e.g., 'quantity of product i'}}}}. Type: {{{{GRB.CONTINUOUS / GRB.INTEGER}}}}.
+-    -   `y[i]` = {{{{Describe second variable, e.g., 'if product i is produced'}}}}. Type: {{{{GRB.BINARY}}}}.
+-5.  **Identify Parameters (from Schema):**
+-    -   Objective coefficients (e.g., profit) will come from column(s): {{{{e.g., 'Price', 'Production Cost'}}}}.
+-    -   Constraint coefficients (e.g., resource use) will come from: {{{{e.g., 'Resource 1', 'Available Time'}}}}.
+-    -   Constraint RHS (limits) will come from: {{{{e.g., 'Max Demand'}}}}.
+-6.  **Formulate Objective:** {{{{Describe objective, e.g., 'Maximize sum((schema['Price'] - schema['Cost']) * x[i] - schema['FixedCost'] * y[i])'}}}}.
+-7.  **Formulate Constraints:**
+-    -   Constraint 1 (e.g., Resource Limit): {{{{Describe constraint 1, e.g., 'sum(schema['Resource 1'][i] * x[i]) <= schema['Available']'}}}}.
+-    -   Constraint 2 (e.g., Linking): {{{{Describe constraint 2, e.g., 'x[i] <= M * y[i])'}}}}.
+-    -   ... (Other constraints) ...
+-[Abstract Model Plan END]
++    """Use the shared CSVQA ReAct workflow for general and mixed CSV problems."""
++    examples = build_formulation_examples("Others", user_query, k=3)
++    prefix = f"""You are an expert optimization modeler.
++Reference examples illustrate structure only; the original question and current data are authoritative.
++{examples}
++Return a concise symbolic model with sets, parameters, variable domains, the complete objective,
++all constraints and exact source Data Mapping. Preserve all interacting decision families.
++An explicitly complete entity list in the question is authoritative; otherwise use all required data.
++For finite-horizon changes or ramps, an initial binary state does not supply a continuous initial level.
++For recurring cyclic operation, preserve wrap-around coverage of shifts across the period boundary.
++Minimum-down-time restrictions start on an on-to-off transition; allow an always-on sequence.
++Preserve the question's complete summation scopes, units, additive constants and boundary conditions.
++Mirror matrix entries only when symmetry is explicitly stated, checking identifiers and conflicting entries.
++Distinguish axis captions and scalar-parameter rows from decision entities through their identifiers.
++State query-requested filters and joins explicitly; a preview or example never defines the selected set.
+ """
+-        abstract_model_template += '\nApply unconditional quantity/resource bounds unconditionally. Only use activation-conditioned bounds when the current query explicitly makes them conditional; an activation fee alone does not make an otherwise unconditional bound conditional.'
+-
+-        abstract_prompt = PromptTemplate(
+-            template=abstract_model_template,
+-            input_variables=["query", "schema", "few_shot_examples"]
+-        )
+-        
+-        abstract_model_chain = LLMChain(llm=llm2, prompt=abstract_prompt)
+-        
+-        abstract_model_plan = abstract_model_chain.run(
+-            query=user_query,
+-            schema=schema,
+-            few_shot_examples=few_shot_block_abstract
+-        )
+-        print(f"[Observation]:\n{abstract_model_plan}")
+-        
+-        print("\n[Gurobi Pipeline Step 3/3]: Generating Gurobi Code...")
+-        
+-        few_shot_block_code = build_few_shot_Other(examples, t='Code')
+-        
+-        code_gen_template = """
+-You are an expert Gurobi programmer.
+-Your task is to strictly follow the User Query, CSV Schema, and "Abstract Model Plan" to translate them into a single, complete, executable Gurobi Python code block.
+-The code must start with ```python and end with ```.
+-The code must include the necessary imports from gurobipy, pandas, numpy, re, math or json. Do not import sys or os.
+-Create exactly one Gurobi model in m or model and call its optimize() exactly once, both at top level. Do not wrap model creation or solving in functions or try/except; let errors propagate to the execution harness. Do not write files or call computeIIS().
+-The code must read all supplied CSV files needed by the model, at these exact newline-separated paths:
+-{dataset_address}
+-Read their complete contents at runtime. The schema preview is not the full dataset.
+-Preserve explicit business identifiers and matrix axes; do not invent filenames or columns.
+-Data-reading contract: these files were parsed with pandas.read_csv(path, sep=',').
+-The displayed preview is space-aligned for readability; it does not imply a whitespace delimiter.
+-pandas already consumes the CSV header. Select entity and parameter rows through identifier values
+-or validated predicates, never guessed iloc offsets or a guessed number of header rows.
+-Normalize identifier types explicitly on both sides of every lookup/join, including matrix row
+-indices versus column labels. Preserve the actual identifiers and derive dimensions from all rows.
+-Series.apply receives one cell value, not a row; use vectorized column predicates or DataFrame.apply
+-with axis=1 when a predicate needs a row. Every comprehension must use the indices it binds, not
+-stale variables from a preceding loop. Do not silently skip failed conversions or missing coefficients.
+-Use setObjective for the exact metric requested by the query, including all additive constants,
+-signs and units. An optimizer-equivalent objective is not an equivalent reported objective value;
+-do not drop constant terms and then merely restore them in printed output.
+-The code must *fully* implement all variables, objectives, and constraints from the "Abstract Model Plan".
+-
+-[Examples of the Full Process]
+-{few_shot_examples}
+-
+-[User Query]
+-{query}
+-
+-[CSV Schema]
+-{schema}
+-
+-[Abstract Model Plan]
+-{abstract_plan}
+-
+-An explicitly enumerated complete entity set in the query is authoritative: extra CSV entities
+-must not enlarge that set unless the query explicitly delegates its definition to the data.
+-For a one-off finite-horizon schedule, change/ramp constraints compare consecutive modeled periods. An initial
+-binary on/off state is not a pre-horizon continuous quantity: do not invent an initial continuous
+-level or a first-period ramp limit unless the query explicitly supplies that continuous boundary.
+-For recurring daily/cyclic operation, preserve wrap-around coverage across the last/first period
+-when a working shift spans the boundary; do not impose a fictitious empty start to a recurring day.
+-State and implement the original objective sense and complete value expression, including constants.
+-Do not offer sign-reversed or constant-shifted optimizer-equivalent objectives as alternatives.
+-Examples illustrate style; the current query and schema determine the actual scope, indices and boundaries.
+-
+-Data selection: state for each entity table whether all rows or a subset is required; name the
+-filter column, exact condition, entity key, and joins. Preserve shared resource/parameter tables.
+-Without a query-requested filter, use the complete entity set. A preview is never the selected set.
+-Matching statistics are evidence, not instructions: do not broaden a zero-match condition to
+-substring matching or all rows. Check selected keys and applicable counts at runtime; recompute
+-combined conditions rather than treating individual counts as intersection counts.
+-
+-Reserve m and model for the Gurobi model; never reuse them as loop variables or other values.
+-Keep business identifiers as Python dictionary keys, separate from Gurobi names.
+-Use name='' for addVars/addConstrs so business keys are not expanded into solver names;
+-use only short ASCII names for individually named variables and constraints.
+-Never invent, truncate, or replace required coefficients with dummy or random data.
+-Before optimization, validate coefficient dimensions and identifier coverage against decision index sets;
+-raise an explicit error for missing data instead of guessing, padding, or silently dropping entries.
+-
+-[Your Gurobi Code]
+-"""
+-
+-        code_gen_template += "\n" + CSV_SOLVER_INSTRUCTIONS + MODEL_INTERFACE_INSTRUCTIONS
+-
+-        code_gen_prompt = PromptTemplate(
+-            template=code_gen_template,
+-            input_variables=["query", "schema", "abstract_plan", "dataset_address", "few_shot_examples"]
+-        )
+-        
+-        code_gen_chain = LLMChain(llm=llm2, prompt=code_gen_prompt)
+-        
+-        final_code = code_gen_chain.run(
+-            query=user_query,
+-            schema=schema,
+-            abstract_plan=abstract_model_plan,
+-            dataset_address=dataset_address,
+-            few_shot_examples=few_shot_block_code 
+-        )
+-        
+-        if "```python" in final_code:
+-            code_block = final_code.split("```python", 1)[1]
+-            if "```" in code_block:
+-                code_block = code_block.split("```", 1)[0]
+-            final_answer = "```python\n" + code_block.strip() + "\n```"
+-        else:
+-            if not final_code.strip().startswith("import"):
+-                print(f"[Warning] Step 3 output was not a valid code block. Output: {final_code[:200]}...")
+-                final_answer = f"Error: Code generation failed. LLM returned non-code output:\n{final_code}"
+-            else:
+-                print("[Warning] Step 3 output missed ```python tag, adding it.")
+-                final_answer = "```python\n" + final_code.strip() + "\n```"
+-            
+-        print(f"[Final Answer]:\n{final_answer}")
+-        return {
+-            "formulation": abstract_model_plan, "code": final_answer, "observation": schema,
+-            "trace": {"status": "LEGACY_SCHEMA", "planner_attempt_count": 0,
+-                      "payload_hash": hashlib.sha256(schema.encode()).hexdigest()},
+-        }
+-
+-    except Exception as e:
+-        print(f"[Gurobi Pipeline Error]: {e}")
+-        raise
++    return formulate_with_csvqa(
++        user_query, dataset_address, "Others", CSVQA_PLANNED_PROMPTS["Others"],
++        CSVQA_TOOL_DESCRIPTIONS["Others"], prefix, "",
++    )
+ 
+ 
+ def get_others_without_CSV_response(query):
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell26
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell26
+@@ -1,3 +1,3 @@
+ ## 13. Generate Python code
+ 
+-get_code preserves the original query-only workflow. get_csv_code uses structured NRM data or the numerical formulation from CSVQA. Others with CSV already generates code in section 12. All prompt examples are defined in this notebook.
++CSV code uses exact current source DataFrames. Few-shot Only supplies source paths/schema without the complete current Observation. Query-only code remains self-contained.
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell27
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell27
+@@ -138,7 +138,7 @@
+     "Others": "Follow the formulation exactly; do not introduce unsupported assumptions.",
+ }
+ 
+-PLANNED_CODE_INSTRUCTIONS = "\nUse the formulation for model structure and Data Mapping. At execution, CSVQA_FRAMES\nis a dictionary from exact table_id to a pandas DataFrame of the original source fields.\nRead every coefficient and entity field from CSVQA_FRAMES[table_id]. Values remain\noriginal strings, including empty fields; explicitly convert required numeric columns.\nDo not redefine these frames, copy coefficients into literals, or read external files.\nUse exact column names and source IDs. Do not guess table/record dictionary layouts.\nCSVQA_DATA remains available ONLY for metadata such as roles and matrix relationships.\nIts top-level table objects have records; values belongs to a record, not to a table.\nDo not access a table as a record or reparse structured source data as CSV text.\nPreserve source row order, complete entity sets and both matrix axes. Select the exact\ntable_id from Data Mapping; roles may repeat. A copied example's entity list never\ndefines the current set without an explicit original-query restriction.\nOptional row_id_mapping/column_id_mapping in matrix metadata maps raw labels to entity\nIDs. Apply it only when supplied; otherwise use exact raw IDs. Preserve all coefficients.\nWithout a continuous pre-horizon value, start change/ramp constraints at the second\nperiod; an initial binary state does not supply a continuous period-zero value.\nOnly parse individual source fields when those fields themselves contain structured text.\n"
++PLANNED_CODE_INSTRUCTIONS = '\nUse the formulation for model structure and Data Mapping. At execution, CSVQA_FRAMES\nis a dictionary from exact table_id to a pandas DataFrame of the original source fields.\nRead every coefficient and entity field from CSVQA_FRAMES[table_id]. Values remain\noriginal strings, including empty fields; explicitly convert required numeric columns.\nDo not redefine these frames, copy coefficients into literals, or read external files.\nUse exact column names and source IDs. Do not guess table/record dictionary layouts.\nCSVQA_DATA remains available ONLY for metadata such as roles and matrix relationships.\nIts top-level table objects have records; values belongs to a record, not to a table.\nDo not access a table as a record or reparse structured source data as CSV text.\nPreserve source row order, complete entity sets and both matrix axes. Select the exact\ntable_id from Data Mapping; roles may repeat. A copied example\'s entity list never\ndefines the current set without an explicit original-query restriction.\nOptional row_id_mapping/column_id_mapping in matrix metadata maps raw labels to entity\nIDs. Apply it only when supplied; otherwise use exact raw IDs. Preserve all coefficients.\nWithout a continuous pre-horizon value, start change/ramp constraints at the second\nperiod; an initial binary state does not supply a continuous period-zero value.\nOnly parse individual source fields when those fields themselves contain structured text.\n\nConcrete runtime interface (replace placeholder table/column names using Data Mapping):\n    frame = CSVQA_FRAMES["<table_id>"]\n    for source_row, row in frame.iterrows():\n        identifier = row["<identifier column>"]\n        coefficient = float(row["<numeric column>"])\nCSVQA_FRAMES entries are pandas DataFrames, not table dictionaries: they have no\n"records" column or .records attribute. frame.to_dict("records") returns flat field\ndictionaries; access row[exact_column], never row["values"]. source_row is frame.index,\nnot a source column unless the original CSV explicitly contains a column with that name.\nDo not use row.values from itertuples as a source-record dictionary. Iterate with iterrows\nor flat to_dict("records") dictionaries when source headers are not valid Python identifiers.\n'
+ 
+ LEGACY_CODE_INSTRUCTIONS = """
+ Build a self-contained program using the concrete coefficients and identifiers in
+@@ -170,6 +170,9 @@
+ Use pandas Series.str.casefold() for vectorized text and string.casefold() for one string.
+ 
+ Use numeric variable bounds or omit them; never pass None as lb or ub.
++For a variable unrestricted below, use lb=-gp.GRB.INFINITY; omitting lb means zero.
++Omit ub for its infinity default. Access decisions through their variable containers
++or m.getVars(); do not rely on getVarByName or formatted solver-name strings.
+ Give every decision-variable container a distinct name ending in _vars, such as quantity_vars. Keep scalar keys, loop variables, row objects and parameters separate; never rebind a decision container.
+ quicksum requires an iterable of numeric or linear terms; use scalar constants directly, never quicksum(0).
+ Read external CSVs with dtype=str and keep_default_na=False, then explicitly convert required numeric fields. Preserve empty fields and literal identifiers; do not turn a missing relationship into a string 'nan'.
+@@ -196,7 +199,7 @@
+     return "\n\n".join(examples)
+ 
+ 
+-def _generate_code(output, route, original_query="", data_payload="", legacy_observation=""):
++def _generate_code(output, route, original_query="", data_payload="", legacy_observation="", *, direct_source=False):
+     route = normalize_route(route)
+     bind_observation = route == "RA" and bool(legacy_observation) and not data_payload
+     parts = [ORIGINAL_CODE_PROMPT.format(output=output)]
+@@ -218,7 +221,7 @@
+             f"Complete LEGACY_RECORDS:\n{json.dumps(records, ensure_ascii=False)}"
+         )
+     else:
+-        parts.append(LEGACY_CODE_INSTRUCTIONS)
++        parts.append(DIRECT_SOURCE_CODE_INSTRUCTIONS if direct_source else LEGACY_CODE_INSTRUCTIONS)
+     parts.append(CSV_ROUTE_HINT[route])
+ 
+     examples = retrieve_csv_code_example(route, original_query or output)
+@@ -247,3 +250,5 @@
+ def get_code(output, selected_problem, original_query=""):
+     """Generate self-contained code for a query-only formulation."""
+     return _generate_code(output, selected_problem, original_query=original_query)
++
++DIRECT_SOURCE_CODE_INSTRUCTIONS = '\nRead the exact source CSV paths in Source Schema at runtime with pandas. Preserve text\nidentifiers and complete source rows, then implement query-required joins and calculations.\nNo complete current CSV data is provided to this generation stage. Never invent coefficients\nor encode assumed data values. Use only source columns and the mathematical model.\nTry UTF-8-sig, UTF-8, GBK and Latin-1 only on decoding errors, matching the shared reader.\n'
+--- Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v7:cell29
++++ Ablation_Study_Large_Scale_Or_RAG_Only_ReAct.ipynb:v9:cell29
+@@ -1,15 +1,22 @@
+ def _source_candidate(code):
++    """Validate source; retain original bulk-name normalization unless names are queried."""
+     source = str(code).strip()
+     match = re.fullmatch(r"```(?:python|py)?\s*\n(.*?)\n```", source, re.DOTALL)
+     source = match.group(1) if match else source
+     tree = ast.parse(source)
+-    # Bulk names expand business keys; keep those keys out of Gurobi display names.
++    name_lookup = any(isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
++                      and node.func.attr in {"getVarByName", "getConstrByName"}
++                      for node in ast.walk(tree))
++    if name_lookup:
++        return source
++    # Preserve original solver-name safety without altering business dictionary keys.
+     for node in ast.walk(tree):
+         if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                 and node.func.attr in {"addVars", "addConstrs"}):
+             node.keywords = [kw for kw in node.keywords if kw.arg != "name"]
+             node.keywords.append(ast.keyword(arg="name", value=ast.Constant(value="")))
+     return ast.unparse(tree)
++
+ 
+ 
+ class ModelInterfaceError(RuntimeError):

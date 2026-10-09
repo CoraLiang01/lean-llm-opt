@@ -1,0 +1,108 @@
+﻿problem_id,query,dataset_address,input_kind,true_label,true_route,label_objective,assigned_route,predicted_label,forced_route,experiment_mode,repair_count,retry_count,fallback_count,pipeline_stage,api_retry_count,api_retry_events,csvqa_status,final_ok,final_objective,execution_error,execution_error_type,execution_error_code,record_status,cache_source,fatal_service_error,classification_correct,solution_correct,seconds,classification_source,external_case_deadline_seconds,external_deadline_exceeded,base_notebook_sha256,notebook_source_sha256,cache_fingerprint,evaluated_utc,generated_model_path,generated_model_sha256,solve_code_path,solve_code_sha256,csvqa_observation_path,csvqa_observation_sha256,csvqa_trace_path,csvqa_trace_sha256,solution_path,solution_sha256
+OR-004,"A retail store operates a complex supply chain to distribute products across various categories, serving customers in multiple geographic regions. The daily demand of customer groups is recorded in ""customer_demand.csv"", while the supply capacity of distribution centers is detailed in ""supply_capacity.csv"". The transportation cost per unit of goods from each distribution center to each customer group is recorded in ""transportation_costs.csv"". The objective is to develop an optimal fulfillment policy that determines how goods should be allocated from distribution centers to customer groups, ensuring that all demands are met without exceeding supply capacities, while minimizing the total transportation cost.","/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP4/customer_demand.csv
+/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP4/supply_capacity.csv
+/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP4/transportation_costs.csv",external_csv,TP,TP,913520.1123,TP,TP,,automatic,0,0,0,formulation,0,[],PLANNED,False,,"ValueError: An output parsing error occurred. In order to pass this error back to the agent and have it try again, pass `handle_parsing_errors=True` to the AgentExecutor. This is the error: Could not parse LLM output: `The problem is a transportation (minimum-cost network flow) model with 12 distribution centers (suppliers) and 12 customer groups. Let $x_{ij}$ denote the nonnegative continuous quantity shipped from distribution center $i$ to customer group $j$.
+
+##### Sets
+
+- $I$: set of distribution centers (from supply_capacity.csv), $I = \{\text{S1}, \text{S2}, \ldots, \text{S12}\}$
+- $J$: set of customer groups (from customer_demand.csv), $J = \{\text{C1}, \text{C2}, \ldots, \text{C12}\}$
+
+##### Parameters
+
+- $d_j$: demand of customer group $j$ (from customer_demand.csv)
+- $s_i$: supply capacity of distribution center $i$ (from supply_capacity.csv)
+- $c_{ij}$: transportation cost per unit from $i$ to $j$ (from transportation_costs.csv)
+
+##### Decision Variables
+
+- $x_{ij} \geq 0$: quantity shipped from distribution center $i$ to customer group $j$ (continuous)
+
+##### Objective
+
+\[
+\min \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij}
+\]
+
+##### Constraints
+
+1. **Demand satisfaction** (each customer group must receive at least its demand):
+
+   \[
+   \sum_{i \in I} x_{ij} \geq d_j \qquad \forall j \in J
+   \]
+
+2. **Supply capacity** (each distribution center cannot ship more than its capacity):
+
+   \[
+   \sum_{j \in J} x_{ij} \leq s_i \qquad \forall i \in I
+   \]
+
+3. **Non-negativity**:
+
+   \[
+   x_{ij} \geq 0 \qquad \forall i \in I,\, j \in J
+   \]
+
+---
+
+#### Data Mapping
+
+- **Set $I$ (distribution centers):** S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12 (from supply_capacity.csv, column ""Unnamed: 0"", table_id: file_1_view_0)
+- **Set $J$ (customer groups):** C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12 (from customer_demand.csv, column ""customer"", table_id: file_0_view_0)
+- **Demand $d_j$:** from customer_demand.csv, column ""demand"", table_id: file_0_view_0, indexed by ""customer""
+- **Supply $s_i$:** from supply_capacity.csv, column ""supply_capacity"", table_id: file_1_view_0, indexed by ""Unnamed: 0""
+- **Cost $c_{ij}$:** from transportation_costs.csv, table_id: file_2_view_0, rows indexed by ""Unnamed: 0"" (distribution center), columns by customer group (""C1""...""C12"")
+
+---
+
+##### Explicit Data Mapping Table
+
+| Index | Distribution Center $i$ | $s_i$ (file_1_view_0) |
+|-------|------------------------|-----------------------|
+| 1     | S1                     | 58                    |
+| 2     | S2                     | 32                    |
+| 3     | S3                     | 6161                  |
+| 4     | S4                     | 4                     |
+| 5     | S5                     | 47                    |
+| 6     | S6                     | 178                   |
+| 7     | S7                     | 142                   |
+| 8     | S8                     | 164                   |
+| 9     | S9                     | 1011                  |
+| 10    | S10                    | 6                     |
+| 11    | S11                    | 7081                  |
+| 12    | S12                    | 948                   |
+
+| Index | Customer Group $j$ | $d_j$ (file_0_view_0) |
+|-------|-------------------|-----------------------|
+| 1     | C1                | 52                    |
+| 2     | C2                | 80                    |
+| 3     | C3                | 392                   |
+| 4     | C4                | 103                   |
+| 5     | C5                | 32                    |
+| 6     | C6                | 1426                  |
+| 7     | C7                | 1024                  |
+| 8     | C8                | 2736                  |
+| 9     | C9                | 1129                  |
+| 10    | C10               | 676                   |
+| 11    | C11               | 2631                  |
+| 12    | C12               | 31                    |
+
+- $c_{ij}$: from transportation_costs.csv (file_2_view_0), row ""Unnamed: 0"" = $i$, column = $j$
+
+---
+
+##### Complete Model
+
+\[
+\begin{align*}
+\min_{x_{ij} \geq 0} \quad & \sum_{i \in I} \sum_{j \in J} c_{ij} x_{ij} \\
+\text{s.t.} \quad
+& \sum_{i \in I} x_{ij} \geq d_j \qquad \forall j \in J \\
+& \sum_{j \in J} x_{ij} \leq s_i \qquad \forall i \in I \\
+& x_{ij} \geq 0 \qquad \forall i \in I,\, j \in J
+\end{align*}
+\]
+
+with all indices, parameters, and data sources as mapped above.`
+For troubleshooting, visit: https://docs.langchain.com/oss/python/langchain/errors/OUTPUT_PARSING_FAILURE ",ValueError,,error,computed,False,True,False,19.377,computed,1800,False,25312cbdee6bd4a162fbce3caa34c6a1098615d9335927f197b6dab1dabef58b,25312cbdee6bd4a162fbce3caa34c6a1098615d9335927f197b6dab1dabef58b,a0b05157614aa813dc6193fb7916cd3eb77ea453771f68ea96b8fbc2b2d5b956,2026-10-06T02:13:57.543210+00:00,results_cases/AUTO/OR-004/2d6eed870f5c7b23/model.md,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,results_cases/AUTO/OR-004/2d6eed870f5c7b23/solve.py,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,results_cases/AUTO/OR-004/2d6eed870f5c7b23/data_overview.md,26ec3983b5b2c794be23a1dfcd6c3ea39fae51ace666c07691a16321a7f97222,results_cases/AUTO/OR-004/2d6eed870f5c7b23/csvqa_trace.json,0f7ba90821ce48d8789a1abcc2a1acec524216085dde9c200f7a3ce45c253c8c,results_cases/AUTO/OR-004/2d6eed870f5c7b23/solution.json,7b111a5dbedc63a35b0a065f2491daf81a90586d96e0aa24dfd06d6c643e6ad0

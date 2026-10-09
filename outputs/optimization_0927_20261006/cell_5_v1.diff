@@ -1,0 +1,33 @@
+--- before:cell5
++++ v1:cell5
+@@ -1,3 +1,17 @@
++HTTP_RETRY_EVENTS = []
++
++
++def _record_http_request(request):
++    index = int(request.headers.get("x-stainless-retry-count", "0"))
++    if index:
++        HTTP_RETRY_EVENTS.append({"endpoint": request.url.path, "retry_index": index})
++
++
++@lru_cache(maxsize=1)
++def _get_http_client():
++    return httpx.Client(timeout=180, event_hooks={"request": [_record_http_request]})
++
++
+ class ModelOutputTruncated(RuntimeError):
+     """The API explicitly reported an incomplete model response."""
+ 
+@@ -33,10 +47,10 @@
+ def make_llm(*, timeout=180):
+     return ChatOpenAI(
+         model_name=MODEL_SNAPSHOT, openai_api_key=require_api_key(),
+-        temperature=0.0, top_p=1, n=1, max_retries=0, timeout=timeout,
++        temperature=0.0, top_p=1, n=1, max_retries=1, http_client=_get_http_client(), timeout=timeout,
+         callbacks=[RejectTruncatedOutput()],
+     )
+ 
+ 
+ def make_embeddings():
+-    return OpenAIEmbeddings(model=EMBEDDING_MODEL, openai_api_key=require_api_key(), max_retries=0)
++    return OpenAIEmbeddings(model=EMBEDDING_MODEL, openai_api_key=require_api_key(), max_retries=1, http_client=_get_http_client())

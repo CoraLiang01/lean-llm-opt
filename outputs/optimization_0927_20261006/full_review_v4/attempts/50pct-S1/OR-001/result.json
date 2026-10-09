@@ -1,0 +1,72 @@
+{
+  "problem_id": "50pct-S1/OR-001",
+  "query": "In the construction industry, we have a set of managers and a set of construction projects. Each manager incurs different costs for each project, based on their experience and expertise. The cost information for each manager and project is saved in the CSV file \"manager_project_costs.csv\", where each row represents a manager, and each column represents the cost for that manager to complete a specific project. The objective is to find the optimal assignment that minimizes the total cost of completing all projects. Each manager must be assigned to exactly one project, and each project must be managed by exactly one manager. The goal is to minimize the total cost while satisfying these one-to-one assignment constraints.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/AP_testing/AP2/manager_project_costs.csv",
+  "input_kind": "external_csv",
+  "true_label": "AP",
+  "true_route": "AP",
+  "label_objective": 9000.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "pipeline_stage": "completed",
+  "predicted_label": "AP",
+  "assigned_route": "AP",
+  "generated_model": "##### Objective Function:\n\n$\\quad \\min \\sum_{i \\in \\{\\text{MA}, \\text{MB}, \\text{MC}\\}} \\sum_{j \\in \\{\\text{P1}, \\text{P2}, \\text{P3}\\}} c_{ij} x_{ij}$\n\nwhere $c_{ij}$ is the cost for manager $i$ to complete project $j$, and $x_{ij}$ is a binary variable equal to 1 if manager $i$ is assigned to project $j$, 0 otherwise.\n\n##### Constraints\n\n###### 1. Assignment Constraints:\n\n$\\sum_{j \\in \\{\\text{P1}, \\text{P2}, \\text{P3}\\}} x_{ij} = 1 \\quad \\forall i \\in \\{\\text{MA}, \\text{MB}, \\text{MC}\\}$\n\n$\\sum_{i \\in \\{\\text{MA}, \\text{MB}, \\text{MC}\\}} x_{ij} = 1 \\quad \\forall j \\in \\{\\text{P1}, \\text{P2}, \\text{P3}\\}$\n\n###### 2. Variable Constraints:\n\n$x_{ij} \\in \\{0,1\\} \\quad \\forall i \\in \\{\\text{MA}, \\text{MB}, \\text{MC}\\},\\ j \\in \\{\\text{P1}, \\text{P2}, \\text{P3}\\}$\n\n##### Retrieved Information\n\n{\n  \"cost\": {\n    \"MA\": {\n      \"P1\": 3000,\n      \"P2\": 3200,\n      \"P3\": 3100,\n      \"archive_revision_number\": 2,\n      \"record_display_theme\": \"Amber\"\n    },\n    \"MB\": {\n      \"P1\": 2800,\n      \"P2\": 3300,\n      \"P3\": 2900,\n      \"archive_revision_number\": 2,\n      \"record_display_theme\": \"Amber\"\n    },\n    \"MC\": {\n      \"P1\": 2900,\n      \"P2\": 3100,\n      \"P3\": 3000,\n      \"archive_revision_number\": 6,\n      \"record_display_theme\": \"Azure\"\n    }\n  },\n  \"managers\": [\n    \"MA\",\n    \"MB\",\n    \"MC\"\n  ],\n  \"projects\": [\n    \"P1\",\n    \"P2\",\n    \"P3\"\n  ]\n}",
+  "csvqa_observation": "[\n  {\n    \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/AP_testing/AP2/manager_project_costs.csv\",\n    \"values\": {\n      \"Unnamed: 0\": \"MA\",\n      \"archive_revision_number\": \"2\",\n      \"P1\": \"3000\",\n      \"P2\": \"3200\",\n      \"P3\": \"3100\",\n      \"record_display_theme\": \"Amber\"\n    }\n  },\n  {\n    \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/AP_testing/AP2/manager_project_costs.csv\",\n    \"values\": {\n      \"Unnamed: 0\": \"MB\",\n      \"archive_revision_number\": \"2\",\n      \"P1\": \"2800\",\n      \"P2\": \"3300\",\n      \"P3\": \"2900\",\n      \"record_display_theme\": \"Amber\"\n    }\n  },\n  {\n    \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S1/Large-scale-or/AP_testing/AP2/manager_project_costs.csv\",\n    \"values\": {\n      \"Unnamed: 0\": \"MC\",\n      \"archive_revision_number\": \"6\",\n      \"P1\": \"2900\",\n      \"P2\": \"3100\",\n      \"P3\": \"3000\",\n      \"record_display_theme\": \"Azure\"\n    }\n  }\n]",
+  "csvqa_mode": "legacy",
+  "csvqa_status": "LEGACY_FULL_DATA",
+  "solve_code": "import gurobipy as gp\nfrom gurobipy import GRB\nmanagers = ['MA', 'MB', 'MC']\nprojects = ['P1', 'P2', 'P3']\ncost = {'MA': {'P1': 3000, 'P2': 3200, 'P3': 3100}, 'MB': {'P1': 2800, 'P2': 3300, 'P3': 2900}, 'MC': {'P1': 2900, 'P2': 3100, 'P3': 3000}}\nfor i in managers:\n    if i not in cost or not isinstance(cost[i], dict):\n        raise ValueError(f'Missing cost data for manager {i}')\n    for j in projects:\n        if j not in cost[i]:\n            raise ValueError(f'Missing cost data for manager {i}, project {j}')\nm = gp.Model('ManagerProjectAssignment')\nx_vars = m.addVars(managers, projects, vtype=GRB.BINARY, name='')\nm.setObjective(gp.quicksum((cost[i][j] * x_vars[i, j] for i in managers for j in projects)), GRB.MINIMIZE)\nm.addConstrs((gp.quicksum((x_vars[i, j] for j in projects)) == 1 for i in managers), name='')\nm.addConstrs((gp.quicksum((x_vars[i, j] for i in managers)) == 1 for j in projects), name='')\nm.Params.MIPGap = 0.0001\nm.optimize()\nif m.Status == GRB.OPTIMAL:\n    print(f'ObjVal: {m.ObjVal}')\n    for var in m.getVars():\n        print(f'{var.VarName}: {var.X}')\nelse:\n    print(f'Solver status: {m.Status}')",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 9000.0,
+  "final_solution": [
+    [
+      "C0",
+      1.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      -0.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      1.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      1.0
+    ],
+    [
+      "C8",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "experiment_method": "full",
+  "benchmark": "50pct-S1",
+  "seconds": 19.958,
+  "evaluated_utc": "2026-10-06T05:30:04.891941+00:00",
+  "notebook_source_sha256": "8664c2eba4a40f00fc3d72ca2753d08b9ca8dd51d93631ddb6c956b8a025495f",
+  "external_deadline_seconds": 1800,
+  "external_deadline_exceeded": false
+}

@@ -1,0 +1,363 @@
+{
+  "problem_id": "OR-044",
+  "query": "A supermarket manager needs to select a variety of products to stock in different sections of the store. Particularly, the store has several sections, each with a display space limit provided in \"capacity.csv.\" The predefined price and shelf space requirement of each product are detailed in \"products.csv.\" The objective is to determine the optimal number of units of each product to stock in each section to maximize the total revenue, while ensuring that the total space used by the products in each section does not exceed the available capacity. The decision variables x_ij denote the number of units of product j to be placed in section i.The decision variables must be integers.",
+  "dataset_address": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv\n/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv",
+  "input_kind": "external_csv",
+  "true_label": "RA",
+  "true_route": "RA",
+  "label_objective": 8000.0,
+  "forced_route": null,
+  "experiment_mode": "automatic",
+  "repair_count": 0,
+  "retry_count": 0,
+  "fallback_count": 0,
+  "pipeline_stage": "completed",
+  "predicted_label": "RA",
+  "assigned_route": "RA",
+  "generated_model": "ABSTRACT MATHEMATICAL MODEL\n\n**Index Sets:**\n- $S$: set of section IDs (from `file_0_view_0.SectionID`)\n- $P$: set of product names (from `file_1_view_0.ProductName`)\n\n**Parameters:**\n- $C_s$: capacity of section $s$ (from `file_0_view_0.Capacity`)\n- $v_p$: value (price) of product $p$ (from `file_1_view_0.Value`)\n- $w_p$: shelf space requirement of product $p$ (from `file_1_view_0.Weight`)\n\n**Decision Variables:**\n- $x_{sp} \\in \\mathbb{Z}_{\\geq 0}$: number of units of product $p$ to stock in section $s$\n\n**Objective:**\n\\[\n\\max \\sum_{s \\in S} \\sum_{p \\in P} v_p \\cdot x_{sp}\n\\]\n\n**Constraints:**\n1. **Section Capacity Constraints:**  \n   For each section $s \\in S$,\n   \\[\n   \\sum_{p \\in P} w_p \\cdot x_{sp} \\leq C_s\n   \\]\n2. **Integrality and Nonnegativity:**  \n   For all $s \\in S$, $p \\in P$,\n   \\[\n   x_{sp} \\in \\mathbb{Z}_{\\geq 0}\n   \\]\n\n---\n\n**Data Mapping:**\n\n- $S$: All `SectionID` in `file_0_view_0`\n- $P$: All `ProductName` in `file_1_view_0`\n- $C_s$: `file_0_view_0.Capacity` for section $s$\n- $v_p$: `file_1_view_0.Value` for product $p$\n- $w_p$: `file_1_view_0.Weight` for product $p$\n- $x_{sp}$: Number of units of product $p$ in section $s$ (decision variable)",
+  "csvqa_observation": "{\"tables\": [{\"table_id\": \"file_0_view_0\", \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv\", \"columns\": [\"SectionID\", \"Capacity\"], \"records\": [{\"SectionID\": \"1\", \"Capacity\": \"100\"}, {\"SectionID\": \"2\", \"Capacity\": \"150\"}, {\"SectionID\": \"3\", \"Capacity\": \"120\"}, {\"SectionID\": \"4\", \"Capacity\": \"130\"}, {\"SectionID\": \"5\", \"Capacity\": \"90\"}, {\"SectionID\": \"6\", \"Capacity\": \"110\"}, {\"SectionID\": \"7\", \"Capacity\": \"160\"}, {\"SectionID\": \"8\", \"Capacity\": \"140\"}]}, {\"table_id\": \"file_1_view_0\", \"source\": \"/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv\", \"columns\": [\"ProductName\", \"Value\", \"Weight\"], \"records\": [{\"ProductName\": \"1\", \"Value\": \"10\", \"Weight\": \"2\"}, {\"ProductName\": \"2\", \"Value\": \"15\", \"Weight\": \"3\"}, {\"ProductName\": \"3\", \"Value\": \"8\", \"Weight\": \"1\"}, {\"ProductName\": \"4\", \"Value\": \"12\", \"Weight\": \"2\"}, {\"ProductName\": \"5\", \"Value\": \"20\", \"Weight\": \"4\"}, {\"ProductName\": \"6\", \"Value\": \"25\", \"Weight\": \"5\"}, {\"ProductName\": \"7\", \"Value\": \"5\", \"Weight\": \"1\"}, {\"ProductName\": \"8\", \"Value\": \"30\", \"Weight\": \"6\"}, {\"ProductName\": \"9\", \"Value\": \"18\", \"Weight\": \"3\"}, {\"ProductName\": \"10\", \"Value\": \"22\", \"Weight\": \"4\"}]}]}",
+  "csvqa_mode": "direct",
+  "csvqa_status": "DIRECT_FULL_SOURCE",
+  "csvqa_trace": "{\"status\": \"DIRECT_FULL_SOURCE\", \"formulation_protocol\": \"ReAct\", \"csvqa_call_count\": 0, \"planner_attempt_count\": 0, \"repair_count\": 0, \"fallback_count\": 0, \"retry_count\": 0, \"protocol_retry_count\": 0, \"protocol_retry_events\": \"[]\"}",
+  "solve_code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\ndef solve_problem():\n    csv_encodings = ['utf-8-sig', 'utf-8', 'gbk', 'latin-1']\n\n    def read_csv_with_encodings(path):\n        for enc in csv_encodings:\n            try:\n                return pd.read_csv(path, dtype=str, keep_default_na=False, encoding=enc)\n            except UnicodeDecodeError:\n                continue\n        raise RuntimeError(f'Could not decode {path} with tried encodings.')\n    capacity_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/capacity.csv'\n    products_path = '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA10/SalesOfASupermarket1/products.csv'\n    cap_df = read_csv_with_encodings(capacity_path)\n    prod_df = read_csv_with_encodings(products_path)\n    S = cap_df['SectionID'].tolist()\n    P = prod_df['ProductName'].tolist()\n    if cap_df['SectionID'].duplicated().any():\n        raise ValueError('Duplicate SectionID found in capacity.csv')\n    C_s = dict(zip(cap_df['SectionID'], cap_df['Capacity'].astype(float)))\n    if prod_df['ProductName'].duplicated().any():\n        raise ValueError('Duplicate ProductName found in products.csv')\n    v_p = dict(zip(prod_df['ProductName'], prod_df['Value'].astype(float)))\n    w_p = dict(zip(prod_df['ProductName'], prod_df['Weight'].astype(float)))\n    for s in S:\n        if s not in C_s:\n            raise ValueError(f'Missing capacity for section {s}')\n    for p in P:\n        if p not in v_p or p not in w_p:\n            raise ValueError(f'Missing value or weight for product {p}')\n    m = gp.Model('Supermarket_Section_Stocking')\n    quantity_keys = [(s, p) for s in S for p in P]\n    quantity_vars = m.addVars(quantity_keys, lb=0, vtype=GRB.INTEGER, name='')\n    m.setObjective(gp.quicksum((v_p[p] * quantity_vars[s, p] for s in S for p in P)), GRB.MAXIMIZE)\n    for s in S:\n        m.addConstr(gp.quicksum((w_p[p] * quantity_vars[s, p] for p in P)) <= C_s[s], name=f'cap_{s}')\n    m.Params.MIPGap = 0.0001\n    m.optimize()\n    if m.Status == GRB.OPTIMAL:\n        print(f'ObjVal: {m.ObjVal}')\n        for var in m.getVars():\n            print(f'{var.VarName}: {var.X}')\n    else:\n        print(f'Solver status: {m.Status}')\n    return m\nm = solve_problem()",
+  "protocol_retry_count": 0,
+  "protocol_retry_events": "[]",
+  "api_retry_count": 0,
+  "api_retry_events": "[]",
+  "final_objective": 8000.0,
+  "final_solution": [
+    [
+      "C0",
+      -0.0
+    ],
+    [
+      "C1",
+      -0.0
+    ],
+    [
+      "C2",
+      100.0
+    ],
+    [
+      "C3",
+      -0.0
+    ],
+    [
+      "C4",
+      -0.0
+    ],
+    [
+      "C5",
+      -0.0
+    ],
+    [
+      "C6",
+      -0.0
+    ],
+    [
+      "C7",
+      -0.0
+    ],
+    [
+      "C8",
+      -0.0
+    ],
+    [
+      "C9",
+      -0.0
+    ],
+    [
+      "C10",
+      -0.0
+    ],
+    [
+      "C11",
+      -0.0
+    ],
+    [
+      "C12",
+      150.0
+    ],
+    [
+      "C13",
+      -0.0
+    ],
+    [
+      "C14",
+      -0.0
+    ],
+    [
+      "C15",
+      -0.0
+    ],
+    [
+      "C16",
+      -0.0
+    ],
+    [
+      "C17",
+      -0.0
+    ],
+    [
+      "C18",
+      -0.0
+    ],
+    [
+      "C19",
+      -0.0
+    ],
+    [
+      "C20",
+      -0.0
+    ],
+    [
+      "C21",
+      -0.0
+    ],
+    [
+      "C22",
+      120.0
+    ],
+    [
+      "C23",
+      -0.0
+    ],
+    [
+      "C24",
+      -0.0
+    ],
+    [
+      "C25",
+      -0.0
+    ],
+    [
+      "C26",
+      -0.0
+    ],
+    [
+      "C27",
+      -0.0
+    ],
+    [
+      "C28",
+      -0.0
+    ],
+    [
+      "C29",
+      -0.0
+    ],
+    [
+      "C30",
+      -0.0
+    ],
+    [
+      "C31",
+      -0.0
+    ],
+    [
+      "C32",
+      130.0
+    ],
+    [
+      "C33",
+      -0.0
+    ],
+    [
+      "C34",
+      -0.0
+    ],
+    [
+      "C35",
+      -0.0
+    ],
+    [
+      "C36",
+      -0.0
+    ],
+    [
+      "C37",
+      -0.0
+    ],
+    [
+      "C38",
+      -0.0
+    ],
+    [
+      "C39",
+      -0.0
+    ],
+    [
+      "C40",
+      -0.0
+    ],
+    [
+      "C41",
+      -0.0
+    ],
+    [
+      "C42",
+      90.0
+    ],
+    [
+      "C43",
+      -0.0
+    ],
+    [
+      "C44",
+      -0.0
+    ],
+    [
+      "C45",
+      -0.0
+    ],
+    [
+      "C46",
+      -0.0
+    ],
+    [
+      "C47",
+      -0.0
+    ],
+    [
+      "C48",
+      -0.0
+    ],
+    [
+      "C49",
+      -0.0
+    ],
+    [
+      "C50",
+      -0.0
+    ],
+    [
+      "C51",
+      -0.0
+    ],
+    [
+      "C52",
+      110.0
+    ],
+    [
+      "C53",
+      -0.0
+    ],
+    [
+      "C54",
+      -0.0
+    ],
+    [
+      "C55",
+      -0.0
+    ],
+    [
+      "C56",
+      -0.0
+    ],
+    [
+      "C57",
+      -0.0
+    ],
+    [
+      "C58",
+      -0.0
+    ],
+    [
+      "C59",
+      -0.0
+    ],
+    [
+      "C60",
+      -0.0
+    ],
+    [
+      "C61",
+      -0.0
+    ],
+    [
+      "C62",
+      160.0
+    ],
+    [
+      "C63",
+      -0.0
+    ],
+    [
+      "C64",
+      -0.0
+    ],
+    [
+      "C65",
+      -0.0
+    ],
+    [
+      "C66",
+      -0.0
+    ],
+    [
+      "C67",
+      -0.0
+    ],
+    [
+      "C68",
+      -0.0
+    ],
+    [
+      "C69",
+      -0.0
+    ],
+    [
+      "C70",
+      -0.0
+    ],
+    [
+      "C71",
+      -0.0
+    ],
+    [
+      "C72",
+      140.0
+    ],
+    [
+      "C73",
+      -0.0
+    ],
+    [
+      "C74",
+      -0.0
+    ],
+    [
+      "C75",
+      -0.0
+    ],
+    [
+      "C76",
+      -0.0
+    ],
+    [
+      "C77",
+      -0.0
+    ],
+    [
+      "C78",
+      -0.0
+    ],
+    [
+      "C79",
+      -0.0
+    ]
+  ],
+  "final_ok": true,
+  "record_status": "completed",
+  "cache_source": "computed",
+  "classification_correct": true,
+  "solution_correct": true,
+  "seconds": 10.139,
+  "classification_source": "final_full_cache",
+  "external_case_deadline_seconds": 1800,
+  "external_deadline_exceeded": false,
+  "base_notebook_sha256": "192d99645fce9979490c71e53c89948bd6874993c4d95ff10b9c3a9a044c08b1",
+  "notebook_source_sha256": "5ddad9b79a56ba8572d74f743afee427e23d6237567f19eb1ea2dfbd1fc32a81",
+  "cache_fingerprint": "563f1d683ce2a8369c008f73bf18f2534346544a803ea4d5eebe1680a192af65",
+  "evaluated_utc": "2026-10-06T07:54:38.860601+00:00"
+}

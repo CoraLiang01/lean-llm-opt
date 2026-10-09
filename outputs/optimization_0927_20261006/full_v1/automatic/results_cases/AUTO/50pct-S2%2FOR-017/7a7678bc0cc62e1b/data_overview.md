@@ -1,0 +1,382 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C1",
+      "customer_support_ticket_count": "3",
+      "demand": "216"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C2",
+      "customer_support_ticket_count": "1",
+      "demand": "168"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C3",
+      "customer_support_ticket_count": "12",
+      "demand": "264"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C4",
+      "customer_support_ticket_count": "3",
+      "demand": "216"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C5",
+      "customer_support_ticket_count": "8",
+      "demand": "216"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C6",
+      "customer_support_ticket_count": "1",
+      "demand": "192"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C7",
+      "customer_support_ticket_count": "5",
+      "demand": "144"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C8",
+      "customer_support_ticket_count": "8",
+      "demand": "168"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C9",
+      "customer_support_ticket_count": "3",
+      "demand": "168"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/customer_demand.csv",
+    "values": {
+      "customer_id": "C10",
+      "customer_support_ticket_count": "8",
+      "demand": "168"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S1",
+      "fleet_vehicle_count": "16",
+      "supply_capacity": "288"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S2",
+      "fleet_vehicle_count": "8",
+      "supply_capacity": "288"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S3",
+      "fleet_vehicle_count": "5",
+      "supply_capacity": "264"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S4",
+      "fleet_vehicle_count": "5",
+      "supply_capacity": "264"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S5",
+      "fleet_vehicle_count": "8",
+      "supply_capacity": "216"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S6",
+      "fleet_vehicle_count": "12",
+      "supply_capacity": "216"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S7",
+      "fleet_vehicle_count": "16",
+      "supply_capacity": "168"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S8",
+      "fleet_vehicle_count": "8",
+      "supply_capacity": "216"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S9",
+      "fleet_vehicle_count": "16",
+      "supply_capacity": "240"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/supply_capacity.csv",
+    "values": {
+      "supplier_id": "S10",
+      "fleet_vehicle_count": "24",
+      "supply_capacity": "168"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "15",
+      "supplier_id": "S1",
+      "transportation_cost_to_C1": "590.3648137",
+      "transportation_cost_to_C2": "23.66917261",
+      "transportation_cost_to_C3": "88.8900587",
+      "customer_support_staff_count": "5",
+      "transportation_cost_to_C4": "497.5222881",
+      "transportation_cost_to_C5": "466.0903432",
+      "transportation_cost_to_C6": "29.02209683",
+      "annual_vehicle_inspection_count": "15",
+      "operations_region": "West",
+      "transportation_cost_to_C7": "23.67524483",
+      "transportation_cost_to_C8": "23.67776029",
+      "transportation_cost_to_C9": "0.311839491",
+      "warehouse_floor_area_sqm": "250",
+      "transportation_cost_to_C10": "58.89547392",
+      "annual_inspection_count": "6"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "15",
+      "supplier_id": "S2",
+      "transportation_cost_to_C1": "2042.0715",
+      "transportation_cost_to_C2": "2133.978484",
+      "transportation_cost_to_C3": "705.1591203",
+      "customer_support_staff_count": "16",
+      "transportation_cost_to_C4": "101.5945452",
+      "transportation_cost_to_C5": "2052.937657",
+      "transportation_cost_to_C6": "1738.754951",
+      "annual_vehicle_inspection_count": "15",
+      "operations_region": "East",
+      "transportation_cost_to_C7": "101.6109497",
+      "transportation_cost_to_C8": "101.6106217",
+      "transportation_cost_to_C9": "122.4521427",
+      "warehouse_floor_area_sqm": "250",
+      "transportation_cost_to_C10": "67.29170751",
+      "annual_inspection_count": "2"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "25",
+      "supplier_id": "S3",
+      "transportation_cost_to_C1": "22.29722216",
+      "transportation_cost_to_C2": "497.9271939",
+      "transportation_cost_to_C3": "1653.082886",
+      "customer_support_staff_count": "16",
+      "transportation_cost_to_C4": "23.68545123",
+      "transportation_cost_to_C5": "1386.080789",
+      "transportation_cost_to_C6": "26.13715281",
+      "annual_vehicle_inspection_count": "4",
+      "operations_region": "West",
+      "transportation_cost_to_C7": "497.6220483",
+      "transportation_cost_to_C8": "498.0935847",
+      "transportation_cost_to_C9": "865.3816296",
+      "warehouse_floor_area_sqm": "650",
+      "transportation_cost_to_C10": "1008.671739",
+      "annual_inspection_count": "3"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "60",
+      "supplier_id": "S4",
+      "transportation_cost_to_C1": "960.7814534",
+      "transportation_cost_to_C2": "49.12830005",
+      "transportation_cost_to_C3": "1324.238697",
+      "customer_support_staff_count": "16",
+      "transportation_cost_to_C4": "1032.209548",
+      "transportation_cost_to_C5": "0.078047254",
+      "transportation_cost_to_C6": "53.30826873",
+      "annual_vehicle_inspection_count": "4",
+      "operations_region": "West",
+      "transportation_cost_to_C7": "49.13641672",
+      "transportation_cost_to_C8": "1031.821442",
+      "transportation_cost_to_C9": "466.0049531",
+      "warehouse_floor_area_sqm": "400",
+      "transportation_cost_to_C10": "1351.818907",
+      "annual_inspection_count": "6"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "60",
+      "supplier_id": "S5",
+      "transportation_cost_to_C1": "1471.272167",
+      "transportation_cost_to_C2": "85.69560728",
+      "transportation_cost_to_C3": "38.89266824",
+      "customer_support_staff_count": "16",
+      "transportation_cost_to_C4": "1542.050036",
+      "transportation_cost_to_C5": "112.2051437",
+      "transportation_cost_to_C6": "82.37020164",
+      "annual_vehicle_inspection_count": "10",
+      "operations_region": "North",
+      "transportation_cost_to_C7": "1542.33992",
+      "transportation_cost_to_C8": "85.69238746",
+      "transportation_cost_to_C9": "1924.936077",
+      "warehouse_floor_area_sqm": "400",
+      "transportation_cost_to_C10": "1094.669596",
+      "annual_inspection_count": "2"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "25",
+      "supplier_id": "S6",
+      "transportation_cost_to_C1": "191.9058726",
+      "transportation_cost_to_C2": "158.5040103",
+      "transportation_cost_to_C3": "91.0204535",
+      "customer_support_staff_count": "5",
+      "transportation_cost_to_C4": "184.447472",
+      "transportation_cost_to_C5": "968.1467987",
+      "transportation_cost_to_C6": "284.1076062",
+      "annual_vehicle_inspection_count": "10",
+      "operations_region": "North",
+      "transportation_cost_to_C7": "8.791061588",
+      "transportation_cost_to_C8": "158.7052384",
+      "transportation_cost_to_C9": "27.94387435",
+      "warehouse_floor_area_sqm": "250",
+      "transportation_cost_to_C10": "929.8071683",
+      "annual_inspection_count": "6"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "25",
+      "supplier_id": "S7",
+      "transportation_cost_to_C1": "81.23891457",
+      "transportation_cost_to_C2": "0.374464222",
+      "transportation_cost_to_C3": "2079.466865",
+      "customer_support_staff_count": "16",
+      "transportation_cost_to_C4": "0.306567176",
+      "transportation_cost_to_C5": "1031.777296",
+      "transportation_cost_to_C6": "7.203964492",
+      "annual_vehicle_inspection_count": "4",
+      "operations_region": "West",
+      "transportation_cost_to_C7": "0.076230722",
+      "transportation_cost_to_C8": "0.03247388",
+      "transportation_cost_to_C9": "23.68582797",
+      "warehouse_floor_area_sqm": "400",
+      "transportation_cost_to_C10": "849.9799407",
+      "annual_inspection_count": "2"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "40",
+      "supplier_id": "S8",
+      "transportation_cost_to_C1": "56.09931097",
+      "transportation_cost_to_C2": "935.6143109",
+      "transportation_cost_to_C3": "73.08824617",
+      "customer_support_staff_count": "5",
+      "transportation_cost_to_C4": "52.00392409",
+      "transportation_cost_to_C5": "4.025792389",
+      "transportation_cost_to_C6": "1002.232766",
+      "annual_vehicle_inspection_count": "20",
+      "operations_region": "East",
+      "transportation_cost_to_C7": "935.776603",
+      "transportation_cost_to_C8": "935.7007252",
+      "transportation_cost_to_C9": "612.8698719",
+      "warehouse_floor_area_sqm": "1200",
+      "transportation_cost_to_C10": "1348.836615",
+      "annual_inspection_count": "2"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "60",
+      "supplier_id": "S9",
+      "transportation_cost_to_C1": "4.502283327",
+      "transportation_cost_to_C2": "0.389958534",
+      "transportation_cost_to_C3": "1782.466218",
+      "customer_support_staff_count": "8",
+      "transportation_cost_to_C4": "0.006345907",
+      "transportation_cost_to_C5": "1031.991011",
+      "transportation_cost_to_C6": "129.5066562",
+      "annual_vehicle_inspection_count": "7",
+      "operations_region": "North",
+      "transportation_cost_to_C7": "0.211831957",
+      "transportation_cost_to_C8": "0.645730107",
+      "transportation_cost_to_C9": "497.6272391",
+      "warehouse_floor_area_sqm": "250",
+      "transportation_cost_to_C10": "40.46575555",
+      "annual_inspection_count": "1"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/redundancy_complete/50pct/S2/Large-scale-or/TP_testing/TP3/transportation_costs.csv",
+    "values": {
+      "monthly_support_ticket_count": "15",
+      "supplier_id": "S10",
+      "transportation_cost_to_C1": "333.686927",
+      "transportation_cost_to_C2": "277.4719386",
+      "transportation_cost_to_C3": "86.02096892",
+      "customer_support_staff_count": "20",
+      "transportation_cost_to_C4": "277.3083661",
+      "transportation_cost_to_C5": "1004.464908",
+      "transportation_cost_to_C6": "19.95033682",
+      "annual_vehicle_inspection_count": "4",
+      "operations_region": "North",
+      "transportation_cost_to_C7": "13.20207369",
+      "transportation_cost_to_C8": "238.1432152",
+      "transportation_cost_to_C9": "411.0580332",
+      "warehouse_floor_area_sqm": "250",
+      "transportation_cost_to_C10": "941.7526366",
+      "annual_inspection_count": "1"
+    }
+  }
+]

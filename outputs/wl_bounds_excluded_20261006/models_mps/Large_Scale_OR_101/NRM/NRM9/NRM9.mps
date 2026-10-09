@@ -1,0 +1,13 @@
+* Signature: 0xd3dd9ab9835ade73
+NAME _copy
+OBJSENSE MAX
+ROWS
+ N  OBJ
+COLUMNS
+    MARKER    'MARKER'                 'INTORG'
+    x_1       OBJ       255.28
+    MARKER    'MARKER'                 'INTEND'
+RHS
+BOUNDS
+ UP BND1      x_1       3066513
+ENDATA
