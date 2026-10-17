@@ -1,0 +1,39 @@
+LEGACY_OBSERVATION = '[\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv",\n    "values": {\n      "Center": "SC1",\n      "OpeningCost": "12",\n      "CoveredDistricts": "D1;D2;D4"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv",\n    "values": {\n      "Center": "SC2",\n      "OpeningCost": "15",\n      "CoveredDistricts": "D2;D3;D5"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv",\n    "values": {\n      "Center": "SC3",\n      "OpeningCost": "18",\n      "CoveredDistricts": "D4;D5;D6"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv",\n    "values": {\n      "Center": "SC4",\n      "OpeningCost": "10",\n      "CoveredDistricts": "D6;D7"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv",\n    "values": {\n      "Center": "SC5",\n      "OpeningCost": "14",\n      "CoveredDistricts": "D7;D8;D10"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv",\n    "values": {\n      "Center": "SC6",\n      "OpeningCost": "13",\n      "CoveredDistricts": "D8;D9"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv",\n    "values": {\n      "Center": "SC7",\n      "OpeningCost": "16",\n      "CoveredDistricts": "D1;D9;D10"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv",\n    "values": {\n      "Center": "SC8",\n      "OpeningCost": "11",\n      "CoveredDistricts": "D3;D4;D8"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D1"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D2"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D3"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D4"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D5"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D6"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D7"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D8"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D9"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv",\n    "values": {\n      "District": "D10"\n    }\n  }\n]'
+LEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv', 'values': {'Center': 'SC1', 'OpeningCost': '12', 'CoveredDistricts': 'D1;D2;D4'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv', 'values': {'Center': 'SC2', 'OpeningCost': '15', 'CoveredDistricts': 'D2;D3;D5'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv', 'values': {'Center': 'SC3', 'OpeningCost': '18', 'CoveredDistricts': 'D4;D5;D6'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv', 'values': {'Center': 'SC4', 'OpeningCost': '10', 'CoveredDistricts': 'D6;D7'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv', 'values': {'Center': 'SC5', 'OpeningCost': '14', 'CoveredDistricts': 'D7;D8;D10'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv', 'values': {'Center': 'SC6', 'OpeningCost': '13', 'CoveredDistricts': 'D8;D9'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv', 'values': {'Center': 'SC7', 'OpeningCost': '16', 'CoveredDistricts': 'D1;D9;D10'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/service_centers.csv', 'values': {'Center': 'SC8', 'OpeningCost': '11', 'CoveredDistricts': 'D3;D4;D8'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D1'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D2'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D3'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D4'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D5'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D6'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D7'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D8'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D9'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/benchmark_dataset/Variant4/inputs/districts.csv', 'values': {'District': 'D10'}}]
+import gurobipy as gp
+from gurobipy import GRB
+records = LEGACY_RECORDS
+centers = []
+opening_cost = {}
+center_covers = {}
+for rec in records:
+    if rec['source'].endswith('service_centers.csv'):
+        c = rec['values']['Center']
+        centers.append(c)
+        opening_cost[c] = float(rec['values']['OpeningCost'])
+        center_covers[c] = set(rec['values']['CoveredDistricts'].split(';'))
+districts = []
+for rec in records:
+    if rec['source'].endswith('districts.csv'):
+        d = rec['values']['District']
+        districts.append(d)
+a = {}
+for i in centers:
+    for j in districts:
+        a[i, j] = 1 if j in center_covers[i] else 0
+for j in districts:
+    if not any((a[i, j] == 1 for i in centers)):
+        raise ValueError(f'District {j} is not covered by any center.')
+m = gp.Model('SetCovering')
+m.Params.MIPGap = 0.0001
+y_vars = m.addVars(centers, vtype=GRB.BINARY, name='')
+m.setObjective(gp.quicksum((opening_cost[i] * y_vars[i] for i in centers)), GRB.MINIMIZE)
+for j in districts:
+    m.addConstr(gp.quicksum((a[i, j] * y_vars[i] for i in centers)) >= 1, name=f'cover_{j}')
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for v in m.getVars():
+        print(f'{v.VarName}: {v.X}')
+else:
+    print(f'Solver status: {m.Status}')

@@ -1,0 +1,232 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "1",
+      "Capacity": "500"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "2",
+      "Capacity": "700"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "3",
+      "Capacity": "600"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "4",
+      "Capacity": "800"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "5",
+      "Capacity": "550"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "6",
+      "Capacity": "900"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "7",
+      "Capacity": "650"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "8",
+      "Capacity": "750"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "9",
+      "Capacity": "820"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/capacity.csv",
+    "values": {
+      "ShelfID": "10",
+      "Capacity": "570"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "1",
+      "Value": "50",
+      "Weight": "10"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "2",
+      "Value": "70",
+      "Weight": "20"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "3",
+      "Value": "30",
+      "Weight": "5"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "4",
+      "Value": "60",
+      "Weight": "15"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "5",
+      "Value": "80",
+      "Weight": "25"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "6",
+      "Value": "90",
+      "Weight": "30"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "7",
+      "Value": "40",
+      "Weight": "12"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "8",
+      "Value": "100",
+      "Weight": "35"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "9",
+      "Value": "55",
+      "Weight": "10"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "10",
+      "Value": "75",
+      "Weight": "20"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "11",
+      "Value": "65",
+      "Weight": "18"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "12",
+      "Value": "95",
+      "Weight": "28"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "13",
+      "Value": "45",
+      "Weight": "8"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "14",
+      "Value": "85",
+      "Weight": "22"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "15",
+      "Value": "70",
+      "Weight": "25"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "16",
+      "Value": "110",
+      "Weight": "40"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "17",
+      "Value": "50",
+      "Weight": "14"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "18",
+      "Value": "60",
+      "Weight": "16"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "19",
+      "Value": "120",
+      "Weight": "50"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA19/BigMartSalesData1/products.csv",
+    "values": {
+      "ProductName": "20",
+      "Value": "100",
+      "Weight": "30"
+    }
+  }
+]

@@ -1,0 +1,21 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/AP_testing/AP4/manager_project_costs.csv
+CSV delimiter: comma; first line consumed as header.
+Total rows: 11
+Columns: ['Manager', 'Project 1 Cost', 'Project 2 Cost', 'Project 3 Cost', 'Project 4 Cost', 'Project 5 Cost', 'Project 6 Cost', 'Project 7 Cost', 'Project 8 Cost', 'Project 9 Cost', 'Project 10 Cost', 'Project 11 Cost']
+Parsed column types: {'Manager': 'object', 'Project 1 Cost': 'int64', 'Project 2 Cost': 'int64', 'Project 3 Cost': 'int64', 'Project 4 Cost': 'int64', 'Project 5 Cost': 'int64', 'Project 6 Cost': 'int64', 'Project 7 Cost': 'int64', 'Project 8 Cost': 'int64', 'Project 9 Cost': 'int64', 'Project 10 Cost': 'int64', 'Project 11 Cost': 'int64'}
+Preview only (first 10 rows):
+   Manager Project 1 Cost Project 2 Cost Project 3 Cost Project 4 Cost Project 5 Cost Project 6 Cost Project 7 Cost Project 8 Cost Project 9 Cost Project 10 Cost Project 11 Cost
+ Manager 1            708           1948           2424           1068            729            199           1651           3174           3211            3167            1711
+ Manager 2           1700           2670           1883           2534           1429           1173            777            248           1704            2603            1822
+ Manager 3            160            755           3477           3122           2968           3023           1417            254           3175            2502            2595
+ Manager 4           2213           1008            411           1199            418           1000           3148           1724           1984            1954            1805
+ Manager 5            198           1721           1318           3194           3036           2938           3298           3332           1806             270            1893
+ Manager 6           2375           1804           3174           1607           2168           1642            970           3433           1528            2696            2217
+ Manager 7           2400            211           1172            425           1222            287            653           1466            479            2762             577
+ Manager 8            272           2574            413            202           1220           2392            410           2250           2272            3260            2981
+ Manager 9           2844           2775            357           2601           1627            125           1029           1354           2280             114            2161
+Manager 10           1222            296           3375            352           2167           2202           3139           2526            767            1873            1185
+Full-file column statistics: {"Manager": {"missing": 0, "unique_nonempty": 11}, "Project 1 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [160.0, 2844.0]}, "Project 2 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [211.0, 2775.0]}, "Project 3 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [357.0, 3477.0]}, "Project 4 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [202.0, 3194.0]}, "Project 5 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [418.0, 3036.0]}, "Project 6 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [125.0, 3023.0]}, "Project 7 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [410.0, 3298.0]}, "Project 8 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [248.0, 3433.0]}, "Project 9 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [479.0, 3211.0]}, "Project 10 Cost": {"missing": 0, "unique_nonempty": 11, "numeric_range": [114.0, 3260.0]}, "Project 11 Cost": {"missing": 0, "unique_nonempty": 10, "numeric_range": [577.0, 2981.0]}}
+Matching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.
+Counts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.
+Query-name evidence: [{"term": "manager", "matching_columns": [{"column": "Manager", "exact": 0, "prefix": 11, "contains": 11, "examples": ["Manager 1", "Manager 2", "Manager 3"]}], "exact_matching_columns": 0}, {"term": "manager_project_costs.csv", "matching_columns": [], "exact_matching_columns": 0}]

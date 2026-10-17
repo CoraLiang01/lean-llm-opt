@@ -1,0 +1,44 @@
+LEGACY_OBSERVATION = '[\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C1",\n      "demand": "83"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C2",\n      "demand": "76"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C3",\n      "demand": "91"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C4",\n      "demand": "68"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C5",\n      "demand": "104"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C6",\n      "demand": "97"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C7",\n      "demand": "88"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C8",\n      "demand": "73"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C9",\n      "demand": "109"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C10",\n      "demand": "95"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C11",\n      "demand": "82"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C12",\n      "demand": "67"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C13",\n      "demand": "113"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C14",\n      "demand": "79"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv",\n    "values": {\n      "customer": "C15",\n      "demand": "92"\n    }\n  }\n]'
+LEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C1', 'demand': '83'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C2', 'demand': '76'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C3', 'demand': '91'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C4', 'demand': '68'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C5', 'demand': '104'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C6', 'demand': '97'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C7', 'demand': '88'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C8', 'demand': '73'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C9', 'demand': '109'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C10', 'demand': '95'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C11', 'demand': '82'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C12', 'demand': '67'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C13', 'demand': '113'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C14', 'demand': '79'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP12/demand.csv', 'values': {'customer': 'C15', 'demand': '92'}}]
+from gurobipy import Model, GRB, quicksum
+
+def build_and_solve():
+    plant_ids = ['F%d' % i for i in range(1, 16)]
+    customer_ids = ['C%d' % j for j in range(1, 16)]
+    f = {'F1': 11250, 'F2': 13480, 'F3': 14870, 'F4': 10290, 'F5': 16740, 'F6': 13960, 'F7': 12680, 'F8': 17890, 'F9': 10950, 'F10': 15320, 'F11': 11830, 'F12': 14110, 'F13': 15970, 'F14': 13140, 'F15': 10580}
+    cap = {'F1': 101, 'F2': 124, 'F3': 139, 'F4': 86, 'F5': 157, 'F6': 133, 'F7': 118, 'F8': 162, 'F9': 92, 'F10': 144, 'F11': 107, 'F12': 129, 'F13': 151, 'F14': 113, 'F15': 85}
+    c = {'F1': [7.8, 7.6, 6.7, 7.9, 8.1, 8.3, 7.3, 8.2, 8.1, 8.2, 7.3, 7.7, 6.7, 7.1, 7.9], 'F2': [5.3, 6, 5, 6.4, 5.9, 6.2, 5.6, 6.1, 6.3, 6.1, 5, 5.6, 5.3, 4.9, 6.3], 'F3': [7.2, 8.1, 7.4, 8.8, 8.5, 8.7, 7.7, 8.7, 8.9, 8.5, 7.2, 7.7, 7.1, 7.6, 8.4], 'F4': [7, 7.1, 6.5, 7.9, 7.4, 7.7, 6.7, 7.9, 7.8, 7.3, 6.8, 7, 6.5, 6.7, 7.6], 'F5': [3.5, 3.8, 2.9, 4.3, 3.6, 3.9, 3.2, 4.3, 4.5, 4, 3.2, 4, 2.9, 3.4, 3.9], 'F6': [8.2, 8.6, 7.9, 9.5, 8.5, 9.3, 8.5, 9.4, 9, 9.2, 8.1, 8.7, 7.9, 8.5, 9], 'F7': [6.9, 7.6, 6.8, 8.4, 8, 8, 7.6, 8, 8.1, 7.8, 6.9, 7.1, 7, 6.9, 7.5], 'F8': [6.9, 7.8, 7.1, 8.7, 8.6, 8.2, 7.2, 7.9, 8.4, 7.9, 7, 7.4, 6.8, 7.3, 8], 'F9': [3.5, 3.8, 2.8, 4.4, 4.2, 4.8, 3.8, 5, 4.5, 4.1, 3.2, 3.7, 3.7, 3.2, 4.5], 'F10': [5.2, 6.1, 5.1, 6.3, 6.1, 6, 5.6, 6.5, 6.2, 5.9, 5.3, 6.1, 5.1, 5.2, 6.2], 'F11': [5.2, 5.5, 4.5, 6.2, 5.7, 6.1, 5.1, 5.8, 5.7, 6.2, 5.2, 5.2, 4.5, 5.1, 5.4], 'F12': [7.8, 8.7, 7.6, 9, 8.6, 9, 8.5, 9.3, 9.3, 8.4, 7.9, 8.2, 7.4, 7.6, 8.7], 'F13': [6.7, 6.6, 6.1, 7.3, 7.1, 7.5, 6.7, 8, 7.6, 7.2, 6.3, 6.9, 6.2, 6, 7.2], 'F14': [7.5, 8.6, 7.6, 8.2, 8, 7.9, 7.5, 8.7, 8.8, 8.1, 7.2, 7.3, 7, 7, 8], 'F15': [5.1, 5.8, 4.6, 5.9, 6.5, 5.9, 5.2, 7, 7.1, 5.9, 5.1, 5.8, 5.4, 4.9, 6]}
+    d = {}
+    for rec in LEGACY_RECORDS:
+        if rec['source'].endswith('demand.csv'):
+            cust = rec['values']['customer']
+            d[cust] = int(rec['values']['demand'])
+    if set(plant_ids) != set(f.keys()) or set(plant_ids) != set(cap.keys()) or set(plant_ids) != set(c.keys()):
+        raise ValueError('Plant identifiers mismatch in fixed cost, capacity, or cost data.')
+    if set(customer_ids) != set(d.keys()):
+        raise ValueError('Customer identifiers mismatch in demand data.')
+    for i in plant_ids:
+        if len(c[i]) != len(customer_ids):
+            raise ValueError(f'Cost row for {i} does not match number of customers.')
+    c_dict = {}
+    for i in plant_ids:
+        for idx, j in enumerate(customer_ids):
+            c_dict[i, j] = float(c[i][idx])
+    m = Model()
+    m.Params.MIPGap = 0.0001
+    y_vars = m.addVars(plant_ids, vtype=GRB.BINARY, lb=0, ub=1, name='')
+    x_vars = m.addVars(plant_ids, customer_ids, vtype=GRB.CONTINUOUS, lb=0, name='')
+    m.setObjective(quicksum((f[i] * y_vars[i] for i in plant_ids)) + quicksum((c_dict[i, j] * x_vars[i, j] for i in plant_ids for j in customer_ids)), GRB.MINIMIZE)
+    for j in customer_ids:
+        m.addConstr(quicksum((x_vars[i, j] for i in plant_ids)) == d[j], name='demand_%s' % j)
+    for i in plant_ids:
+        m.addConstr(quicksum((x_vars[i, j] for j in customer_ids)) <= cap[i] * y_vars[i], name='cap_%s' % i)
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(m.ObjVal)
+        for v in m.getVars():
+            print(v.VarName, v.X)
+    else:
+        print(m.Status)
+    return m
+m = build_and_solve()

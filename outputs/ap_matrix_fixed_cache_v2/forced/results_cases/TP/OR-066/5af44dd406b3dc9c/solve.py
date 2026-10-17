@@ -1,0 +1,64 @@
+LEGACY_OBSERVATION = '[\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv",\n    "values": {\n      "customer": "C1",\n      "demand": "144"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv",\n    "values": {\n      "customer": "C2",\n      "demand": "216"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv",\n    "values": {\n      "Unnamed: 0": "S1",\n      "fixed_costs": "105.97"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv",\n    "values": {\n      "Unnamed: 0": "S2",\n      "fixed_costs": "85.31"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv",\n    "values": {\n      "Unnamed: 0": "S1",\n      "C1": "2358.39",\n      "C2": "1492.08"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv",\n    "values": {\n      "Unnamed: 0": "S2",\n      "C1": "0.07000000000000001",\n      "C2": "52.32"\n    }\n  }\n]'
+LEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv', 'values': {'customer': 'C1', 'demand': '144'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/demand.csv', 'values': {'customer': 'C2', 'demand': '216'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv', 'values': {'Unnamed: 0': 'S1', 'fixed_costs': '105.97'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/fixed_cost.csv', 'values': {'Unnamed: 0': 'S2', 'fixed_costs': '85.31'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv', 'values': {'Unnamed: 0': 'S1', 'C1': '2358.39', 'C2': '1492.08'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/UFLP_testing/UFLP10/transportation_costs.csv', 'values': {'Unnamed: 0': 'S2', 'C1': '0.07000000000000001', 'C2': '52.32'}}]
+import gurobipy as gp
+from gurobipy import GRB
+suppliers = []
+customers = []
+demand = {}
+fixed_cost = {}
+transport_cost = {}
+for rec in LEGACY_RECORDS:
+    src = rec['source']
+    vals = rec['values']
+    if src.endswith('demand.csv'):
+        cust = vals['customer']
+        if cust not in customers:
+            customers.append(cust)
+        demand[cust] = float(vals['demand'])
+    elif src.endswith('fixed_cost.csv'):
+        sup = vals['Unnamed: 0']
+        if sup not in suppliers:
+            suppliers.append(sup)
+        fixed_cost[sup] = float(vals['fixed_costs'])
+    elif src.endswith('transportation_costs.csv'):
+        sup = vals['Unnamed: 0']
+        if sup not in suppliers:
+            suppliers.append(sup)
+        if sup not in transport_cost:
+            transport_cost[sup] = {}
+        for cust in customers:
+            if cust in vals:
+                transport_cost[sup][cust] = float(vals[cust])
+        if not customers:
+            for k in vals:
+                if k != 'Unnamed: 0':
+                    customers.append(k)
+                    demand[k] = None
+            for cust in customers:
+                if cust in vals:
+                    transport_cost[sup][cust] = float(vals[cust])
+for sup in suppliers:
+    if sup not in fixed_cost:
+        raise ValueError(f'Missing fixed cost for supplier {sup}')
+    if sup not in transport_cost:
+        raise ValueError(f'Missing transport cost row for supplier {sup}')
+    for cust in customers:
+        if cust not in transport_cost[sup]:
+            raise ValueError(f'Missing transport cost for supplier {sup}, customer {cust}')
+for cust in customers:
+    if cust not in demand or demand[cust] is None:
+        raise ValueError(f'Missing demand for customer {cust}')
+m = gp.Model('UFLP_Gurobi_RAG')
+y_vars = m.addVars(suppliers, vtype=GRB.BINARY, name='')
+x_vars = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='')
+m.setObjective(gp.quicksum((fixed_cost[i] * y_vars[i] for i in suppliers)) + gp.quicksum((transport_cost[i][j] * x_vars[i, j] for i in suppliers for j in customers)), GRB.MINIMIZE)
+m.addConstrs((gp.quicksum((x_vars[i, j] for i in suppliers)) == demand[j] for j in customers), name='')
+m.addConstrs((x_vars[i, j] <= demand[j] * y_vars[i] for i in suppliers for j in customers), name='')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')

@@ -1,0 +1,47 @@
+LEGACY_OBSERVATION = '[\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv",\n    "values": {\n      "Customers": "Customer1",\n      "demand": "70"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv",\n    "values": {\n      "Customers": "Customer2",\n      "demand": "80"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv",\n    "values": {\n      "Customers": "Customer3",\n      "demand": "60"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv",\n    "values": {\n      "Customers": "Customer4",\n      "demand": "90"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv",\n    "values": {\n      "Customers": "Customer5",\n      "demand": "85"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv",\n    "values": {\n      "Customers": "Customer6",\n      "demand": "95"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv",\n    "values": {\n      "Suppliers": "Supplier1",\n      "supply_capacity": "200"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv",\n    "values": {\n      "Suppliers": "Supplier2",\n      "supply_capacity": "250"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv",\n    "values": {\n      "Suppliers": "Supplier3",\n      "supply_capacity": "230"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv",\n    "values": {\n      "Suppliers": "Supplier4",\n      "supply_capacity": "220"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv",\n    "values": {\n      "Suppliers": "Supplier5",\n      "supply_capacity": "210"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv",\n    "values": {\n      "Unnamed: 0": "Supplier1",\n      "Customer1": "2",\n      "Customer2": "3",\n      "Customer3": "1",\n      "Customer4": "2",\n      "Customer5": "3",\n      "Customer6": "2"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv",\n    "values": {\n      "Unnamed: 0": "Supplier2",\n      "Customer1": "1",\n      "Customer2": "2",\n      "Customer3": "3",\n      "Customer4": "2",\n      "Customer5": "3",\n      "Customer6": "2"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv",\n    "values": {\n      "Unnamed: 0": "Supplier3",\n      "Customer1": "3",\n      "Customer2": "1",\n      "Customer3": "2",\n      "Customer4": "3",\n      "Customer5": "2",\n      "Customer6": "3"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv",\n    "values": {\n      "Unnamed: 0": "Supplier4",\n      "Customer1": "2",\n      "Customer2": "3",\n      "Customer3": "2",\n      "Customer4": "1",\n      "Customer5": "3",\n      "Customer6": "4"\n    }\n  },\n  {\n    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv",\n    "values": {\n      "Unnamed: 0": "Supplier5",\n      "Customer1": "3",\n      "Customer2": "2",\n      "Customer3": "3",\n      "Customer4": "3",\n      "Customer5": "2",\n      "Customer6": "3"\n    }\n  }\n]'
+LEGACY_RECORDS = [{'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv', 'values': {'Customers': 'Customer1', 'demand': '70'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv', 'values': {'Customers': 'Customer2', 'demand': '80'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv', 'values': {'Customers': 'Customer3', 'demand': '60'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv', 'values': {'Customers': 'Customer4', 'demand': '90'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv', 'values': {'Customers': 'Customer5', 'demand': '85'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/customer_demand.csv', 'values': {'Customers': 'Customer6', 'demand': '95'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv', 'values': {'Suppliers': 'Supplier1', 'supply_capacity': '200'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv', 'values': {'Suppliers': 'Supplier2', 'supply_capacity': '250'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv', 'values': {'Suppliers': 'Supplier3', 'supply_capacity': '230'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv', 'values': {'Suppliers': 'Supplier4', 'supply_capacity': '220'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/supply_capacity.csv', 'values': {'Suppliers': 'Supplier5', 'supply_capacity': '210'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv', 'values': {'Unnamed: 0': 'Supplier1', 'Customer1': '2', 'Customer2': '3', 'Customer3': '1', 'Customer4': '2', 'Customer5': '3', 'Customer6': '2'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv', 'values': {'Unnamed: 0': 'Supplier2', 'Customer1': '1', 'Customer2': '2', 'Customer3': '3', 'Customer4': '2', 'Customer5': '3', 'Customer6': '2'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv', 'values': {'Unnamed: 0': 'Supplier3', 'Customer1': '3', 'Customer2': '1', 'Customer3': '2', 'Customer4': '3', 'Customer5': '2', 'Customer6': '3'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv', 'values': {'Unnamed: 0': 'Supplier4', 'Customer1': '2', 'Customer2': '3', 'Customer3': '2', 'Customer4': '1', 'Customer5': '3', 'Customer6': '4'}}, {'source': '/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/TP_testing/TP8/transportation_costs.csv', 'values': {'Unnamed: 0': 'Supplier5', 'Customer1': '3', 'Customer2': '2', 'Customer3': '3', 'Customer4': '3', 'Customer5': '2', 'Customer6': '3'}}]
+import gurobipy as gp
+from gurobipy import GRB
+customer_demand = {}
+supply_capacity = {}
+transportation_cost = {}
+for rec in LEGACY_RECORDS:
+    src = rec['source']
+    vals = rec['values']
+    if src.endswith('customer_demand.csv'):
+        customer = vals['Customers']
+        demand = int(vals['demand'])
+        customer_demand[customer] = demand
+    elif src.endswith('supply_capacity.csv'):
+        supplier = vals['Suppliers']
+        capacity = int(vals['supply_capacity'])
+        supply_capacity[supplier] = capacity
+    elif src.endswith('transportation_costs.csv'):
+        supplier = vals['Unnamed: 0']
+        if supplier not in transportation_cost:
+            transportation_cost[supplier] = {}
+        for k, v in vals.items():
+            if k == 'Unnamed: 0':
+                continue
+            transportation_cost[supplier][k] = float(v)
+suppliers = list(supply_capacity.keys())
+customers = list(customer_demand.keys())
+for s in suppliers:
+    if s not in transportation_cost:
+        raise ValueError(f'Missing transportation cost row for supplier {s}')
+    for c in customers:
+        if c not in transportation_cost[s]:
+            raise ValueError(f'Missing transportation cost for supplier {s}, customer {c}')
+m = gp.Model('FreshMart_Transportation')
+x_vars = m.addVars(suppliers, customers, lb=0, vtype=GRB.CONTINUOUS, name='')
+m.setObjective(gp.quicksum((transportation_cost[s][c] * x_vars[s, c] for s in suppliers for c in customers)), GRB.MINIMIZE)
+m.addConstrs((gp.quicksum((x_vars[s, c] for s in suppliers)) == customer_demand[c] for c in customers), name='')
+m.addConstrs((gp.quicksum((x_vars[s, c] for c in customers)) <= supply_capacity[s] for s in suppliers), name='')
+m.Params.MIPGap = 0.0001
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print(f'ObjVal: {m.ObjVal}')
+    for var in m.getVars():
+        print(f'{var.VarName}: {var.X}')
+else:
+    print(f'Solver status: {m.Status}')

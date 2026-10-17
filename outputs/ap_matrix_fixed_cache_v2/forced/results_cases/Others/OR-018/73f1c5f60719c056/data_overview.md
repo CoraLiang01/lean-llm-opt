@@ -1,0 +1,21 @@
+File: /Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/NRM_testing/NRM9/Salesdata.csv
+CSV delimiter: comma; first line consumed as header.
+Total rows: 12
+Columns: ['Product Name', 'Revenue', 'Demand', 'Initial Inventory']
+Parsed column types: {'Product Name': 'object', 'Revenue': 'float64', 'Demand': 'int64', 'Initial Inventory': 'int64'}
+Preview only (first 10 rows):
+          Product Name Revenue  Demand Initial Inventory
+      Baby Food_255.28  255.28 3066513          22749210
+       Beverages_47.45   47.45 2961484          22049510
+          Cereal_205.7   205.7 2621950          19459680
+        Clothes_109.28  109.28 2660974          19754410
+       Cosmetics_437.2   437.2 2896197          21366410
+           Fruits_9.33    9.33 3169426          23410830
+      Household_668.27  668.27 2846953          20986130
+           Meat_421.89  421.89 2546972          19011970
+Office Supplies_651.21  651.21 2855686          21062780
+   Personal Care_81.73   81.73 2855360          21265920
+Full-file column statistics: {"Product Name": {"missing": 0, "unique_nonempty": 12}, "Revenue": {"missing": 0, "unique_nonempty": 12, "numeric_range": [9.33, 668.27]}, "Demand": {"missing": 0, "unique_nonempty": 12, "numeric_range": [2546972.0, 3169426.0]}, "Initial Inventory": {"missing": 0, "unique_nonempty": 12, "numeric_range": [19011970.0, 23410830.0]}}
+Matching uses casefold and collapsed/trimmed whitespace; original IDs and leading zeros are preserved.
+Counts are per column and per individual condition, not intersections. Empty matching_columns means zero matches in every column.
+Query-name evidence: [{"term": "baby", "matching_columns": [{"column": "Product Name", "exact": 0, "prefix": 1, "contains": 1, "examples": ["Baby Food_255.28"]}], "exact_matching_columns": 0}, {"term": "demand", "matching_columns": [], "exact_matching_columns": 0}, {"term": "initial inventory", "matching_columns": [], "exact_matching_columns": 0}, {"term": "revenue", "matching_columns": [], "exact_matching_columns": 0}]

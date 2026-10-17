@@ -1,0 +1,272 @@
+[
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "1",
+      "Capacity": "200"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "2",
+      "Capacity": "200"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "3",
+      "Capacity": "300"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "4",
+      "Capacity": "400"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "5",
+      "Capacity": "550"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "6",
+      "Capacity": "600"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "7",
+      "Capacity": "650"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "8",
+      "Capacity": "750"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "9",
+      "Capacity": "820"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/capacity.csv",
+    "values": {
+      "BookshelfID": "10",
+      "Capacity": "570"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "The Great Gatsby",
+      "Value": "50",
+      "Weight": "10"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "To Kill a Mockingbird",
+      "Value": "70",
+      "Weight": "20"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "1984",
+      "Value": "30",
+      "Weight": "5"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Pride and Prejudice",
+      "Value": "60",
+      "Weight": "15"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "The Catcher in the Rye",
+      "Value": "80",
+      "Weight": "25"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Moby Dick",
+      "Value": "90",
+      "Weight": "30"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Jane Eyre",
+      "Value": "40",
+      "Weight": "12"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "War and Peace",
+      "Value": "100",
+      "Weight": "35"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "The Odyssey",
+      "Value": "55",
+      "Weight": "10"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Crime and Punishment",
+      "Value": "75",
+      "Weight": "20"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "The Hobbit",
+      "Value": "65",
+      "Weight": "18"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Brave New World",
+      "Value": "95",
+      "Weight": "28"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Anna Karenina",
+      "Value": "45",
+      "Weight": "8"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Wuthering Heights",
+      "Value": "85",
+      "Weight": "22"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "The Divine Comedy",
+      "Value": "70",
+      "Weight": "25"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "The Iliad",
+      "Value": "110",
+      "Weight": "40"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Les Misérables",
+      "Value": "50",
+      "Weight": "14"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Dracula",
+      "Value": "60",
+      "Weight": "16"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Frankenstein",
+      "Value": "120",
+      "Weight": "50"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "The Brothers Karamazov",
+      "Value": "100",
+      "Weight": "30"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Don Quixote",
+      "Value": "52",
+      "Weight": "11"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "One Hundred Years of Solitude",
+      "Value": "68",
+      "Weight": "19"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Ulysses",
+      "Value": "38",
+      "Weight": "7"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "The Alchemist",
+      "Value": "58",
+      "Weight": "14"
+    }
+  },
+  {
+    "source": "/Users/cora/Documents/GitHub/lean-llm-opt/Test_Dataset/Large-scale-or/RA_testing/RA18/BooksSalesAndRatings1/products.csv",
+    "values": {
+      "ProductName": "Meditations",
+      "Value": "82",
+      "Weight": "24"
+    }
+  }
+]
