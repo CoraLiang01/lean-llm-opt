@@ -1,0 +1,148 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'Amazon runs several distribution centers that deliver essential goods daily to different customer groups. '
+          'The daily demand for each customer group is listed in “customer_demand.csv,” while the daily supply '
+          'capacity of the distribution centers is outlined in “supply_capacity.csv.” The transportation cost per unit '
+          'from each distribution center to each customer group is specified in “transportation_costs.csv.” The goal '
+          'is to decide the quantity of goods to be shipped from each distribution center to each customer group, '
+          'ensuring all demands are fulfilled without exceeding the supply capacity of any center, while minimizing '
+          'the total transportation cost.',
+ 'relationships': [],
+ 'route': 'RA',
+ 'tables': [{'columns': ['Customers', 'demand'],
+             'file_index': 0,
+             'file_name': 'customer_demand.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 8,
+             'records': [{'source_row': 0, 'values': {'Customers': 'demand1', 'demand': '9'}},
+                         {'source_row': 1, 'values': {'Customers': 'demand2', 'demand': '66'}},
+                         {'source_row': 2, 'values': {'Customers': 'demand3', 'demand': '56'}},
+                         {'source_row': 3, 'values': {'Customers': 'demand4', 'demand': '17'}},
+                         {'source_row': 4, 'values': {'Customers': 'demand5', 'demand': '43'}},
+                         {'source_row': 5, 'values': {'Customers': 'demand6', 'demand': '62'}},
+                         {'source_row': 6, 'values': {'Customers': 'demand7', 'demand': '10'}},
+                         {'source_row': 7, 'values': {'Customers': 'demand8', 'demand': '37'}}],
+             'returned_rows': 8,
+             'role': 'descriptive non-unique role',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['Supplier', 'supply_capacity'],
+             'file_index': 1,
+             'file_name': 'supply_capacity.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 8,
+             'records': [{'source_row': 0, 'values': {'Supplier': 'supplier1', 'supply_capacity': '60'}},
+                         {'source_row': 1, 'values': {'Supplier': 'supplier2', 'supply_capacity': '22'}},
+                         {'source_row': 2, 'values': {'Supplier': 'supplier3', 'supply_capacity': '16'}},
+                         {'source_row': 3, 'values': {'Supplier': 'supplier4', 'supply_capacity': '14'}},
+                         {'source_row': 4, 'values': {'Supplier': 'supplier5', 'supply_capacity': '19'}},
+                         {'source_row': 5, 'values': {'Supplier': 'supplier6', 'supply_capacity': '70'}},
+                         {'source_row': 6, 'values': {'Supplier': 'supplier7', 'supply_capacity': '60'}},
+                         {'source_row': 7, 'values': {'Supplier': 'supplier8', 'supply_capacity': '39'}}],
+             'returned_rows': 8,
+             'role': 'descriptive non-unique role',
+             'table_id': 'file_1_view_0'},
+            {'columns': ['Unnamed: 0', 'demand1', 'demand2', 'demand3', 'demand4'],
+             'file_index': 2,
+             'file_name': 'transportation_costs.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 8,
+             'records': [{'source_row': 0,
+                          'values': {'Unnamed: 0': 'supply1',
+                                     'demand1': '0.03020736643461065',
+                                     'demand2': '229.50723504640203',
+                                     'demand3': '198.62356558205792',
+                                     'demand4': '12.995050640153751'}},
+                         {'source_row': 1,
+                          'values': {'Unnamed: 0': 'supply2',
+                                     'demand1': '232.34691308087835',
+                                     'demand2': '3.6258726438627473',
+                                     'demand3': '0.28605434149404785',
+                                     'demand4': '45.73127693242935'}},
+                         {'source_row': 2,
+                          'values': {'Unnamed: 0': 'supply3',
+                                     'demand1': '11.061938334356302',
+                                     'demand2': '0.2041995326579051',
+                                     'demand3': '0.2789447278030927',
+                                     'demand4': '45.721912724349636'}},
+                         {'source_row': 3,
+                          'values': {'Unnamed: 0': 'supply4',
+                                     'demand1': '235.1794835706472',
+                                     'demand2': '43.794668963036194',
+                                     'demand3': '40.709846782945924',
+                                     'demand4': '0.07774496620087613'}},
+                         {'source_row': 4,
+                          'values': {'Unnamed: 0': 'supply5',
+                                     'demand1': '211.85808746383796',
+                                     'demand2': '47.60180876530328',
+                                     'demand3': '50.04007716193931',
+                                     'demand4': '86.14548807358399'}},
+                         {'source_row': 5,
+                          'values': {'Unnamed: 0': 'supply6',
+                                     'demand1': '6.45506633554524',
+                                     'demand2': '88.16323623354015',
+                                     'demand3': '5.047091671641611',
+                                     'demand4': '151.46120287365497'}},
+                         {'source_row': 6,
+                          'values': {'Unnamed: 0': 'supply7',
+                                     'demand1': '174.27229047340035',
+                                     'demand2': '250.58223528739327',
+                                     'demand3': '253.90413041857263',
+                                     'demand4': '16.235467318386764'}},
+                         {'source_row': 7,
+                          'values': {'Unnamed: 0': 'supply8',
+                                     'demand1': '207.87006253790491',
+                                     'demand2': '1.517168471518212',
+                                     'demand3': '24.027239288137153',
+                                     'demand4': '27.133999276450346'}}],
+             'returned_rows': 8,
+             'role': 'descriptive non-unique role',
+             'table_id': 'file_2_view_0'}],
+ 'validation': {'matrix_checks': [], 'status': 'OK'}}
+import gurobipy
+from gurobipy import GRB
+tables = CSVQA_DATA['tables']
+
+def get_table(table_id):
+    for t in tables:
+        if t.get('table_id') == table_id:
+            return t
+    raise ValueError(f'Table {table_id} not found')
+cust_table = get_table('file_0_view_0')
+customers = []
+demand = {}
+for rec in cust_table['records']:
+    cust = rec['values']['Customers']
+    customers.append(cust)
+    demand[cust] = float(rec['values']['demand'])
+sup_table = get_table('file_1_view_0')
+suppliers = []
+supply = {}
+for rec in sup_table['records']:
+    sup = rec['values']['Supplier']
+    suppliers.append(sup)
+    supply[sup] = float(rec['values']['supply_capacity'])
+cost_table = get_table('file_2_view_0')
+cost = {}
+for rec in cost_table['records']:
+    sup = rec['values']['Unnamed: 0']
+    for col, val in rec['values'].items():
+        if col.startswith('demand'):
+            cust = col
+            cost[sup, cust] = float(val)
+for sup in suppliers:
+    for cust in customers:
+        if (sup, cust) not in cost:
+            raise ValueError(f'Missing cost for supplier {sup} and customer {cust}')
+
+def solve_problem():
+    m = gurobipy.Model()
+    m.setParam('MIPGap', 1e-06)
+    keys = [(s, c) for s in suppliers for c in customers]
+    x = m.addVars(keys, lb=0, vtype=GRB.CONTINUOUS, name='')
+    m.setObjective(gurobipy.quicksum((cost[s, c] * x[s, c] for s in suppliers for c in customers)), GRB.MINIMIZE)
+    for c in customers:
+        m.addConstr(gurobipy.quicksum((x[s, c] for s in suppliers)) >= demand[c], name=f'dem_{c}')
+    for s in suppliers:
+        m.addConstr(gurobipy.quicksum((x[s, c] for c in customers)) <= supply[s], name=f'sup_{s}')
+    m.optimize()
+    return m
+m = solve_problem()
