@@ -1,0 +1,46 @@
+##### Objective Function: 
+
+$\quad \quad \min \sum_{s=1}^{24} x_{s}$
+
+##### Constraints
+
+###### 1. Coverage Constraints: 
+
+$\quad \quad \sum_{s=\max(1,t-3)}^{t} x_{s} \;\geq\; r_{t}, \quad \forall t=1,\dots,24$
+
+###### 2. Non‑negativity and Integrality Constraints: 
+
+$\quad \quad  x_{s} \in \mathbb{Z}_{\geq 0}, \quad \forall s=1,\dots,24$
+
+Where $r_{t}$ denotes the number of drivers/crew required in shift $t$ as given in the data.
+
+###### Retrieved Information
+
+{
+  "shifts": [
+    {"Shift": "1", "Time": "0:00-1:00", "Number Required": 20},
+    {"Shift": "2", "Time": "1:00-2:00", "Number Required": 18},
+    {"Shift": "3", "Time": "2:00-3:00", "Number Required": 15},
+    {"Shift": "4", "Time": "3:00-4:00", "Number Required": 15},
+    {"Shift": "5", "Time": "4:00-5:00", "Number Required": 20},
+    {"Shift": "6", "Time": "5:00-6:00", "Number Required": 30},
+    {"Shift": "7", "Time": "6:00-7:00", "Number Required": 60},
+    {"Shift": "8", "Time": "7:00-8:00", "Number Required": 70},
+    {"Shift": "9", "Time": "8:00-9:00", "Number Required": 50},
+    {"Shift": "10", "Time": "9:00-10:00", "Number Required": 55},
+    {"Shift": "11", "Time": "10:00-11:00", "Number Required": 65},
+    {"Shift": "12", "Time": "11:00-12:00", "Number Required": 75},
+    {"Shift": "13", "Time": "12:00-13:00", "Number Required": 80},
+    {"Shift": "14", "Time": "13:00-14:00", "Number Required": 70},
+    {"Shift": "15", "Time": "14:00-15:00", "Number Required": 60},
+    {"Shift": "16", "Time": "15:00-16:00", "Number Required": 55},
+    {"Shift": "17", "Time": "16:00-17:00", "Number Required": 60},
+    {"Shift": "18", "Time": "17:00-18:00", "Number Required": 75},
+    {"Shift": "19", "Time": "18:00-19:00", "Number Required": 85},
+    {"Shift": "20", "Time": "19:00-20:00", "Number Required": 70},
+    {"Shift": "21", "Time": "20:00-21:00", "Number Required": 50},
+    {"Shift": "22", "Time": "21:00-22:00", "Number Required": 40},
+    {"Shift": "23", "Time": "22:00-23:00", "Number Required": 35},
+    {"Shift": "24", "Time": "23:00-0:00", "Number Required": 25}
+  ]
+}

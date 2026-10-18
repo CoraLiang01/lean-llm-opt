@@ -1,0 +1,110 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'A pharmacy chain needs to replenish its drug inventory. The ‘products.csv’ file provides a table of '
+          'benefits associated with each drug product. There are overall stock capacity limits for pharmacy chains '
+          'detailed in the ‘capacity.csv’ file.Our objective is to decide which drugs to order each day and in what '
+          'quantities to maximise the overall benefit while adhering to the overall stock capacity. The decision '
+          'variable x_i represents the number of units of the ith drug to be ordered each day.',
+ 'relationships': [],
+ 'route': 'RA',
+ 'tables': [{'aliases': ['file_0_view_0', 'capacity.csv'],
+             'columns': ['Capacity'],
+             'file_index': 0,
+             'file_name': 'capacity.csv',
+             'filters': {'conditions': [{'column': 'Capacity',
+                                         'dtype': 'number',
+                                         'evidence': 'overall stock capacity limits',
+                                         'operator': 'eq',
+                                         'value': '520'}],
+                         'logic': 'and'},
+             'original_rows': 1,
+             'records': [{'source_row': 0, 'values': {'Capacity': '520'}}],
+             'returned_rows': 1,
+             'role': 'descriptive non-unique role',
+             'table_id': 'file_0_view_0'},
+            {'aliases': ['file_1_view_0', 'products.csv'],
+             'columns': ['ProductName', 'Value', 'Weight'],
+             'file_index': 1,
+             'file_name': 'products.csv',
+             'filters': {'conditions': [{'column': 'ProductName',
+                                         'dtype': 'string',
+                                         'evidence': 'products.csv',
+                                         'operator': 'not_null'}],
+                         'logic': 'and'},
+             'original_rows': 20,
+             'records': [{'source_row': 0, 'values': {'ProductName': 'NSAIDs', 'Value': '250', 'Weight': '913'}},
+                         {'source_row': 1,
+                          'values': {'ProductName': 'Antirheumatic Drugs', 'Value': '178', 'Weight': '754'}},
+                         {'source_row': 2,
+                          'values': {'ProductName': 'Acetic Acid Derivatives', 'Value': '313', 'Weight': '428'}},
+                         {'source_row': 3, 'values': {'ProductName': 'Antibiotics', 'Value': '301', 'Weight': '711'}},
+                         {'source_row': 4,
+                          'values': {'ProductName': 'Antiviral Drugs', 'Value': '425', 'Weight': '350'}},
+                         {'source_row': 5,
+                          'values': {'ProductName': 'Antifungal Agents', 'Value': '260', 'Weight': '159'}},
+                         {'source_row': 6,
+                          'values': {'ProductName': 'Antidepressants', 'Value': '848', 'Weight': '353'}},
+                         {'source_row': 7,
+                          'values': {'ProductName': 'Antipsychotics', 'Value': '934', 'Weight': '291'}},
+                         {'source_row': 8,
+                          'values': {'ProductName': 'Antihistamines', 'Value': '114', 'Weight': '302'}},
+                         {'source_row': 9,
+                          'values': {'ProductName': 'Corticosteroids', 'Value': '1357', 'Weight': '50'}},
+                         {'source_row': 10,
+                          'values': {'ProductName': 'Beta Blockers', 'Value': '156', 'Weight': '250'}},
+                         {'source_row': 11,
+                          'values': {'ProductName': 'Calcium Channel Blockers', 'Value': '1780', 'Weight': '178'}},
+                         {'source_row': 12,
+                          'values': {'ProductName': 'ACE Inhibitors', 'Value': '695', 'Weight': '313'}},
+                         {'source_row': 13,
+                          'values': {'ProductName': 'Angiotensin II Receptor Blockers',
+                                     'Value': '405',
+                                     'Weight': '378'}},
+                         {'source_row': 14, 'values': {'ProductName': 'Diuretics', 'Value': '320', 'Weight': '94'}},
+                         {'source_row': 15, 'values': {'ProductName': 'Statins', 'Value': '320', 'Weight': '97'}},
+                         {'source_row': 16, 'values': {'ProductName': 'Insulin', 'Value': '1357', 'Weight': '470'}},
+                         {'source_row': 17,
+                          'values': {'ProductName': 'Anticoagulants', 'Value': '1357', 'Weight': '341'}},
+                         {'source_row': 18,
+                          'values': {'ProductName': 'Antiepileptic Drugs', 'Value': '405', 'Weight': '121'}},
+                         {'source_row': 19, 'values': {'ProductName': 'Antiemetics', 'Value': '998', 'Weight': '61'}}],
+             'returned_rows': 20,
+             'role': 'descriptive non-unique role',
+             'table_id': 'file_1_view_0'}],
+ 'validation': {'matrix_checks': [], 'status': 'OK'}}
+import gurobipy as gp
+from gurobipy import GRB
+capacity_table = None
+for tbl in CSVQA_DATA['tables']:
+    if tbl.get('table_id') == 'file_0_view_0' or 'file_0_view_0' in tbl.get('aliases', []):
+        capacity_table = tbl
+        break
+capacity = int(capacity_table['records'][0]['values']['Capacity'])
+products_table = None
+for tbl in CSVQA_DATA['tables']:
+    if tbl.get('table_id') == 'file_1_view_0' or 'file_1_view_0' in tbl.get('aliases', []):
+        products_table = tbl
+        break
+product_names = []
+profits = []
+weights = []
+for rec in products_table['records']:
+    vals = rec['values']
+    product_names.append(vals['ProductName'])
+    profits.append(int(vals['Value']))
+    weights.append(int(vals['Weight']))
+m = gp.Model('pharmacy_inventory')
+m.Params.MIPGap = 1e-06
+vars = []
+for name in product_names:
+    var = m.addVar(vtype=GRB.INTEGER, lb=0)
+    vars.append(var)
+m.update()
+m.setObjective(gp.quicksum((profits[i] * vars[i] for i in range(len(vars)))), GRB.MAXIMIZE)
+m.addConstr(gp.quicksum((weights[i] * vars[i] for i in range(len(vars)))) <= capacity, 'capacity')
+m.optimize()
+if m.Status == GRB.OPTIMAL:
+    print('ObjVal:', m.ObjVal)
+    for v in m.getVars():
+        print(v.VarName, v.X)
+else:
+    print('Status:', m.Status)
