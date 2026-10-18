@@ -1,1 +1,0 @@
-{"values": {"Product Name": "Aalopuri", "Revenue": "20", "Demand": "1483", "Initial Inventory": "10440.0"}}
