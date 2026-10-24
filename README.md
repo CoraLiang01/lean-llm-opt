@@ -42,6 +42,19 @@ This repository accompanies the paper: https://papers.ssrn.com/sol3/papers.cfm?a
 
 11. **requirements.txt**  
    - Lists required Python packages.  
+#### Additional Experiments
+
+1. **Ablation_Study_gpt_oss_20b_Large-scale_RAG_Only.ipynb** and **Ablation_Study_gpt_oss_20b_Large-scale_Few-shot_Only.ipynb**
+   - Component ablations of the gpt-oss-20b workflow on the 101 Large-scale-or instances, with the same two settings as the GPT-4.1 ablations. Both settings share the automatic classifications in `outputs/ablation_gpt_oss_20b_classifications.csv` and the reference examples in `Large_Scale_Or_Files/RAG_Examples_Ablation.csv`.
+   - Results: `outputs/ablation_gpt_oss_20b_rag_only/` (82/101) and `outputs/ablation_gpt_oss_20b_few_shot_only/` (75/101).
+
+2. **fallback.ipynb**
+   - The audit-and-repair fallback: after the Primary workflow, it audits the formulation logic, the data usage and the code, repairs the first failing layer, re-executes the program in isolation and audits it again. It contains the shared definitions and a GPT-4.1 and a gpt-oss-20b backend.
+
+3. **LEAN_LLM_OPT_4.1_Large-scale_with_Fallback.ipynb** and **LEAN_LLM_OPT_gpt_oss_20b_Large-scale_with_Fallback.ipynb**
+   - Each Primary workflow followed by the fallback with the same model, run on the 36 structural variants in `benchmark_dataset`.
+   - Results: `outputs/variants_fallback_gpt41/` (33/36 to 35/36) and `outputs/variants_fallback_gpt_oss_20b/` (29/36 to 33/36).
+
 #### Installation
 Prerequisites:
 - Python 3.10 or higher

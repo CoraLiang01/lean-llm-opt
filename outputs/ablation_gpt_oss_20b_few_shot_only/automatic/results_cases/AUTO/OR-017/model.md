@@ -1,0 +1,1 @@
+The total price of all items that have a quantity of 2 is **$4,205.84**.

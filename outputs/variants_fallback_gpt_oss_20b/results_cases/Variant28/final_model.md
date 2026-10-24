@@ -1,0 +1,2 @@
+**
+The program now reads the prepared JSON file, filters items and bundles to include only authorized items, converts all usage and capacity amounts to base units (Wh, ml, minute) using the provided conversion factors, builds the Gurobi model with the correct variables and constraints—including conditional category quantity limits—and optimizes the objective. No external file access or network calls are performed.

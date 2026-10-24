@@ -1,0 +1,13 @@
+[
+  {
+    "layer": "logic",
+    "summary": "Complete program returned for logic repair",
+    "formulation": "The model is unchanged from the original formulation except for the addition of the inventory non‑negativity constraint  \n\\(I_t \\ge 0\\) for all months \\(t\\).  All other constraints, objective, and variable definitions remain the same.\n\nCODE:",
+    "code": "import pandas as pd\nimport gurobipy as gp\nfrom gurobipy import GRB\n\n# Path to the prepared inputs JSON file\nDATA_PATH = \"work/Variant1/prepared_inputs.json\"\n\ndef solve_problem():\n    # Load the prepared tables\n    data = pd.read_json(DATA_PATH, typ='series')\n    tables = {t['name']: t['rows'] for t in data['tables']}\n\n    # Extract the monthly lot‑sizing data\n    rows = tables['monthly_lot_sizing']\n    months = [row['Month'] for row in rows]\n\n    # Convert string values to numeric types\n    d_t = {}\n    c_t = {}\n    s_t = {}\n    h_t = {}\n    p_t = {}\n    for row in rows:\n        month = row['Month']\n        d_t[month] = int(row['Demand'])\n        c_t[month] = float(row['ProductionCost'])\n        s_t[month] = float(row['SetupCost'])\n        h_t[month] = float(row['HoldingCost'])\n        p_t[month] = int(row['ProductionCapacity'])\n\n    # Create the Gurobi model\n    m = gp.Model('LotSizing')\n    m.setParam('MIPGap', 1e-6)\n\n    # Decision variables\n    x = m.addVars(months, vtype=GRB.CONTINUOUS, lb=0, name='x')\n    I = m.addVars(months, vtype=GRB.CONTINUOUS, lb=0, name='I')\n    y = m.addVars(months, vtype=GRB.BINARY, name='y')\n\n    # Objective: minimize production, setup, and holding costs\n    obj = gp.quicksum(c_t[mth] * x[mth] + s_t[mth] * y[mth] + h_t[mth] * I[mth] for mth in months)\n    m.setObjective(obj, GRB.MINIMIZE)\n\n    # Inventory balance constraints\n    for idx, mth in enumerate(months):\n        if idx == 0:\n            # Initial inventory is zero\n            m.addConstr(x[mth] - I[mth] == d_t[mth], name=f'bal_{mth}')\n        else:\n            prev_mth = months[idx - 1]\n            m.addConstr(I[prev_mth] + x[mth] == d_t[mth] + I[mth], name=f'bal_{mth}')\n\n    # Production capacity / setup linking\n    for mth in months:\n        m.addConstr(x[mth] <= p_t[mth] * y[mth], name=f'cap_{mth}')\n\n    # Final inventory must be zero\n    m.addConstr(I[months[-1]] == 0, name='final_inv')\n\n    # (Inventory non‑negativity is already enforced by lb=0 on I)\n\n    # Optimize\n    m.optimize()\n\n    return m\n\n# Expose the model for inspection\nm = solve_problem()",
+    "runtime": {
+      "status": "OPTIMAL",
+      "objective": 60345.0,
+      "error": null
+    }
+  }
+]

@@ -1,0 +1,94 @@
+[
+  {
+    "code": {
+      "explanation": "The code builds variables and constraints for all items, regardless of the `authorized` flag, and attempts to access `y[prereq]` without checking existence, causing a KeyError. This allows unauthorized items to be selected and can crash the solver.",
+      "fix": "1. Filter `items` to only authorized items before creating `q`, `y`, and `z` variables.\n2. Build `usage`, `bundles`, `incompat_pairs`, and `prerequisites` only for authorized items.\n3. In the prerequisite loop, add `m.addConstr(y[i] <= y[prereq])` for all prerequisites; if `prereq` is unauthorized, enforce `y[i]==0`.\n4. Update all summations (`sum_y`, `sum_q`, resource capacity) to iterate only over authorized items.\n5. Adjust bundle and incompatibility constraints to use only authorized items.\n6. Ensure the objective includes only authorized items.\n7. Add a safety check: if a prerequisite refers to an unauthorized item, set `y[i]==0`.\n8. Remove the erroneous `if prereq in y:` guard that caused the KeyError, or replace it with the above logic.",
+      "issue": "Unauthorized items not filtered and KeyError in prerequisite handling",
+      "status": "FAIL"
+    },
+    "data": {
+      "explanation": "All tables and columns referenced in the formulation are present in the data. The data includes the `authorized` flag, unit conversions, and capacity ledger entries as required.",
+      "fix": "None",
+      "issue": "N/A",
+      "status": "PASS"
+    },
+    "first_failed_layer": "logic",
+    "format_error": null,
+    "index": 0,
+    "logic": {
+      "explanation": "The formulation does not enforce that only items with `authorized=1` can be ordered. Consequently the model may select unauthorized items, violating the problem statement.",
+      "fix": "Add a constraint `y[i]==0` for every item where `authorized==0` (or filter the `items` dictionary to include only authorized items before creating variables).",
+      "issue": "Missing authorized‑item filter",
+      "status": "FAIL"
+    }
+  },
+  {
+    "code": {
+      "explanation": "The line `CSVQA_DATA = pd.read_json(DATA_PATH, typ='series').to_dict()` attempts to read a JSON series with a key 'logical_records', which does not exist in the file. This raises a KeyError and stops execution before the model is built.",
+      "fix": "Replace the data loading block with code that matches the actual JSON format. For example:\n```python\nimport json\nwith open(DATA_PATH) as f:\n    raw = json.load(f)\n# Convert each table to a pandas DataFrame if needed\nitems_df = pd.DataFrame(raw.get('item', []))\n# Continue parsing using these DataFrames instead of the current loop.\n```\nAlso remove the `typ='series'` argument and adjust the subsequent parsing logic to iterate over the tables directly.",
+      "issue": "KeyError during data load",
+      "status": "FAIL"
+    },
+    "data": {
+      "explanation": "The code expects the prepared_inputs.json to contain a top‑level key 'logical_records' with nested records. The actual file contains a flat dictionary of tables (e.g., 'item', 'usage', 'capacity_ledger', etc.). This mismatch causes a KeyError during data loading.",
+      "fix": "Adjust the data loading routine to read the JSON as a dictionary of tables. For example:\n```python\nimport json\nwith open(DATA_PATH) as f:\n    data = json.load(f)\n# data['item'] will give the item table, etc.\n```",
+      "issue": "JSON structure mismatch",
+      "status": "FAIL"
+    },
+    "first_failed_layer": "data",
+    "format_error": null,
+    "index": 1,
+    "logic": {
+      "explanation": "The mathematical formulation correctly models the problem: it enforces authorized items, lot size bounds, category activation and quantity limits, incompatibilities, prerequisites, bundle bonuses, resource capacities, and a net benefit objective. All constraints are logically consistent with the problem statement.",
+      "fix": "",
+      "issue": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "code": {
+      "explanation": "The runtime error indicates a FORBIDDEN_CALL, which occurs when attempting to use Gurobi (or any external solver) that is not allowed in the execution sandbox. Additionally, the prerequisite logic bug is present in the code.",
+      "fix": "Replace the Gurobi model with a solver that is permitted (e.g., PuLP with CBC or OR-Tools CP-SAT). Ensure the prerequisite logic is corrected as described in the logic section. Remove or comment out all Gurobi imports and calls.",
+      "issue": "Gurobi solver call is forbidden in this environment",
+      "status": "FAIL"
+    },
+    "data": {
+      "explanation": "The JSON schema and unit conversions are consistent with the problem description. All tables are loaded, authorized items are filtered, and unit conversions are applied correctly.",
+      "fix": "",
+      "issue": "",
+      "status": "PASS"
+    },
+    "first_failed_layer": "logic",
+    "format_error": null,
+    "index": 2,
+    "logic": {
+      "explanation": "The code sets y[i] == 0 for every item that is not a key in the prerequisites dictionary. Since the dictionary only contains items that actually have a prerequisite, this unintentionally disables all items that have no prerequisite, violating the problem statement that such items should be allowed.",
+      "fix": "Remove the block that forces y[i] == 0 for items not in prerequisites. Instead, only forbid items whose prerequisite is unauthorized by checking the prerequisite’s presence in the authorized items set.",
+      "issue": "Prerequisite handling incorrectly forbids items without prerequisites",
+      "status": "FAIL"
+    }
+  },
+  {
+    "code": {
+      "explanation": "The runtime error shows that the `pulp` package is not installed, so the solver cannot be invoked. Additionally, the JSON loading logic is incorrect (see the data section). The code also imports `json` but never uses it. Without PuLP, the model cannot be built or solved.",
+      "fix": "1. Install PuLP (e.g., `pip install pulp`).\n2. Correct the JSON loading as described in the data section.\n3. Remove the unused `import json` or use it for the corrected loading.\n4. Verify that all required tables are present in the loaded JSON before building the dictionaries.",
+      "issue": "Missing PuLP module and incorrect JSON handling",
+      "status": "FAIL"
+    },
+    "data": {
+      "explanation": "The code uses `pd.read_json(DATA_PATH, typ='series')` and then accesses `data['tables']`. `pd.read_json` with `typ='series'` returns a Series, so indexing by key fails. The prepared_inputs.json is a JSON object with a top‑level key `tables`, so the correct approach is to load it as a dict (e.g., `json.load(open(DATA_PATH))`) or use `pd.read_json(DATA_PATH)` without `typ='series'`.",
+      "fix": "Replace the JSON loading block with:\n```python\nimport json\nwith open(DATA_PATH) as f:\n    data = json.load(f)\n```",
+      "issue": "JSON reading error",
+      "status": "FAIL"
+    },
+    "first_failed_layer": "data",
+    "format_error": null,
+    "index": 3,
+    "logic": {
+      "explanation": "The mathematical formulation correctly encodes the problem: quantity bounds, category activation and limits, incompatibilities, prerequisites, bundle bonuses, resource capacities, and the objective. All constraints are logically consistent with the problem statement.",
+      "fix": "",
+      "issue": "",
+      "status": "PASS"
+    }
+  }
+]

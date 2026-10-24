@@ -1,0 +1,71 @@
+[
+  {
+    "code": {
+      "explanation": "The code builds the bundle binary variables for every row in the bundle table without verifying that both items exist in the item table or are authorized. When a bundle references an item that is absent from item_params, the lookup y[a] (or w[key]) fails, causing the runtime error. Additionally, bundles containing unauthorized items are not excluded, which violates the problem requirement that an unauthorized option cannot trigger a bonus.",
+      "fix": "Filter the bundle list before creating variables:\n```\n# Keep only bundles whose both items exist and are authorized\nbundles = [b for b in bundles if b['item_a'] in item_params and b['item_b'] in item_params and item_params[b['item_a']]['authorized'] and item_params[b['item_b']]['authorized']]\n```\nThen rebuild the w dictionary using this filtered list. This ensures that all y[a] and y[b] lookups succeed and that bonuses are only considered for authorized items. Also, add a guard when creating w variables:\n```\nfor (idx, b) in enumerate(bundles):\n    key = (b['item_a'], b['item_b'])\n    w[key] = m.addVar(vtype=GRB.BINARY, name=f'w_{idx}')\n```\nFinally, update the objective and constraints to use the filtered bundles list. This resolves the KeyError and enforces the intended business logic.",
+      "issue": "KeyError: 'R7fbb3730d314' when accessing y[a] or w[key] for bundles that reference items not present in item_params.",
+      "status": "FAIL"
+    },
+    "data": {
+      "explanation": "All required tables are present and the code parses the expected columns. The unit conversions are applied once in the data preparation step, matching the transformation rules. No missing or mismatched fields are detected.",
+      "fix": "",
+      "issue": "",
+      "status": "PASS"
+    },
+    "first_failed_layer": "code",
+    "format_error": null,
+    "index": 0,
+    "logic": {
+      "explanation": "The mathematical formulation correctly captures all stated constraints: quantity bounds, category activation, incompatibility, prerequisite, bundle bonus, resource capacities, and fee/bonus accounting. The objective function aligns with the problem statement.",
+      "fix": "",
+      "issue": "",
+      "status": "PASS"
+    }
+  },
+  {
+    "code": {
+      "explanation": "Without these corrections, the solver may produce solutions that violate the problem constraints or misinterpret resource limits. The code also assumes that all tables are present and correctly formatted, which may not hold if the JSON structure changes.",
+      "fix": "1. Add a preprocessing step that converts all `usage` and `capacity_ledger` amounts to base units using the provided conversion factors. 2. Modify the category quantity constraints to be conditional on `z[c]`. 3. Ensure that the capacity constraints use the signed, converted capacity values. 4. Add error handling for missing or malformed tables. 5. Optionally, validate that all referenced items in bundles, incompatibilities, and prerequisites exist in the authorized item set before adding constraints.",
+      "issue": "The implementation lacks unit conversion, conditional category quantity constraints, and proper handling of signed capacity ledger entries. It also does not enforce that the category quantity limits apply only when the category is activated.",
+      "status": "FAIL"
+    },
+    "data": {
+      "explanation": "The problem specifies that resource usage must be compared to the signed sum of capacity ledger entries after converting all units to a common base. The current implementation ignores unit conversion and does not explicitly handle negative capacity entries, potentially leading to infeasible or suboptimal solutions.",
+      "fix": "Parse the JSON into a dictionary of tables (e.g., `data = pd.read_json(DATA_PATH, typ='series').to_dict()`), then apply the unit conversion rules to both `usage` and `capacity` tables. Sum the signed capacity amounts per resource after conversion. Ensure that the data extraction correctly handles the structure of the JSON file.",
+      "issue": "The data loading and preprocessing do not perform the required unit conversions and do not handle signed capacity ledger entries correctly. The JSON is read into a Series, but the code assumes a list of tables; if the structure differs, the extraction will fail. Moreover, the capacity ledger may contain negative entries that should reduce available capacity, but the code simply sums all amounts without considering sign or unit.",
+      "status": "FAIL"
+    },
+    "first_failed_layer": "logic",
+    "format_error": null,
+    "index": 1,
+    "logic": {
+      "explanation": "The model adds constraints `sum_q >= min_quantity` and `sum_q <= max_quantity` for every category regardless of whether any item in that category is selected. This forces the solver to satisfy the minimum quantity even when no item is chosen, which is inconsistent with the problem statement. The resource usage and capacity ledger amounts are used directly without converting to a common base unit, leading to incorrect feasibility checks.",
+      "fix": "Replace the unconditional constraints with conditional ones: `sum_q >= min_quantity * z[c]` and `sum_q <= max_quantity * z[c]`. Also, before building the capacity constraints, convert all usage amounts and capacity ledger amounts to a common unit (e.g., Wh, ml, minute) using the provided conversion factors.",
+      "issue": "Category quantity limits are enforced unconditionally, violating the requirement that minimum and maximum quantities apply only when the category is activated. Additionally, unit conversions for resources (kWh→Wh, liter→ml, hour→minute) are not applied, so capacity constraints are evaluated on mismatched units.",
+      "status": "FAIL"
+    }
+  },
+  {
+    "code": {
+      "explanation": "The Python implementation correctly loads the data, builds the Gurobi model with appropriate variable types, applies all constraints, and optimizes the objective. Runtime shows a feasible optimal solution with objective 45493 cents.",
+      "fix": "",
+      "issue": "",
+      "status": "PASS"
+    },
+    "data": {
+      "explanation": "The JSON input contains the expected tables and rows. All referenced items exist, and unit conversions are applied only once as specified. No missing or duplicate data is detected.",
+      "fix": "",
+      "issue": "",
+      "status": "PASS"
+    },
+    "first_failed_layer": "none",
+    "format_error": null,
+    "index": 2,
+    "logic": {
+      "explanation": "All objective terms, decision variables, and constraints match the problem statement. The model correctly enforces item authorization, quantity bounds, category activation and limits, incompatibilities, prerequisites, bundle bonuses, and resource capacities.",
+      "fix": "",
+      "issue": "",
+      "status": "PASS"
+    }
+  }
+]
