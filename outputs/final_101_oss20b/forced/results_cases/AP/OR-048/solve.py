@@ -1,0 +1,46 @@
+CSVQA_DATA = {'query': 'Amazon needs to allocate different types of air conditioners into different warehouse storage areas. Specifically, Amazon has several storage areas, each with a capacity limit provided in “capacity.csv.” The predefined value and size of each air conditioner type can be found in “products.csv.” The objective is to determine the optimal number of units of each air conditioner type to place in each storage area to maximize the total value of the air conditioners across all areas, while ensuring that the total size of the units in each area does not exceed its capacity. The decision variablesx_ijrepresent the number of units of air conditioner type j to be placed in storage area i.The decision variables must be integers.', 'relationships': [], 'tables': [{'columns': ['StorageID', 'Capacity'], 'file_name': 'capacity.csv', 'records': [{'data_row_number': 0, 'values': {'Capacity': '1083', 'StorageID': '1'}}, {'data_row_number': 1, 'values': {'Capacity': '1840', 'StorageID': '2'}}, {'data_row_number': 2, 'values': {'Capacity': '770', 'StorageID': '3'}}, {'data_row_number': 3, 'values': {'Capacity': '1299', 'StorageID': '4'}}, {'data_row_number': 4, 'values': {'Capacity': '1259', 'StorageID': '5'}}, {'data_row_number': 5, 'values': {'Capacity': '543', 'StorageID': '6'}}, {'data_row_number': 6, 'values': {'Capacity': '1831', 'StorageID': '7'}}, {'data_row_number': 7, 'values': {'Capacity': '855', 'StorageID': '8'}}, {'data_row_number': 8, 'values': {'Capacity': '619', 'StorageID': '9'}}, {'data_row_number': 9, 'values': {'Capacity': '637', 'StorageID': '10'}}, {'data_row_number': 10, 'values': {'Capacity': '935', 'StorageID': '11'}}, {'data_row_number': 11, 'values': {'Capacity': '626', 'StorageID': '12'}}, {'data_row_number': 12, 'values': {'Capacity': '1457', 'StorageID': '13'}}, {'data_row_number': 13, 'values': {'Capacity': '1198', 'StorageID': '14'}}, {'data_row_number': 14, 'values': {'Capacity': '837', 'StorageID': '15'}}], 'table_id': 'file_0_view_0'}, {'columns': ['ProductName', 'Value', 'Weight'], 'file_name': 'products.csv', 'records': [{'data_row_number': 0, 'values': {'ProductName': 'Window Unit', 'Value': '4811', 'Weight': '114'}}, {'data_row_number': 1, 'values': {'ProductName': 'Portable Unit', 'Value': '1130', 'Weight': '200'}}, {'data_row_number': 2, 'values': {'ProductName': 'Split System', 'Value': '1611', 'Weight': '106'}}, {'data_row_number': 3, 'values': {'ProductName': 'Ductless System', 'Value': '3368', 'Weight': '256'}}, {'data_row_number': 4, 'values': {'ProductName': 'Central AC', 'Value': '2135', 'Weight': '268'}}, {'data_row_number': 5, 'values': {'ProductName': 'Hybrid AC', 'Value': '1046', 'Weight': '185'}}, {'data_row_number': 6, 'values': {'ProductName': 'Geothermal AC', 'Value': '4030', 'Weight': '299'}}, {'data_row_number': 7, 'values': {'ProductName': 'Smart AC', 'Value': '3761', 'Weight': '131'}}, {'data_row_number': 8, 'values': {'ProductName': 'Evaporative Cooler', 'Value': '3523', 'Weight': '139'}}, {'data_row_number': 9, 'values': {'ProductName': 'Package Unit', 'Value': '1701', 'Weight': '105'}}], 'table_id': 'file_1_view_0'}]}
+import gurobipy
+from gurobipy import GRB
+
+def solve_problem():
+    tables = CSVQA_DATA['tables']
+    capacity_table = next((t for t in tables if t['table_id'] == 'file_0_view_0'))
+    product_table = next((t for t in tables if t['table_id'] == 'file_1_view_0'))
+    I = []
+    c_i = {}
+    for rec in capacity_table['records']:
+        sid = rec['values']['StorageID']
+        cap = int(rec['values']['Capacity'])
+        I.append(sid)
+        c_i[sid] = cap
+    J = []
+    v_j = {}
+    w_j = {}
+    for rec in product_table['records']:
+        pname = rec['values']['ProductName']
+        val = int(rec['values']['Value'])
+        wt = int(rec['values']['Weight'])
+        J.append(pname)
+        v_j[pname] = val
+        w_j[pname] = wt
+    for sid in I:
+        if sid not in c_i:
+            raise ValueError(f'Missing capacity for StorageID {sid}')
+    for pname in J:
+        if pname not in v_j or pname not in w_j:
+            raise ValueError(f'Missing value or weight for ProductName {pname}')
+    m = gurobipy.Model()
+    m.setParam('MIPGap', 1e-06)
+    keys = [(i, j) for i in I for j in J]
+    x_ij = m.addVars(keys, vtype=GRB.INTEGER, lb=0, name='')
+    m.setObjective(gurobipy.quicksum((v_j[j] * x_ij[i, j] for i in I for j in J)), GRB.MAXIMIZE)
+    m.addConstrs((gurobipy.quicksum((w_j[j] * x_ij[i, j] for j in J)) <= c_i[i] for i in I), name='')
+    m.optimize()
+    if m.Status == GRB.OPTIMAL:
+        print(f'ObjVal: {m.ObjVal}')
+        for var in m.getVars():
+            print(f'{var.VarName}: {var.X}')
+    else:
+        print(f'Solver status: {m.Status}')
+    return m
+m = solve_problem()

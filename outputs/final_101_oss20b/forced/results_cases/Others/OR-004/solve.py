@@ -1,0 +1,56 @@
+CSVQA_DATA = {'query': 'A retail store operates a complex supply chain to distribute products across various categories, serving customers in multiple geographic regions. The daily demand of customer groups is recorded in "customer_demand.csv", while the supply capacity of distribution centers is detailed in "supply_capacity.csv". The transportation cost per unit of goods from each distribution center to each customer group is recorded in "transportation_costs.csv". The objective is to develop an optimal fulfillment policy that determines how goods should be allocated from distribution centers to customer groups, ensuring that all demands are met without exceeding supply capacities, while minimizing the total transportation cost.', 'relationships': [], 'tables': [{'columns': ['customer', 'demand'], 'file_name': 'customer_demand.csv', 'records': [{'data_row_number': 0, 'values': {'customer': 'C1', 'demand': '52'}}, {'data_row_number': 1, 'values': {'customer': 'C2', 'demand': '80'}}, {'data_row_number': 2, 'values': {'customer': 'C3', 'demand': '392'}}, {'data_row_number': 3, 'values': {'customer': 'C4', 'demand': '103'}}, {'data_row_number': 4, 'values': {'customer': 'C5', 'demand': '32'}}, {'data_row_number': 5, 'values': {'customer': 'C6', 'demand': '1426'}}, {'data_row_number': 6, 'values': {'customer': 'C7', 'demand': '1024'}}, {'data_row_number': 7, 'values': {'customer': 'C8', 'demand': '2736'}}, {'data_row_number': 8, 'values': {'customer': 'C9', 'demand': '1129'}}, {'data_row_number': 9, 'values': {'customer': 'C10', 'demand': '676'}}, {'data_row_number': 10, 'values': {'customer': 'C11', 'demand': '2631'}}, {'data_row_number': 11, 'values': {'customer': 'C12', 'demand': '31'}}], 'table_id': 'file_0_view_0'}, {'columns': ['Unnamed: 0', 'supply_capacity'], 'file_name': 'supply_capacity.csv', 'records': [{'data_row_number': 0, 'values': {'Unnamed: 0': 'S1', 'supply_capacity': '58'}}, {'data_row_number': 1, 'values': {'Unnamed: 0': 'S2', 'supply_capacity': '32'}}, {'data_row_number': 2, 'values': {'Unnamed: 0': 'S3', 'supply_capacity': '6161'}}, {'data_row_number': 3, 'values': {'Unnamed: 0': 'S4', 'supply_capacity': '4'}}, {'data_row_number': 4, 'values': {'Unnamed: 0': 'S5', 'supply_capacity': '47'}}, {'data_row_number': 5, 'values': {'Unnamed: 0': 'S6', 'supply_capacity': '178'}}, {'data_row_number': 6, 'values': {'Unnamed: 0': 'S7', 'supply_capacity': '142'}}, {'data_row_number': 7, 'values': {'Unnamed: 0': 'S8', 'supply_capacity': '164'}}, {'data_row_number': 8, 'values': {'Unnamed: 0': 'S9', 'supply_capacity': '1011'}}, {'data_row_number': 9, 'values': {'Unnamed: 0': 'S10', 'supply_capacity': '6'}}, {'data_row_number': 10, 'values': {'Unnamed: 0': 'S11', 'supply_capacity': '7081'}}, {'data_row_number': 11, 'values': {'Unnamed: 0': 'S12', 'supply_capacity': '948'}}], 'table_id': 'file_1_view_0'}, {'columns': ['Unnamed: 0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12'], 'file_name': 'transportation_costs.csv', 'records': [{'data_row_number': 0, 'values': {'C1': '134.72882437877243', 'C10': '82.52035827662691', 'C11': '1538.830198350349', 'C12': '2320.1146477101956', 'C2': '72.30045141110347', 'C3': '37.9759927355347', 'C4': '611.84656497826', 'C5': '1650.3353902326157', 'C6': '32.97044486689555', 'C7': '34.99837373425947', 'C8': '73.25207370031997', 'C9': '165.752089835103', 'Unnamed: 0': 'S1'}}, {'data_row_number': 1, 'values': {'C1': '23.835369186583733', 'C10': '82.8115250443967', 'C11': '1702.1724763823142', 'C12': '1925.8446970545492', 'C2': '1128.6332865368709', 'C3': '187.05459590556023', 'C4': '1.6077337129635412', 'C5': '2227.7036991312493', 'C6': '72.44693148708649', 'C7': '12.60074797346823', 'C8': '1078.7729548111274', 'C9': '383.7220569377865', 'Unnamed: 0': 'S2'}}, {'data_row_number': 2, 'values': {'C1': '1138.498759622659', 'C10': '664.1846792537777', 'C11': '36.70238978444623', 'C12': '1405.0506919253128', 'C2': '231.8983422482863', 'C3': '44.1568226726957', 'C4': '962.5481640749796', 'C5': '980.1306032437444', 'C6': '1107.5157506568996', 'C7': '741.7073424442746', 'C8': '136.70204401709762', 'C9': '1182.5161115443857', 'Unnamed: 0': 'S3'}}, {'data_row_number': 3, 'values': {'C1': '1043.7562803117191', 'C10': '642.5520451224766', 'C11': '437.9556823253786', 'C12': '76.12498668603241', 'C2': '24.207016063238527', 'C3': '1120.9890438994094', 'C4': '1027.5437638768522', 'C5': '893.4457577903337', 'C6': '1244.2626779205734', 'C7': '980.0297707948428', 'C8': '513.5650272201696', 'C9': '977.6321548115833', 'Unnamed: 0': 'S4'}}, {'data_row_number': 4, 'values': {'C1': '4.939930661779214', 'C10': '1783.0865677438942', 'C11': '1619.6154655942953', 'C12': '116.08497905117572', 'C2': '1278.1815735383598', 'C3': '549.7570743190075', 'C4': '21.335474111511868', 'C5': '98.32689279702352', 'C6': '452.0903462786745', 'C7': '595.5981933612871', 'C8': '70.84029746549007', 'C9': '0.001236242263106387', 'Unnamed: 0': 'S5'}}, {'data_row_number': 5, 'values': {'C1': '2105.5398596409113', 'C10': '788.4640306393768', 'C11': '818.9532260267922', 'C12': '17.249645794282493', 'C2': '1340.9770559580859', 'C3': '2077.2747284488696', 'C4': '2202.2515396165613', 'C5': '20.5336958780729', 'C6': '2514.0983598337716', 'C7': '2393.213466538681', 'C8': '1197.765543404598', 'C9': '102.32440248566687', 'Unnamed: 0': 'S6'}}, {'data_row_number': 6, 'values': {'C1': '61.36183063260923', 'C10': '519.3858364273143', 'C11': '483.3345987058458', 'C12': '1412.7652882009972', 'C2': '113.23716964851326', 'C3': '50.231076475261865', 'C4': '1219.1951077346878', 'C5': '869.868986439361', 'C6': '58.3717723017115', 'C7': '957.3213131437595', 'C8': '168.9964798230943', 'C9': '1363.342713601386', 'Unnamed: 0': 'S7'}}, {'data_row_number': 7, 'values': {'C1': '1169.3640988900754', 'C10': '72.78392607232098', 'C11': '1479.1137195486635', 'C12': '65.87463475119084', 'C2': '1037.2170744709088', 'C3': '732.3577706907058', 'C4': '865.2255769415611', 'C5': '1510.0296187049466', 'C6': '780.853789775776', 'C7': '860.7971696230202', 'C8': '935.9126432821531', 'C9': '61.82504909829045', 'Unnamed: 0': 'S8'}}, {'data_row_number': 8, 'values': {'C1': '7.936521667214095', 'C10': '1580.7262556456867', 'C11': '1423.5615412405277', 'C12': '2000.5637996766272', 'C2': '1357.5387610434743', 'C3': '628.3001825422914', 'C4': '25.245141819018265', 'C5': '1760.0085249934855', 'C6': '604.6583535734275', 'C7': '696.677483277236', 'C8': '1586.4093183806565', 'C9': '89.68006942976479', 'Unnamed: 0': 'S9'}}, {'data_row_number': 9, 'values': {'C1': '1685.3409758586952', 'C10': '2.676413573774264', 'C11': '202.72671236450077', 'C12': '45.95308313010429', 'C2': '437.39384912973503', 'C3': '1568.8939936485654', 'C4': '1486.9268967582923', 'C5': '498.37544466423503', 'C6': '1493.3860214089566', 'C7': '70.17952878640685', 'C8': '526.999992252258', 'C9': '1527.6606596831157', 'Unnamed: 0': 'S10'}}, {'data_row_number': 10, 'values': {'C1': '937.1094078301182', 'C10': '1274.3227526636908', 'C11': '1574.7961500081667', 'C12': '1826.428257280374', 'C2': '903.0141415848653', 'C3': '264.7208998642393', 'C4': '21.823340175910644', 'C5': '1661.105486348982', 'C6': '18.59349093795307', 'C7': '372.0817876391536', 'C8': '956.6955598743717', 'C9': '42.9120185256587', 'Unnamed: 0': 'S11'}}, {'data_row_number': 11, 'values': {'C1': '1685.7576850724427', 'C10': '0.010486218015015225', 'C11': '11.1693204455916', 'C12': '963.9941814871104', 'C2': '377.3256672852414', 'C3': '1347.0162725120726', 'C4': '1737.020030508406', 'C5': '23.612177980608287', 'C6': '83.08521829288628', 'C7': '1476.1258241571823', 'C8': '530.0021927141197', 'C9': '1782.8442633270377', 'Unnamed: 0': 'S12'}}], 'table_id': 'file_2_view_0'}]}
+import gurobipy
+from gurobipy import GRB
+tables = CSVQA_DATA['tables']
+
+def get_table(table_id):
+    for t in tables:
+        if t['table_id'] == table_id:
+            return t
+    raise ValueError(f'Table {table_id} not found')
+table_demand = get_table('file_0_view_0')
+demand = {}
+for rec in table_demand['records']:
+    cust = rec['values']['customer']
+    val = float(rec['values']['demand'])
+    demand[cust] = val
+C = set(demand.keys())
+table_supply = get_table('file_1_view_0')
+supply = {}
+for rec in table_supply['records']:
+    sup = rec['values']['Unnamed: 0']
+    val = float(rec['values']['supply_capacity'])
+    supply[sup] = val
+S = set(supply.keys())
+table_cost = get_table('file_2_view_0')
+cost = {}
+for rec in table_cost['records']:
+    sup = rec['values']['Unnamed: 0']
+    for cust in C:
+        key = f'C{cust[1:]}'
+        if key not in rec['values']:
+            raise ValueError(f'Missing cost for supplier {sup} to customer {cust}')
+        cost[sup, cust] = float(rec['values'][key])
+missing_supplies = S - set(supply.keys())
+if missing_supplies:
+    raise ValueError(f'Missing supply capacity for suppliers: {missing_supplies}')
+missing_demands = C - set(demand.keys())
+if missing_demands:
+    raise ValueError(f'Missing demand for customers: {missing_demands}')
+missing_costs = [(s, c) for s in S for c in C if (s, c) not in cost]
+if missing_costs:
+    raise ValueError(f'Missing cost entries for pairs: {missing_costs}')
+
+def solve_problem():
+    m = gurobipy.Model()
+    m.setParam('MIPGap', 1e-06)
+    x = m.addVars([(s, c) for s in S for c in C], lb=0, vtype=GRB.CONTINUOUS, name='')
+    obj = gurobipy.quicksum((cost[s, c] * x[s, c] for s in S for c in C))
+    m.setObjective(obj, GRB.MINIMIZE)
+    for c in C:
+        m.addConstr(gurobipy.quicksum((x[s, c] for s in S)) == demand[c], name=f'Demand_{c}')
+    for s in S:
+        m.addConstr(gurobipy.quicksum((x[s, c] for c in C)) <= supply[s], name=f'Supply_{s}')
+    m.optimize()
+    return m
+m = solve_problem()

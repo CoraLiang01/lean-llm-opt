@@ -1,0 +1,41 @@
+CSVQA_DATA = {'query': 'Service centres need to be opened at ten candidate locations SC1–SC10 to serve fifteen customers C1–C15. Each centre has a fixed opening cost, and the cost of serving a customer depends on which centre is chosen. The goal is to minimise the sum of all fixed opening costs and customer–centre service costs while ensuring that every customer is served.\n    service_centers_fixed_costs.csv gives the fixed opening cost for each centre SC1–SC10. expanded_customer_service_costs.csv gives the per-customer service cost from each centre. Row “Customer” is C1–C15; each SC column contains the cost to serve that customer from that centre.\n    Requirements is that, every customer must be assigned to exactly one service centre. A customer may be assigned only to a centre that is opened. And each opened centre may serve at most 4 customers. Your decision is to choose open or not open each centre and assign each customer to exactly one opened centre, so that to minimise total cost = sum of fixed opening costs for all opened centres + sum of service costs for all customer–centre assignments using the costs in the two CSV files named above.', 'relationships': [], 'tables': [{'columns': ['Customer', 'SC1', 'SC2', 'SC3', 'SC4', 'SC5', 'SC6', 'SC7', 'SC8', 'SC9', 'SC10'], 'file_name': 'expanded_customer_service_costs.csv', 'records': [{'data_row_number': 0, 'values': {'Customer': 'C1', 'SC1': '15.1', 'SC10': '17.3', 'SC2': '21.2', 'SC3': '14.9', 'SC4': '18.8', 'SC5': '22.9', 'SC6': '16.8', 'SC7': '16.5', 'SC8': '9.4', 'SC9': '16.1'}}, {'data_row_number': 1, 'values': {'Customer': 'C2', 'SC1': '13.4', 'SC10': '11.7', 'SC2': '16.3', 'SC3': '20.2', 'SC4': '19.6', 'SC5': '20.9', 'SC6': '22.1', 'SC7': '16.9', 'SC8': '9.4', 'SC9': '13.8'}}, {'data_row_number': 2, 'values': {'Customer': 'C3', 'SC1': '15.2', 'SC10': '20.4', 'SC2': '18.8', 'SC3': '14.7', 'SC4': '21.7', 'SC5': '18.1', 'SC6': '18.6', 'SC7': '12.3', 'SC8': '11.2', 'SC9': '11.9'}}, {'data_row_number': 3, 'values': {'Customer': 'C4', 'SC1': '16.8', 'SC10': '22.2', 'SC2': '19.1', 'SC3': '18.3', 'SC4': '18.8', 'SC5': '23.1', 'SC6': '15.7', 'SC7': '13.1', 'SC8': '8.6', 'SC9': '15.6'}}, {'data_row_number': 4, 'values': {'Customer': 'C5', 'SC1': '13.4', 'SC10': '18.2', 'SC2': '18.6', 'SC3': '20.8', 'SC4': '19.8', 'SC5': '22.1', 'SC6': '18.1', 'SC7': '16.7', 'SC8': '12.1', 'SC9': '11.4'}}, {'data_row_number': 5, 'values': {'Customer': 'C6', 'SC1': '12.5', 'SC10': '14.6', 'SC2': '22.5', 'SC3': '15.5', 'SC4': '14.9', 'SC5': '21.6', 'SC6': '21.3', 'SC7': '16.1', 'SC8': '10.7', 'SC9': '11.9'}}, {'data_row_number': 6, 'values': {'Customer': 'C7', 'SC1': '12.1', 'SC10': '18.7', 'SC2': '17.1', 'SC3': '19.8', 'SC4': '18.6', 'SC5': '22.1', 'SC6': '20.7', 'SC7': '20.5', 'SC8': '12.2', 'SC9': '15.4'}}, {'data_row_number': 7, 'values': {'Customer': 'C8', 'SC1': '12.3', 'SC10': '20.1', 'SC2': '15.7', 'SC3': '17.9', 'SC4': '21.3', 'SC5': '22.7', 'SC6': '15.3', 'SC7': '16.6', 'SC8': '11.4', 'SC9': '14.1'}}, {'data_row_number': 8, 'values': {'Customer': 'C9', 'SC1': '16.3', 'SC10': '19.1', 'SC2': '21.3', 'SC3': '17.6', 'SC4': '20.8', 'SC5': '21.8', 'SC6': '17.2', 'SC7': '15.5', 'SC8': '12.6', 'SC9': '19.9'}}, {'data_row_number': 9, 'values': {'Customer': 'C10', 'SC1': '12.1', 'SC10': '17.4', 'SC2': '18.7', 'SC3': '14.4', 'SC4': '20.1', 'SC5': '22.7', 'SC6': '14.1', 'SC7': '18.1', 'SC8': '11.4', 'SC9': '18.1'}}, {'data_row_number': 10, 'values': {'Customer': 'C11', 'SC1': '16.7', 'SC10': '16.1', 'SC2': '18.7', 'SC3': '15.7', 'SC4': '19.9', 'SC5': '24.2', 'SC6': '18.7', 'SC7': '14.2', 'SC8': '13.1', 'SC9': '14.7'}}, {'data_row_number': 11, 'values': {'Customer': 'C12', 'SC1': '11.3', 'SC10': '17.8', 'SC2': '23.8', 'SC3': '15.5', 'SC4': '17.3', 'SC5': '23.2', 'SC6': '17.7', 'SC7': '16.8', 'SC8': '14.5', 'SC9': '15.8'}}, {'data_row_number': 12, 'values': {'Customer': 'C13', 'SC1': '15.1', 'SC10': '13.9', 'SC2': '20.5', 'SC3': '15.1', 'SC4': '18.4', 'SC5': '20.6', 'SC6': '17.9', 'SC7': '14.5', 'SC8': '8.5', 'SC9': '14.9'}}, {'data_row_number': 13, 'values': {'Customer': 'C14', 'SC1': '8.3', 'SC10': '15.1', 'SC2': '20.7', 'SC3': '14.7', 'SC4': '20.4', 'SC5': '20.6', 'SC6': '14.8', 'SC7': '14.2', 'SC8': '11.5', 'SC9': '14.1'}}, {'data_row_number': 14, 'values': {'Customer': 'C15', 'SC1': '12.1', 'SC10': '18.7', 'SC2': '16.3', 'SC3': '16.4', 'SC4': '15.1', 'SC5': '21.3', 'SC6': '19.1', 'SC7': '19.5', 'SC8': '16.7', 'SC9': '11.1'}}], 'table_id': 'file_0_view_0'}, {'columns': ['Service Center', 'Fixed Opening Cost'], 'file_name': 'service_centers_fixed_costs.csv', 'records': [{'data_row_number': 0, 'values': {'Fixed Opening Cost': '385.1', 'Service Center': 'SC1'}}, {'data_row_number': 1, 'values': {'Fixed Opening Cost': '546.3', 'Service Center': 'SC2'}}, {'data_row_number': 2, 'values': {'Fixed Opening Cost': '485.2', 'Service Center': 'SC3'}}, {'data_row_number': 3, 'values': {'Fixed Opening Cost': '448.1', 'Service Center': 'SC4'}}, {'data_row_number': 4, 'values': {'Fixed Opening Cost': '324.1', 'Service Center': 'SC5'}}, {'data_row_number': 5, 'values': {'Fixed Opening Cost': '323.9', 'Service Center': 'SC6'}}, {'data_row_number': 6, 'values': {'Fixed Opening Cost': '296.5', 'Service Center': 'SC7'}}, {'data_row_number': 7, 'values': {'Fixed Opening Cost': '522.7', 'Service Center': 'SC8'}}, {'data_row_number': 8, 'values': {'Fixed Opening Cost': '448.7', 'Service Center': 'SC9'}}, {'data_row_number': 9, 'values': {'Fixed Opening Cost': '478.7', 'Service Center': 'SC10'}}], 'table_id': 'file_1_view_0'}]}
+import gurobipy
+from gurobipy import GRB
+
+def solve_problem():
+    tables = CSVQA_DATA['tables']
+    fixed_table = next((t for t in tables if t['table_id'] == 'file_1_view_0'))
+    cost_table = next((t for t in tables if t['table_id'] == 'file_0_view_0'))
+    S = [rec['values']['Service Center'] for rec in fixed_table['records']]
+    C = [rec['values']['Customer'] for rec in cost_table['records']]
+    f_s = {}
+    for rec in fixed_table['records']:
+        s = rec['values']['Service Center']
+        f_s[s] = float(rec['values']['Fixed Opening Cost'])
+    c_s_c = {}
+    for rec in cost_table['records']:
+        c = rec['values']['Customer']
+        for s in S:
+            key = f'SC{s[-1]}' if s.startswith('SC') else s
+            if key not in rec['values']:
+                raise ValueError(f'Missing cost for customer {c} at centre {s}')
+            c_s_c[s, c] = float(rec['values'][key])
+    for s in S:
+        if s not in f_s:
+            raise ValueError(f'Missing fixed cost for centre {s}')
+    for c in C:
+        for s in S:
+            if (s, c) not in c_s_c:
+                raise ValueError(f'Missing service cost for centre {s} and customer {c}')
+    m = gurobipy.Model('ServiceCenterAssignment')
+    m.setParam('MIPGap', 1e-06)
+    y = m.addVars(S, vtype=GRB.BINARY, name='')
+    x = m.addVars([(s, c) for s in S for c in C], vtype=GRB.BINARY, name='')
+    obj = gurobipy.quicksum((f_s[s] * y[s] for s in S)) + gurobipy.quicksum((c_s_c[s, c] * x[s, c] for s in S for c in C))
+    m.setObjective(obj, GRB.MINIMIZE)
+    m.addConstrs((gurobipy.quicksum((x[s, c] for s in S)) == 1 for c in C), name='')
+    m.addConstrs((x[s, c] <= y[s] for s in S for c in C), name='')
+    m.addConstrs((gurobipy.quicksum((x[s, c] for c in C)) <= 4 * y[s] for s in S), name='')
+    m.optimize()
+    return m
+m = solve_problem()

@@ -1,0 +1,55 @@
+CSVQA_DATA = {'query': 'Amazon runs several distribution centers that deliver essential goods daily to different customer groups. The daily demand for each customer group is listed in “customer_demand.csv,” while the daily supply capacity of the distribution centers is outlined in “supply_capacity.csv.” The transportation cost per unit from each distribution center to each customer group is specified in “transportation_costs.csv.” The goal is to decide the quantity of goods to be shipped from each distribution center to each customer group, ensuring all demands are fulfilled without exceeding the supply capacity of any center, while minimizing the total transportation cost.', 'relationships': [], 'tables': [{'columns': ['Customers', 'demand'], 'file_name': 'customer_demand.csv', 'records': [{'data_row_number': 0, 'values': {'Customers': 'demand1', 'demand': '9'}}, {'data_row_number': 1, 'values': {'Customers': 'demand2', 'demand': '66'}}, {'data_row_number': 2, 'values': {'Customers': 'demand3', 'demand': '56'}}, {'data_row_number': 3, 'values': {'Customers': 'demand4', 'demand': '17'}}, {'data_row_number': 4, 'values': {'Customers': 'demand5', 'demand': '43'}}, {'data_row_number': 5, 'values': {'Customers': 'demand6', 'demand': '62'}}, {'data_row_number': 6, 'values': {'Customers': 'demand7', 'demand': '10'}}, {'data_row_number': 7, 'values': {'Customers': 'demand8', 'demand': '37'}}], 'table_id': 'file_0_view_0'}, {'columns': ['Supplier', 'supply_capacity'], 'file_name': 'supply_capacity.csv', 'records': [{'data_row_number': 0, 'values': {'Supplier': 'supplier1', 'supply_capacity': '60'}}, {'data_row_number': 1, 'values': {'Supplier': 'supplier2', 'supply_capacity': '22'}}, {'data_row_number': 2, 'values': {'Supplier': 'supplier3', 'supply_capacity': '16'}}, {'data_row_number': 3, 'values': {'Supplier': 'supplier4', 'supply_capacity': '14'}}, {'data_row_number': 4, 'values': {'Supplier': 'supplier5', 'supply_capacity': '19'}}, {'data_row_number': 5, 'values': {'Supplier': 'supplier6', 'supply_capacity': '70'}}, {'data_row_number': 6, 'values': {'Supplier': 'supplier7', 'supply_capacity': '60'}}, {'data_row_number': 7, 'values': {'Supplier': 'supplier8', 'supply_capacity': '39'}}], 'table_id': 'file_1_view_0'}, {'columns': ['Unnamed: 0', 'demand1', 'demand2', 'demand3', 'demand4'], 'file_name': 'transportation_costs.csv', 'records': [{'data_row_number': 0, 'values': {'Unnamed: 0': 'supply1', 'demand1': '0.03020736643461065', 'demand2': '229.50723504640203', 'demand3': '198.62356558205792', 'demand4': '12.995050640153751'}}, {'data_row_number': 1, 'values': {'Unnamed: 0': 'supply2', 'demand1': '232.34691308087835', 'demand2': '3.6258726438627473', 'demand3': '0.28605434149404785', 'demand4': '45.73127693242935'}}, {'data_row_number': 2, 'values': {'Unnamed: 0': 'supply3', 'demand1': '11.061938334356302', 'demand2': '0.2041995326579051', 'demand3': '0.2789447278030927', 'demand4': '45.721912724349636'}}, {'data_row_number': 3, 'values': {'Unnamed: 0': 'supply4', 'demand1': '235.1794835706472', 'demand2': '43.794668963036194', 'demand3': '40.709846782945924', 'demand4': '0.07774496620087613'}}, {'data_row_number': 4, 'values': {'Unnamed: 0': 'supply5', 'demand1': '211.85808746383796', 'demand2': '47.60180876530328', 'demand3': '50.04007716193931', 'demand4': '86.14548807358399'}}, {'data_row_number': 5, 'values': {'Unnamed: 0': 'supply6', 'demand1': '6.45506633554524', 'demand2': '88.16323623354015', 'demand3': '5.047091671641611', 'demand4': '151.46120287365497'}}, {'data_row_number': 6, 'values': {'Unnamed: 0': 'supply7', 'demand1': '174.27229047340035', 'demand2': '250.58223528739327', 'demand3': '253.90413041857263', 'demand4': '16.235467318386764'}}, {'data_row_number': 7, 'values': {'Unnamed: 0': 'supply8', 'demand1': '207.87006253790491', 'demand2': '1.517168471518212', 'demand3': '24.027239288137153', 'demand4': '27.133999276450346'}}], 'table_id': 'file_2_view_0'}]}
+import gurobipy
+from gurobipy import GRB
+
+def solve_problem():
+    tables = CSVQA_DATA['tables']
+    demand_table = next((t for t in tables if t['table_id'] == 'file_0_view_0'))
+    supply_table = next((t for t in tables if t['table_id'] == 'file_1_view_0'))
+    cost_table = next((t for t in tables if t['table_id'] == 'file_2_view_0'))
+    demand_dict = {}
+    for rec in demand_table['records']:
+        cust = rec['values']['Customers']
+        val = rec['values']['demand']
+        try:
+            demand_dict[cust] = int(val)
+        except ValueError:
+            raise ValueError(f'Invalid demand value for {cust}: {val}')
+    supply_dict = {}
+    for rec in supply_table['records']:
+        sup = rec['values']['Supplier']
+        val = rec['values']['supply_capacity']
+        try:
+            supply_dict[sup] = int(val)
+        except ValueError:
+            raise ValueError(f'Invalid supply capacity for {sup}: {val}')
+    cost_dict = {}
+    cost_columns = [col for col in cost_table['columns'] if col != 'Unnamed: 0']
+    for rec in cost_table['records']:
+        sup = rec['values']['Unnamed: 0']
+        for cust in cost_columns:
+            val = rec['values'][cust]
+            try:
+                cost = float(val)
+            except ValueError:
+                raise ValueError(f'Invalid cost value for {sup}->{cust}: {val}')
+            cost_dict[sup, cust] = cost
+    S = {s for s, _ in cost_dict.keys()}
+    C = {c for _, c in cost_dict.keys()}
+    for s in S:
+        if s not in supply_dict:
+            raise ValueError(f'Supply capacity missing for supplier {s}')
+    for c in C:
+        if c not in demand_dict:
+            raise ValueError(f'Demand missing for customer {c}')
+    m = gurobipy.Model()
+    m.setParam('MIPGap', 1e-06)
+    x = m.addVars([(s, c) for s in S for c in C], vtype=GRB.INTEGER, lb=0, name='')
+    m.setObjective(gurobipy.quicksum((cost_dict[s, c] * x[s, c] for s in S for c in C)), GRB.MINIMIZE)
+    for s in S:
+        m.addConstr(gurobipy.quicksum((x[s, c] for c in C)) <= supply_dict[s], name=f'supply_{s}')
+    for c in C:
+        m.addConstr(gurobipy.quicksum((x[s, c] for s in S)) >= demand_dict[c], name=f'demand_{c}')
+    m.optimize()
+    return m
+m = solve_problem()

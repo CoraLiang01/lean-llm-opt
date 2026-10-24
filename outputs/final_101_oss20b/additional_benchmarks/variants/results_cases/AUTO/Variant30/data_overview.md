@@ -1,0 +1,27455 @@
+{
+  "logical_records": {
+    "benefit": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "680",
+          "component": "item6_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "benefit:0012",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-20",
+          "component": "item13_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "benefit:0027",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "968",
+          "component": "item12_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "benefit:0024",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-18",
+          "component": "item31_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "benefit:0063",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "684",
+          "component": "item18_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "benefit:0036",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9034",
+          "component": "item27_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "benefit:0054",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-37",
+          "component": "item19_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "benefit:0039",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-5",
+          "component": "item22_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "benefit:0045",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "420",
+          "component": "item21_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "benefit:0042",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1043",
+          "component": "item9_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "benefit:0018",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "673",
+          "component": "item6_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "benefit:0012",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-5",
+          "component": "item10_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "benefit:0021",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-20",
+          "component": "item16_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "benefit:0033",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "2",
+          "component": "item10_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "benefit:0021",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "417",
+          "component": "item21_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "benefit:0042",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1093",
+          "component": "item3_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "benefit:0006",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-18",
+          "component": "item31_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "benefit:0063",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1358",
+          "component": "item20_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "benefit:0040",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "668",
+          "component": "item0_base",
+          "effective_date": "2026-03-23",
+          "item_ref": "R6007124a9f06",
+          "record_id": "benefit:0000",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "0",
+          "component": "item28_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "benefit:0057",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-24",
+          "component": "item25_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "benefit:0051",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9004",
+          "component": "item15_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "benefit:0030",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "14",
+          "component": "item22_rebate",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "benefit:0045",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-20",
+          "component": "item16_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "benefit:0033",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-7",
+          "component": "item28_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "benefit:0057",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-5",
+          "component": "item4_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "benefit:0009",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1224",
+          "component": "item30_base",
+          "effective_date": "2026-03-23",
+          "item_ref": "R30896725a0ac",
+          "record_id": "benefit:0060",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "691",
+          "component": "item18_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "benefit:0036",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-7",
+          "component": "item1_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "benefit:0003",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1186",
+          "component": "item14_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "benefit:0028",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "965",
+          "component": "item12_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "benefit:0024",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "649",
+          "component": "item0_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "benefit:0000",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "649",
+          "component": "item0_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "benefit:0000",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1215",
+          "component": "item8_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "benefit:0016",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-44",
+          "component": "item19_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "benefit:0039",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "857",
+          "component": "item26_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "benefit:0052",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "417",
+          "component": "item21_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "benefit:0042",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1036",
+          "component": "item9_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "benefit:0018",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9040",
+          "component": "item24_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "benefit:0048",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9004",
+          "component": "item15_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "benefit:0030",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "2",
+          "component": "item22_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "benefit:0045",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-7",
+          "component": "item7_rebate",
+          "effective_date": "2026-03-23",
+          "item_ref": "R1820116348cd",
+          "record_id": "benefit:0015",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-19",
+          "component": "item7_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "benefit:0015",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1120",
+          "component": "item2_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "benefit:0004",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-20",
+          "component": "item13_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "benefit:0027",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 45,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1212",
+          "component": "item30_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "benefit:0060",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 46,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9037",
+          "component": "item27_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "benefit:0054",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 47,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-31",
+          "component": "item25_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "benefit:0051",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 48,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1205",
+          "component": "item30_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "benefit:0060",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 49,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "656",
+          "component": "item0_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "benefit:0000",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 50,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-18",
+          "component": "item31_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "benefit:0063",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 51,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9004",
+          "component": "item15_base",
+          "effective_date": "2026-03-23",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "benefit:0030",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 52,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-5",
+          "component": "item10_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "benefit:0021",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 53,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-26",
+          "component": "item7_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "benefit:0015",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 54,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1093",
+          "component": "item3_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "benefit:0006",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 55,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "0",
+          "component": "item1_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "benefit:0003",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 56,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-8",
+          "component": "item4_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "benefit:0009",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 57,
+        "table_id": "file_4_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9033",
+          "component": "item24_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "benefit:0048",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1120",
+          "component": "item2_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "benefit:0004",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-4",
+          "component": "item12_rebate",
+          "effective_date": "2026-03-23",
+          "item_ref": "R665d41e9e962",
+          "record_id": "benefit:0025",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-23",
+          "component": "item6_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "benefit:0013",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-34",
+          "component": "item27_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "benefit:0055",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1186",
+          "component": "item14_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "benefit:0028",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-33",
+          "component": "item24_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "benefit:0049",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-26",
+          "component": "item0_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "benefit:0001",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1213",
+          "component": "item5_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "benefit:0010",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-37",
+          "component": "item30_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "benefit:0061",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1215",
+          "component": "item8_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "benefit:0016",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-1",
+          "component": "item15_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "benefit:0031",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-49",
+          "component": "item9_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "benefit:0019",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "349",
+          "component": "item29_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "benefit:0058",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-29",
+          "component": "item18_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "benefit:0037",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1127",
+          "component": "item2_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "benefit:0004",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1358",
+          "component": "item20_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "benefit:0040",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "860",
+          "component": "item26_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "benefit:0052",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1186",
+          "component": "item14_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "benefit:0028",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "649",
+          "component": "item0_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "benefit:withdrawn",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "857",
+          "component": "item26_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "benefit:0052",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "454",
+          "component": "item28_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "benefit:0056",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "349",
+          "component": "item29_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "benefit:0058",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-44",
+          "component": "item30_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "benefit:0061",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-34",
+          "component": "item27_rebate",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "benefit:0055",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1306",
+          "component": "item11_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "benefit:0022",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1377",
+          "component": "item20_base",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "benefit:0040",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-29",
+          "component": "item18_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "benefit:0037",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-25",
+          "component": "item3_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "benefit:0007",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-25",
+          "component": "item3_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "benefit:0007",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-43",
+          "component": "item21_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "benefit:0043",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-4",
+          "component": "item15_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "benefit:0031",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-26",
+          "component": "item0_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "benefit:0001",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "506",
+          "component": "item17_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "benefit:0034",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "411",
+          "component": "item10_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "benefit:0020",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1032",
+          "component": "item22_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "benefit:0044",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-26",
+          "component": "item24_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "benefit:0049",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9031",
+          "component": "item23_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "benefit:0046",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-23",
+          "component": "item6_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "benefit:0013",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1189",
+          "component": "item14_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "benefit:0028",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9038",
+          "component": "item23_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "benefit:0046",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1303",
+          "component": "item11_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "benefit:0022",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-22",
+          "component": "item3_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "benefit:0007",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1222",
+          "component": "item8_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "benefit:0016",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1597",
+          "component": "item16_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "benefit:0032",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-33",
+          "component": "item24_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "benefit:0049",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 45,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-4",
+          "component": "item12_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "benefit:0025",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 46,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-34",
+          "component": "item27_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "benefit:0055",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 47,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-49",
+          "component": "item9_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "benefit:0019",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 48,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1365",
+          "component": "item20_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "benefit:0040",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 49,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1301",
+          "component": "item4_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "benefit:0008",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 50,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1210",
+          "component": "item5_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "benefit:0010",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 51,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "DELETE",
+          "amount_cents": "",
+          "component": "",
+          "effective_date": "2026-03-02",
+          "item_ref": "",
+          "record_id": "benefit:withdrawn",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 52,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1219",
+          "component": "item5_base",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "benefit:0010",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 53,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-43",
+          "component": "item21_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "benefit:0043",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 54,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "506",
+          "component": "item17_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "benefit:0034",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 55,
+        "table_id": "file_11_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-4",
+          "component": "item12_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "benefit:0025",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1301",
+          "component": "item4_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "benefit:0008",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-22",
+          "component": "item14_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "benefit:0029",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-28",
+          "component": "item23_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "benefit:0047",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-24",
+          "component": "item17_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "benefit:0035",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "420",
+          "component": "item10_base",
+          "effective_date": "2026-03-23",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "benefit:0020",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-7",
+          "component": "item20_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "benefit:0041",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-31",
+          "component": "item23_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "benefit:0047",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "504",
+          "component": "item7_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "benefit:0014",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "504",
+          "component": "item7_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "benefit:0014",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1622",
+          "component": "item13_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "benefit:0026",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "9033",
+          "component": "item24_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "benefit:0048",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "504",
+          "component": "item7_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "benefit:0014",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1308",
+          "component": "item4_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "benefit:0008",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1002",
+          "component": "item31_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "benefit:0062",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1002",
+          "component": "item31_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "benefit:0062",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "454",
+          "component": "item28_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "benefit:0056",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-29",
+          "component": "item29_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "benefit:0059",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-30",
+          "component": "item5_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "benefit:0011",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "707",
+          "component": "item1_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "benefit:0002",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1597",
+          "component": "item16_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "benefit:0032",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-30",
+          "component": "item5_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "benefit:0011",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-5",
+          "component": "item17_rebate",
+          "effective_date": "2026-03-23",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "benefit:0035",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-7",
+          "component": "item26_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "benefit:0053",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1035",
+          "component": "item22_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "benefit:0044",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1055",
+          "component": "item25_base",
+          "effective_date": "2026-03-23",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "benefit:0050",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-6",
+          "component": "item2_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "benefit:0005",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "633",
+          "component": "item19_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "benefit:0038",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "704",
+          "component": "item1_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "benefit:0002",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "454",
+          "component": "item28_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "benefit:0056",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "649",
+          "component": "item0_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "benefit:0000",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "630",
+          "component": "item19_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "benefit:0038",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "965",
+          "component": "item12_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "benefit:0024",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1205",
+          "component": "item30_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "benefit:0060",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-7",
+          "component": "item20_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "benefit:0041",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "454",
+          "component": "item28_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "benefit:0056",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-17",
+          "component": "item17_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "benefit:0035",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1",
+          "component": "item8_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "benefit:0017",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "414",
+          "component": "item10_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "benefit:0020",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "411",
+          "component": "item10_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "benefit:0020",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1597",
+          "component": "item16_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "benefit:0032",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-36",
+          "component": "item29_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "benefit:0059",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-6",
+          "component": "item2_rebate",
+          "effective_date": "2026-03-23",
+          "item_ref": "R1218064667a2",
+          "record_id": "benefit:0005",
+          "revision": "3",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-50",
+          "component": "item11_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "benefit:0023",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1615",
+          "component": "item13_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "benefit:0026",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-22",
+          "component": "item14_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "benefit:0029",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 45,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-7",
+          "component": "item26_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "benefit:0053",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 46,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1036",
+          "component": "item25_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "benefit:0050",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 47,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-24",
+          "component": "item17_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "benefit:0035",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 48,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1043",
+          "component": "item25_base",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "benefit:0050",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 49,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "684",
+          "component": "item18_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "benefit:0036",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 50,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-50",
+          "component": "item11_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "benefit:0023",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 51,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "673",
+          "component": "item6_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "benefit:0012",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 52,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-6",
+          "component": "item2_rebate",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "benefit:0005",
+          "revision": "1",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 53,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "1032",
+          "component": "item22_base",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "benefit:0044",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 54,
+        "table_id": "file_14_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount_cents": "-6",
+          "component": "item8_rebate",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "benefit:0017",
+          "revision": "2",
+          "table": "benefit",
+          "tenant": "NORTH"
+        }
+      }
+    ],
+    "bundle": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "136",
+          "effective_date": "2026-01-21",
+          "item_a": "R7308b473a5a8",
+          "item_b": "Rf6f2a500079e",
+          "record_id": "bundle:0001",
+          "revision": "1",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "174",
+          "effective_date": "2026-02-21",
+          "item_a": "R148f899e57f6",
+          "item_b": "R698808ad9a96",
+          "record_id": "bundle:0000",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "276",
+          "effective_date": "2026-01-21",
+          "item_a": "R148f899e57f6",
+          "item_b": "Rc07011e6ab2d",
+          "record_id": "bundle:0007",
+          "revision": "1",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "529",
+          "effective_date": "2026-03-23",
+          "item_a": "R698808ad9a96",
+          "item_b": "R07e87ed82812",
+          "record_id": "bundle:0005",
+          "revision": "3",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "187",
+          "effective_date": "2026-01-21",
+          "item_a": "R8e867287f9dc",
+          "item_b": "Rc2e7f1ec75e0",
+          "record_id": "bundle:0003",
+          "revision": "1",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "129",
+          "effective_date": "2026-02-21",
+          "item_a": "R7308b473a5a8",
+          "item_b": "Rf6f2a500079e",
+          "record_id": "bundle:0001",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "269",
+          "effective_date": "2026-02-21",
+          "item_a": "R148f899e57f6",
+          "item_b": "Rc07011e6ab2d",
+          "record_id": "bundle:0007",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "180",
+          "effective_date": "2026-02-21",
+          "item_a": "R8e867287f9dc",
+          "item_b": "Rc2e7f1ec75e0",
+          "record_id": "bundle:0003",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "269",
+          "effective_date": "2026-02-21",
+          "item_a": "R148f899e57f6",
+          "item_b": "Rc07011e6ab2d",
+          "record_id": "bundle:0007",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "517",
+          "effective_date": "2026-01-21",
+          "item_a": "R698808ad9a96",
+          "item_b": "R07e87ed82812",
+          "record_id": "bundle:0005",
+          "revision": "1",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_3_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "510",
+          "effective_date": "2026-02-21",
+          "item_a": "R698808ad9a96",
+          "item_b": "R07e87ed82812",
+          "record_id": "bundle:0005",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "350",
+          "effective_date": "2026-02-21",
+          "item_a": "R7308b473a5a8",
+          "item_b": "R1218064667a2",
+          "record_id": "bundle:0002",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "230",
+          "effective_date": "2026-01-21",
+          "item_a": "Rd05f0610c770",
+          "item_b": "R7308b473a5a8",
+          "record_id": "bundle:0006",
+          "revision": "1",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "174",
+          "effective_date": "2026-01-21",
+          "item_a": "R148f899e57f6",
+          "item_b": "R698808ad9a96",
+          "record_id": "bundle:withdrawn",
+          "revision": "1",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "557",
+          "effective_date": "2026-01-21",
+          "item_a": "Rc2e7f1ec75e0",
+          "item_b": "R0f58f5015d0d",
+          "record_id": "bundle:0004",
+          "revision": "1",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "181",
+          "effective_date": "2026-01-21",
+          "item_a": "R148f899e57f6",
+          "item_b": "R698808ad9a96",
+          "record_id": "bundle:0000",
+          "revision": "1",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "550",
+          "effective_date": "2026-02-21",
+          "item_a": "Rc2e7f1ec75e0",
+          "item_b": "R0f58f5015d0d",
+          "record_id": "bundle:0004",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "223",
+          "effective_date": "2026-02-21",
+          "item_a": "Rd05f0610c770",
+          "item_b": "R7308b473a5a8",
+          "record_id": "bundle:0006",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "357",
+          "effective_date": "2026-01-21",
+          "item_a": "R7308b473a5a8",
+          "item_b": "R1218064667a2",
+          "record_id": "bundle:0002",
+          "revision": "1",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "174",
+          "effective_date": "2026-02-21",
+          "item_a": "R148f899e57f6",
+          "item_b": "R698808ad9a96",
+          "record_id": "bundle:0000",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "550",
+          "effective_date": "2026-02-21",
+          "item_a": "Rc2e7f1ec75e0",
+          "item_b": "R0f58f5015d0d",
+          "record_id": "bundle:0004",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "193",
+          "effective_date": "2026-03-23",
+          "item_a": "R148f899e57f6",
+          "item_b": "R698808ad9a96",
+          "record_id": "bundle:0000",
+          "revision": "3",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "UPSERT",
+          "bonus_cents": "174",
+          "effective_date": "2026-02-21",
+          "item_a": "R148f899e57f6",
+          "item_b": "R698808ad9a96",
+          "record_id": "bundle:0000",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_10_view_0",
+        "values": {
+          "action": "DELETE",
+          "bonus_cents": "",
+          "effective_date": "2026-03-02",
+          "item_a": "",
+          "item_b": "",
+          "record_id": "bundle:withdrawn",
+          "revision": "2",
+          "table": "bundle",
+          "tenant": "NORTH"
+        }
+      }
+    ],
+    "capacity_ledger": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "246007",
+          "effective_date": "2026-01-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0004",
+          "resource": "power",
+          "revision": "1",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13140",
+          "effective_date": "2026-02-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0002",
+          "resource": "labor",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "241000",
+          "effective_date": "2026-02-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0000",
+          "resource": "space",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13147",
+          "effective_date": "2026-01-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0002",
+          "resource": "labor",
+          "revision": "1",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "241019",
+          "effective_date": "2026-03-23",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0000",
+          "resource": "space",
+          "revision": "3",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "DELETE",
+          "amount": "",
+          "effective_date": "2026-03-02",
+          "entry": "",
+          "record_id": "capacity_ledger:withdrawn",
+          "resource": "",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": ""
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "246000",
+          "effective_date": "2026-02-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0004",
+          "resource": "power",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "241000",
+          "effective_date": "2026-01-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:withdrawn",
+          "resource": "space",
+          "revision": "1",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "241000",
+          "effective_date": "2026-02-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0000",
+          "resource": "space",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "241007",
+          "effective_date": "2026-01-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0000",
+          "resource": "space",
+          "revision": "1",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_7_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "246000",
+          "effective_date": "2026-02-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0004",
+          "resource": "power",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "SOUTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_19_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "-293",
+          "effective_date": "2026-01-21",
+          "entry": "reservation",
+          "record_id": "capacity_ledger:0003",
+          "resource": "labor",
+          "revision": "1",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_19_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "-6000",
+          "effective_date": "2026-02-21",
+          "entry": "reservation",
+          "record_id": "capacity_ledger:0001",
+          "resource": "space",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_19_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "-11000",
+          "effective_date": "2026-02-21",
+          "entry": "reservation",
+          "record_id": "capacity_ledger:0005",
+          "resource": "power",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_19_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "-10981",
+          "effective_date": "2026-03-23",
+          "entry": "reservation",
+          "record_id": "capacity_ledger:0005",
+          "resource": "power",
+          "revision": "3",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_19_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "-5993",
+          "effective_date": "2026-01-21",
+          "entry": "reservation",
+          "record_id": "capacity_ledger:0001",
+          "resource": "space",
+          "revision": "1",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_19_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "241000",
+          "effective_date": "2026-02-21",
+          "entry": "opening",
+          "record_id": "capacity_ledger:0000",
+          "resource": "space",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "SOUTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_19_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "-300",
+          "effective_date": "2026-02-21",
+          "entry": "reservation",
+          "record_id": "capacity_ledger:0003",
+          "resource": "labor",
+          "revision": "2",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_19_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "-10993",
+          "effective_date": "2026-01-21",
+          "entry": "reservation",
+          "record_id": "capacity_ledger:0005",
+          "resource": "power",
+          "revision": "1",
+          "table": "capacity_ledger",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      }
+    ],
+    "category": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_15_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "339",
+          "category": "G1",
+          "effective_date": "2026-01-21",
+          "maximum_quantity": "24",
+          "minimum_quantity": "12",
+          "record_id": "category:0001",
+          "revision": "1",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_15_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "332",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "maximum_quantity": "17",
+          "minimum_quantity": "5",
+          "record_id": "category:0001",
+          "revision": "2",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_15_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "162",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "maximum_quantity": "21",
+          "minimum_quantity": "9",
+          "record_id": "category:0000",
+          "revision": "2",
+          "table": "category",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_15_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "166",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "maximum_quantity": "21",
+          "minimum_quantity": "9",
+          "record_id": "category:0003",
+          "revision": "2",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_15_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "173",
+          "category": "G3",
+          "effective_date": "2026-01-21",
+          "maximum_quantity": "28",
+          "minimum_quantity": "16",
+          "record_id": "category:0003",
+          "revision": "1",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_17_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "199",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "maximum_quantity": "21",
+          "minimum_quantity": "9",
+          "record_id": "category:0002",
+          "revision": "2",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_17_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "169",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "maximum_quantity": "28",
+          "minimum_quantity": "16",
+          "record_id": "category:0000",
+          "revision": "1",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_17_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "206",
+          "category": "G2",
+          "effective_date": "2026-01-21",
+          "maximum_quantity": "28",
+          "minimum_quantity": "16",
+          "record_id": "category:0002",
+          "revision": "1",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_17_view_0",
+        "values": {
+          "action": "DELETE",
+          "activation_fee_cents": "",
+          "category": "",
+          "effective_date": "2026-03-02",
+          "maximum_quantity": "",
+          "minimum_quantity": "",
+          "record_id": "category:withdrawn",
+          "revision": "2",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_17_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "162",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "maximum_quantity": "21",
+          "minimum_quantity": "9",
+          "record_id": "category:0000",
+          "revision": "2",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_17_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "162",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "maximum_quantity": "21",
+          "minimum_quantity": "9",
+          "record_id": "category:withdrawn",
+          "revision": "1",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_17_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "181",
+          "category": "G0",
+          "effective_date": "2026-03-23",
+          "maximum_quantity": "40",
+          "minimum_quantity": "28",
+          "record_id": "category:0000",
+          "revision": "3",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_17_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "162",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "maximum_quantity": "21",
+          "minimum_quantity": "9",
+          "record_id": "category:0000",
+          "revision": "2",
+          "table": "category",
+          "tenant": "NORTH"
+        }
+      }
+    ],
+    "identity": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I01",
+          "kind": "item",
+          "record_id": "identity:0001",
+          "ref": "Ref851ccaa158",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I03",
+          "kind": "item",
+          "record_id": "identity:0003",
+          "ref": "R7955a6f70abc",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I03",
+          "kind": "item",
+          "record_id": "identity:0003",
+          "ref": "R7955a6f70abc",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I09",
+          "kind": "item",
+          "record_id": "identity:0009",
+          "ref": "R1b36613ee493",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I15",
+          "kind": "item",
+          "record_id": "identity:0015",
+          "ref": "Re7d589eb4737",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I07",
+          "kind": "item",
+          "record_id": "identity:0007",
+          "ref": "R1820116348cd",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I08",
+          "kind": "item",
+          "record_id": "identity:0008",
+          "ref": "Rf6f2a500079e",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I13",
+          "kind": "item",
+          "record_id": "identity:0013",
+          "ref": "R747b4b07f2df",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I17",
+          "kind": "item",
+          "record_id": "identity:0017",
+          "ref": "R0f58f5015d0d",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I23",
+          "kind": "item",
+          "record_id": "identity:0023",
+          "ref": "Ra5833cedea5c",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I21",
+          "kind": "item",
+          "record_id": "identity:0021",
+          "ref": "Rd05f0610c770",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I21",
+          "kind": "item",
+          "record_id": "identity:0021",
+          "ref": "Rd05f0610c770",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I31",
+          "kind": "item",
+          "record_id": "identity:0031",
+          "ref": "R07e87ed82812",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I25",
+          "kind": "item",
+          "record_id": "identity:0025",
+          "ref": "R7308b473a5a8",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I11",
+          "kind": "item",
+          "record_id": "identity:0011",
+          "ref": "Rfb0a4e0e3df5",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "entity_id": "I25",
+          "kind": "item",
+          "record_id": "identity:0025",
+          "ref": "R7308b473a5a8",
+          "revision": "3",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I21",
+          "kind": "item",
+          "record_id": "identity:0021",
+          "ref": "Rd05f0610c770",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I19",
+          "kind": "item",
+          "record_id": "identity:0019",
+          "ref": "R698808ad9a96",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I00",
+          "kind": "item",
+          "record_id": "identity:0000",
+          "ref": "R6007124a9f06",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I01",
+          "kind": "item",
+          "record_id": "identity:0001",
+          "ref": "Ref851ccaa158",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I19",
+          "kind": "item",
+          "record_id": "identity:0019",
+          "ref": "R698808ad9a96",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I05",
+          "kind": "item",
+          "record_id": "identity:0005",
+          "ref": "Rc9f004c5ca0f",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I27",
+          "kind": "item",
+          "record_id": "identity:0027",
+          "ref": "Rf9db851ed8bb",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I24",
+          "kind": "item",
+          "record_id": "identity:0024",
+          "ref": "Rcf5370ab2e7c",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I16",
+          "kind": "item",
+          "record_id": "identity:0016",
+          "ref": "R3a11be59ddaa",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I29",
+          "kind": "item",
+          "record_id": "identity:0029",
+          "ref": "R9197b70e3d09",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "entity_id": "I05",
+          "kind": "item",
+          "record_id": "identity:0005",
+          "ref": "Rc9f004c5ca0f",
+          "revision": "3",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I09",
+          "kind": "item",
+          "record_id": "identity:0009",
+          "ref": "R1b36613ee493",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I25",
+          "kind": "item",
+          "record_id": "identity:0025",
+          "ref": "R7308b473a5a8",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I15",
+          "kind": "item",
+          "record_id": "identity:0015",
+          "ref": "Re7d589eb4737",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I31",
+          "kind": "item",
+          "record_id": "identity:0031",
+          "ref": "R07e87ed82812",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I05",
+          "kind": "item",
+          "record_id": "identity:0005",
+          "ref": "Rc9f004c5ca0f",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I11",
+          "kind": "item",
+          "record_id": "identity:0011",
+          "ref": "Rfb0a4e0e3df5",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "entity_id": "I15",
+          "kind": "item",
+          "record_id": "identity:0015",
+          "ref": "Re7d589eb4737",
+          "revision": "3",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I13",
+          "kind": "item",
+          "record_id": "identity:0013",
+          "ref": "R747b4b07f2df",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I27",
+          "kind": "item",
+          "record_id": "identity:0027",
+          "ref": "Rf9db851ed8bb",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I07",
+          "kind": "item",
+          "record_id": "identity:0007",
+          "ref": "R1820116348cd",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I07",
+          "kind": "item",
+          "record_id": "identity:0007",
+          "ref": "R1820116348cd",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I29",
+          "kind": "item",
+          "record_id": "identity:0029",
+          "ref": "R9197b70e3d09",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I23",
+          "kind": "item",
+          "record_id": "identity:0023",
+          "ref": "Ra5833cedea5c",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_1_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I17",
+          "kind": "item",
+          "record_id": "identity:0017",
+          "ref": "R0f58f5015d0d",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I18",
+          "kind": "item",
+          "record_id": "identity:0018",
+          "ref": "Rfb39090aa5c5",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I12",
+          "kind": "item",
+          "record_id": "identity:0012",
+          "ref": "R665d41e9e962",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I16",
+          "kind": "item",
+          "record_id": "identity:0016",
+          "ref": "R3a11be59ddaa",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I06",
+          "kind": "item",
+          "record_id": "identity:0006",
+          "ref": "R148f899e57f6",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I20",
+          "kind": "item",
+          "record_id": "identity:0020",
+          "ref": "Rc2e7f1ec75e0",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I08",
+          "kind": "item",
+          "record_id": "identity:0008",
+          "ref": "Rf6f2a500079e",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I16",
+          "kind": "item",
+          "record_id": "identity:0016",
+          "ref": "R3a11be59ddaa",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I08",
+          "kind": "item",
+          "record_id": "identity:0008",
+          "ref": "Rf6f2a500079e",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I28",
+          "kind": "item",
+          "record_id": "identity:0028",
+          "ref": "R7dcc05e5ca15",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I22",
+          "kind": "item",
+          "record_id": "identity:0022",
+          "ref": "Rc07011e6ab2d",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I04",
+          "kind": "item",
+          "record_id": "identity:0004",
+          "ref": "R65d8546a7fb6",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I02",
+          "kind": "item",
+          "record_id": "identity:0002",
+          "ref": "R1218064667a2",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I00",
+          "kind": "item",
+          "record_id": "identity:withdrawn",
+          "ref": "R6007124a9f06",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I26",
+          "kind": "item",
+          "record_id": "identity:0026",
+          "ref": "Rc6c554a79b27",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I00",
+          "kind": "item",
+          "record_id": "identity:0000",
+          "ref": "R6007124a9f06",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I12",
+          "kind": "item",
+          "record_id": "identity:0012",
+          "ref": "R665d41e9e962",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I28",
+          "kind": "item",
+          "record_id": "identity:0028",
+          "ref": "R7dcc05e5ca15",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I24",
+          "kind": "item",
+          "record_id": "identity:0024",
+          "ref": "Rcf5370ab2e7c",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I28",
+          "kind": "item",
+          "record_id": "identity:0028",
+          "ref": "R7dcc05e5ca15",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I00",
+          "kind": "item",
+          "record_id": "identity:0000",
+          "ref": "R6007124a9f06",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I00",
+          "kind": "item",
+          "record_id": "identity:0000",
+          "ref": "R6007124a9f06",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I12",
+          "kind": "item",
+          "record_id": "identity:0012",
+          "ref": "R665d41e9e962",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I30",
+          "kind": "item",
+          "record_id": "identity:0030",
+          "ref": "R30896725a0ac",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I14",
+          "kind": "item",
+          "record_id": "identity:0014",
+          "ref": "R8e867287f9dc",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I04",
+          "kind": "item",
+          "record_id": "identity:0004",
+          "ref": "R65d8546a7fb6",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I20",
+          "kind": "item",
+          "record_id": "identity:0020",
+          "ref": "Rc2e7f1ec75e0",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I26",
+          "kind": "item",
+          "record_id": "identity:0026",
+          "ref": "Rc6c554a79b27",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I24",
+          "kind": "item",
+          "record_id": "identity:0024",
+          "ref": "Rcf5370ab2e7c",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I14",
+          "kind": "item",
+          "record_id": "identity:0014",
+          "ref": "R8e867287f9dc",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I22",
+          "kind": "item",
+          "record_id": "identity:0022",
+          "ref": "Rc07011e6ab2d",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I20",
+          "kind": "item",
+          "record_id": "identity:0020",
+          "ref": "Rc2e7f1ec75e0",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I10",
+          "kind": "item",
+          "record_id": "identity:0010",
+          "ref": "R2b2709069f4c",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I10",
+          "kind": "item",
+          "record_id": "identity:0010",
+          "ref": "R2b2709069f4c",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I28",
+          "kind": "item",
+          "record_id": "identity:0028",
+          "ref": "R7dcc05e5ca15",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I18",
+          "kind": "item",
+          "record_id": "identity:0018",
+          "ref": "Rfb39090aa5c5",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I30",
+          "kind": "item",
+          "record_id": "identity:0030",
+          "ref": "R30896725a0ac",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "entity_id": "I00",
+          "kind": "item",
+          "record_id": "identity:0000",
+          "ref": "R6007124a9f06",
+          "revision": "3",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "entity_id": "I30",
+          "kind": "item",
+          "record_id": "identity:0030",
+          "ref": "R30896725a0ac",
+          "revision": "3",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "entity_id": "I20",
+          "kind": "item",
+          "record_id": "identity:0020",
+          "ref": "Rc2e7f1ec75e0",
+          "revision": "3",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "entity_id": "I14",
+          "kind": "item",
+          "record_id": "identity:0014",
+          "ref": "R8e867287f9dc",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "entity_id": "I10",
+          "kind": "item",
+          "record_id": "identity:0010",
+          "ref": "R2b2709069f4c",
+          "revision": "3",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I04",
+          "kind": "item",
+          "record_id": "identity:0004",
+          "ref": "R65d8546a7fb6",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I02",
+          "kind": "item",
+          "record_id": "identity:0002",
+          "ref": "R1218064667a2",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "entity_id": "I06",
+          "kind": "item",
+          "record_id": "identity:0006",
+          "ref": "R148f899e57f6",
+          "revision": "1",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_21_view_0",
+        "values": {
+          "action": "DELETE",
+          "effective_date": "2026-03-02",
+          "entity_id": "",
+          "kind": "",
+          "record_id": "identity:withdrawn",
+          "ref": "",
+          "revision": "2",
+          "table": "identity",
+          "tenant": "NORTH"
+        }
+      }
+    ],
+    "incompatible": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R65d8546a7fb6",
+          "item_b": "R665d41e9e962",
+          "record_id": "incompatible:0000",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R7955a6f70abc",
+          "item_b": "R698808ad9a96",
+          "record_id": "incompatible:0009",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R747b4b07f2df",
+          "item_b": "Rf6f2a500079e",
+          "record_id": "incompatible:0001",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "R747b4b07f2df",
+          "item_b": "Rf6f2a500079e",
+          "record_id": "incompatible:0001",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "Rfb39090aa5c5",
+          "item_b": "R148f899e57f6",
+          "record_id": "incompatible:0008",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "R7308b473a5a8",
+          "item_b": "Rf9db851ed8bb",
+          "record_id": "incompatible:0007",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R747b4b07f2df",
+          "item_b": "Rd05f0610c770",
+          "record_id": "incompatible:0005",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R9197b70e3d09",
+          "item_b": "R665d41e9e962",
+          "record_id": "incompatible:0003",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R7308b473a5a8",
+          "item_b": "Rf9db851ed8bb",
+          "record_id": "incompatible:0007",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "R7955a6f70abc",
+          "item_b": "R698808ad9a96",
+          "record_id": "incompatible:0009",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "R9197b70e3d09",
+          "item_b": "R665d41e9e962",
+          "record_id": "incompatible:0003",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R7308b473a5a8",
+          "item_b": "Rf9db851ed8bb",
+          "record_id": "incompatible:0007",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "item_a": "R747b4b07f2df",
+          "item_b": "Rd05f0610c770",
+          "record_id": "incompatible:0005",
+          "revision": "3",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_6_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "R747b4b07f2df",
+          "item_b": "Rd05f0610c770",
+          "record_id": "incompatible:0005",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R1b36613ee493",
+          "item_b": "R8e867287f9dc",
+          "record_id": "incompatible:0004",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "R9197b70e3d09",
+          "item_b": "R7308b473a5a8",
+          "record_id": "incompatible:0006",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "Rf9db851ed8bb",
+          "item_b": "R747b4b07f2df",
+          "record_id": "incompatible:0002",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "Rfb39090aa5c5",
+          "item_b": "R148f899e57f6",
+          "record_id": "incompatible:0008",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "DELETE",
+          "effective_date": "2026-03-02",
+          "item_a": "",
+          "item_b": "",
+          "record_id": "incompatible:withdrawn",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "R1b36613ee493",
+          "item_b": "R8e867287f9dc",
+          "record_id": "incompatible:0004",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R65d8546a7fb6",
+          "item_b": "R665d41e9e962",
+          "record_id": "incompatible:0000",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R9197b70e3d09",
+          "item_b": "R7308b473a5a8",
+          "record_id": "incompatible:0006",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R1b36613ee493",
+          "item_b": "R8e867287f9dc",
+          "record_id": "incompatible:0004",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "Rf9db851ed8bb",
+          "item_b": "R747b4b07f2df",
+          "record_id": "incompatible:0002",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_a": "R65d8546a7fb6",
+          "item_b": "R665d41e9e962",
+          "record_id": "incompatible:0000",
+          "revision": "2",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "R65d8546a7fb6",
+          "item_b": "R665d41e9e962",
+          "record_id": "incompatible:withdrawn",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "R65d8546a7fb6",
+          "item_b": "R665d41e9e962",
+          "record_id": "incompatible:0000",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "item_a": "R65d8546a7fb6",
+          "item_b": "R665d41e9e962",
+          "record_id": "incompatible:0000",
+          "revision": "3",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_13_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_a": "Rfb39090aa5c5",
+          "item_b": "R148f899e57f6",
+          "record_id": "incompatible:0008",
+          "revision": "1",
+          "table": "incompatible",
+          "tenant": "NORTH"
+        }
+      }
+    ],
+    "item": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G2",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb39090aa5c5",
+          "maximum_order": "20",
+          "minimum_lot": "9",
+          "record_id": "item:0018",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "maximum_order": "8",
+          "minimum_lot": "2",
+          "record_id": "item:0012",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "item_ref": "R3a11be59ddaa",
+          "maximum_order": "17",
+          "minimum_lot": "9",
+          "record_id": "item:0016",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G2",
+          "effective_date": "2026-01-21",
+          "item_ref": "R148f899e57f6",
+          "maximum_order": "20",
+          "minimum_lot": "9",
+          "record_id": "item:0006",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "maximum_order": "7",
+          "minimum_lot": "2",
+          "record_id": "item:0020",
+          "revision": "2",
+          "table": "item",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "maximum_order": "13",
+          "minimum_lot": "2",
+          "record_id": "item:0008",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "maximum_order": "10",
+          "minimum_lot": "2",
+          "record_id": "item:0016",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf6f2a500079e",
+          "maximum_order": "20",
+          "minimum_lot": "9",
+          "record_id": "item:0008",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:0028",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "maximum_order": "9",
+          "minimum_lot": "2",
+          "record_id": "item:0022",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "maximum_order": "7",
+          "minimum_lot": "2",
+          "record_id": "item:0004",
+          "revision": "2",
+          "table": "item",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "maximum_order": "9",
+          "minimum_lot": "2",
+          "record_id": "item:0002",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:withdrawn",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G2",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc6c554a79b27",
+          "maximum_order": "15",
+          "minimum_lot": "9",
+          "record_id": "item:0026",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "20",
+          "category": "G0",
+          "effective_date": "2026-03-23",
+          "item_ref": "R6007124a9f06",
+          "maximum_order": "30",
+          "minimum_lot": "21",
+          "record_id": "item:0000",
+          "revision": "3",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "maximum_order": "8",
+          "minimum_lot": "2",
+          "record_id": "item:0012",
+          "revision": "2",
+          "table": "item",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7dcc05e5ca15",
+          "maximum_order": "18",
+          "minimum_lot": "9",
+          "record_id": "item:0028",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "7",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "maximum_order": "18",
+          "minimum_lot": "9",
+          "record_id": "item:0024",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:0028",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "maximum_order": "18",
+          "minimum_lot": "9",
+          "record_id": "item:0000",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:0000",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "item_ref": "R665d41e9e962",
+          "maximum_order": "15",
+          "minimum_lot": "9",
+          "record_id": "item:0012",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G2",
+          "effective_date": "2026-01-21",
+          "item_ref": "R30896725a0ac",
+          "maximum_order": "14",
+          "minimum_lot": "9",
+          "record_id": "item:0030",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "maximum_order": "12",
+          "minimum_lot": "2",
+          "record_id": "item:0014",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "maximum_order": "7",
+          "minimum_lot": "2",
+          "record_id": "item:0004",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "20",
+          "category": "G0",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc2e7f1ec75e0",
+          "maximum_order": "26",
+          "minimum_lot": "21",
+          "record_id": "item:0020",
+          "revision": "3",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "maximum_order": "8",
+          "minimum_lot": "2",
+          "record_id": "item:0026",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "0",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:0024",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G2",
+          "effective_date": "2026-01-21",
+          "item_ref": "R8e867287f9dc",
+          "maximum_order": "19",
+          "minimum_lot": "9",
+          "record_id": "item:0014",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G2",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc07011e6ab2d",
+          "maximum_order": "16",
+          "minimum_lot": "9",
+          "record_id": "item:0022",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "maximum_order": "7",
+          "minimum_lot": "2",
+          "record_id": "item:0020",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "20",
+          "category": "G2",
+          "effective_date": "2026-03-23",
+          "item_ref": "R2b2709069f4c",
+          "maximum_order": "29",
+          "minimum_lot": "21",
+          "record_id": "item:0010",
+          "revision": "3",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "maximum_order": "10",
+          "minimum_lot": "2",
+          "record_id": "item:0010",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:0028",
+          "revision": "2",
+          "table": "item",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "maximum_order": "13",
+          "minimum_lot": "2",
+          "record_id": "item:0018",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "maximum_order": "7",
+          "minimum_lot": "2",
+          "record_id": "item:0030",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:0000",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "20",
+          "category": "G2",
+          "effective_date": "2026-03-23",
+          "item_ref": "R30896725a0ac",
+          "maximum_order": "26",
+          "minimum_lot": "21",
+          "record_id": "item:0030",
+          "revision": "3",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "maximum_order": "14",
+          "minimum_lot": "9",
+          "record_id": "item:0020",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "maximum_order": "12",
+          "minimum_lot": "2",
+          "record_id": "item:0014",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G2",
+          "effective_date": "2026-01-21",
+          "item_ref": "R2b2709069f4c",
+          "maximum_order": "17",
+          "minimum_lot": "9",
+          "record_id": "item:0010",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G0",
+          "effective_date": "2026-01-21",
+          "item_ref": "R65d8546a7fb6",
+          "maximum_order": "14",
+          "minimum_lot": "9",
+          "record_id": "item:0004",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G2",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1218064667a2",
+          "maximum_order": "16",
+          "minimum_lot": "9",
+          "record_id": "item:0002",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G2",
+          "effective_date": "2026-02-21",
+          "item_ref": "R148f899e57f6",
+          "maximum_order": "13",
+          "minimum_lot": "2",
+          "record_id": "item:0006",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_9_view_0",
+        "values": {
+          "action": "DELETE",
+          "authorized": "",
+          "category": "",
+          "effective_date": "2026-03-02",
+          "item_ref": "",
+          "maximum_order": "",
+          "minimum_lot": "",
+          "record_id": "item:withdrawn",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G1",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ref851ccaa158",
+          "maximum_order": "15",
+          "minimum_lot": "9",
+          "record_id": "item:0001",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7955a6f70abc",
+          "maximum_order": "7",
+          "minimum_lot": "2",
+          "record_id": "item:0003",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G3",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7955a6f70abc",
+          "maximum_order": "14",
+          "minimum_lot": "9",
+          "record_id": "item:0003",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1b36613ee493",
+          "maximum_order": "7",
+          "minimum_lot": "2",
+          "record_id": "item:0009",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "7",
+          "category": "G3",
+          "effective_date": "2026-01-21",
+          "item_ref": "Re7d589eb4737",
+          "maximum_order": "19",
+          "minimum_lot": "9",
+          "record_id": "item:0015",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "maximum_order": "10",
+          "minimum_lot": "2",
+          "record_id": "item:0007",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "maximum_order": "13",
+          "minimum_lot": "2",
+          "record_id": "item:0008",
+          "revision": "2",
+          "table": "item",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "item_ref": "R747b4b07f2df",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:0013",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G1",
+          "effective_date": "2026-01-21",
+          "item_ref": "R0f58f5015d0d",
+          "maximum_order": "16",
+          "minimum_lot": "9",
+          "record_id": "item:0017",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "0",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ra5833cedea5c",
+          "maximum_order": "10",
+          "minimum_lot": "2",
+          "record_id": "item:0023",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G1",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rd05f0610c770",
+          "maximum_order": "20",
+          "minimum_lot": "9",
+          "record_id": "item:0021",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "maximum_order": "13",
+          "minimum_lot": "2",
+          "record_id": "item:0021",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G3",
+          "effective_date": "2026-01-21",
+          "item_ref": "R07e87ed82812",
+          "maximum_order": "15",
+          "minimum_lot": "9",
+          "record_id": "item:0031",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G1",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7308b473a5a8",
+          "maximum_order": "17",
+          "minimum_lot": "9",
+          "record_id": "item:0025",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G3",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "maximum_order": "19",
+          "minimum_lot": "9",
+          "record_id": "item:0011",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "20",
+          "category": "G1",
+          "effective_date": "2026-03-23",
+          "item_ref": "R7308b473a5a8",
+          "maximum_order": "29",
+          "minimum_lot": "21",
+          "record_id": "item:0025",
+          "revision": "3",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "maximum_order": "13",
+          "minimum_lot": "2",
+          "record_id": "item:0021",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G3",
+          "effective_date": "2026-01-21",
+          "item_ref": "R698808ad9a96",
+          "maximum_order": "17",
+          "minimum_lot": "9",
+          "record_id": "item:0019",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:0000",
+          "revision": "2",
+          "table": "item",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ref851ccaa158",
+          "maximum_order": "8",
+          "minimum_lot": "2",
+          "record_id": "item:0001",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "item_ref": "R698808ad9a96",
+          "maximum_order": "10",
+          "minimum_lot": "2",
+          "record_id": "item:0019",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "maximum_order": "7",
+          "minimum_lot": "2",
+          "record_id": "item:0005",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "0",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf9db851ed8bb",
+          "maximum_order": "13",
+          "minimum_lot": "2",
+          "record_id": "item:0027",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "0",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "maximum_order": "11",
+          "minimum_lot": "2",
+          "record_id": "item:0024",
+          "revision": "2",
+          "table": "item",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G0",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "maximum_order": "10",
+          "minimum_lot": "2",
+          "record_id": "item:0016",
+          "revision": "2",
+          "table": "item",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G1",
+          "effective_date": "2026-01-21",
+          "item_ref": "R9197b70e3d09",
+          "maximum_order": "20",
+          "minimum_lot": "9",
+          "record_id": "item:0029",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G1",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "maximum_order": "14",
+          "minimum_lot": "9",
+          "record_id": "item:0005",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G1",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1b36613ee493",
+          "maximum_order": "14",
+          "minimum_lot": "9",
+          "record_id": "item:0009",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "maximum_order": "10",
+          "minimum_lot": "2",
+          "record_id": "item:0025",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "0",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "item_ref": "Re7d589eb4737",
+          "maximum_order": "12",
+          "minimum_lot": "2",
+          "record_id": "item:0015",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "item_ref": "R07e87ed82812",
+          "maximum_order": "8",
+          "minimum_lot": "2",
+          "record_id": "item:0031",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "20",
+          "category": "G1",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc9f004c5ca0f",
+          "maximum_order": "26",
+          "minimum_lot": "21",
+          "record_id": "item:0005",
+          "revision": "3",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "maximum_order": "12",
+          "minimum_lot": "2",
+          "record_id": "item:0011",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "19",
+          "category": "G3",
+          "effective_date": "2026-03-23",
+          "item_ref": "Re7d589eb4737",
+          "maximum_order": "31",
+          "minimum_lot": "21",
+          "record_id": "item:0015",
+          "revision": "3",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G1",
+          "effective_date": "2026-01-21",
+          "item_ref": "R747b4b07f2df",
+          "maximum_order": "18",
+          "minimum_lot": "9",
+          "record_id": "item:0013",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "7",
+          "category": "G3",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf9db851ed8bb",
+          "maximum_order": "20",
+          "minimum_lot": "9",
+          "record_id": "item:0027",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G3",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "maximum_order": "10",
+          "minimum_lot": "2",
+          "record_id": "item:0007",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "8",
+          "category": "G3",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1820116348cd",
+          "maximum_order": "17",
+          "minimum_lot": "9",
+          "record_id": "item:0007",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "item_ref": "R9197b70e3d09",
+          "maximum_order": "13",
+          "minimum_lot": "2",
+          "record_id": "item:0029",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "7",
+          "category": "G3",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ra5833cedea5c",
+          "maximum_order": "17",
+          "minimum_lot": "9",
+          "record_id": "item:0023",
+          "revision": "1",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_12_view_0",
+        "values": {
+          "action": "UPSERT",
+          "authorized": "1",
+          "category": "G1",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "maximum_order": "9",
+          "minimum_lot": "2",
+          "record_id": "item:0017",
+          "revision": "2",
+          "table": "item",
+          "tenant": "NORTH"
+        }
+      }
+    ],
+    "item_fee": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "490",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "item_fee:0018",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "499",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "item_fee:0012",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "501",
+          "effective_date": "2026-01-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "item_fee:0016",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "492",
+          "effective_date": "2026-02-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "item_fee:0006",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "132",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "item_fee:0020",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "224",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "item_fee:0008",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "494",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "item_fee:0016",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "217",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "item_fee:0008",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "336",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "item_fee:0028",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "195",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "item_fee:0022",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "215",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "item_fee:0004",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "256",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "item_fee:0002",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "DELETE",
+          "activation_fee_cents": "",
+          "effective_date": "2026-03-02",
+          "item_ref": "",
+          "record_id": "item_fee:withdrawn",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "411",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "item_fee:0026",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "372",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "item_fee:0000",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "499",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "item_fee:0012",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "343",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "item_fee:0028",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "465",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "item_fee:0024",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "336",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "item_fee:0028",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "391",
+          "effective_date": "2026-03-23",
+          "item_ref": "R6007124a9f06",
+          "record_id": "item_fee:0000",
+          "revision": "3",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "372",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "item_fee:0000",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "506",
+          "effective_date": "2026-01-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "item_fee:0012",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "130",
+          "effective_date": "2026-01-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "item_fee:0030",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "498",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "item_fee:0014",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "222",
+          "effective_date": "2026-01-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "item_fee:0004",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "132",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "item_fee:0020",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "404",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "item_fee:0026",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "458",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "item_fee:0024",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "498",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "item_fee:0014",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "202",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "item_fee:0022",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "139",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "item_fee:0020",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "288",
+          "effective_date": "2026-03-23",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "item_fee:0010",
+          "revision": "3",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "276",
+          "effective_date": "2026-01-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "item_fee:0010",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "336",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "item_fee:0028",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "497",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "item_fee:0018",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "123",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "item_fee:0030",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "379",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "item_fee:0000",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "142",
+          "effective_date": "2026-03-23",
+          "item_ref": "R30896725a0ac",
+          "record_id": "item_fee:0030",
+          "revision": "3",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "151",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "item_fee:0020",
+          "revision": "3",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "505",
+          "effective_date": "2026-01-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "item_fee:0014",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "269",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "item_fee:0010",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "215",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "item_fee:0004",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "249",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "item_fee:0002",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "499",
+          "effective_date": "2026-01-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "item_fee:0006",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_2_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "372",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "item_fee:withdrawn",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "214",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "item_fee:0001",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "317",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "item_fee:0003",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "310",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "item_fee:0003",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "144",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "item_fee:0009",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "202",
+          "effective_date": "2026-01-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "item_fee:0015",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "464",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "item_fee:0007",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "217",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "item_fee:0008",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "351",
+          "effective_date": "2026-01-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "item_fee:0013",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "302",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "item_fee:0017",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "466",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "item_fee:0023",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "154",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "item_fee:0021",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "154",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "item_fee:0021",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "274",
+          "effective_date": "2026-02-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "item_fee:0031",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "237",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "item_fee:0025",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "492",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "item_fee:0011",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "249",
+          "effective_date": "2026-03-23",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "item_fee:0025",
+          "revision": "3",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "161",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "item_fee:0021",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "111",
+          "effective_date": "2026-01-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "item_fee:0019",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "372",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "item_fee:0000",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "207",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "item_fee:0001",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "104",
+          "effective_date": "2026-02-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "item_fee:0019",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "350",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "item_fee:0005",
+          "revision": "3",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "374",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "item_fee:0027",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "458",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "item_fee:0024",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "494",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "item_fee:0016",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "502",
+          "effective_date": "2026-01-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "item_fee:0029",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "331",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "item_fee:0005",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "137",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "item_fee:0009",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "230",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "item_fee:0025",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "214",
+          "effective_date": "2026-03-23",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "item_fee:0015",
+          "revision": "3",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "281",
+          "effective_date": "2026-01-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "item_fee:0031",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "338",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "item_fee:0005",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "485",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "item_fee:0011",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "195",
+          "effective_date": "2026-02-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "item_fee:0015",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "344",
+          "effective_date": "2026-02-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "item_fee:0013",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "367",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "item_fee:0027",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "457",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "item_fee:0007",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "457",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "item_fee:0007",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "495",
+          "effective_date": "2026-02-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "item_fee:0029",
+          "revision": "2",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "473",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "item_fee:0023",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_16_view_0",
+        "values": {
+          "action": "UPSERT",
+          "activation_fee_cents": "309",
+          "effective_date": "2026-01-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "item_fee:0017",
+          "revision": "1",
+          "table": "item_fee",
+          "tenant": "NORTH"
+        }
+      }
+    ],
+    "market": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "3",
+          "item_ref": "Ref851ccaa158",
+          "margin_percent": "28",
+          "record_id": "market:0001",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "2",
+          "item_ref": "R7955a6f70abc",
+          "margin_percent": "26",
+          "record_id": "market:0003",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "9",
+          "item_ref": "R7955a6f70abc",
+          "margin_percent": "33",
+          "record_id": "market:0003",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "10",
+          "historical_sales": "10",
+          "item_ref": "R1b36613ee493",
+          "margin_percent": "17",
+          "record_id": "market:0009",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "9",
+          "item_ref": "Re7d589eb4737",
+          "margin_percent": "42",
+          "record_id": "market:0015",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "3",
+          "item_ref": "R1820116348cd",
+          "margin_percent": "18",
+          "record_id": "market:0007",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "1",
+          "item_ref": "Rf6f2a500079e",
+          "margin_percent": "31",
+          "record_id": "market:0008",
+          "revision": "2",
+          "table": "market",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "10",
+          "historical_sales": "9",
+          "item_ref": "R747b4b07f2df",
+          "margin_percent": "41",
+          "record_id": "market:0013",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "10",
+          "item_ref": "R0f58f5015d0d",
+          "margin_percent": "36",
+          "record_id": "market:0017",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "3",
+          "item_ref": "Ra5833cedea5c",
+          "margin_percent": "16",
+          "record_id": "market:0023",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "1",
+          "item_ref": "Rd05f0610c770",
+          "margin_percent": "30",
+          "record_id": "market:0021",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "1",
+          "item_ref": "Rd05f0610c770",
+          "margin_percent": "30",
+          "record_id": "market:0021",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "8",
+          "historical_sales": "10",
+          "item_ref": "R07e87ed82812",
+          "margin_percent": "39",
+          "record_id": "market:0031",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "3",
+          "item_ref": "R7308b473a5a8",
+          "margin_percent": "6",
+          "record_id": "market:0025",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "1",
+          "item_ref": "Rfb0a4e0e3df5",
+          "margin_percent": "7",
+          "record_id": "market:0011",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "8",
+          "historical_sales": "10",
+          "item_ref": "R7308b473a5a8",
+          "margin_percent": "13",
+          "record_id": "market:0025",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "10",
+          "historical_sales": "8",
+          "item_ref": "Rd05f0610c770",
+          "margin_percent": "37",
+          "record_id": "market:0021",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "10",
+          "historical_sales": "10",
+          "item_ref": "R698808ad9a96",
+          "margin_percent": "19",
+          "record_id": "market:0019",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "3",
+          "item_ref": "R6007124a9f06",
+          "margin_percent": "22",
+          "record_id": "market:0000",
+          "revision": "2",
+          "table": "market",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "10",
+          "item_ref": "Ref851ccaa158",
+          "margin_percent": "35",
+          "record_id": "market:0001",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "3",
+          "item_ref": "R698808ad9a96",
+          "margin_percent": "12",
+          "record_id": "market:0019",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "10",
+          "historical_sales": "10",
+          "item_ref": "Rc9f004c5ca0f",
+          "margin_percent": "22",
+          "record_id": "market:0005",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "9",
+          "item_ref": "Rf9db851ed8bb",
+          "margin_percent": "12",
+          "record_id": "market:0027",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "2",
+          "item_ref": "Rcf5370ab2e7c",
+          "margin_percent": "17",
+          "record_id": "market:0024",
+          "revision": "2",
+          "table": "market",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "3",
+          "item_ref": "R3a11be59ddaa",
+          "margin_percent": "15",
+          "record_id": "market:0016",
+          "revision": "2",
+          "table": "market",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "10",
+          "historical_sales": "10",
+          "item_ref": "R9197b70e3d09",
+          "margin_percent": "37",
+          "record_id": "market:0029",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "3",
+          "item_ref": "Rc9f004c5ca0f",
+          "margin_percent": "15",
+          "record_id": "market:0005",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "3",
+          "item_ref": "R1b36613ee493",
+          "margin_percent": "10",
+          "record_id": "market:0009",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "forecast_units": "20",
+          "historical_sales": "22",
+          "item_ref": "R7308b473a5a8",
+          "margin_percent": "25",
+          "record_id": "market:0025",
+          "revision": "3",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "forecast_units": "21",
+          "historical_sales": "21",
+          "item_ref": "Re7d589eb4737",
+          "margin_percent": "54",
+          "record_id": "market:0015",
+          "revision": "3",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "3",
+          "item_ref": "R07e87ed82812",
+          "margin_percent": "32",
+          "record_id": "market:0031",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "forecast_units": "22",
+          "historical_sales": "22",
+          "item_ref": "Rc9f004c5ca0f",
+          "margin_percent": "34",
+          "record_id": "market:0005",
+          "revision": "3",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "8",
+          "historical_sales": "8",
+          "item_ref": "Rfb0a4e0e3df5",
+          "margin_percent": "14",
+          "record_id": "market:0011",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "2",
+          "item_ref": "Re7d589eb4737",
+          "margin_percent": "35",
+          "record_id": "market:0015",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "2",
+          "item_ref": "R747b4b07f2df",
+          "margin_percent": "34",
+          "record_id": "market:0013",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "2",
+          "item_ref": "Rf9db851ed8bb",
+          "margin_percent": "5",
+          "record_id": "market:0027",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "3",
+          "item_ref": "R1820116348cd",
+          "margin_percent": "18",
+          "record_id": "market:0007",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "8",
+          "historical_sales": "10",
+          "item_ref": "R1820116348cd",
+          "margin_percent": "25",
+          "record_id": "market:0007",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "3",
+          "item_ref": "R9197b70e3d09",
+          "margin_percent": "30",
+          "record_id": "market:0029",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "10",
+          "item_ref": "Ra5833cedea5c",
+          "margin_percent": "23",
+          "record_id": "market:0023",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_8_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "3",
+          "item_ref": "R0f58f5015d0d",
+          "margin_percent": "29",
+          "record_id": "market:0017",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "1",
+          "item_ref": "Rfb39090aa5c5",
+          "margin_percent": "28",
+          "record_id": "market:0018",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "8",
+          "historical_sales": "9",
+          "item_ref": "R665d41e9e962",
+          "margin_percent": "12",
+          "record_id": "market:0012",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "3",
+          "item_ref": "R3a11be59ddaa",
+          "margin_percent": "15",
+          "record_id": "market:0016",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "8",
+          "historical_sales": "10",
+          "item_ref": "R148f899e57f6",
+          "margin_percent": "15",
+          "record_id": "market:0006",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "2",
+          "item_ref": "Rc2e7f1ec75e0",
+          "margin_percent": "25",
+          "record_id": "market:0020",
+          "revision": "2",
+          "table": "market",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "8",
+          "item_ref": "Rf6f2a500079e",
+          "margin_percent": "38",
+          "record_id": "market:0008",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "10",
+          "item_ref": "R3a11be59ddaa",
+          "margin_percent": "22",
+          "record_id": "market:0016",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "1",
+          "item_ref": "Rf6f2a500079e",
+          "margin_percent": "31",
+          "record_id": "market:0008",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "2",
+          "item_ref": "R7dcc05e5ca15",
+          "margin_percent": "33",
+          "record_id": "market:0028",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "3",
+          "item_ref": "Rc07011e6ab2d",
+          "margin_percent": "18",
+          "record_id": "market:0022",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "3",
+          "item_ref": "R65d8546a7fb6",
+          "margin_percent": "12",
+          "record_id": "market:0004",
+          "revision": "2",
+          "table": "market",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "10",
+          "item_ref": "R1218064667a2",
+          "margin_percent": "36",
+          "record_id": "market:0002",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "DELETE",
+          "effective_date": "2026-03-02",
+          "forecast_units": "",
+          "historical_sales": "",
+          "item_ref": "",
+          "margin_percent": "",
+          "record_id": "market:withdrawn",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "10",
+          "historical_sales": "8",
+          "item_ref": "Rc6c554a79b27",
+          "margin_percent": "38",
+          "record_id": "market:0026",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "10",
+          "historical_sales": "10",
+          "item_ref": "R6007124a9f06",
+          "margin_percent": "29",
+          "record_id": "market:0000",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "2",
+          "item_ref": "R665d41e9e962",
+          "margin_percent": "5",
+          "record_id": "market:0012",
+          "revision": "2",
+          "table": "market",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "2",
+          "item_ref": "R7dcc05e5ca15",
+          "margin_percent": "33",
+          "record_id": "market:0028",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "8",
+          "historical_sales": "9",
+          "item_ref": "Rcf5370ab2e7c",
+          "margin_percent": "24",
+          "record_id": "market:0024",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "9",
+          "item_ref": "R7dcc05e5ca15",
+          "margin_percent": "40",
+          "record_id": "market:0028",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "forecast_units": "22",
+          "historical_sales": "22",
+          "item_ref": "R6007124a9f06",
+          "margin_percent": "41",
+          "record_id": "market:0000",
+          "revision": "3",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "3",
+          "item_ref": "R6007124a9f06",
+          "margin_percent": "22",
+          "record_id": "market:0000",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "2",
+          "item_ref": "R665d41e9e962",
+          "margin_percent": "5",
+          "record_id": "market:0012",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "10",
+          "historical_sales": "10",
+          "item_ref": "R30896725a0ac",
+          "margin_percent": "14",
+          "record_id": "market:0030",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "1",
+          "item_ref": "R8e867287f9dc",
+          "margin_percent": "15",
+          "record_id": "market:0014",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "3",
+          "item_ref": "R65d8546a7fb6",
+          "margin_percent": "12",
+          "record_id": "market:0004",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "9",
+          "item_ref": "Rc2e7f1ec75e0",
+          "margin_percent": "32",
+          "record_id": "market:0020",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "1",
+          "item_ref": "Rc6c554a79b27",
+          "margin_percent": "31",
+          "record_id": "market:0026",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "2",
+          "item_ref": "Rcf5370ab2e7c",
+          "margin_percent": "17",
+          "record_id": "market:0024",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "1",
+          "item_ref": "R8e867287f9dc",
+          "margin_percent": "15",
+          "record_id": "market:0014",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "10",
+          "item_ref": "Rc07011e6ab2d",
+          "margin_percent": "25",
+          "record_id": "market:0022",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "2",
+          "item_ref": "Rc2e7f1ec75e0",
+          "margin_percent": "25",
+          "record_id": "market:0020",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "2",
+          "item_ref": "R2b2709069f4c",
+          "margin_percent": "35",
+          "record_id": "market:0010",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "forecast_units": "20",
+          "historical_sales": "21",
+          "item_ref": "R2b2709069f4c",
+          "margin_percent": "54",
+          "record_id": "market:0010",
+          "revision": "3",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "2",
+          "item_ref": "R7dcc05e5ca15",
+          "margin_percent": "33",
+          "record_id": "market:0028",
+          "revision": "2",
+          "table": "market",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "8",
+          "item_ref": "Rfb39090aa5c5",
+          "margin_percent": "35",
+          "record_id": "market:0018",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "forecast_units": "22",
+          "historical_sales": "22",
+          "item_ref": "R30896725a0ac",
+          "margin_percent": "26",
+          "record_id": "market:0030",
+          "revision": "3",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "3",
+          "item_ref": "R6007124a9f06",
+          "margin_percent": "22",
+          "record_id": "market:0000",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "3",
+          "historical_sales": "3",
+          "item_ref": "R30896725a0ac",
+          "margin_percent": "7",
+          "record_id": "market:0030",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "forecast_units": "21",
+          "historical_sales": "21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "margin_percent": "44",
+          "record_id": "market:0020",
+          "revision": "3",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "8",
+          "item_ref": "R8e867287f9dc",
+          "margin_percent": "22",
+          "record_id": "market:0014",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "8",
+          "historical_sales": "9",
+          "item_ref": "R2b2709069f4c",
+          "margin_percent": "42",
+          "record_id": "market:0010",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "9",
+          "historical_sales": "10",
+          "item_ref": "R65d8546a7fb6",
+          "margin_percent": "19",
+          "record_id": "market:0004",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "2",
+          "historical_sales": "3",
+          "item_ref": "R1218064667a2",
+          "margin_percent": "29",
+          "record_id": "market:0002",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "forecast_units": "1",
+          "historical_sales": "3",
+          "item_ref": "R148f899e57f6",
+          "margin_percent": "8",
+          "record_id": "market:0006",
+          "revision": "2",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_20_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "forecast_units": "3",
+          "historical_sales": "3",
+          "item_ref": "R6007124a9f06",
+          "margin_percent": "22",
+          "record_id": "market:withdrawn",
+          "revision": "1",
+          "table": "market",
+          "tenant": "NORTH"
+        }
+      }
+    ],
+    "requires": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R747b4b07f2df",
+          "prerequisite_ref": "R7955a6f70abc",
+          "record_id": "requires:0001",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "prerequisite_ref": "R65d8546a7fb6",
+          "record_id": "requires:0008",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7308b473a5a8",
+          "prerequisite_ref": "R6007124a9f06",
+          "record_id": "requires:0013",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R9197b70e3d09",
+          "prerequisite_ref": "R148f899e57f6",
+          "record_id": "requires:0017",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R747b4b07f2df",
+          "prerequisite_ref": "R7955a6f70abc",
+          "record_id": "requires:0001",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ra5833cedea5c",
+          "prerequisite_ref": "R1820116348cd",
+          "record_id": "requires:0011",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R9197b70e3d09",
+          "prerequisite_ref": "R148f899e57f6",
+          "record_id": "requires:0017",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rd05f0610c770",
+          "prerequisite_ref": "R65d8546a7fb6",
+          "record_id": "requires:0009",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf9db851ed8bb",
+          "prerequisite_ref": "R2b2709069f4c",
+          "record_id": "requires:0015",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "prerequisite_ref": "R65d8546a7fb6",
+          "record_id": "requires:0009",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf9db851ed8bb",
+          "prerequisite_ref": "R2b2709069f4c",
+          "record_id": "requires:0015",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "Re7d589eb4737",
+          "prerequisite_ref": "Ref851ccaa158",
+          "record_id": "requires:0003",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "prerequisite_ref": "R6007124a9f06",
+          "record_id": "requires:0005",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R698808ad9a96",
+          "prerequisite_ref": "R7955a6f70abc",
+          "record_id": "requires:0007",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R07e87ed82812",
+          "prerequisite_ref": "R148f899e57f6",
+          "record_id": "requires:0019",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Re7d589eb4737",
+          "prerequisite_ref": "Ref851ccaa158",
+          "record_id": "requires:0003",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "item_ref": "R0f58f5015d0d",
+          "prerequisite_ref": "R6007124a9f06",
+          "record_id": "requires:0005",
+          "revision": "3",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "prerequisite_ref": "Rc9f004c5ca0f",
+          "record_id": "requires:0000",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "prerequisite_ref": "R1b36613ee493",
+          "record_id": "requires:0016",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R698808ad9a96",
+          "prerequisite_ref": "R7955a6f70abc",
+          "record_id": "requires:0007",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "prerequisite_ref": "R6007124a9f06",
+          "record_id": "requires:0013",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R07e87ed82812",
+          "prerequisite_ref": "R148f899e57f6",
+          "record_id": "requires:0019",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R0f58f5015d0d",
+          "prerequisite_ref": "R6007124a9f06",
+          "record_id": "requires:0005",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rf9db851ed8bb",
+          "prerequisite_ref": "R2b2709069f4c",
+          "record_id": "requires:0015",
+          "revision": "3",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ra5833cedea5c",
+          "prerequisite_ref": "R1820116348cd",
+          "record_id": "requires:0011",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_0_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R698808ad9a96",
+          "prerequisite_ref": "R7955a6f70abc",
+          "record_id": "requires:0007",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "item_ref": "R665d41e9e962",
+          "prerequisite_ref": "Rc9f004c5ca0f",
+          "record_id": "requires:0000",
+          "revision": "3",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "prerequisite_ref": "R65d8546a7fb6",
+          "record_id": "requires:0008",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "DELETE",
+          "effective_date": "2026-03-02",
+          "item_ref": "",
+          "prerequisite_ref": "",
+          "record_id": "requires:withdrawn",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "prerequisite_ref": "R65d8546a7fb6",
+          "record_id": "requires:0004",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "prerequisite_ref": "R1820116348cd",
+          "record_id": "requires:0002",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "prerequisite_ref": "Rf6f2a500079e",
+          "record_id": "requires:0014",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R3a11be59ddaa",
+          "prerequisite_ref": "R65d8546a7fb6",
+          "record_id": "requires:0004",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc07011e6ab2d",
+          "prerequisite_ref": "R6007124a9f06",
+          "record_id": "requires:0010",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb39090aa5c5",
+          "prerequisite_ref": "R1820116348cd",
+          "record_id": "requires:0006",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "prerequisite_ref": "R6007124a9f06",
+          "record_id": "requires:0010",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc6c554a79b27",
+          "prerequisite_ref": "Rf6f2a500079e",
+          "record_id": "requires:0014",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "prerequisite_ref": "R148f899e57f6",
+          "record_id": "requires:0012",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R30896725a0ac",
+          "prerequisite_ref": "R2b2709069f4c",
+          "record_id": "requires:0018",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "prerequisite_ref": "R148f899e57f6",
+          "record_id": "requires:0012",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "SOUTH"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R665d41e9e962",
+          "prerequisite_ref": "Rc9f004c5ca0f",
+          "record_id": "requires:withdrawn",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "prerequisite_ref": "R148f899e57f6",
+          "record_id": "requires:0012",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "prerequisite_ref": "R2b2709069f4c",
+          "record_id": "requires:0018",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "prerequisite_ref": "R65d8546a7fb6",
+          "record_id": "requires:0008",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "prerequisite_ref": "Rf6f2a500079e",
+          "record_id": "requires:0014",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R665d41e9e962",
+          "prerequisite_ref": "Rc9f004c5ca0f",
+          "record_id": "requires:0000",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7dcc05e5ca15",
+          "prerequisite_ref": "R1b36613ee493",
+          "record_id": "requires:0016",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc07011e6ab2d",
+          "prerequisite_ref": "R6007124a9f06",
+          "record_id": "requires:0010",
+          "revision": "3",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "prerequisite_ref": "R1820116348cd",
+          "record_id": "requires:0006",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "prerequisite_ref": "R65d8546a7fb6",
+          "record_id": "requires:0004",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "prerequisite_ref": "Rc9f004c5ca0f",
+          "record_id": "requires:0000",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "prerequisite_ref": "Rc9f004c5ca0f",
+          "record_id": "requires:0000",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-01-21",
+          "item_ref": "R8e867287f9dc",
+          "prerequisite_ref": "R1820116348cd",
+          "record_id": "requires:0002",
+          "revision": "1",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_23_view_0",
+        "values": {
+          "action": "UPSERT",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "prerequisite_ref": "R1b36613ee493",
+          "record_id": "requires:0016",
+          "revision": "2",
+          "table": "requires",
+          "tenant": "NORTH"
+        }
+      }
+    ],
+    "usage": [
+      {
+        "data_row_number": 0,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "480",
+          "effective_date": "2026-02-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "usage:0040",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "360",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "usage:0028",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "usage:0012",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "540",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "usage:0082",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "120",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "usage:0082",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "720",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:0001",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "900",
+          "effective_date": "2026-01-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "usage:0040",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "600",
+          "effective_date": "2026-01-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "usage:0031",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "720",
+          "effective_date": "2026-01-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "usage:0019",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "540",
+          "effective_date": "2026-01-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "usage:0046",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "900",
+          "effective_date": "2026-01-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "usage:0058",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "420",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "usage:0070",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "300",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "usage:0085",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "960",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "usage:0061",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "600",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "usage:0010",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "420",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "usage:0007",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "300",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:0001",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "840",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "usage:0007",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "2000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "usage:0036",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "300",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "usage:0055",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "720",
+          "effective_date": "2026-01-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "usage:0088",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "usage:0025",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "1440",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "usage:0055",
+          "resource": "labor",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "540",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "usage:0061",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "300",
+          "effective_date": "2026-02-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "usage:0019",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "900",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "usage:0067",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "1320",
+          "effective_date": "2026-03-23",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "usage:0010",
+          "resource": "labor",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "660",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "usage:0073",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "660",
+          "effective_date": "2026-01-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "usage:0091",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "180",
+          "effective_date": "2026-02-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "usage:0094",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "480",
+          "effective_date": "2026-02-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "usage:0058",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "1620",
+          "effective_date": "2026-03-23",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "usage:0040",
+          "resource": "labor",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "660",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "usage:0064",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "420",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "usage:0007",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "180",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "usage:0037",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "900",
+          "effective_date": "2026-01-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "usage:0052",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "720",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "usage:0085",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "180",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "usage:0031",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "360",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "usage:0028",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "480",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "usage:0079",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "usage:0072",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "360",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "usage:0013",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "300",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "usage:0076",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "usage:0016",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "120",
+          "effective_date": "2026-02-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "usage:0046",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 45,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "1560",
+          "effective_date": "2026-03-23",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "usage:0070",
+          "resource": "labor",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 46,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "1440",
+          "effective_date": "2026-03-23",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "usage:0085",
+          "resource": "labor",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 47,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "usage:0084",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 48,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "usage:0022",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 49,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "480",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "usage:0052",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 50,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "usage:0073",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 51,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "usage:0091",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 52,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "480",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "usage:0049",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 53,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:0000",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 54,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "840",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "usage:0004",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 55,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "600",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "usage:0034",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 56,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "usage:0043",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 57,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "usage:0024",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 58,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "720",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "usage:0076",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 59,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "780",
+          "effective_date": "2026-01-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "usage:0013",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 60,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "180",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "usage:0010",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 61,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "usage:0048",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 62,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "usage:0064",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 63,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "420",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "usage:0004",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 64,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "420",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "usage:0070",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 65,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "660",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "usage:0025",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 66,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "840",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "usage:0070",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 67,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "600",
+          "effective_date": "2026-01-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "usage:0094",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 68,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "780",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "usage:0028",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 69,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "720",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "usage:0055",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 70,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "usage:0091",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 71,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "660",
+          "effective_date": "2026-01-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "usage:0043",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 72,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "660",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "usage:0016",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 73,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "180",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "usage:0034",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 74,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "usage:0060",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 75,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "900",
+          "effective_date": "2026-01-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "usage:0049",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 76,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "600",
+          "effective_date": "2026-01-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "usage:0037",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 77,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "900",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "usage:0079",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 78,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "660",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "usage:0022",
+          "resource": "labor",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 79,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "1380",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "usage:0025",
+          "resource": "labor",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 80,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "300",
+          "effective_date": "2026-02-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "usage:0088",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 81,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "480",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "usage:0067",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 82,
+        "table_id": "file_5_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "480",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "usage:0049",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "usage:0071",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "usage:0065",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "15000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "usage:0056",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "usage:0023",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "usage:0092",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "usage:0014",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "usage:0011",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "2000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "usage:0038",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "480",
+          "effective_date": "2026-02-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "usage:0040",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "usage:0020",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "usage:0071",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "300",
+          "effective_date": "2026-02-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "usage:0088",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "8000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "usage:0056",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "usage:0032",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "8000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "usage:0056",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "usage:0029",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "usage:0047",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "usage:0008",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "usage:0017",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "usage:0065",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "usage:0086",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "usage:0017",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "usage:0062",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "480",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "usage:0052",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "usage:0029",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "8000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "usage:0077",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "15000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "usage:0080",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:0002",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "usage:0026",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "usage:0014",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "usage:0026",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "15000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "usage:0077",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "usage:0050",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "7000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "usage:0068",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "14000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "usage:0089",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "300",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "usage:0076",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "usage:0095",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "4000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "usage:0035",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "27000",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "usage:0080",
+          "resource": "power",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "usage:0041",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "4000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "usage:0035",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "usage:0053",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "usage:0083",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "2000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "usage:0074",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "7000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "usage:0089",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 45,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "24000",
+          "effective_date": "2026-03-23",
+          "item_ref": "R148f899e57f6",
+          "record_id": "usage:0020",
+          "resource": "power",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 46,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "usage:0044",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 47,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "usage:0023",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 48,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:0002",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 49,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "14000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "usage:0068",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 50,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "usage:0053",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 51,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "usage:0020",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 52,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "27000",
+          "effective_date": "2026-03-23",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "usage:0005",
+          "resource": "power",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 53,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "usage:0092",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 54,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "usage:0083",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 55,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "usage:0059",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 56,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "usage:0008",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 57,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "8000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "usage:0080",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 58,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "8000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "usage:0005",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 59,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "usage:0016",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 60,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "24000",
+          "effective_date": "2026-03-23",
+          "item_ref": "R07e87ed82812",
+          "record_id": "usage:0095",
+          "resource": "power",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 61,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "usage:0014",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 62,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "8000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "usage:0077",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 63,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "usage:0047",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 64,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "23000",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "usage:0035",
+          "resource": "power",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 65,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "usage:0095",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 66,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "24000",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "usage:0065",
+          "resource": "power",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 67,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "11000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "usage:0035",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 68,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "usage:0041",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 69,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "usage:0038",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 70,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "usage:0062",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 71,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "15000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "usage:0005",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 72,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "usage:0044",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 73,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "usage:0050",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 74,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "usage:0059",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 75,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "420",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "usage:0004",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 76,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "usage:0074",
+          "resource": "power",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 77,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "360",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "usage:0028",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 78,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "240",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "usage:0064",
+          "resource": "labor",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "minute"
+        }
+      },
+      {
+        "data_row_number": 79,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "22000",
+          "effective_date": "2026-03-23",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "usage:0050",
+          "resource": "power",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 80,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "2000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "usage:0011",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 81,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "usage:0086",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 82,
+        "table_id": "file_18_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "usage:0032",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 0,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "usage:0003",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 1,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "usage:0069",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 2,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "usage:0045",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 3,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "usage:0045",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 4,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "usage:0024",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 5,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "usage:0054",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 6,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "usage:0048",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 7,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "8000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "usage:0056",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 8,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "usage:0066",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 9,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "8000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "usage:0087",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 10,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "usage:0006",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 11,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "usage:0042",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 12,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "28000",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "usage:0060",
+          "resource": "space",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 13,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "usage:0051",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 14,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "usage:0093",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 15,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R3a11be59ddaa",
+          "record_id": "usage:0048",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 16,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "usage:0008",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 17,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "usage:0084",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 18,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "usage:0063",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 19,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:0000",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 20,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "usage:0072",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 21,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "usage:0033",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 22,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "usage:0027",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 23,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "usage:0084",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 24,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:0000",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 25,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1b36613ee493",
+          "record_id": "usage:0027",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 26,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "usage:0032",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 27,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ra5833cedea5c",
+          "record_id": "usage:0069",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 28,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "usage:0009",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 29,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "usage:0042",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 30,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "4000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "usage:0081",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 31,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb39090aa5c5",
+          "record_id": "usage:0054",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 32,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "7000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "usage:0068",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 33,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7dcc05e5ca15",
+          "record_id": "usage:0084",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 34,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "usage:0090",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 35,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "2000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rfb0a4e0e3df5",
+          "record_id": "usage:0033",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 36,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "11000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rf9db851ed8bb",
+          "record_id": "usage:0081",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 37,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "usage:0078",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 38,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "4000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "usage:0039",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 39,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "7000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "usage:0021",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 40,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "11000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R747b4b07f2df",
+          "record_id": "usage:0039",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 41,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "usage:0042",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 42,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "7000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "usage:0021",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 43,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "usage:0018",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 44,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R07e87ed82812",
+          "record_id": "usage:0093",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 45,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "usage:0015",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 46,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "usage:0060",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 47,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "usage:0057",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 48,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rcf5370ab2e7c",
+          "record_id": "usage:0072",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 49,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "usage:0063",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 50,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "8000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "usage:0080",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 51,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R0f58f5015d0d",
+          "record_id": "usage:0051",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 52,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1218064667a2",
+          "record_id": "usage:0006",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 53,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "12000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "usage:0090",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 54,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "24000",
+          "effective_date": "2026-03-23",
+          "item_ref": "R30896725a0ac",
+          "record_id": "usage:0090",
+          "resource": "space",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 55,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "usage:0075",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 56,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "21000",
+          "effective_date": "2026-03-23",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "usage:0075",
+          "resource": "space",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 57,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "2000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7308b473a5a8",
+          "record_id": "usage:0075",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 58,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R30896725a0ac",
+          "record_id": "usage:0092",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 59,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "14000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R1820116348cd",
+          "record_id": "usage:0021",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 60,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "DELETE",
+          "amount": "",
+          "effective_date": "2026-03-02",
+          "item_ref": "",
+          "record_id": "usage:withdrawn",
+          "resource": "",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": ""
+        }
+      },
+      {
+        "data_row_number": 61,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "usage:0012",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 62,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R7955a6f70abc",
+          "record_id": "usage:0009",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 63,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rf6f2a500079e",
+          "record_id": "usage:0024",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 64,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "2000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Ref851ccaa158",
+          "record_id": "usage:0003",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 65,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:0000",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 66,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "3000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "usage:0015",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 67,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "Rc6c554a79b27",
+          "record_id": "usage:0078",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 68,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "15000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R9197b70e3d09",
+          "record_id": "usage:0087",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 69,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "usage:0036",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 70,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc07011e6ab2d",
+          "record_id": "usage:0066",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 71,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "10000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rd05f0610c770",
+          "record_id": "usage:0063",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 72,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "2000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R665d41e9e962",
+          "record_id": "usage:0036",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 73,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "28000",
+          "effective_date": "2026-03-23",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "usage:0030",
+          "resource": "space",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 74,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "usage:0030",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 75,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "9000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R698808ad9a96",
+          "record_id": "usage:0057",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 76,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "6000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:withdrawn",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 77,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "25000",
+          "effective_date": "2026-03-23",
+          "item_ref": "R6007124a9f06",
+          "record_id": "usage:0000",
+          "resource": "space",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 78,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "usage:0020",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "wh"
+        }
+      },
+      {
+        "data_row_number": 79,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "Rc2e7f1ec75e0",
+          "record_id": "usage:0060",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 80,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "28000",
+          "effective_date": "2026-03-23",
+          "item_ref": "Re7d589eb4737",
+          "record_id": "usage:0045",
+          "resource": "space",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 81,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "16000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R2b2709069f4c",
+          "record_id": "usage:0030",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 82,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "22000",
+          "effective_date": "2026-03-23",
+          "item_ref": "Rc9f004c5ca0f",
+          "record_id": "usage:0015",
+          "resource": "space",
+          "revision": "3",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 83,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "13000",
+          "effective_date": "2026-01-21",
+          "item_ref": "R65d8546a7fb6",
+          "record_id": "usage:0012",
+          "resource": "space",
+          "revision": "1",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 84,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "2000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R148f899e57f6",
+          "record_id": "usage:0018",
+          "resource": "space",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "NORTH",
+          "unit": "ml"
+        }
+      },
+      {
+        "data_row_number": 85,
+        "table_id": "file_22_view_0",
+        "values": {
+          "action": "UPSERT",
+          "amount": "5000",
+          "effective_date": "2026-02-21",
+          "item_ref": "R8e867287f9dc",
+          "record_id": "usage:0044",
+          "resource": "power",
+          "revision": "2",
+          "table": "usage",
+          "tenant": "SOUTH",
+          "unit": "wh"
+        }
+      }
+    ]
+  },
+  "logical_table_index": {
+    "benefit": [
+      "file_4_view_0",
+      "file_11_view_0",
+      "file_14_view_0"
+    ],
+    "bundle": [
+      "file_3_view_0",
+      "file_10_view_0"
+    ],
+    "capacity_ledger": [
+      "file_7_view_0",
+      "file_19_view_0"
+    ],
+    "category": [
+      "file_15_view_0",
+      "file_17_view_0"
+    ],
+    "identity": [
+      "file_1_view_0",
+      "file_21_view_0"
+    ],
+    "incompatible": [
+      "file_6_view_0",
+      "file_13_view_0"
+    ],
+    "item": [
+      "file_9_view_0",
+      "file_12_view_0"
+    ],
+    "item_fee": [
+      "file_2_view_0",
+      "file_16_view_0"
+    ],
+    "market": [
+      "file_8_view_0",
+      "file_20_view_0"
+    ],
+    "requires": [
+      "file_0_view_0",
+      "file_23_view_0"
+    ],
+    "usage": [
+      "file_5_view_0",
+      "file_18_view_0",
+      "file_22_view_0"
+    ]
+  },
+  "query": "A vehicle dealer is reconciling its inventory records before placing an order. For business unit NORTH, use the records effective on or before 2026-03-12 and find the replenishment quantities with the highest net return. For each (tenant, table, record_id), exclude future events, keep the highest integer revision and discard the record if that revision is DELETE. Identical retransmissions count once. This selection rule applies to every table before joining or summing records. The benefit rows contain signed amount_cents components; sum them for each item to obtain its per-unit benefit. Deduct item_fee once for each option with positive quantity. Use 1000 ml per liter, 60 minutes per hour and 1000 wh per kwh when comparing resource use with capacity. An authorized option may be rejected or accepted in an integer lot between minimum_lot and maximum_order; unauthorized options must have zero quantity. The signed capacity_ledger total is the limit for each resource, and usage is per ordered unit. Category quantity limits are unconditional. The category activation fee is charged once when that category is used. Respect all incompatible pairs and requires dependencies: the latter require a positive prerequisite quantity, not a quantity ratio. Award each bundle bonus once when both options are ordered, and zero otherwise, including when either option is unauthorized. Report the maximum net benefit in USD cents. All fixed fees and bonuses are in the same unit.",
+  "relationships": [],
+  "tables": [
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "prerequisite_ref"
+      ],
+      "file_name": "export_01.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R747b4b07f2df",
+            "prerequisite_ref": "R7955a6f70abc",
+            "record_id": "requires:0001",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "prerequisite_ref": "R65d8546a7fb6",
+            "record_id": "requires:0008",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7308b473a5a8",
+            "prerequisite_ref": "R6007124a9f06",
+            "record_id": "requires:0013",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R9197b70e3d09",
+            "prerequisite_ref": "R148f899e57f6",
+            "record_id": "requires:0017",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R747b4b07f2df",
+            "prerequisite_ref": "R7955a6f70abc",
+            "record_id": "requires:0001",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ra5833cedea5c",
+            "prerequisite_ref": "R1820116348cd",
+            "record_id": "requires:0011",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R9197b70e3d09",
+            "prerequisite_ref": "R148f899e57f6",
+            "record_id": "requires:0017",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rd05f0610c770",
+            "prerequisite_ref": "R65d8546a7fb6",
+            "record_id": "requires:0009",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf9db851ed8bb",
+            "prerequisite_ref": "R2b2709069f4c",
+            "record_id": "requires:0015",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "prerequisite_ref": "R65d8546a7fb6",
+            "record_id": "requires:0009",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf9db851ed8bb",
+            "prerequisite_ref": "R2b2709069f4c",
+            "record_id": "requires:0015",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "Re7d589eb4737",
+            "prerequisite_ref": "Ref851ccaa158",
+            "record_id": "requires:0003",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "prerequisite_ref": "R6007124a9f06",
+            "record_id": "requires:0005",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R698808ad9a96",
+            "prerequisite_ref": "R7955a6f70abc",
+            "record_id": "requires:0007",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R07e87ed82812",
+            "prerequisite_ref": "R148f899e57f6",
+            "record_id": "requires:0019",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Re7d589eb4737",
+            "prerequisite_ref": "Ref851ccaa158",
+            "record_id": "requires:0003",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "item_ref": "R0f58f5015d0d",
+            "prerequisite_ref": "R6007124a9f06",
+            "record_id": "requires:0005",
+            "revision": "3",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "prerequisite_ref": "Rc9f004c5ca0f",
+            "record_id": "requires:0000",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "prerequisite_ref": "R1b36613ee493",
+            "record_id": "requires:0016",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R698808ad9a96",
+            "prerequisite_ref": "R7955a6f70abc",
+            "record_id": "requires:0007",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "prerequisite_ref": "R6007124a9f06",
+            "record_id": "requires:0013",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R07e87ed82812",
+            "prerequisite_ref": "R148f899e57f6",
+            "record_id": "requires:0019",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R0f58f5015d0d",
+            "prerequisite_ref": "R6007124a9f06",
+            "record_id": "requires:0005",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rf9db851ed8bb",
+            "prerequisite_ref": "R2b2709069f4c",
+            "record_id": "requires:0015",
+            "revision": "3",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ra5833cedea5c",
+            "prerequisite_ref": "R1820116348cd",
+            "record_id": "requires:0011",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R698808ad9a96",
+            "prerequisite_ref": "R7955a6f70abc",
+            "record_id": "requires:0007",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_0_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "ref",
+        "kind",
+        "entity_id"
+      ],
+      "file_name": "export_02.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I01",
+            "kind": "item",
+            "record_id": "identity:0001",
+            "ref": "Ref851ccaa158",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I03",
+            "kind": "item",
+            "record_id": "identity:0003",
+            "ref": "R7955a6f70abc",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I03",
+            "kind": "item",
+            "record_id": "identity:0003",
+            "ref": "R7955a6f70abc",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I09",
+            "kind": "item",
+            "record_id": "identity:0009",
+            "ref": "R1b36613ee493",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I15",
+            "kind": "item",
+            "record_id": "identity:0015",
+            "ref": "Re7d589eb4737",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I07",
+            "kind": "item",
+            "record_id": "identity:0007",
+            "ref": "R1820116348cd",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I08",
+            "kind": "item",
+            "record_id": "identity:0008",
+            "ref": "Rf6f2a500079e",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I13",
+            "kind": "item",
+            "record_id": "identity:0013",
+            "ref": "R747b4b07f2df",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I17",
+            "kind": "item",
+            "record_id": "identity:0017",
+            "ref": "R0f58f5015d0d",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I23",
+            "kind": "item",
+            "record_id": "identity:0023",
+            "ref": "Ra5833cedea5c",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I21",
+            "kind": "item",
+            "record_id": "identity:0021",
+            "ref": "Rd05f0610c770",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I21",
+            "kind": "item",
+            "record_id": "identity:0021",
+            "ref": "Rd05f0610c770",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I31",
+            "kind": "item",
+            "record_id": "identity:0031",
+            "ref": "R07e87ed82812",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I25",
+            "kind": "item",
+            "record_id": "identity:0025",
+            "ref": "R7308b473a5a8",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I11",
+            "kind": "item",
+            "record_id": "identity:0011",
+            "ref": "Rfb0a4e0e3df5",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "entity_id": "I25",
+            "kind": "item",
+            "record_id": "identity:0025",
+            "ref": "R7308b473a5a8",
+            "revision": "3",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I21",
+            "kind": "item",
+            "record_id": "identity:0021",
+            "ref": "Rd05f0610c770",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I19",
+            "kind": "item",
+            "record_id": "identity:0019",
+            "ref": "R698808ad9a96",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I00",
+            "kind": "item",
+            "record_id": "identity:0000",
+            "ref": "R6007124a9f06",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I01",
+            "kind": "item",
+            "record_id": "identity:0001",
+            "ref": "Ref851ccaa158",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I19",
+            "kind": "item",
+            "record_id": "identity:0019",
+            "ref": "R698808ad9a96",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I05",
+            "kind": "item",
+            "record_id": "identity:0005",
+            "ref": "Rc9f004c5ca0f",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I27",
+            "kind": "item",
+            "record_id": "identity:0027",
+            "ref": "Rf9db851ed8bb",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I24",
+            "kind": "item",
+            "record_id": "identity:0024",
+            "ref": "Rcf5370ab2e7c",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I16",
+            "kind": "item",
+            "record_id": "identity:0016",
+            "ref": "R3a11be59ddaa",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I29",
+            "kind": "item",
+            "record_id": "identity:0029",
+            "ref": "R9197b70e3d09",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "entity_id": "I05",
+            "kind": "item",
+            "record_id": "identity:0005",
+            "ref": "Rc9f004c5ca0f",
+            "revision": "3",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I09",
+            "kind": "item",
+            "record_id": "identity:0009",
+            "ref": "R1b36613ee493",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I25",
+            "kind": "item",
+            "record_id": "identity:0025",
+            "ref": "R7308b473a5a8",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I15",
+            "kind": "item",
+            "record_id": "identity:0015",
+            "ref": "Re7d589eb4737",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I31",
+            "kind": "item",
+            "record_id": "identity:0031",
+            "ref": "R07e87ed82812",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I05",
+            "kind": "item",
+            "record_id": "identity:0005",
+            "ref": "Rc9f004c5ca0f",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I11",
+            "kind": "item",
+            "record_id": "identity:0011",
+            "ref": "Rfb0a4e0e3df5",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "entity_id": "I15",
+            "kind": "item",
+            "record_id": "identity:0015",
+            "ref": "Re7d589eb4737",
+            "revision": "3",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I13",
+            "kind": "item",
+            "record_id": "identity:0013",
+            "ref": "R747b4b07f2df",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I27",
+            "kind": "item",
+            "record_id": "identity:0027",
+            "ref": "Rf9db851ed8bb",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I07",
+            "kind": "item",
+            "record_id": "identity:0007",
+            "ref": "R1820116348cd",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I07",
+            "kind": "item",
+            "record_id": "identity:0007",
+            "ref": "R1820116348cd",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I29",
+            "kind": "item",
+            "record_id": "identity:0029",
+            "ref": "R9197b70e3d09",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I23",
+            "kind": "item",
+            "record_id": "identity:0023",
+            "ref": "Ra5833cedea5c",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I17",
+            "kind": "item",
+            "record_id": "identity:0017",
+            "ref": "R0f58f5015d0d",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_1_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "activation_fee_cents"
+      ],
+      "file_name": "export_03.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "490",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "item_fee:0018",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "499",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "item_fee:0012",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "501",
+            "effective_date": "2026-01-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "item_fee:0016",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "492",
+            "effective_date": "2026-02-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "item_fee:0006",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "132",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "item_fee:0020",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "224",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "item_fee:0008",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "494",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "item_fee:0016",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "217",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "item_fee:0008",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "336",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "item_fee:0028",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "195",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "item_fee:0022",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "215",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "item_fee:0004",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "256",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "item_fee:0002",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "DELETE",
+            "activation_fee_cents": "",
+            "effective_date": "2026-03-02",
+            "item_ref": "",
+            "record_id": "item_fee:withdrawn",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "411",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "item_fee:0026",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "372",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "item_fee:0000",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "499",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "item_fee:0012",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "343",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "item_fee:0028",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "465",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "item_fee:0024",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "336",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "item_fee:0028",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "391",
+            "effective_date": "2026-03-23",
+            "item_ref": "R6007124a9f06",
+            "record_id": "item_fee:0000",
+            "revision": "3",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "372",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "item_fee:0000",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "506",
+            "effective_date": "2026-01-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "item_fee:0012",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "130",
+            "effective_date": "2026-01-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "item_fee:0030",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "498",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "item_fee:0014",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "222",
+            "effective_date": "2026-01-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "item_fee:0004",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "132",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "item_fee:0020",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "404",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "item_fee:0026",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "458",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "item_fee:0024",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "498",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "item_fee:0014",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "202",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "item_fee:0022",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "139",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "item_fee:0020",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "288",
+            "effective_date": "2026-03-23",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "item_fee:0010",
+            "revision": "3",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "276",
+            "effective_date": "2026-01-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "item_fee:0010",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "336",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "item_fee:0028",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "497",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "item_fee:0018",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "123",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "item_fee:0030",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "379",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "item_fee:0000",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "142",
+            "effective_date": "2026-03-23",
+            "item_ref": "R30896725a0ac",
+            "record_id": "item_fee:0030",
+            "revision": "3",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "151",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "item_fee:0020",
+            "revision": "3",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "505",
+            "effective_date": "2026-01-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "item_fee:0014",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "269",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "item_fee:0010",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "215",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "item_fee:0004",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "249",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "item_fee:0002",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "499",
+            "effective_date": "2026-01-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "item_fee:0006",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "372",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "item_fee:withdrawn",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_2_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_a",
+        "item_b",
+        "bonus_cents"
+      ],
+      "file_name": "export_04.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "136",
+            "effective_date": "2026-01-21",
+            "item_a": "R7308b473a5a8",
+            "item_b": "Rf6f2a500079e",
+            "record_id": "bundle:0001",
+            "revision": "1",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "174",
+            "effective_date": "2026-02-21",
+            "item_a": "R148f899e57f6",
+            "item_b": "R698808ad9a96",
+            "record_id": "bundle:0000",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "276",
+            "effective_date": "2026-01-21",
+            "item_a": "R148f899e57f6",
+            "item_b": "Rc07011e6ab2d",
+            "record_id": "bundle:0007",
+            "revision": "1",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "529",
+            "effective_date": "2026-03-23",
+            "item_a": "R698808ad9a96",
+            "item_b": "R07e87ed82812",
+            "record_id": "bundle:0005",
+            "revision": "3",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "187",
+            "effective_date": "2026-01-21",
+            "item_a": "R8e867287f9dc",
+            "item_b": "Rc2e7f1ec75e0",
+            "record_id": "bundle:0003",
+            "revision": "1",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "129",
+            "effective_date": "2026-02-21",
+            "item_a": "R7308b473a5a8",
+            "item_b": "Rf6f2a500079e",
+            "record_id": "bundle:0001",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "269",
+            "effective_date": "2026-02-21",
+            "item_a": "R148f899e57f6",
+            "item_b": "Rc07011e6ab2d",
+            "record_id": "bundle:0007",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "180",
+            "effective_date": "2026-02-21",
+            "item_a": "R8e867287f9dc",
+            "item_b": "Rc2e7f1ec75e0",
+            "record_id": "bundle:0003",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "269",
+            "effective_date": "2026-02-21",
+            "item_a": "R148f899e57f6",
+            "item_b": "Rc07011e6ab2d",
+            "record_id": "bundle:0007",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "517",
+            "effective_date": "2026-01-21",
+            "item_a": "R698808ad9a96",
+            "item_b": "R07e87ed82812",
+            "record_id": "bundle:0005",
+            "revision": "1",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "510",
+            "effective_date": "2026-02-21",
+            "item_a": "R698808ad9a96",
+            "item_b": "R07e87ed82812",
+            "record_id": "bundle:0005",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_3_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "component",
+        "amount_cents"
+      ],
+      "file_name": "export_05.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "680",
+            "component": "item6_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "benefit:0012",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-20",
+            "component": "item13_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "benefit:0027",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "968",
+            "component": "item12_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "benefit:0024",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-18",
+            "component": "item31_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "benefit:0063",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "684",
+            "component": "item18_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "benefit:0036",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9034",
+            "component": "item27_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "benefit:0054",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-37",
+            "component": "item19_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "benefit:0039",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-5",
+            "component": "item22_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "benefit:0045",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "420",
+            "component": "item21_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "benefit:0042",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1043",
+            "component": "item9_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "benefit:0018",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "673",
+            "component": "item6_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "benefit:0012",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-5",
+            "component": "item10_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "benefit:0021",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-20",
+            "component": "item16_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "benefit:0033",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "2",
+            "component": "item10_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "benefit:0021",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "417",
+            "component": "item21_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "benefit:0042",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1093",
+            "component": "item3_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "benefit:0006",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-18",
+            "component": "item31_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "benefit:0063",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1358",
+            "component": "item20_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "benefit:0040",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "668",
+            "component": "item0_base",
+            "effective_date": "2026-03-23",
+            "item_ref": "R6007124a9f06",
+            "record_id": "benefit:0000",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "0",
+            "component": "item28_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "benefit:0057",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-24",
+            "component": "item25_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "benefit:0051",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9004",
+            "component": "item15_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "benefit:0030",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "14",
+            "component": "item22_rebate",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "benefit:0045",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-20",
+            "component": "item16_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "benefit:0033",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-7",
+            "component": "item28_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "benefit:0057",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-5",
+            "component": "item4_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "benefit:0009",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1224",
+            "component": "item30_base",
+            "effective_date": "2026-03-23",
+            "item_ref": "R30896725a0ac",
+            "record_id": "benefit:0060",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "691",
+            "component": "item18_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "benefit:0036",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-7",
+            "component": "item1_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "benefit:0003",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1186",
+            "component": "item14_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "benefit:0028",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "965",
+            "component": "item12_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "benefit:0024",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "649",
+            "component": "item0_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "benefit:0000",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "649",
+            "component": "item0_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "benefit:0000",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1215",
+            "component": "item8_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "benefit:0016",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-44",
+            "component": "item19_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "benefit:0039",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "857",
+            "component": "item26_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "benefit:0052",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "417",
+            "component": "item21_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "benefit:0042",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1036",
+            "component": "item9_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "benefit:0018",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9040",
+            "component": "item24_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "benefit:0048",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9004",
+            "component": "item15_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "benefit:0030",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "2",
+            "component": "item22_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "benefit:0045",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-7",
+            "component": "item7_rebate",
+            "effective_date": "2026-03-23",
+            "item_ref": "R1820116348cd",
+            "record_id": "benefit:0015",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-19",
+            "component": "item7_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "benefit:0015",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1120",
+            "component": "item2_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "benefit:0004",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-20",
+            "component": "item13_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "benefit:0027",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 45,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1212",
+            "component": "item30_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "benefit:0060",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 46,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9037",
+            "component": "item27_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "benefit:0054",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 47,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-31",
+            "component": "item25_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "benefit:0051",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 48,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1205",
+            "component": "item30_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "benefit:0060",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 49,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "656",
+            "component": "item0_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "benefit:0000",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 50,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-18",
+            "component": "item31_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "benefit:0063",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 51,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9004",
+            "component": "item15_base",
+            "effective_date": "2026-03-23",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "benefit:0030",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 52,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-5",
+            "component": "item10_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "benefit:0021",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 53,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-26",
+            "component": "item7_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "benefit:0015",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 54,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1093",
+            "component": "item3_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "benefit:0006",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 55,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "0",
+            "component": "item1_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "benefit:0003",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 56,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-8",
+            "component": "item4_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "benefit:0009",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 57,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9033",
+            "component": "item24_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "benefit:0048",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_4_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "resource",
+        "amount",
+        "unit"
+      ],
+      "file_name": "export_06.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "amount": "480",
+            "effective_date": "2026-02-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "usage:0040",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "amount": "360",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "usage:0028",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "usage:0012",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "amount": "540",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "usage:0082",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "amount": "120",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "usage:0082",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "amount": "720",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:0001",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "amount": "900",
+            "effective_date": "2026-01-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "usage:0040",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "amount": "600",
+            "effective_date": "2026-01-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "usage:0031",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "amount": "720",
+            "effective_date": "2026-01-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "usage:0019",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "amount": "540",
+            "effective_date": "2026-01-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "usage:0046",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "amount": "900",
+            "effective_date": "2026-01-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "usage:0058",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "amount": "420",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "usage:0070",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "amount": "300",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "usage:0085",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "amount": "960",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "usage:0061",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "amount": "600",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "usage:0010",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "amount": "420",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "usage:0007",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "amount": "300",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:0001",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "amount": "840",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "usage:0007",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "amount": "2000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "usage:0036",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "amount": "300",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "usage:0055",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "amount": "720",
+            "effective_date": "2026-01-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "usage:0088",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "usage:0025",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "amount": "1440",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "usage:0055",
+            "resource": "labor",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "amount": "540",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "usage:0061",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "amount": "300",
+            "effective_date": "2026-02-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "usage:0019",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "amount": "900",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "usage:0067",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "amount": "1320",
+            "effective_date": "2026-03-23",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "usage:0010",
+            "resource": "labor",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "amount": "660",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "usage:0073",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "amount": "660",
+            "effective_date": "2026-01-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "usage:0091",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "amount": "180",
+            "effective_date": "2026-02-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "usage:0094",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "amount": "480",
+            "effective_date": "2026-02-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "usage:0058",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "amount": "1620",
+            "effective_date": "2026-03-23",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "usage:0040",
+            "resource": "labor",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "amount": "660",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "usage:0064",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "amount": "420",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "usage:0007",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "amount": "180",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "usage:0037",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "amount": "900",
+            "effective_date": "2026-01-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "usage:0052",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "amount": "720",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "usage:0085",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "amount": "180",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "usage:0031",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "amount": "360",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "usage:0028",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "amount": "480",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "usage:0079",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "usage:0072",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "amount": "360",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "usage:0013",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "amount": "300",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "usage:0076",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "usage:0016",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "UPSERT",
+            "amount": "120",
+            "effective_date": "2026-02-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "usage:0046",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 45,
+          "values": {
+            "action": "UPSERT",
+            "amount": "1560",
+            "effective_date": "2026-03-23",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "usage:0070",
+            "resource": "labor",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 46,
+          "values": {
+            "action": "UPSERT",
+            "amount": "1440",
+            "effective_date": "2026-03-23",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "usage:0085",
+            "resource": "labor",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 47,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "usage:0084",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 48,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "usage:0022",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 49,
+          "values": {
+            "action": "UPSERT",
+            "amount": "480",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "usage:0052",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 50,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "usage:0073",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 51,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "usage:0091",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 52,
+          "values": {
+            "action": "UPSERT",
+            "amount": "480",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "usage:0049",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 53,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:0000",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 54,
+          "values": {
+            "action": "UPSERT",
+            "amount": "840",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "usage:0004",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 55,
+          "values": {
+            "action": "UPSERT",
+            "amount": "600",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "usage:0034",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 56,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "usage:0043",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 57,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "usage:0024",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 58,
+          "values": {
+            "action": "UPSERT",
+            "amount": "720",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "usage:0076",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 59,
+          "values": {
+            "action": "UPSERT",
+            "amount": "780",
+            "effective_date": "2026-01-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "usage:0013",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 60,
+          "values": {
+            "action": "UPSERT",
+            "amount": "180",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "usage:0010",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 61,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "usage:0048",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 62,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "usage:0064",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 63,
+          "values": {
+            "action": "UPSERT",
+            "amount": "420",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "usage:0004",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 64,
+          "values": {
+            "action": "UPSERT",
+            "amount": "420",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "usage:0070",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 65,
+          "values": {
+            "action": "UPSERT",
+            "amount": "660",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "usage:0025",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 66,
+          "values": {
+            "action": "UPSERT",
+            "amount": "840",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "usage:0070",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 67,
+          "values": {
+            "action": "UPSERT",
+            "amount": "600",
+            "effective_date": "2026-01-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "usage:0094",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 68,
+          "values": {
+            "action": "UPSERT",
+            "amount": "780",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "usage:0028",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 69,
+          "values": {
+            "action": "UPSERT",
+            "amount": "720",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "usage:0055",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 70,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "usage:0091",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 71,
+          "values": {
+            "action": "UPSERT",
+            "amount": "660",
+            "effective_date": "2026-01-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "usage:0043",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 72,
+          "values": {
+            "action": "UPSERT",
+            "amount": "660",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "usage:0016",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 73,
+          "values": {
+            "action": "UPSERT",
+            "amount": "180",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "usage:0034",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 74,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "usage:0060",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 75,
+          "values": {
+            "action": "UPSERT",
+            "amount": "900",
+            "effective_date": "2026-01-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "usage:0049",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 76,
+          "values": {
+            "action": "UPSERT",
+            "amount": "600",
+            "effective_date": "2026-01-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "usage:0037",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 77,
+          "values": {
+            "action": "UPSERT",
+            "amount": "900",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "usage:0079",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 78,
+          "values": {
+            "action": "UPSERT",
+            "amount": "660",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "usage:0022",
+            "resource": "labor",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 79,
+          "values": {
+            "action": "UPSERT",
+            "amount": "1380",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "usage:0025",
+            "resource": "labor",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 80,
+          "values": {
+            "action": "UPSERT",
+            "amount": "300",
+            "effective_date": "2026-02-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "usage:0088",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 81,
+          "values": {
+            "action": "UPSERT",
+            "amount": "480",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "usage:0067",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 82,
+          "values": {
+            "action": "UPSERT",
+            "amount": "480",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "usage:0049",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        }
+      ],
+      "table_id": "file_5_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_a",
+        "item_b"
+      ],
+      "file_name": "export_07.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R65d8546a7fb6",
+            "item_b": "R665d41e9e962",
+            "record_id": "incompatible:0000",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R7955a6f70abc",
+            "item_b": "R698808ad9a96",
+            "record_id": "incompatible:0009",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R747b4b07f2df",
+            "item_b": "Rf6f2a500079e",
+            "record_id": "incompatible:0001",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "R747b4b07f2df",
+            "item_b": "Rf6f2a500079e",
+            "record_id": "incompatible:0001",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "Rfb39090aa5c5",
+            "item_b": "R148f899e57f6",
+            "record_id": "incompatible:0008",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "R7308b473a5a8",
+            "item_b": "Rf9db851ed8bb",
+            "record_id": "incompatible:0007",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R747b4b07f2df",
+            "item_b": "Rd05f0610c770",
+            "record_id": "incompatible:0005",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R9197b70e3d09",
+            "item_b": "R665d41e9e962",
+            "record_id": "incompatible:0003",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R7308b473a5a8",
+            "item_b": "Rf9db851ed8bb",
+            "record_id": "incompatible:0007",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "R7955a6f70abc",
+            "item_b": "R698808ad9a96",
+            "record_id": "incompatible:0009",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "R9197b70e3d09",
+            "item_b": "R665d41e9e962",
+            "record_id": "incompatible:0003",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R7308b473a5a8",
+            "item_b": "Rf9db851ed8bb",
+            "record_id": "incompatible:0007",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "item_a": "R747b4b07f2df",
+            "item_b": "Rd05f0610c770",
+            "record_id": "incompatible:0005",
+            "revision": "3",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "R747b4b07f2df",
+            "item_b": "Rd05f0610c770",
+            "record_id": "incompatible:0005",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_6_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "resource",
+        "entry",
+        "amount",
+        "unit"
+      ],
+      "file_name": "export_08.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "amount": "246007",
+            "effective_date": "2026-01-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0004",
+            "resource": "power",
+            "revision": "1",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13140",
+            "effective_date": "2026-02-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0002",
+            "resource": "labor",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "amount": "241000",
+            "effective_date": "2026-02-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0000",
+            "resource": "space",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13147",
+            "effective_date": "2026-01-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0002",
+            "resource": "labor",
+            "revision": "1",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "amount": "241019",
+            "effective_date": "2026-03-23",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0000",
+            "resource": "space",
+            "revision": "3",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "DELETE",
+            "amount": "",
+            "effective_date": "2026-03-02",
+            "entry": "",
+            "record_id": "capacity_ledger:withdrawn",
+            "resource": "",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": ""
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "amount": "246000",
+            "effective_date": "2026-02-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0004",
+            "resource": "power",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "amount": "241000",
+            "effective_date": "2026-01-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:withdrawn",
+            "resource": "space",
+            "revision": "1",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "amount": "241000",
+            "effective_date": "2026-02-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0000",
+            "resource": "space",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "amount": "241007",
+            "effective_date": "2026-01-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0000",
+            "resource": "space",
+            "revision": "1",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "amount": "246000",
+            "effective_date": "2026-02-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0004",
+            "resource": "power",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "SOUTH",
+            "unit": "wh"
+          }
+        }
+      ],
+      "table_id": "file_7_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "historical_sales",
+        "forecast_units",
+        "margin_percent"
+      ],
+      "file_name": "export_09.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "3",
+            "item_ref": "Ref851ccaa158",
+            "margin_percent": "28",
+            "record_id": "market:0001",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "2",
+            "item_ref": "R7955a6f70abc",
+            "margin_percent": "26",
+            "record_id": "market:0003",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "9",
+            "item_ref": "R7955a6f70abc",
+            "margin_percent": "33",
+            "record_id": "market:0003",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "10",
+            "historical_sales": "10",
+            "item_ref": "R1b36613ee493",
+            "margin_percent": "17",
+            "record_id": "market:0009",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "9",
+            "item_ref": "Re7d589eb4737",
+            "margin_percent": "42",
+            "record_id": "market:0015",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "3",
+            "item_ref": "R1820116348cd",
+            "margin_percent": "18",
+            "record_id": "market:0007",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "1",
+            "item_ref": "Rf6f2a500079e",
+            "margin_percent": "31",
+            "record_id": "market:0008",
+            "revision": "2",
+            "table": "market",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "10",
+            "historical_sales": "9",
+            "item_ref": "R747b4b07f2df",
+            "margin_percent": "41",
+            "record_id": "market:0013",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "10",
+            "item_ref": "R0f58f5015d0d",
+            "margin_percent": "36",
+            "record_id": "market:0017",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "3",
+            "item_ref": "Ra5833cedea5c",
+            "margin_percent": "16",
+            "record_id": "market:0023",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "1",
+            "item_ref": "Rd05f0610c770",
+            "margin_percent": "30",
+            "record_id": "market:0021",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "1",
+            "item_ref": "Rd05f0610c770",
+            "margin_percent": "30",
+            "record_id": "market:0021",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "8",
+            "historical_sales": "10",
+            "item_ref": "R07e87ed82812",
+            "margin_percent": "39",
+            "record_id": "market:0031",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "3",
+            "item_ref": "R7308b473a5a8",
+            "margin_percent": "6",
+            "record_id": "market:0025",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "1",
+            "item_ref": "Rfb0a4e0e3df5",
+            "margin_percent": "7",
+            "record_id": "market:0011",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "8",
+            "historical_sales": "10",
+            "item_ref": "R7308b473a5a8",
+            "margin_percent": "13",
+            "record_id": "market:0025",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "10",
+            "historical_sales": "8",
+            "item_ref": "Rd05f0610c770",
+            "margin_percent": "37",
+            "record_id": "market:0021",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "10",
+            "historical_sales": "10",
+            "item_ref": "R698808ad9a96",
+            "margin_percent": "19",
+            "record_id": "market:0019",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "3",
+            "item_ref": "R6007124a9f06",
+            "margin_percent": "22",
+            "record_id": "market:0000",
+            "revision": "2",
+            "table": "market",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "10",
+            "item_ref": "Ref851ccaa158",
+            "margin_percent": "35",
+            "record_id": "market:0001",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "3",
+            "item_ref": "R698808ad9a96",
+            "margin_percent": "12",
+            "record_id": "market:0019",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "10",
+            "historical_sales": "10",
+            "item_ref": "Rc9f004c5ca0f",
+            "margin_percent": "22",
+            "record_id": "market:0005",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "9",
+            "item_ref": "Rf9db851ed8bb",
+            "margin_percent": "12",
+            "record_id": "market:0027",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "2",
+            "item_ref": "Rcf5370ab2e7c",
+            "margin_percent": "17",
+            "record_id": "market:0024",
+            "revision": "2",
+            "table": "market",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "3",
+            "item_ref": "R3a11be59ddaa",
+            "margin_percent": "15",
+            "record_id": "market:0016",
+            "revision": "2",
+            "table": "market",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "10",
+            "historical_sales": "10",
+            "item_ref": "R9197b70e3d09",
+            "margin_percent": "37",
+            "record_id": "market:0029",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "3",
+            "item_ref": "Rc9f004c5ca0f",
+            "margin_percent": "15",
+            "record_id": "market:0005",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "3",
+            "item_ref": "R1b36613ee493",
+            "margin_percent": "10",
+            "record_id": "market:0009",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "forecast_units": "20",
+            "historical_sales": "22",
+            "item_ref": "R7308b473a5a8",
+            "margin_percent": "25",
+            "record_id": "market:0025",
+            "revision": "3",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "forecast_units": "21",
+            "historical_sales": "21",
+            "item_ref": "Re7d589eb4737",
+            "margin_percent": "54",
+            "record_id": "market:0015",
+            "revision": "3",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "3",
+            "item_ref": "R07e87ed82812",
+            "margin_percent": "32",
+            "record_id": "market:0031",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "forecast_units": "22",
+            "historical_sales": "22",
+            "item_ref": "Rc9f004c5ca0f",
+            "margin_percent": "34",
+            "record_id": "market:0005",
+            "revision": "3",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "8",
+            "historical_sales": "8",
+            "item_ref": "Rfb0a4e0e3df5",
+            "margin_percent": "14",
+            "record_id": "market:0011",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "2",
+            "item_ref": "Re7d589eb4737",
+            "margin_percent": "35",
+            "record_id": "market:0015",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "2",
+            "item_ref": "R747b4b07f2df",
+            "margin_percent": "34",
+            "record_id": "market:0013",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "2",
+            "item_ref": "Rf9db851ed8bb",
+            "margin_percent": "5",
+            "record_id": "market:0027",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "3",
+            "item_ref": "R1820116348cd",
+            "margin_percent": "18",
+            "record_id": "market:0007",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "8",
+            "historical_sales": "10",
+            "item_ref": "R1820116348cd",
+            "margin_percent": "25",
+            "record_id": "market:0007",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "3",
+            "item_ref": "R9197b70e3d09",
+            "margin_percent": "30",
+            "record_id": "market:0029",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "10",
+            "item_ref": "Ra5833cedea5c",
+            "margin_percent": "23",
+            "record_id": "market:0023",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "3",
+            "item_ref": "R0f58f5015d0d",
+            "margin_percent": "29",
+            "record_id": "market:0017",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_8_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "category",
+        "authorized",
+        "minimum_lot",
+        "maximum_order"
+      ],
+      "file_name": "export_10.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G2",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb39090aa5c5",
+            "maximum_order": "20",
+            "minimum_lot": "9",
+            "record_id": "item:0018",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "maximum_order": "8",
+            "minimum_lot": "2",
+            "record_id": "item:0012",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "item_ref": "R3a11be59ddaa",
+            "maximum_order": "17",
+            "minimum_lot": "9",
+            "record_id": "item:0016",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G2",
+            "effective_date": "2026-01-21",
+            "item_ref": "R148f899e57f6",
+            "maximum_order": "20",
+            "minimum_lot": "9",
+            "record_id": "item:0006",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "maximum_order": "7",
+            "minimum_lot": "2",
+            "record_id": "item:0020",
+            "revision": "2",
+            "table": "item",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "maximum_order": "13",
+            "minimum_lot": "2",
+            "record_id": "item:0008",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "maximum_order": "10",
+            "minimum_lot": "2",
+            "record_id": "item:0016",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf6f2a500079e",
+            "maximum_order": "20",
+            "minimum_lot": "9",
+            "record_id": "item:0008",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:0028",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "maximum_order": "9",
+            "minimum_lot": "2",
+            "record_id": "item:0022",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "maximum_order": "7",
+            "minimum_lot": "2",
+            "record_id": "item:0004",
+            "revision": "2",
+            "table": "item",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "maximum_order": "9",
+            "minimum_lot": "2",
+            "record_id": "item:0002",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:withdrawn",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G2",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc6c554a79b27",
+            "maximum_order": "15",
+            "minimum_lot": "9",
+            "record_id": "item:0026",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "20",
+            "category": "G0",
+            "effective_date": "2026-03-23",
+            "item_ref": "R6007124a9f06",
+            "maximum_order": "30",
+            "minimum_lot": "21",
+            "record_id": "item:0000",
+            "revision": "3",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "maximum_order": "8",
+            "minimum_lot": "2",
+            "record_id": "item:0012",
+            "revision": "2",
+            "table": "item",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7dcc05e5ca15",
+            "maximum_order": "18",
+            "minimum_lot": "9",
+            "record_id": "item:0028",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "7",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "maximum_order": "18",
+            "minimum_lot": "9",
+            "record_id": "item:0024",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:0028",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "maximum_order": "18",
+            "minimum_lot": "9",
+            "record_id": "item:0000",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:0000",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "item_ref": "R665d41e9e962",
+            "maximum_order": "15",
+            "minimum_lot": "9",
+            "record_id": "item:0012",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G2",
+            "effective_date": "2026-01-21",
+            "item_ref": "R30896725a0ac",
+            "maximum_order": "14",
+            "minimum_lot": "9",
+            "record_id": "item:0030",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "maximum_order": "12",
+            "minimum_lot": "2",
+            "record_id": "item:0014",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "maximum_order": "7",
+            "minimum_lot": "2",
+            "record_id": "item:0004",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "20",
+            "category": "G0",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc2e7f1ec75e0",
+            "maximum_order": "26",
+            "minimum_lot": "21",
+            "record_id": "item:0020",
+            "revision": "3",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "maximum_order": "8",
+            "minimum_lot": "2",
+            "record_id": "item:0026",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "0",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:0024",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G2",
+            "effective_date": "2026-01-21",
+            "item_ref": "R8e867287f9dc",
+            "maximum_order": "19",
+            "minimum_lot": "9",
+            "record_id": "item:0014",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G2",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc07011e6ab2d",
+            "maximum_order": "16",
+            "minimum_lot": "9",
+            "record_id": "item:0022",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "maximum_order": "7",
+            "minimum_lot": "2",
+            "record_id": "item:0020",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "20",
+            "category": "G2",
+            "effective_date": "2026-03-23",
+            "item_ref": "R2b2709069f4c",
+            "maximum_order": "29",
+            "minimum_lot": "21",
+            "record_id": "item:0010",
+            "revision": "3",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "maximum_order": "10",
+            "minimum_lot": "2",
+            "record_id": "item:0010",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:0028",
+            "revision": "2",
+            "table": "item",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "maximum_order": "13",
+            "minimum_lot": "2",
+            "record_id": "item:0018",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "maximum_order": "7",
+            "minimum_lot": "2",
+            "record_id": "item:0030",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:0000",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "20",
+            "category": "G2",
+            "effective_date": "2026-03-23",
+            "item_ref": "R30896725a0ac",
+            "maximum_order": "26",
+            "minimum_lot": "21",
+            "record_id": "item:0030",
+            "revision": "3",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "maximum_order": "14",
+            "minimum_lot": "9",
+            "record_id": "item:0020",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "maximum_order": "12",
+            "minimum_lot": "2",
+            "record_id": "item:0014",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G2",
+            "effective_date": "2026-01-21",
+            "item_ref": "R2b2709069f4c",
+            "maximum_order": "17",
+            "minimum_lot": "9",
+            "record_id": "item:0010",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "item_ref": "R65d8546a7fb6",
+            "maximum_order": "14",
+            "minimum_lot": "9",
+            "record_id": "item:0004",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G2",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1218064667a2",
+            "maximum_order": "16",
+            "minimum_lot": "9",
+            "record_id": "item:0002",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "item_ref": "R148f899e57f6",
+            "maximum_order": "13",
+            "minimum_lot": "2",
+            "record_id": "item:0006",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "DELETE",
+            "authorized": "",
+            "category": "",
+            "effective_date": "2026-03-02",
+            "item_ref": "",
+            "maximum_order": "",
+            "minimum_lot": "",
+            "record_id": "item:withdrawn",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_9_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_a",
+        "item_b",
+        "bonus_cents"
+      ],
+      "file_name": "export_11.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "350",
+            "effective_date": "2026-02-21",
+            "item_a": "R7308b473a5a8",
+            "item_b": "R1218064667a2",
+            "record_id": "bundle:0002",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "230",
+            "effective_date": "2026-01-21",
+            "item_a": "Rd05f0610c770",
+            "item_b": "R7308b473a5a8",
+            "record_id": "bundle:0006",
+            "revision": "1",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "174",
+            "effective_date": "2026-01-21",
+            "item_a": "R148f899e57f6",
+            "item_b": "R698808ad9a96",
+            "record_id": "bundle:withdrawn",
+            "revision": "1",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "557",
+            "effective_date": "2026-01-21",
+            "item_a": "Rc2e7f1ec75e0",
+            "item_b": "R0f58f5015d0d",
+            "record_id": "bundle:0004",
+            "revision": "1",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "181",
+            "effective_date": "2026-01-21",
+            "item_a": "R148f899e57f6",
+            "item_b": "R698808ad9a96",
+            "record_id": "bundle:0000",
+            "revision": "1",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "550",
+            "effective_date": "2026-02-21",
+            "item_a": "Rc2e7f1ec75e0",
+            "item_b": "R0f58f5015d0d",
+            "record_id": "bundle:0004",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "223",
+            "effective_date": "2026-02-21",
+            "item_a": "Rd05f0610c770",
+            "item_b": "R7308b473a5a8",
+            "record_id": "bundle:0006",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "357",
+            "effective_date": "2026-01-21",
+            "item_a": "R7308b473a5a8",
+            "item_b": "R1218064667a2",
+            "record_id": "bundle:0002",
+            "revision": "1",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "174",
+            "effective_date": "2026-02-21",
+            "item_a": "R148f899e57f6",
+            "item_b": "R698808ad9a96",
+            "record_id": "bundle:0000",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "550",
+            "effective_date": "2026-02-21",
+            "item_a": "Rc2e7f1ec75e0",
+            "item_b": "R0f58f5015d0d",
+            "record_id": "bundle:0004",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "193",
+            "effective_date": "2026-03-23",
+            "item_a": "R148f899e57f6",
+            "item_b": "R698808ad9a96",
+            "record_id": "bundle:0000",
+            "revision": "3",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "bonus_cents": "174",
+            "effective_date": "2026-02-21",
+            "item_a": "R148f899e57f6",
+            "item_b": "R698808ad9a96",
+            "record_id": "bundle:0000",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "DELETE",
+            "bonus_cents": "",
+            "effective_date": "2026-03-02",
+            "item_a": "",
+            "item_b": "",
+            "record_id": "bundle:withdrawn",
+            "revision": "2",
+            "table": "bundle",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_10_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "component",
+        "amount_cents"
+      ],
+      "file_name": "export_12.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1120",
+            "component": "item2_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "benefit:0004",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-4",
+            "component": "item12_rebate",
+            "effective_date": "2026-03-23",
+            "item_ref": "R665d41e9e962",
+            "record_id": "benefit:0025",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-23",
+            "component": "item6_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "benefit:0013",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-34",
+            "component": "item27_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "benefit:0055",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1186",
+            "component": "item14_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "benefit:0028",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-33",
+            "component": "item24_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "benefit:0049",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-26",
+            "component": "item0_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "benefit:0001",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1213",
+            "component": "item5_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "benefit:0010",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-37",
+            "component": "item30_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "benefit:0061",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1215",
+            "component": "item8_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "benefit:0016",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-1",
+            "component": "item15_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "benefit:0031",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-49",
+            "component": "item9_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "benefit:0019",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "349",
+            "component": "item29_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "benefit:0058",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-29",
+            "component": "item18_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "benefit:0037",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1127",
+            "component": "item2_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "benefit:0004",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1358",
+            "component": "item20_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "benefit:0040",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "860",
+            "component": "item26_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "benefit:0052",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1186",
+            "component": "item14_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "benefit:0028",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "649",
+            "component": "item0_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "benefit:withdrawn",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "857",
+            "component": "item26_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "benefit:0052",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "454",
+            "component": "item28_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "benefit:0056",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "349",
+            "component": "item29_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "benefit:0058",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-44",
+            "component": "item30_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "benefit:0061",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-34",
+            "component": "item27_rebate",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "benefit:0055",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1306",
+            "component": "item11_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "benefit:0022",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1377",
+            "component": "item20_base",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "benefit:0040",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-29",
+            "component": "item18_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "benefit:0037",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-25",
+            "component": "item3_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "benefit:0007",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-25",
+            "component": "item3_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "benefit:0007",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-43",
+            "component": "item21_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "benefit:0043",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-4",
+            "component": "item15_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "benefit:0031",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-26",
+            "component": "item0_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "benefit:0001",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "506",
+            "component": "item17_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "benefit:0034",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "411",
+            "component": "item10_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "benefit:0020",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1032",
+            "component": "item22_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "benefit:0044",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-26",
+            "component": "item24_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "benefit:0049",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9031",
+            "component": "item23_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "benefit:0046",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-23",
+            "component": "item6_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "benefit:0013",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1189",
+            "component": "item14_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "benefit:0028",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9038",
+            "component": "item23_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "benefit:0046",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1303",
+            "component": "item11_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "benefit:0022",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-22",
+            "component": "item3_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "benefit:0007",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1222",
+            "component": "item8_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "benefit:0016",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1597",
+            "component": "item16_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "benefit:0032",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-33",
+            "component": "item24_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "benefit:0049",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 45,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-4",
+            "component": "item12_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "benefit:0025",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 46,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-34",
+            "component": "item27_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "benefit:0055",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 47,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-49",
+            "component": "item9_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "benefit:0019",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 48,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1365",
+            "component": "item20_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "benefit:0040",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 49,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1301",
+            "component": "item4_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "benefit:0008",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 50,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1210",
+            "component": "item5_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "benefit:0010",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 51,
+          "values": {
+            "action": "DELETE",
+            "amount_cents": "",
+            "component": "",
+            "effective_date": "2026-03-02",
+            "item_ref": "",
+            "record_id": "benefit:withdrawn",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 52,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1219",
+            "component": "item5_base",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "benefit:0010",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 53,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-43",
+            "component": "item21_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "benefit:0043",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 54,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "506",
+            "component": "item17_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "benefit:0034",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 55,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-4",
+            "component": "item12_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "benefit:0025",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_11_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "category",
+        "authorized",
+        "minimum_lot",
+        "maximum_order"
+      ],
+      "file_name": "export_13.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G1",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ref851ccaa158",
+            "maximum_order": "15",
+            "minimum_lot": "9",
+            "record_id": "item:0001",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7955a6f70abc",
+            "maximum_order": "7",
+            "minimum_lot": "2",
+            "record_id": "item:0003",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G3",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7955a6f70abc",
+            "maximum_order": "14",
+            "minimum_lot": "9",
+            "record_id": "item:0003",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1b36613ee493",
+            "maximum_order": "7",
+            "minimum_lot": "2",
+            "record_id": "item:0009",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "7",
+            "category": "G3",
+            "effective_date": "2026-01-21",
+            "item_ref": "Re7d589eb4737",
+            "maximum_order": "19",
+            "minimum_lot": "9",
+            "record_id": "item:0015",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "maximum_order": "10",
+            "minimum_lot": "2",
+            "record_id": "item:0007",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "maximum_order": "13",
+            "minimum_lot": "2",
+            "record_id": "item:0008",
+            "revision": "2",
+            "table": "item",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "item_ref": "R747b4b07f2df",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:0013",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G1",
+            "effective_date": "2026-01-21",
+            "item_ref": "R0f58f5015d0d",
+            "maximum_order": "16",
+            "minimum_lot": "9",
+            "record_id": "item:0017",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "0",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ra5833cedea5c",
+            "maximum_order": "10",
+            "minimum_lot": "2",
+            "record_id": "item:0023",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G1",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rd05f0610c770",
+            "maximum_order": "20",
+            "minimum_lot": "9",
+            "record_id": "item:0021",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "maximum_order": "13",
+            "minimum_lot": "2",
+            "record_id": "item:0021",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G3",
+            "effective_date": "2026-01-21",
+            "item_ref": "R07e87ed82812",
+            "maximum_order": "15",
+            "minimum_lot": "9",
+            "record_id": "item:0031",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G1",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7308b473a5a8",
+            "maximum_order": "17",
+            "minimum_lot": "9",
+            "record_id": "item:0025",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G3",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "maximum_order": "19",
+            "minimum_lot": "9",
+            "record_id": "item:0011",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "20",
+            "category": "G1",
+            "effective_date": "2026-03-23",
+            "item_ref": "R7308b473a5a8",
+            "maximum_order": "29",
+            "minimum_lot": "21",
+            "record_id": "item:0025",
+            "revision": "3",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "maximum_order": "13",
+            "minimum_lot": "2",
+            "record_id": "item:0021",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G3",
+            "effective_date": "2026-01-21",
+            "item_ref": "R698808ad9a96",
+            "maximum_order": "17",
+            "minimum_lot": "9",
+            "record_id": "item:0019",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:0000",
+            "revision": "2",
+            "table": "item",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ref851ccaa158",
+            "maximum_order": "8",
+            "minimum_lot": "2",
+            "record_id": "item:0001",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "item_ref": "R698808ad9a96",
+            "maximum_order": "10",
+            "minimum_lot": "2",
+            "record_id": "item:0019",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "maximum_order": "7",
+            "minimum_lot": "2",
+            "record_id": "item:0005",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "0",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf9db851ed8bb",
+            "maximum_order": "13",
+            "minimum_lot": "2",
+            "record_id": "item:0027",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "0",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "maximum_order": "11",
+            "minimum_lot": "2",
+            "record_id": "item:0024",
+            "revision": "2",
+            "table": "item",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "maximum_order": "10",
+            "minimum_lot": "2",
+            "record_id": "item:0016",
+            "revision": "2",
+            "table": "item",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G1",
+            "effective_date": "2026-01-21",
+            "item_ref": "R9197b70e3d09",
+            "maximum_order": "20",
+            "minimum_lot": "9",
+            "record_id": "item:0029",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G1",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "maximum_order": "14",
+            "minimum_lot": "9",
+            "record_id": "item:0005",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G1",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1b36613ee493",
+            "maximum_order": "14",
+            "minimum_lot": "9",
+            "record_id": "item:0009",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "maximum_order": "10",
+            "minimum_lot": "2",
+            "record_id": "item:0025",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "0",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "item_ref": "Re7d589eb4737",
+            "maximum_order": "12",
+            "minimum_lot": "2",
+            "record_id": "item:0015",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "item_ref": "R07e87ed82812",
+            "maximum_order": "8",
+            "minimum_lot": "2",
+            "record_id": "item:0031",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "20",
+            "category": "G1",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc9f004c5ca0f",
+            "maximum_order": "26",
+            "minimum_lot": "21",
+            "record_id": "item:0005",
+            "revision": "3",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "maximum_order": "12",
+            "minimum_lot": "2",
+            "record_id": "item:0011",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "19",
+            "category": "G3",
+            "effective_date": "2026-03-23",
+            "item_ref": "Re7d589eb4737",
+            "maximum_order": "31",
+            "minimum_lot": "21",
+            "record_id": "item:0015",
+            "revision": "3",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G1",
+            "effective_date": "2026-01-21",
+            "item_ref": "R747b4b07f2df",
+            "maximum_order": "18",
+            "minimum_lot": "9",
+            "record_id": "item:0013",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "7",
+            "category": "G3",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf9db851ed8bb",
+            "maximum_order": "20",
+            "minimum_lot": "9",
+            "record_id": "item:0027",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "maximum_order": "10",
+            "minimum_lot": "2",
+            "record_id": "item:0007",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "8",
+            "category": "G3",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1820116348cd",
+            "maximum_order": "17",
+            "minimum_lot": "9",
+            "record_id": "item:0007",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "item_ref": "R9197b70e3d09",
+            "maximum_order": "13",
+            "minimum_lot": "2",
+            "record_id": "item:0029",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "7",
+            "category": "G3",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ra5833cedea5c",
+            "maximum_order": "17",
+            "minimum_lot": "9",
+            "record_id": "item:0023",
+            "revision": "1",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "authorized": "1",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "maximum_order": "9",
+            "minimum_lot": "2",
+            "record_id": "item:0017",
+            "revision": "2",
+            "table": "item",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_12_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_a",
+        "item_b"
+      ],
+      "file_name": "export_14.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R1b36613ee493",
+            "item_b": "R8e867287f9dc",
+            "record_id": "incompatible:0004",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "R9197b70e3d09",
+            "item_b": "R7308b473a5a8",
+            "record_id": "incompatible:0006",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "Rf9db851ed8bb",
+            "item_b": "R747b4b07f2df",
+            "record_id": "incompatible:0002",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "Rfb39090aa5c5",
+            "item_b": "R148f899e57f6",
+            "record_id": "incompatible:0008",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "DELETE",
+            "effective_date": "2026-03-02",
+            "item_a": "",
+            "item_b": "",
+            "record_id": "incompatible:withdrawn",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "R1b36613ee493",
+            "item_b": "R8e867287f9dc",
+            "record_id": "incompatible:0004",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R65d8546a7fb6",
+            "item_b": "R665d41e9e962",
+            "record_id": "incompatible:0000",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R9197b70e3d09",
+            "item_b": "R7308b473a5a8",
+            "record_id": "incompatible:0006",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R1b36613ee493",
+            "item_b": "R8e867287f9dc",
+            "record_id": "incompatible:0004",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "Rf9db851ed8bb",
+            "item_b": "R747b4b07f2df",
+            "record_id": "incompatible:0002",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_a": "R65d8546a7fb6",
+            "item_b": "R665d41e9e962",
+            "record_id": "incompatible:0000",
+            "revision": "2",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "R65d8546a7fb6",
+            "item_b": "R665d41e9e962",
+            "record_id": "incompatible:withdrawn",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "R65d8546a7fb6",
+            "item_b": "R665d41e9e962",
+            "record_id": "incompatible:0000",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "item_a": "R65d8546a7fb6",
+            "item_b": "R665d41e9e962",
+            "record_id": "incompatible:0000",
+            "revision": "3",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_a": "Rfb39090aa5c5",
+            "item_b": "R148f899e57f6",
+            "record_id": "incompatible:0008",
+            "revision": "1",
+            "table": "incompatible",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_13_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "component",
+        "amount_cents"
+      ],
+      "file_name": "export_15.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1301",
+            "component": "item4_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "benefit:0008",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-22",
+            "component": "item14_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "benefit:0029",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-28",
+            "component": "item23_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "benefit:0047",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-24",
+            "component": "item17_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "benefit:0035",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "420",
+            "component": "item10_base",
+            "effective_date": "2026-03-23",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "benefit:0020",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-7",
+            "component": "item20_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "benefit:0041",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-31",
+            "component": "item23_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "benefit:0047",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "504",
+            "component": "item7_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "benefit:0014",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "504",
+            "component": "item7_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "benefit:0014",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1622",
+            "component": "item13_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "benefit:0026",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "9033",
+            "component": "item24_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "benefit:0048",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "504",
+            "component": "item7_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "benefit:0014",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1308",
+            "component": "item4_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "benefit:0008",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1002",
+            "component": "item31_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "benefit:0062",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1002",
+            "component": "item31_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "benefit:0062",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "454",
+            "component": "item28_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "benefit:0056",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-29",
+            "component": "item29_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "benefit:0059",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-30",
+            "component": "item5_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "benefit:0011",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "707",
+            "component": "item1_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "benefit:0002",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1597",
+            "component": "item16_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "benefit:0032",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-30",
+            "component": "item5_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "benefit:0011",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-5",
+            "component": "item17_rebate",
+            "effective_date": "2026-03-23",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "benefit:0035",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-7",
+            "component": "item26_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "benefit:0053",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1035",
+            "component": "item22_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "benefit:0044",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1055",
+            "component": "item25_base",
+            "effective_date": "2026-03-23",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "benefit:0050",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-6",
+            "component": "item2_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "benefit:0005",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "633",
+            "component": "item19_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "benefit:0038",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "704",
+            "component": "item1_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "benefit:0002",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "454",
+            "component": "item28_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "benefit:0056",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "649",
+            "component": "item0_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "benefit:0000",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "630",
+            "component": "item19_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "benefit:0038",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "965",
+            "component": "item12_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "benefit:0024",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1205",
+            "component": "item30_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "benefit:0060",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-7",
+            "component": "item20_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "benefit:0041",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "454",
+            "component": "item28_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "benefit:0056",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-17",
+            "component": "item17_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "benefit:0035",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1",
+            "component": "item8_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "benefit:0017",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "414",
+            "component": "item10_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "benefit:0020",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "411",
+            "component": "item10_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "benefit:0020",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1597",
+            "component": "item16_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "benefit:0032",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-36",
+            "component": "item29_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "benefit:0059",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-6",
+            "component": "item2_rebate",
+            "effective_date": "2026-03-23",
+            "item_ref": "R1218064667a2",
+            "record_id": "benefit:0005",
+            "revision": "3",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-50",
+            "component": "item11_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "benefit:0023",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1615",
+            "component": "item13_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "benefit:0026",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-22",
+            "component": "item14_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "benefit:0029",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 45,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-7",
+            "component": "item26_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "benefit:0053",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 46,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1036",
+            "component": "item25_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "benefit:0050",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 47,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-24",
+            "component": "item17_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "benefit:0035",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 48,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1043",
+            "component": "item25_base",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "benefit:0050",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 49,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "684",
+            "component": "item18_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "benefit:0036",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 50,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-50",
+            "component": "item11_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "benefit:0023",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 51,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "673",
+            "component": "item6_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "benefit:0012",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 52,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-6",
+            "component": "item2_rebate",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "benefit:0005",
+            "revision": "1",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 53,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "1032",
+            "component": "item22_base",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "benefit:0044",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 54,
+          "values": {
+            "action": "UPSERT",
+            "amount_cents": "-6",
+            "component": "item8_rebate",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "benefit:0017",
+            "revision": "2",
+            "table": "benefit",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_14_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "category",
+        "minimum_quantity",
+        "maximum_quantity",
+        "activation_fee_cents"
+      ],
+      "file_name": "export_16.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "339",
+            "category": "G1",
+            "effective_date": "2026-01-21",
+            "maximum_quantity": "24",
+            "minimum_quantity": "12",
+            "record_id": "category:0001",
+            "revision": "1",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "332",
+            "category": "G1",
+            "effective_date": "2026-02-21",
+            "maximum_quantity": "17",
+            "minimum_quantity": "5",
+            "record_id": "category:0001",
+            "revision": "2",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "162",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "maximum_quantity": "21",
+            "minimum_quantity": "9",
+            "record_id": "category:0000",
+            "revision": "2",
+            "table": "category",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "166",
+            "category": "G3",
+            "effective_date": "2026-02-21",
+            "maximum_quantity": "21",
+            "minimum_quantity": "9",
+            "record_id": "category:0003",
+            "revision": "2",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "173",
+            "category": "G3",
+            "effective_date": "2026-01-21",
+            "maximum_quantity": "28",
+            "minimum_quantity": "16",
+            "record_id": "category:0003",
+            "revision": "1",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_15_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "activation_fee_cents"
+      ],
+      "file_name": "export_17.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "214",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "item_fee:0001",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "317",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "item_fee:0003",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "310",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "item_fee:0003",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "144",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "item_fee:0009",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "202",
+            "effective_date": "2026-01-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "item_fee:0015",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "464",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "item_fee:0007",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "217",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "item_fee:0008",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "351",
+            "effective_date": "2026-01-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "item_fee:0013",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "302",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "item_fee:0017",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "466",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "item_fee:0023",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "154",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "item_fee:0021",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "154",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "item_fee:0021",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "274",
+            "effective_date": "2026-02-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "item_fee:0031",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "237",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "item_fee:0025",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "492",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "item_fee:0011",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "249",
+            "effective_date": "2026-03-23",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "item_fee:0025",
+            "revision": "3",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "161",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "item_fee:0021",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "111",
+            "effective_date": "2026-01-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "item_fee:0019",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "372",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "item_fee:0000",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "207",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "item_fee:0001",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "104",
+            "effective_date": "2026-02-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "item_fee:0019",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "350",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "item_fee:0005",
+            "revision": "3",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "374",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "item_fee:0027",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "458",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "item_fee:0024",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "494",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "item_fee:0016",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "502",
+            "effective_date": "2026-01-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "item_fee:0029",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "331",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "item_fee:0005",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "137",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "item_fee:0009",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "230",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "item_fee:0025",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "214",
+            "effective_date": "2026-03-23",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "item_fee:0015",
+            "revision": "3",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "281",
+            "effective_date": "2026-01-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "item_fee:0031",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "338",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "item_fee:0005",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "485",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "item_fee:0011",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "195",
+            "effective_date": "2026-02-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "item_fee:0015",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "344",
+            "effective_date": "2026-02-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "item_fee:0013",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "367",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "item_fee:0027",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "457",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "item_fee:0007",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "457",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "item_fee:0007",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "495",
+            "effective_date": "2026-02-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "item_fee:0029",
+            "revision": "2",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "473",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "item_fee:0023",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "309",
+            "effective_date": "2026-01-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "item_fee:0017",
+            "revision": "1",
+            "table": "item_fee",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_16_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "category",
+        "minimum_quantity",
+        "maximum_quantity",
+        "activation_fee_cents"
+      ],
+      "file_name": "export_18.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "199",
+            "category": "G2",
+            "effective_date": "2026-02-21",
+            "maximum_quantity": "21",
+            "minimum_quantity": "9",
+            "record_id": "category:0002",
+            "revision": "2",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "169",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "maximum_quantity": "28",
+            "minimum_quantity": "16",
+            "record_id": "category:0000",
+            "revision": "1",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "206",
+            "category": "G2",
+            "effective_date": "2026-01-21",
+            "maximum_quantity": "28",
+            "minimum_quantity": "16",
+            "record_id": "category:0002",
+            "revision": "1",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "DELETE",
+            "activation_fee_cents": "",
+            "category": "",
+            "effective_date": "2026-03-02",
+            "maximum_quantity": "",
+            "minimum_quantity": "",
+            "record_id": "category:withdrawn",
+            "revision": "2",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "162",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "maximum_quantity": "21",
+            "minimum_quantity": "9",
+            "record_id": "category:0000",
+            "revision": "2",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "162",
+            "category": "G0",
+            "effective_date": "2026-01-21",
+            "maximum_quantity": "21",
+            "minimum_quantity": "9",
+            "record_id": "category:withdrawn",
+            "revision": "1",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "181",
+            "category": "G0",
+            "effective_date": "2026-03-23",
+            "maximum_quantity": "40",
+            "minimum_quantity": "28",
+            "record_id": "category:0000",
+            "revision": "3",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "activation_fee_cents": "162",
+            "category": "G0",
+            "effective_date": "2026-02-21",
+            "maximum_quantity": "21",
+            "minimum_quantity": "9",
+            "record_id": "category:0000",
+            "revision": "2",
+            "table": "category",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_17_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "resource",
+        "amount",
+        "unit"
+      ],
+      "file_name": "export_19.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "usage:0071",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "usage:0065",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "amount": "15000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "usage:0056",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "usage:0023",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "usage:0092",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "usage:0014",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "usage:0011",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "amount": "2000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "usage:0038",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "amount": "480",
+            "effective_date": "2026-02-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "usage:0040",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "usage:0020",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "usage:0071",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "amount": "300",
+            "effective_date": "2026-02-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "usage:0088",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "amount": "8000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "usage:0056",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "usage:0032",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "amount": "8000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "usage:0056",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "usage:0029",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "usage:0047",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "usage:0008",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "usage:0017",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "usage:0065",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "usage:0086",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "usage:0017",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "usage:0062",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "amount": "480",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "usage:0052",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "usage:0029",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "amount": "8000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "usage:0077",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "amount": "15000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "usage:0080",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:0002",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "usage:0026",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "usage:0014",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "usage:0026",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "amount": "15000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "usage:0077",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "usage:0050",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "amount": "7000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "usage:0068",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "amount": "14000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "usage:0089",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "amount": "300",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "usage:0076",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "usage:0095",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "amount": "4000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "usage:0035",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "amount": "27000",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "usage:0080",
+            "resource": "power",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "usage:0041",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "amount": "4000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "usage:0035",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "usage:0053",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "usage:0083",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "amount": "2000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "usage:0074",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "UPSERT",
+            "amount": "7000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "usage:0089",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 45,
+          "values": {
+            "action": "UPSERT",
+            "amount": "24000",
+            "effective_date": "2026-03-23",
+            "item_ref": "R148f899e57f6",
+            "record_id": "usage:0020",
+            "resource": "power",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 46,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "usage:0044",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 47,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "usage:0023",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 48,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:0002",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 49,
+          "values": {
+            "action": "UPSERT",
+            "amount": "14000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "usage:0068",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 50,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "usage:0053",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 51,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "usage:0020",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 52,
+          "values": {
+            "action": "UPSERT",
+            "amount": "27000",
+            "effective_date": "2026-03-23",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "usage:0005",
+            "resource": "power",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 53,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "usage:0092",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 54,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "usage:0083",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 55,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "usage:0059",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 56,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "usage:0008",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 57,
+          "values": {
+            "action": "UPSERT",
+            "amount": "8000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "usage:0080",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 58,
+          "values": {
+            "action": "UPSERT",
+            "amount": "8000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "usage:0005",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 59,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "usage:0016",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 60,
+          "values": {
+            "action": "UPSERT",
+            "amount": "24000",
+            "effective_date": "2026-03-23",
+            "item_ref": "R07e87ed82812",
+            "record_id": "usage:0095",
+            "resource": "power",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 61,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "usage:0014",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 62,
+          "values": {
+            "action": "UPSERT",
+            "amount": "8000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "usage:0077",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 63,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "usage:0047",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 64,
+          "values": {
+            "action": "UPSERT",
+            "amount": "23000",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "usage:0035",
+            "resource": "power",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 65,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "usage:0095",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 66,
+          "values": {
+            "action": "UPSERT",
+            "amount": "24000",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "usage:0065",
+            "resource": "power",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 67,
+          "values": {
+            "action": "UPSERT",
+            "amount": "11000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "usage:0035",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 68,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "usage:0041",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 69,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "usage:0038",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 70,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "usage:0062",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 71,
+          "values": {
+            "action": "UPSERT",
+            "amount": "15000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "usage:0005",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 72,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "usage:0044",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 73,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "usage:0050",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 74,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "usage:0059",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 75,
+          "values": {
+            "action": "UPSERT",
+            "amount": "420",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "usage:0004",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 76,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "usage:0074",
+            "resource": "power",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 77,
+          "values": {
+            "action": "UPSERT",
+            "amount": "360",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "usage:0028",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 78,
+          "values": {
+            "action": "UPSERT",
+            "amount": "240",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "usage:0064",
+            "resource": "labor",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 79,
+          "values": {
+            "action": "UPSERT",
+            "amount": "22000",
+            "effective_date": "2026-03-23",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "usage:0050",
+            "resource": "power",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 80,
+          "values": {
+            "action": "UPSERT",
+            "amount": "2000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "usage:0011",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 81,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "usage:0086",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 82,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "usage:0032",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        }
+      ],
+      "table_id": "file_18_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "resource",
+        "entry",
+        "amount",
+        "unit"
+      ],
+      "file_name": "export_20.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "amount": "-293",
+            "effective_date": "2026-01-21",
+            "entry": "reservation",
+            "record_id": "capacity_ledger:0003",
+            "resource": "labor",
+            "revision": "1",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "amount": "-6000",
+            "effective_date": "2026-02-21",
+            "entry": "reservation",
+            "record_id": "capacity_ledger:0001",
+            "resource": "space",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "amount": "-11000",
+            "effective_date": "2026-02-21",
+            "entry": "reservation",
+            "record_id": "capacity_ledger:0005",
+            "resource": "power",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "amount": "-10981",
+            "effective_date": "2026-03-23",
+            "entry": "reservation",
+            "record_id": "capacity_ledger:0005",
+            "resource": "power",
+            "revision": "3",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "amount": "-5993",
+            "effective_date": "2026-01-21",
+            "entry": "reservation",
+            "record_id": "capacity_ledger:0001",
+            "resource": "space",
+            "revision": "1",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "amount": "241000",
+            "effective_date": "2026-02-21",
+            "entry": "opening",
+            "record_id": "capacity_ledger:0000",
+            "resource": "space",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "SOUTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "amount": "-300",
+            "effective_date": "2026-02-21",
+            "entry": "reservation",
+            "record_id": "capacity_ledger:0003",
+            "resource": "labor",
+            "revision": "2",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "minute"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "amount": "-10993",
+            "effective_date": "2026-01-21",
+            "entry": "reservation",
+            "record_id": "capacity_ledger:0005",
+            "resource": "power",
+            "revision": "1",
+            "table": "capacity_ledger",
+            "tenant": "NORTH",
+            "unit": "wh"
+          }
+        }
+      ],
+      "table_id": "file_19_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "historical_sales",
+        "forecast_units",
+        "margin_percent"
+      ],
+      "file_name": "export_21.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "1",
+            "item_ref": "Rfb39090aa5c5",
+            "margin_percent": "28",
+            "record_id": "market:0018",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "8",
+            "historical_sales": "9",
+            "item_ref": "R665d41e9e962",
+            "margin_percent": "12",
+            "record_id": "market:0012",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "3",
+            "item_ref": "R3a11be59ddaa",
+            "margin_percent": "15",
+            "record_id": "market:0016",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "8",
+            "historical_sales": "10",
+            "item_ref": "R148f899e57f6",
+            "margin_percent": "15",
+            "record_id": "market:0006",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "2",
+            "item_ref": "Rc2e7f1ec75e0",
+            "margin_percent": "25",
+            "record_id": "market:0020",
+            "revision": "2",
+            "table": "market",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "8",
+            "item_ref": "Rf6f2a500079e",
+            "margin_percent": "38",
+            "record_id": "market:0008",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "10",
+            "item_ref": "R3a11be59ddaa",
+            "margin_percent": "22",
+            "record_id": "market:0016",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "1",
+            "item_ref": "Rf6f2a500079e",
+            "margin_percent": "31",
+            "record_id": "market:0008",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "2",
+            "item_ref": "R7dcc05e5ca15",
+            "margin_percent": "33",
+            "record_id": "market:0028",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "3",
+            "item_ref": "Rc07011e6ab2d",
+            "margin_percent": "18",
+            "record_id": "market:0022",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "3",
+            "item_ref": "R65d8546a7fb6",
+            "margin_percent": "12",
+            "record_id": "market:0004",
+            "revision": "2",
+            "table": "market",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "10",
+            "item_ref": "R1218064667a2",
+            "margin_percent": "36",
+            "record_id": "market:0002",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "DELETE",
+            "effective_date": "2026-03-02",
+            "forecast_units": "",
+            "historical_sales": "",
+            "item_ref": "",
+            "margin_percent": "",
+            "record_id": "market:withdrawn",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "10",
+            "historical_sales": "8",
+            "item_ref": "Rc6c554a79b27",
+            "margin_percent": "38",
+            "record_id": "market:0026",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "10",
+            "historical_sales": "10",
+            "item_ref": "R6007124a9f06",
+            "margin_percent": "29",
+            "record_id": "market:0000",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "2",
+            "item_ref": "R665d41e9e962",
+            "margin_percent": "5",
+            "record_id": "market:0012",
+            "revision": "2",
+            "table": "market",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "2",
+            "item_ref": "R7dcc05e5ca15",
+            "margin_percent": "33",
+            "record_id": "market:0028",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "8",
+            "historical_sales": "9",
+            "item_ref": "Rcf5370ab2e7c",
+            "margin_percent": "24",
+            "record_id": "market:0024",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "9",
+            "item_ref": "R7dcc05e5ca15",
+            "margin_percent": "40",
+            "record_id": "market:0028",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "forecast_units": "22",
+            "historical_sales": "22",
+            "item_ref": "R6007124a9f06",
+            "margin_percent": "41",
+            "record_id": "market:0000",
+            "revision": "3",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "3",
+            "item_ref": "R6007124a9f06",
+            "margin_percent": "22",
+            "record_id": "market:0000",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "2",
+            "item_ref": "R665d41e9e962",
+            "margin_percent": "5",
+            "record_id": "market:0012",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "10",
+            "historical_sales": "10",
+            "item_ref": "R30896725a0ac",
+            "margin_percent": "14",
+            "record_id": "market:0030",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "1",
+            "item_ref": "R8e867287f9dc",
+            "margin_percent": "15",
+            "record_id": "market:0014",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "3",
+            "item_ref": "R65d8546a7fb6",
+            "margin_percent": "12",
+            "record_id": "market:0004",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "9",
+            "item_ref": "Rc2e7f1ec75e0",
+            "margin_percent": "32",
+            "record_id": "market:0020",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "1",
+            "item_ref": "Rc6c554a79b27",
+            "margin_percent": "31",
+            "record_id": "market:0026",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "2",
+            "item_ref": "Rcf5370ab2e7c",
+            "margin_percent": "17",
+            "record_id": "market:0024",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "1",
+            "item_ref": "R8e867287f9dc",
+            "margin_percent": "15",
+            "record_id": "market:0014",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "10",
+            "item_ref": "Rc07011e6ab2d",
+            "margin_percent": "25",
+            "record_id": "market:0022",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "2",
+            "item_ref": "Rc2e7f1ec75e0",
+            "margin_percent": "25",
+            "record_id": "market:0020",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "2",
+            "item_ref": "R2b2709069f4c",
+            "margin_percent": "35",
+            "record_id": "market:0010",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "forecast_units": "20",
+            "historical_sales": "21",
+            "item_ref": "R2b2709069f4c",
+            "margin_percent": "54",
+            "record_id": "market:0010",
+            "revision": "3",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "2",
+            "item_ref": "R7dcc05e5ca15",
+            "margin_percent": "33",
+            "record_id": "market:0028",
+            "revision": "2",
+            "table": "market",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "8",
+            "item_ref": "Rfb39090aa5c5",
+            "margin_percent": "35",
+            "record_id": "market:0018",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "forecast_units": "22",
+            "historical_sales": "22",
+            "item_ref": "R30896725a0ac",
+            "margin_percent": "26",
+            "record_id": "market:0030",
+            "revision": "3",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "3",
+            "item_ref": "R6007124a9f06",
+            "margin_percent": "22",
+            "record_id": "market:0000",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "3",
+            "historical_sales": "3",
+            "item_ref": "R30896725a0ac",
+            "margin_percent": "7",
+            "record_id": "market:0030",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "forecast_units": "21",
+            "historical_sales": "21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "margin_percent": "44",
+            "record_id": "market:0020",
+            "revision": "3",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "8",
+            "item_ref": "R8e867287f9dc",
+            "margin_percent": "22",
+            "record_id": "market:0014",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "8",
+            "historical_sales": "9",
+            "item_ref": "R2b2709069f4c",
+            "margin_percent": "42",
+            "record_id": "market:0010",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "9",
+            "historical_sales": "10",
+            "item_ref": "R65d8546a7fb6",
+            "margin_percent": "19",
+            "record_id": "market:0004",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "2",
+            "historical_sales": "3",
+            "item_ref": "R1218064667a2",
+            "margin_percent": "29",
+            "record_id": "market:0002",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "forecast_units": "1",
+            "historical_sales": "3",
+            "item_ref": "R148f899e57f6",
+            "margin_percent": "8",
+            "record_id": "market:0006",
+            "revision": "2",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "forecast_units": "3",
+            "historical_sales": "3",
+            "item_ref": "R6007124a9f06",
+            "margin_percent": "22",
+            "record_id": "market:withdrawn",
+            "revision": "1",
+            "table": "market",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_20_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "ref",
+        "kind",
+        "entity_id"
+      ],
+      "file_name": "export_22.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I18",
+            "kind": "item",
+            "record_id": "identity:0018",
+            "ref": "Rfb39090aa5c5",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I12",
+            "kind": "item",
+            "record_id": "identity:0012",
+            "ref": "R665d41e9e962",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I16",
+            "kind": "item",
+            "record_id": "identity:0016",
+            "ref": "R3a11be59ddaa",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I06",
+            "kind": "item",
+            "record_id": "identity:0006",
+            "ref": "R148f899e57f6",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I20",
+            "kind": "item",
+            "record_id": "identity:0020",
+            "ref": "Rc2e7f1ec75e0",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I08",
+            "kind": "item",
+            "record_id": "identity:0008",
+            "ref": "Rf6f2a500079e",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I16",
+            "kind": "item",
+            "record_id": "identity:0016",
+            "ref": "R3a11be59ddaa",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I08",
+            "kind": "item",
+            "record_id": "identity:0008",
+            "ref": "Rf6f2a500079e",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I28",
+            "kind": "item",
+            "record_id": "identity:0028",
+            "ref": "R7dcc05e5ca15",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I22",
+            "kind": "item",
+            "record_id": "identity:0022",
+            "ref": "Rc07011e6ab2d",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I04",
+            "kind": "item",
+            "record_id": "identity:0004",
+            "ref": "R65d8546a7fb6",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I02",
+            "kind": "item",
+            "record_id": "identity:0002",
+            "ref": "R1218064667a2",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I00",
+            "kind": "item",
+            "record_id": "identity:withdrawn",
+            "ref": "R6007124a9f06",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I26",
+            "kind": "item",
+            "record_id": "identity:0026",
+            "ref": "Rc6c554a79b27",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I00",
+            "kind": "item",
+            "record_id": "identity:0000",
+            "ref": "R6007124a9f06",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I12",
+            "kind": "item",
+            "record_id": "identity:0012",
+            "ref": "R665d41e9e962",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I28",
+            "kind": "item",
+            "record_id": "identity:0028",
+            "ref": "R7dcc05e5ca15",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I24",
+            "kind": "item",
+            "record_id": "identity:0024",
+            "ref": "Rcf5370ab2e7c",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I28",
+            "kind": "item",
+            "record_id": "identity:0028",
+            "ref": "R7dcc05e5ca15",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I00",
+            "kind": "item",
+            "record_id": "identity:0000",
+            "ref": "R6007124a9f06",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I00",
+            "kind": "item",
+            "record_id": "identity:0000",
+            "ref": "R6007124a9f06",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I12",
+            "kind": "item",
+            "record_id": "identity:0012",
+            "ref": "R665d41e9e962",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I30",
+            "kind": "item",
+            "record_id": "identity:0030",
+            "ref": "R30896725a0ac",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I14",
+            "kind": "item",
+            "record_id": "identity:0014",
+            "ref": "R8e867287f9dc",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I04",
+            "kind": "item",
+            "record_id": "identity:0004",
+            "ref": "R65d8546a7fb6",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I20",
+            "kind": "item",
+            "record_id": "identity:0020",
+            "ref": "Rc2e7f1ec75e0",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I26",
+            "kind": "item",
+            "record_id": "identity:0026",
+            "ref": "Rc6c554a79b27",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I24",
+            "kind": "item",
+            "record_id": "identity:0024",
+            "ref": "Rcf5370ab2e7c",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I14",
+            "kind": "item",
+            "record_id": "identity:0014",
+            "ref": "R8e867287f9dc",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I22",
+            "kind": "item",
+            "record_id": "identity:0022",
+            "ref": "Rc07011e6ab2d",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I20",
+            "kind": "item",
+            "record_id": "identity:0020",
+            "ref": "Rc2e7f1ec75e0",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I10",
+            "kind": "item",
+            "record_id": "identity:0010",
+            "ref": "R2b2709069f4c",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I10",
+            "kind": "item",
+            "record_id": "identity:0010",
+            "ref": "R2b2709069f4c",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I28",
+            "kind": "item",
+            "record_id": "identity:0028",
+            "ref": "R7dcc05e5ca15",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I18",
+            "kind": "item",
+            "record_id": "identity:0018",
+            "ref": "Rfb39090aa5c5",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I30",
+            "kind": "item",
+            "record_id": "identity:0030",
+            "ref": "R30896725a0ac",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "entity_id": "I00",
+            "kind": "item",
+            "record_id": "identity:0000",
+            "ref": "R6007124a9f06",
+            "revision": "3",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "entity_id": "I30",
+            "kind": "item",
+            "record_id": "identity:0030",
+            "ref": "R30896725a0ac",
+            "revision": "3",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "entity_id": "I20",
+            "kind": "item",
+            "record_id": "identity:0020",
+            "ref": "Rc2e7f1ec75e0",
+            "revision": "3",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "entity_id": "I14",
+            "kind": "item",
+            "record_id": "identity:0014",
+            "ref": "R8e867287f9dc",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "entity_id": "I10",
+            "kind": "item",
+            "record_id": "identity:0010",
+            "ref": "R2b2709069f4c",
+            "revision": "3",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I04",
+            "kind": "item",
+            "record_id": "identity:0004",
+            "ref": "R65d8546a7fb6",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I02",
+            "kind": "item",
+            "record_id": "identity:0002",
+            "ref": "R1218064667a2",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "entity_id": "I06",
+            "kind": "item",
+            "record_id": "identity:0006",
+            "ref": "R148f899e57f6",
+            "revision": "1",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "DELETE",
+            "effective_date": "2026-03-02",
+            "entity_id": "",
+            "kind": "",
+            "record_id": "identity:withdrawn",
+            "ref": "",
+            "revision": "2",
+            "table": "identity",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_21_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "resource",
+        "amount",
+        "unit"
+      ],
+      "file_name": "export_23.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "usage:0003",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "usage:0069",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "usage:0045",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "usage:0045",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "usage:0024",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "usage:0054",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "usage:0048",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "amount": "8000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "usage:0056",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "usage:0066",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "amount": "8000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "usage:0087",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "usage:0006",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "usage:0042",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "amount": "28000",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "usage:0060",
+            "resource": "space",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "usage:0051",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "usage:0093",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R3a11be59ddaa",
+            "record_id": "usage:0048",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "usage:0008",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "usage:0084",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "usage:0063",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:0000",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "usage:0072",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "usage:0033",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "usage:0027",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "usage:0084",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:0000",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1b36613ee493",
+            "record_id": "usage:0027",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "usage:0032",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ra5833cedea5c",
+            "record_id": "usage:0069",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "usage:0009",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "usage:0042",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "action": "UPSERT",
+            "amount": "4000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "usage:0081",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "record_id": "usage:0054",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "action": "UPSERT",
+            "amount": "7000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "usage:0068",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7dcc05e5ca15",
+            "record_id": "usage:0084",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "usage:0090",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "action": "UPSERT",
+            "amount": "2000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb0a4e0e3df5",
+            "record_id": "usage:0033",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "action": "UPSERT",
+            "amount": "11000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rf9db851ed8bb",
+            "record_id": "usage:0081",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "usage:0078",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "action": "UPSERT",
+            "amount": "4000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "usage:0039",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "action": "UPSERT",
+            "amount": "7000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "usage:0021",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "action": "UPSERT",
+            "amount": "11000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R747b4b07f2df",
+            "record_id": "usage:0039",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "usage:0042",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "action": "UPSERT",
+            "amount": "7000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "usage:0021",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "usage:0018",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R07e87ed82812",
+            "record_id": "usage:0093",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 45,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "usage:0015",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 46,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "usage:0060",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 47,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "usage:0057",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 48,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "record_id": "usage:0072",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 49,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "usage:0063",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 50,
+          "values": {
+            "action": "UPSERT",
+            "amount": "8000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "usage:0080",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 51,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R0f58f5015d0d",
+            "record_id": "usage:0051",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 52,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1218064667a2",
+            "record_id": "usage:0006",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 53,
+          "values": {
+            "action": "UPSERT",
+            "amount": "12000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "usage:0090",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 54,
+          "values": {
+            "action": "UPSERT",
+            "amount": "24000",
+            "effective_date": "2026-03-23",
+            "item_ref": "R30896725a0ac",
+            "record_id": "usage:0090",
+            "resource": "space",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 55,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "usage:0075",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 56,
+          "values": {
+            "action": "UPSERT",
+            "amount": "21000",
+            "effective_date": "2026-03-23",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "usage:0075",
+            "resource": "space",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 57,
+          "values": {
+            "action": "UPSERT",
+            "amount": "2000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7308b473a5a8",
+            "record_id": "usage:0075",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 58,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "record_id": "usage:0092",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 59,
+          "values": {
+            "action": "UPSERT",
+            "amount": "14000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R1820116348cd",
+            "record_id": "usage:0021",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 60,
+          "values": {
+            "action": "DELETE",
+            "amount": "",
+            "effective_date": "2026-03-02",
+            "item_ref": "",
+            "record_id": "usage:withdrawn",
+            "resource": "",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": ""
+          }
+        },
+        {
+          "data_row_number": 61,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "usage:0012",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 62,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7955a6f70abc",
+            "record_id": "usage:0009",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 63,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rf6f2a500079e",
+            "record_id": "usage:0024",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 64,
+          "values": {
+            "action": "UPSERT",
+            "amount": "2000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Ref851ccaa158",
+            "record_id": "usage:0003",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 65,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:0000",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 66,
+          "values": {
+            "action": "UPSERT",
+            "amount": "3000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "usage:0015",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 67,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "record_id": "usage:0078",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 68,
+          "values": {
+            "action": "UPSERT",
+            "amount": "15000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R9197b70e3d09",
+            "record_id": "usage:0087",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 69,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "usage:0036",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 70,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc07011e6ab2d",
+            "record_id": "usage:0066",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 71,
+          "values": {
+            "action": "UPSERT",
+            "amount": "10000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rd05f0610c770",
+            "record_id": "usage:0063",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 72,
+          "values": {
+            "action": "UPSERT",
+            "amount": "2000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "record_id": "usage:0036",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 73,
+          "values": {
+            "action": "UPSERT",
+            "amount": "28000",
+            "effective_date": "2026-03-23",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "usage:0030",
+            "resource": "space",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 74,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "usage:0030",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 75,
+          "values": {
+            "action": "UPSERT",
+            "amount": "9000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R698808ad9a96",
+            "record_id": "usage:0057",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 76,
+          "values": {
+            "action": "UPSERT",
+            "amount": "6000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:withdrawn",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 77,
+          "values": {
+            "action": "UPSERT",
+            "amount": "25000",
+            "effective_date": "2026-03-23",
+            "item_ref": "R6007124a9f06",
+            "record_id": "usage:0000",
+            "resource": "space",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 78,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "usage:0020",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "wh"
+          }
+        },
+        {
+          "data_row_number": 79,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "record_id": "usage:0060",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 80,
+          "values": {
+            "action": "UPSERT",
+            "amount": "28000",
+            "effective_date": "2026-03-23",
+            "item_ref": "Re7d589eb4737",
+            "record_id": "usage:0045",
+            "resource": "space",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 81,
+          "values": {
+            "action": "UPSERT",
+            "amount": "16000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R2b2709069f4c",
+            "record_id": "usage:0030",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 82,
+          "values": {
+            "action": "UPSERT",
+            "amount": "22000",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc9f004c5ca0f",
+            "record_id": "usage:0015",
+            "resource": "space",
+            "revision": "3",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 83,
+          "values": {
+            "action": "UPSERT",
+            "amount": "13000",
+            "effective_date": "2026-01-21",
+            "item_ref": "R65d8546a7fb6",
+            "record_id": "usage:0012",
+            "resource": "space",
+            "revision": "1",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 84,
+          "values": {
+            "action": "UPSERT",
+            "amount": "2000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R148f899e57f6",
+            "record_id": "usage:0018",
+            "resource": "space",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "NORTH",
+            "unit": "ml"
+          }
+        },
+        {
+          "data_row_number": 85,
+          "values": {
+            "action": "UPSERT",
+            "amount": "5000",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "record_id": "usage:0044",
+            "resource": "power",
+            "revision": "2",
+            "table": "usage",
+            "tenant": "SOUTH",
+            "unit": "wh"
+          }
+        }
+      ],
+      "table_id": "file_22_view_0"
+    },
+    {
+      "columns": [
+        "table",
+        "tenant",
+        "record_id",
+        "revision",
+        "effective_date",
+        "action",
+        "item_ref",
+        "prerequisite_ref"
+      ],
+      "file_name": "export_24.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "item_ref": "R665d41e9e962",
+            "prerequisite_ref": "Rc9f004c5ca0f",
+            "record_id": "requires:0000",
+            "revision": "3",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "prerequisite_ref": "R65d8546a7fb6",
+            "record_id": "requires:0008",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "action": "DELETE",
+            "effective_date": "2026-03-02",
+            "item_ref": "",
+            "prerequisite_ref": "",
+            "record_id": "requires:withdrawn",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "prerequisite_ref": "R65d8546a7fb6",
+            "record_id": "requires:0004",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R8e867287f9dc",
+            "prerequisite_ref": "R1820116348cd",
+            "record_id": "requires:0002",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "prerequisite_ref": "Rf6f2a500079e",
+            "record_id": "requires:0014",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R3a11be59ddaa",
+            "prerequisite_ref": "R65d8546a7fb6",
+            "record_id": "requires:0004",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc07011e6ab2d",
+            "prerequisite_ref": "R6007124a9f06",
+            "record_id": "requires:0010",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rfb39090aa5c5",
+            "prerequisite_ref": "R1820116348cd",
+            "record_id": "requires:0006",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc07011e6ab2d",
+            "prerequisite_ref": "R6007124a9f06",
+            "record_id": "requires:0010",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rc6c554a79b27",
+            "prerequisite_ref": "Rf6f2a500079e",
+            "record_id": "requires:0014",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "prerequisite_ref": "R148f899e57f6",
+            "record_id": "requires:0012",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R30896725a0ac",
+            "prerequisite_ref": "R2b2709069f4c",
+            "record_id": "requires:0018",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "prerequisite_ref": "R148f899e57f6",
+            "record_id": "requires:0012",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "SOUTH"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R665d41e9e962",
+            "prerequisite_ref": "Rc9f004c5ca0f",
+            "record_id": "requires:withdrawn",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rcf5370ab2e7c",
+            "prerequisite_ref": "R148f899e57f6",
+            "record_id": "requires:0012",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R30896725a0ac",
+            "prerequisite_ref": "R2b2709069f4c",
+            "record_id": "requires:0018",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc2e7f1ec75e0",
+            "prerequisite_ref": "R65d8546a7fb6",
+            "record_id": "requires:0008",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rc6c554a79b27",
+            "prerequisite_ref": "Rf6f2a500079e",
+            "record_id": "requires:0014",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R665d41e9e962",
+            "prerequisite_ref": "Rc9f004c5ca0f",
+            "record_id": "requires:0000",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R7dcc05e5ca15",
+            "prerequisite_ref": "R1b36613ee493",
+            "record_id": "requires:0016",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-03-23",
+            "item_ref": "Rc07011e6ab2d",
+            "prerequisite_ref": "R6007124a9f06",
+            "record_id": "requires:0010",
+            "revision": "3",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "Rfb39090aa5c5",
+            "prerequisite_ref": "R1820116348cd",
+            "record_id": "requires:0006",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R3a11be59ddaa",
+            "prerequisite_ref": "R65d8546a7fb6",
+            "record_id": "requires:0004",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "prerequisite_ref": "Rc9f004c5ca0f",
+            "record_id": "requires:0000",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R665d41e9e962",
+            "prerequisite_ref": "Rc9f004c5ca0f",
+            "record_id": "requires:0000",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-01-21",
+            "item_ref": "R8e867287f9dc",
+            "prerequisite_ref": "R1820116348cd",
+            "record_id": "requires:0002",
+            "revision": "1",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "action": "UPSERT",
+            "effective_date": "2026-02-21",
+            "item_ref": "R7dcc05e5ca15",
+            "prerequisite_ref": "R1b36613ee493",
+            "record_id": "requires:0016",
+            "revision": "2",
+            "table": "requires",
+            "tenant": "NORTH"
+          }
+        }
+      ],
+      "table_id": "file_23_view_0"
+    }
+  ]
+}

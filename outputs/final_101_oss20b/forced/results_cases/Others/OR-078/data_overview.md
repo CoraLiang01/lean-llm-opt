@@ -1,0 +1,1329 @@
+{
+  "query": "In a regional electricity market, an electric utility is required to make purchasing and scheduling decisions for generation resources for a future planning period. The company has a choice of three main types of generation: coal, gas and renewables. Since contracts with suppliers are usually purchased on a 'lot' basis, where each lot corresponds to a fixed amount of generation and orders must be placed in whole lots, as described in energy.csv, the company needs to meet its total demand (200) and minimize costs.",
+  "relationships": [],
+  "tables": [
+    {
+      "columns": [
+        "option",
+        "tech",
+        "gen_per_lot",
+        "cost_per_lot",
+        "unit_cost_est"
+      ],
+      "file_name": "energy.csv",
+      "records": [
+        {
+          "data_row_number": 0,
+          "values": {
+            "cost_per_lot": "37.62",
+            "gen_per_lot": "45",
+            "option": "coal_001",
+            "tech": "coal",
+            "unit_cost_est": "0.836"
+          }
+        },
+        {
+          "data_row_number": 1,
+          "values": {
+            "cost_per_lot": "44.43",
+            "gen_per_lot": "55",
+            "option": "coal_002",
+            "tech": "coal",
+            "unit_cost_est": "0.8078"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "cost_per_lot": "34.76",
+            "gen_per_lot": "45",
+            "option": "coal_003",
+            "tech": "coal",
+            "unit_cost_est": "0.7724"
+          }
+        },
+        {
+          "data_row_number": 3,
+          "values": {
+            "cost_per_lot": "33.17",
+            "gen_per_lot": "40",
+            "option": "coal_004",
+            "tech": "coal",
+            "unit_cost_est": "0.8293"
+          }
+        },
+        {
+          "data_row_number": 4,
+          "values": {
+            "cost_per_lot": "40.83",
+            "gen_per_lot": "50",
+            "option": "coal_005",
+            "tech": "coal",
+            "unit_cost_est": "0.8166"
+          }
+        },
+        {
+          "data_row_number": 5,
+          "values": {
+            "cost_per_lot": "33.5",
+            "gen_per_lot": "40",
+            "option": "coal_006",
+            "tech": "coal",
+            "unit_cost_est": "0.8375"
+          }
+        },
+        {
+          "data_row_number": 6,
+          "values": {
+            "cost_per_lot": "42.73",
+            "gen_per_lot": "55",
+            "option": "coal_007",
+            "tech": "coal",
+            "unit_cost_est": "0.7769"
+          }
+        },
+        {
+          "data_row_number": 7,
+          "values": {
+            "cost_per_lot": "34.86",
+            "gen_per_lot": "45",
+            "option": "coal_008",
+            "tech": "coal",
+            "unit_cost_est": "0.7747"
+          }
+        },
+        {
+          "data_row_number": 8,
+          "values": {
+            "cost_per_lot": "36.09",
+            "gen_per_lot": "45",
+            "option": "coal_009",
+            "tech": "coal",
+            "unit_cost_est": "0.802"
+          }
+        },
+        {
+          "data_row_number": 9,
+          "values": {
+            "cost_per_lot": "39.16",
+            "gen_per_lot": "50",
+            "option": "coal_010",
+            "tech": "coal",
+            "unit_cost_est": "0.7832"
+          }
+        },
+        {
+          "data_row_number": 10,
+          "values": {
+            "cost_per_lot": "38.56",
+            "gen_per_lot": "50",
+            "option": "coal_011",
+            "tech": "coal",
+            "unit_cost_est": "0.7712"
+          }
+        },
+        {
+          "data_row_number": 11,
+          "values": {
+            "cost_per_lot": "35.52",
+            "gen_per_lot": "45",
+            "option": "coal_012",
+            "tech": "coal",
+            "unit_cost_est": "0.7893"
+          }
+        },
+        {
+          "data_row_number": 12,
+          "values": {
+            "cost_per_lot": "41.14",
+            "gen_per_lot": "50",
+            "option": "coal_013",
+            "tech": "coal",
+            "unit_cost_est": "0.8228"
+          }
+        },
+        {
+          "data_row_number": 13,
+          "values": {
+            "cost_per_lot": "36.05",
+            "gen_per_lot": "45",
+            "option": "coal_014",
+            "tech": "coal",
+            "unit_cost_est": "0.8011"
+          }
+        },
+        {
+          "data_row_number": 14,
+          "values": {
+            "cost_per_lot": "38.19",
+            "gen_per_lot": "50",
+            "option": "coal_015",
+            "tech": "coal",
+            "unit_cost_est": "0.7638"
+          }
+        },
+        {
+          "data_row_number": 15,
+          "values": {
+            "cost_per_lot": "35.37",
+            "gen_per_lot": "45",
+            "option": "coal_043",
+            "tech": "coal",
+            "unit_cost_est": "0.786"
+          }
+        },
+        {
+          "data_row_number": 16,
+          "values": {
+            "cost_per_lot": "44.61",
+            "gen_per_lot": "55",
+            "option": "coal_044",
+            "tech": "coal",
+            "unit_cost_est": "0.8111"
+          }
+        },
+        {
+          "data_row_number": 17,
+          "values": {
+            "cost_per_lot": "47.87",
+            "gen_per_lot": "60",
+            "option": "coal_045",
+            "tech": "coal",
+            "unit_cost_est": "0.7978"
+          }
+        },
+        {
+          "data_row_number": 18,
+          "values": {
+            "cost_per_lot": "32.68",
+            "gen_per_lot": "40",
+            "option": "coal_046",
+            "tech": "coal",
+            "unit_cost_est": "0.817"
+          }
+        },
+        {
+          "data_row_number": 19,
+          "values": {
+            "cost_per_lot": "44.27",
+            "gen_per_lot": "55",
+            "option": "coal_047",
+            "tech": "coal",
+            "unit_cost_est": "0.8049"
+          }
+        },
+        {
+          "data_row_number": 20,
+          "values": {
+            "cost_per_lot": "43.97",
+            "gen_per_lot": "55",
+            "option": "coal_048",
+            "tech": "coal",
+            "unit_cost_est": "0.7995"
+          }
+        },
+        {
+          "data_row_number": 21,
+          "values": {
+            "cost_per_lot": "39.71",
+            "gen_per_lot": "50",
+            "option": "coal_049",
+            "tech": "coal",
+            "unit_cost_est": "0.7942"
+          }
+        },
+        {
+          "data_row_number": 22,
+          "values": {
+            "cost_per_lot": "30.75",
+            "gen_per_lot": "40",
+            "option": "coal_050",
+            "tech": "coal",
+            "unit_cost_est": "0.7688"
+          }
+        },
+        {
+          "data_row_number": 23,
+          "values": {
+            "cost_per_lot": "32.44",
+            "gen_per_lot": "40",
+            "option": "coal_051",
+            "tech": "coal",
+            "unit_cost_est": "0.811"
+          }
+        },
+        {
+          "data_row_number": 24,
+          "values": {
+            "cost_per_lot": "34.61",
+            "gen_per_lot": "45",
+            "option": "coal_091",
+            "tech": "coal",
+            "unit_cost_est": "0.7691"
+          }
+        },
+        {
+          "data_row_number": 25,
+          "values": {
+            "cost_per_lot": "49.81",
+            "gen_per_lot": "60",
+            "option": "coal_092",
+            "tech": "coal",
+            "unit_cost_est": "0.8302"
+          }
+        },
+        {
+          "data_row_number": 26,
+          "values": {
+            "cost_per_lot": "36.58",
+            "gen_per_lot": "45",
+            "option": "coal_093",
+            "tech": "coal",
+            "unit_cost_est": "0.8129"
+          }
+        },
+        {
+          "data_row_number": 27,
+          "values": {
+            "cost_per_lot": "44.24",
+            "gen_per_lot": "55",
+            "option": "coal_094",
+            "tech": "coal",
+            "unit_cost_est": "0.8044"
+          }
+        },
+        {
+          "data_row_number": 28,
+          "values": {
+            "cost_per_lot": "38.97",
+            "gen_per_lot": "50",
+            "option": "coal_095",
+            "tech": "coal",
+            "unit_cost_est": "0.7794"
+          }
+        },
+        {
+          "data_row_number": 29,
+          "values": {
+            "cost_per_lot": "33.27",
+            "gen_per_lot": "40",
+            "option": "coal_096",
+            "tech": "coal",
+            "unit_cost_est": "0.8318"
+          }
+        },
+        {
+          "data_row_number": 30,
+          "values": {
+            "cost_per_lot": "48.64",
+            "gen_per_lot": "60",
+            "option": "coal_097",
+            "tech": "coal",
+            "unit_cost_est": "0.8107"
+          }
+        },
+        {
+          "data_row_number": 31,
+          "values": {
+            "cost_per_lot": "35.46",
+            "gen_per_lot": "45",
+            "option": "coal_098",
+            "tech": "coal",
+            "unit_cost_est": "0.788"
+          }
+        },
+        {
+          "data_row_number": 32,
+          "values": {
+            "cost_per_lot": "45.75",
+            "gen_per_lot": "55",
+            "option": "coal_099",
+            "tech": "coal",
+            "unit_cost_est": "0.8318"
+          }
+        },
+        {
+          "data_row_number": 33,
+          "values": {
+            "cost_per_lot": "49.34",
+            "gen_per_lot": "60",
+            "option": "coal_100",
+            "tech": "coal",
+            "unit_cost_est": "0.8223"
+          }
+        },
+        {
+          "data_row_number": 34,
+          "values": {
+            "cost_per_lot": "28.75",
+            "gen_per_lot": "30",
+            "option": "gas_001",
+            "tech": "gas",
+            "unit_cost_est": "0.9583"
+          }
+        },
+        {
+          "data_row_number": 35,
+          "values": {
+            "cost_per_lot": "26",
+            "gen_per_lot": "25",
+            "option": "gas_002",
+            "tech": "gas",
+            "unit_cost_est": "1.04"
+          }
+        },
+        {
+          "data_row_number": 36,
+          "values": {
+            "cost_per_lot": "28.53",
+            "gen_per_lot": "30",
+            "option": "gas_003",
+            "tech": "gas",
+            "unit_cost_est": "0.951"
+          }
+        },
+        {
+          "data_row_number": 37,
+          "values": {
+            "cost_per_lot": "25.41",
+            "gen_per_lot": "25",
+            "option": "gas_004",
+            "tech": "gas",
+            "unit_cost_est": "1.0164"
+          }
+        },
+        {
+          "data_row_number": 38,
+          "values": {
+            "cost_per_lot": "24.15",
+            "gen_per_lot": "25",
+            "option": "gas_005",
+            "tech": "gas",
+            "unit_cost_est": "0.966"
+          }
+        },
+        {
+          "data_row_number": 39,
+          "values": {
+            "cost_per_lot": "30.58",
+            "gen_per_lot": "30",
+            "option": "gas_006",
+            "tech": "gas",
+            "unit_cost_est": "1.0193"
+          }
+        },
+        {
+          "data_row_number": 40,
+          "values": {
+            "cost_per_lot": "29.17",
+            "gen_per_lot": "30",
+            "option": "gas_007",
+            "tech": "gas",
+            "unit_cost_est": "0.9723"
+          }
+        },
+        {
+          "data_row_number": 41,
+          "values": {
+            "cost_per_lot": "34.08",
+            "gen_per_lot": "35",
+            "option": "gas_008",
+            "tech": "gas",
+            "unit_cost_est": "0.9737"
+          }
+        },
+        {
+          "data_row_number": 42,
+          "values": {
+            "cost_per_lot": "30.74",
+            "gen_per_lot": "30",
+            "option": "gas_009",
+            "tech": "gas",
+            "unit_cost_est": "1.0247"
+          }
+        },
+        {
+          "data_row_number": 43,
+          "values": {
+            "cost_per_lot": "31.05",
+            "gen_per_lot": "30",
+            "option": "gas_010",
+            "tech": "gas",
+            "unit_cost_est": "1.035"
+          }
+        },
+        {
+          "data_row_number": 44,
+          "values": {
+            "cost_per_lot": "30.2",
+            "gen_per_lot": "30",
+            "option": "gas_011",
+            "tech": "gas",
+            "unit_cost_est": "1.0067"
+          }
+        },
+        {
+          "data_row_number": 45,
+          "values": {
+            "cost_per_lot": "24.67",
+            "gen_per_lot": "25",
+            "option": "gas_012",
+            "tech": "gas",
+            "unit_cost_est": "0.9868"
+          }
+        },
+        {
+          "data_row_number": 46,
+          "values": {
+            "cost_per_lot": "24.36",
+            "gen_per_lot": "25",
+            "option": "gas_013",
+            "tech": "gas",
+            "unit_cost_est": "0.9744"
+          }
+        },
+        {
+          "data_row_number": 47,
+          "values": {
+            "cost_per_lot": "34.63",
+            "gen_per_lot": "35",
+            "option": "gas_014",
+            "tech": "gas",
+            "unit_cost_est": "0.9894"
+          }
+        },
+        {
+          "data_row_number": 48,
+          "values": {
+            "cost_per_lot": "35.46",
+            "gen_per_lot": "35",
+            "option": "gas_015",
+            "tech": "gas",
+            "unit_cost_est": "1.0131"
+          }
+        },
+        {
+          "data_row_number": 49,
+          "values": {
+            "cost_per_lot": "35.01",
+            "gen_per_lot": "35",
+            "option": "gas_016",
+            "tech": "gas",
+            "unit_cost_est": "1.0003"
+          }
+        },
+        {
+          "data_row_number": 50,
+          "values": {
+            "cost_per_lot": "29.98",
+            "gen_per_lot": "30",
+            "option": "gas_017",
+            "tech": "gas",
+            "unit_cost_est": "0.9993"
+          }
+        },
+        {
+          "data_row_number": 51,
+          "values": {
+            "cost_per_lot": "25.56",
+            "gen_per_lot": "25",
+            "option": "gas_018",
+            "tech": "gas",
+            "unit_cost_est": "1.0224"
+          }
+        },
+        {
+          "data_row_number": 52,
+          "values": {
+            "cost_per_lot": "23.81",
+            "gen_per_lot": "25",
+            "option": "gas_019",
+            "tech": "gas",
+            "unit_cost_est": "0.9524"
+          }
+        },
+        {
+          "data_row_number": 53,
+          "values": {
+            "cost_per_lot": "29.03",
+            "gen_per_lot": "30",
+            "option": "gas_020",
+            "tech": "gas",
+            "unit_cost_est": "0.9677"
+          }
+        },
+        {
+          "data_row_number": 54,
+          "values": {
+            "cost_per_lot": "36.59",
+            "gen_per_lot": "35",
+            "option": "gas_021",
+            "tech": "gas",
+            "unit_cost_est": "1.0454"
+          }
+        },
+        {
+          "data_row_number": 55,
+          "values": {
+            "cost_per_lot": "34.55",
+            "gen_per_lot": "35",
+            "option": "gas_022",
+            "tech": "gas",
+            "unit_cost_est": "0.9871"
+          }
+        },
+        {
+          "data_row_number": 56,
+          "values": {
+            "cost_per_lot": "26.07",
+            "gen_per_lot": "25",
+            "option": "gas_023",
+            "tech": "gas",
+            "unit_cost_est": "1.0428"
+          }
+        },
+        {
+          "data_row_number": 57,
+          "values": {
+            "cost_per_lot": "31.4",
+            "gen_per_lot": "30",
+            "option": "gas_024",
+            "tech": "gas",
+            "unit_cost_est": "1.0467"
+          }
+        },
+        {
+          "data_row_number": 58,
+          "values": {
+            "cost_per_lot": "36.24",
+            "gen_per_lot": "35",
+            "option": "gas_025",
+            "tech": "gas",
+            "unit_cost_est": "1.0354"
+          }
+        },
+        {
+          "data_row_number": 59,
+          "values": {
+            "cost_per_lot": "29.66",
+            "gen_per_lot": "30",
+            "option": "gas_026",
+            "tech": "gas",
+            "unit_cost_est": "0.9887"
+          }
+        },
+        {
+          "data_row_number": 60,
+          "values": {
+            "cost_per_lot": "34.36",
+            "gen_per_lot": "35",
+            "option": "gas_027",
+            "tech": "gas",
+            "unit_cost_est": "0.9817"
+          }
+        },
+        {
+          "data_row_number": 61,
+          "values": {
+            "cost_per_lot": "25.14",
+            "gen_per_lot": "25",
+            "option": "gas_028",
+            "tech": "gas",
+            "unit_cost_est": "1.0056"
+          }
+        },
+        {
+          "data_row_number": 62,
+          "values": {
+            "cost_per_lot": "35.69",
+            "gen_per_lot": "35",
+            "option": "gas_029",
+            "tech": "gas",
+            "unit_cost_est": "1.0197"
+          }
+        },
+        {
+          "data_row_number": 63,
+          "values": {
+            "cost_per_lot": "28.79",
+            "gen_per_lot": "30",
+            "option": "gas_030",
+            "tech": "gas",
+            "unit_cost_est": "0.9597"
+          }
+        },
+        {
+          "data_row_number": 64,
+          "values": {
+            "cost_per_lot": "31.47",
+            "gen_per_lot": "30",
+            "option": "gas_031",
+            "tech": "gas",
+            "unit_cost_est": "1.049"
+          }
+        },
+        {
+          "data_row_number": 65,
+          "values": {
+            "cost_per_lot": "25.05",
+            "gen_per_lot": "25",
+            "option": "gas_032",
+            "tech": "gas",
+            "unit_cost_est": "1.002"
+          }
+        },
+        {
+          "data_row_number": 66,
+          "values": {
+            "cost_per_lot": "35.84",
+            "gen_per_lot": "35",
+            "option": "gas_033",
+            "tech": "gas",
+            "unit_cost_est": "1.024"
+          }
+        },
+        {
+          "data_row_number": 67,
+          "values": {
+            "cost_per_lot": "30.61",
+            "gen_per_lot": "30",
+            "option": "gas_034",
+            "tech": "gas",
+            "unit_cost_est": "1.0203"
+          }
+        },
+        {
+          "data_row_number": 68,
+          "values": {
+            "cost_per_lot": "29.38",
+            "gen_per_lot": "30",
+            "option": "gas_035",
+            "tech": "gas",
+            "unit_cost_est": "0.9793"
+          }
+        },
+        {
+          "data_row_number": 69,
+          "values": {
+            "cost_per_lot": "36.09",
+            "gen_per_lot": "35",
+            "option": "gas_036",
+            "tech": "gas",
+            "unit_cost_est": "1.0311"
+          }
+        },
+        {
+          "data_row_number": 70,
+          "values": {
+            "cost_per_lot": "36.45",
+            "gen_per_lot": "35",
+            "option": "gas_037",
+            "tech": "gas",
+            "unit_cost_est": "1.0414"
+          }
+        },
+        {
+          "data_row_number": 71,
+          "values": {
+            "cost_per_lot": "30",
+            "gen_per_lot": "30",
+            "option": "gas_038",
+            "tech": "gas",
+            "unit_cost_est": "1"
+          }
+        },
+        {
+          "data_row_number": 72,
+          "values": {
+            "cost_per_lot": "35.52",
+            "gen_per_lot": "35",
+            "option": "gas_039",
+            "tech": "gas",
+            "unit_cost_est": "1.0149"
+          }
+        },
+        {
+          "data_row_number": 73,
+          "values": {
+            "cost_per_lot": "30.89",
+            "gen_per_lot": "30",
+            "option": "gas_040",
+            "tech": "gas",
+            "unit_cost_est": "1.0297"
+          }
+        },
+        {
+          "data_row_number": 74,
+          "values": {
+            "cost_per_lot": "34.43",
+            "gen_per_lot": "35",
+            "option": "gas_041",
+            "tech": "gas",
+            "unit_cost_est": "0.9837"
+          }
+        },
+        {
+          "data_row_number": 75,
+          "values": {
+            "cost_per_lot": "28.78",
+            "gen_per_lot": "30",
+            "option": "gas_042",
+            "tech": "gas",
+            "unit_cost_est": "0.9593"
+          }
+        },
+        {
+          "data_row_number": 76,
+          "values": {
+            "cost_per_lot": "28.61",
+            "gen_per_lot": "30",
+            "option": "gas_043",
+            "tech": "gas",
+            "unit_cost_est": "0.9537"
+          }
+        },
+        {
+          "data_row_number": 77,
+          "values": {
+            "cost_per_lot": "30.13",
+            "gen_per_lot": "30",
+            "option": "gas_044",
+            "tech": "gas",
+            "unit_cost_est": "1.0043"
+          }
+        },
+        {
+          "data_row_number": 78,
+          "values": {
+            "cost_per_lot": "25.23",
+            "gen_per_lot": "25",
+            "option": "gas_045",
+            "tech": "gas",
+            "unit_cost_est": "1.0092"
+          }
+        },
+        {
+          "data_row_number": 79,
+          "values": {
+            "cost_per_lot": "29.34",
+            "gen_per_lot": "30",
+            "option": "gas_062",
+            "tech": "gas",
+            "unit_cost_est": "0.978"
+          }
+        },
+        {
+          "data_row_number": 80,
+          "values": {
+            "cost_per_lot": "35.83",
+            "gen_per_lot": "35",
+            "option": "gas_063",
+            "tech": "gas",
+            "unit_cost_est": "1.0237"
+          }
+        },
+        {
+          "data_row_number": 81,
+          "values": {
+            "cost_per_lot": "30.34",
+            "gen_per_lot": "30",
+            "option": "gas_064",
+            "tech": "gas",
+            "unit_cost_est": "1.0113"
+          }
+        },
+        {
+          "data_row_number": 82,
+          "values": {
+            "cost_per_lot": "29.24",
+            "gen_per_lot": "30",
+            "option": "gas_065",
+            "tech": "gas",
+            "unit_cost_est": "0.9747"
+          }
+        },
+        {
+          "data_row_number": 83,
+          "values": {
+            "cost_per_lot": "30.77",
+            "gen_per_lot": "30",
+            "option": "gas_066",
+            "tech": "gas",
+            "unit_cost_est": "1.0257"
+          }
+        },
+        {
+          "data_row_number": 84,
+          "values": {
+            "cost_per_lot": "24.04",
+            "gen_per_lot": "25",
+            "option": "gas_067",
+            "tech": "gas",
+            "unit_cost_est": "0.9616"
+          }
+        },
+        {
+          "data_row_number": 85,
+          "values": {
+            "cost_per_lot": "34.69",
+            "gen_per_lot": "35",
+            "option": "gas_096",
+            "tech": "gas",
+            "unit_cost_est": "0.9911"
+          }
+        },
+        {
+          "data_row_number": 86,
+          "values": {
+            "cost_per_lot": "30.83",
+            "gen_per_lot": "30",
+            "option": "gas_097",
+            "tech": "gas",
+            "unit_cost_est": "1.0277"
+          }
+        },
+        {
+          "data_row_number": 87,
+          "values": {
+            "cost_per_lot": "31.29",
+            "gen_per_lot": "30",
+            "option": "gas_098",
+            "tech": "gas",
+            "unit_cost_est": "1.043"
+          }
+        },
+        {
+          "data_row_number": 88,
+          "values": {
+            "cost_per_lot": "34.75",
+            "gen_per_lot": "35",
+            "option": "gas_099",
+            "tech": "gas",
+            "unit_cost_est": "0.9929"
+          }
+        },
+        {
+          "data_row_number": 89,
+          "values": {
+            "cost_per_lot": "35.89",
+            "gen_per_lot": "35",
+            "option": "gas_100",
+            "tech": "gas",
+            "unit_cost_est": "1.0254"
+          }
+        },
+        {
+          "data_row_number": 90,
+          "values": {
+            "cost_per_lot": "19.5",
+            "gen_per_lot": "15",
+            "option": "renewables_001",
+            "tech": "renewables",
+            "unit_cost_est": "1.3"
+          }
+        },
+        {
+          "data_row_number": 91,
+          "values": {
+            "cost_per_lot": "25.82",
+            "gen_per_lot": "20",
+            "option": "renewables_002",
+            "tech": "renewables",
+            "unit_cost_est": "1.291"
+          }
+        },
+        {
+          "data_row_number": 92,
+          "values": {
+            "cost_per_lot": "25.99",
+            "gen_per_lot": "20",
+            "option": "renewables_003",
+            "tech": "renewables",
+            "unit_cost_est": "1.2995"
+          }
+        },
+        {
+          "data_row_number": 93,
+          "values": {
+            "cost_per_lot": "23.78",
+            "gen_per_lot": "20",
+            "option": "renewables_004",
+            "tech": "renewables",
+            "unit_cost_est": "1.189"
+          }
+        },
+        {
+          "data_row_number": 94,
+          "values": {
+            "cost_per_lot": "29.97",
+            "gen_per_lot": "25",
+            "option": "renewables_005",
+            "tech": "renewables",
+            "unit_cost_est": "1.1988"
+          }
+        },
+        {
+          "data_row_number": 95,
+          "values": {
+            "cost_per_lot": "19.66",
+            "gen_per_lot": "15",
+            "option": "renewables_021",
+            "tech": "renewables",
+            "unit_cost_est": "1.3107"
+          }
+        },
+        {
+          "data_row_number": 96,
+          "values": {
+            "cost_per_lot": "24.68",
+            "gen_per_lot": "20",
+            "option": "renewables_022",
+            "tech": "renewables",
+            "unit_cost_est": "1.234"
+          }
+        },
+        {
+          "data_row_number": 97,
+          "values": {
+            "cost_per_lot": "32.65",
+            "gen_per_lot": "25",
+            "option": "renewables_023",
+            "tech": "renewables",
+            "unit_cost_est": "1.306"
+          }
+        },
+        {
+          "data_row_number": 98,
+          "values": {
+            "cost_per_lot": "32.04",
+            "gen_per_lot": "25",
+            "option": "renewables_024",
+            "tech": "renewables",
+            "unit_cost_est": "1.2816"
+          }
+        },
+        {
+          "data_row_number": 99,
+          "values": {
+            "cost_per_lot": "23.96",
+            "gen_per_lot": "20",
+            "option": "renewables_025",
+            "tech": "renewables",
+            "unit_cost_est": "1.198"
+          }
+        },
+        {
+          "data_row_number": 100,
+          "values": {
+            "cost_per_lot": "25.15",
+            "gen_per_lot": "20",
+            "option": "renewables_026",
+            "tech": "renewables",
+            "unit_cost_est": "1.2575"
+          }
+        },
+        {
+          "data_row_number": 101,
+          "values": {
+            "cost_per_lot": "26.02",
+            "gen_per_lot": "20",
+            "option": "renewables_027",
+            "tech": "renewables",
+            "unit_cost_est": "1.301"
+          }
+        },
+        {
+          "data_row_number": 102,
+          "values": {
+            "cost_per_lot": "18.74",
+            "gen_per_lot": "15",
+            "option": "renewables_028",
+            "tech": "renewables",
+            "unit_cost_est": "1.2493"
+          }
+        },
+        {
+          "data_row_number": 103,
+          "values": {
+            "cost_per_lot": "18.69",
+            "gen_per_lot": "15",
+            "option": "renewables_029",
+            "tech": "renewables",
+            "unit_cost_est": "1.246"
+          }
+        },
+        {
+          "data_row_number": 104,
+          "values": {
+            "cost_per_lot": "18.04",
+            "gen_per_lot": "15",
+            "option": "renewables_030",
+            "tech": "renewables",
+            "unit_cost_est": "1.2027"
+          }
+        },
+        {
+          "data_row_number": 105,
+          "values": {
+            "cost_per_lot": "19.03",
+            "gen_per_lot": "15",
+            "option": "renewables_031",
+            "tech": "renewables",
+            "unit_cost_est": "1.2687"
+          }
+        },
+        {
+          "data_row_number": 106,
+          "values": {
+            "cost_per_lot": "25.21",
+            "gen_per_lot": "20",
+            "option": "renewables_032",
+            "tech": "renewables",
+            "unit_cost_est": "1.2605"
+          }
+        },
+        {
+          "data_row_number": 107,
+          "values": {
+            "cost_per_lot": "30.86",
+            "gen_per_lot": "25",
+            "option": "renewables_033",
+            "tech": "renewables",
+            "unit_cost_est": "1.2344"
+          }
+        },
+        {
+          "data_row_number": 108,
+          "values": {
+            "cost_per_lot": "25.92",
+            "gen_per_lot": "20",
+            "option": "renewables_034",
+            "tech": "renewables",
+            "unit_cost_est": "1.296"
+          }
+        },
+        {
+          "data_row_number": 109,
+          "values": {
+            "cost_per_lot": "26.16",
+            "gen_per_lot": "20",
+            "option": "renewables_035",
+            "tech": "renewables",
+            "unit_cost_est": "1.308"
+          }
+        },
+        {
+          "data_row_number": 110,
+          "values": {
+            "cost_per_lot": "19.63",
+            "gen_per_lot": "15",
+            "option": "renewables_036",
+            "tech": "renewables",
+            "unit_cost_est": "1.3087"
+          }
+        },
+        {
+          "data_row_number": 111,
+          "values": {
+            "cost_per_lot": "19.48",
+            "gen_per_lot": "15",
+            "option": "renewables_037",
+            "tech": "renewables",
+            "unit_cost_est": "1.2987"
+          }
+        },
+        {
+          "data_row_number": 112,
+          "values": {
+            "cost_per_lot": "26.23",
+            "gen_per_lot": "20",
+            "option": "renewables_038",
+            "tech": "renewables",
+            "unit_cost_est": "1.3115"
+          }
+        },
+        {
+          "data_row_number": 113,
+          "values": {
+            "cost_per_lot": "18.85",
+            "gen_per_lot": "15",
+            "option": "renewables_039",
+            "tech": "renewables",
+            "unit_cost_est": "1.2567"
+          }
+        },
+        {
+          "data_row_number": 114,
+          "values": {
+            "cost_per_lot": "31.32",
+            "gen_per_lot": "25",
+            "option": "renewables_040",
+            "tech": "renewables",
+            "unit_cost_est": "1.2528"
+          }
+        },
+        {
+          "data_row_number": 115,
+          "values": {
+            "cost_per_lot": "25.49",
+            "gen_per_lot": "20",
+            "option": "renewables_041",
+            "tech": "renewables",
+            "unit_cost_est": "1.2745"
+          }
+        },
+        {
+          "data_row_number": 116,
+          "values": {
+            "cost_per_lot": "25.32",
+            "gen_per_lot": "20",
+            "option": "renewables_042",
+            "tech": "renewables",
+            "unit_cost_est": "1.266"
+          }
+        },
+        {
+          "data_row_number": 117,
+          "values": {
+            "cost_per_lot": "26",
+            "gen_per_lot": "20",
+            "option": "renewables_043",
+            "tech": "renewables",
+            "unit_cost_est": "1.3"
+          }
+        },
+        {
+          "data_row_number": 118,
+          "values": {
+            "cost_per_lot": "18.34",
+            "gen_per_lot": "15",
+            "option": "renewables_044",
+            "tech": "renewables",
+            "unit_cost_est": "1.2227"
+          }
+        },
+        {
+          "data_row_number": 119,
+          "values": {
+            "cost_per_lot": "32.47",
+            "gen_per_lot": "25",
+            "option": "renewables_045",
+            "tech": "renewables",
+            "unit_cost_est": "1.2988"
+          }
+        },
+        {
+          "data_row_number": 120,
+          "values": {
+            "cost_per_lot": "25.3",
+            "gen_per_lot": "20",
+            "option": "renewables_046",
+            "tech": "renewables",
+            "unit_cost_est": "1.265"
+          }
+        },
+        {
+          "data_row_number": 121,
+          "values": {
+            "cost_per_lot": "24.22",
+            "gen_per_lot": "20",
+            "option": "renewables_047",
+            "tech": "renewables",
+            "unit_cost_est": "1.211"
+          }
+        },
+        {
+          "data_row_number": 122,
+          "values": {
+            "cost_per_lot": "24.63",
+            "gen_per_lot": "20",
+            "option": "renewables_048",
+            "tech": "renewables",
+            "unit_cost_est": "1.2315"
+          }
+        },
+        {
+          "data_row_number": 123,
+          "values": {
+            "cost_per_lot": "23.94",
+            "gen_per_lot": "20",
+            "option": "renewables_049",
+            "tech": "renewables",
+            "unit_cost_est": "1.197"
+          }
+        },
+        {
+          "data_row_number": 124,
+          "values": {
+            "cost_per_lot": "32.77",
+            "gen_per_lot": "25",
+            "option": "renewables_050",
+            "tech": "renewables",
+            "unit_cost_est": "1.3108"
+          }
+        },
+        {
+          "data_row_number": 125,
+          "values": {
+            "cost_per_lot": "25.09",
+            "gen_per_lot": "20",
+            "option": "renewables_051",
+            "tech": "renewables",
+            "unit_cost_est": "1.2545"
+          }
+        },
+        {
+          "data_row_number": 126,
+          "values": {
+            "cost_per_lot": "25.78",
+            "gen_per_lot": "20",
+            "option": "renewables_052",
+            "tech": "renewables",
+            "unit_cost_est": "1.289"
+          }
+        },
+        {
+          "data_row_number": 127,
+          "values": {
+            "cost_per_lot": "24.16",
+            "gen_per_lot": "20",
+            "option": "renewables_053",
+            "tech": "renewables",
+            "unit_cost_est": "1.208"
+          }
+        },
+        {
+          "data_row_number": 128,
+          "values": {
+            "cost_per_lot": "32.26",
+            "gen_per_lot": "25",
+            "option": "renewables_054",
+            "tech": "renewables",
+            "unit_cost_est": "1.2904"
+          }
+        },
+        {
+          "data_row_number": 129,
+          "values": {
+            "cost_per_lot": "31.96",
+            "gen_per_lot": "25",
+            "option": "renewables_055",
+            "tech": "renewables",
+            "unit_cost_est": "1.2784"
+          }
+        },
+        {
+          "data_row_number": 130,
+          "values": {
+            "cost_per_lot": "24.8",
+            "gen_per_lot": "20",
+            "option": "renewables_056",
+            "tech": "renewables",
+            "unit_cost_est": "1.24"
+          }
+        }
+      ],
+      "table_id": "file_0_view_0"
+    }
+  ]
+}

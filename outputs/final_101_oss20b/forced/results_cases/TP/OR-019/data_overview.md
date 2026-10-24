@@ -1,0 +1,36 @@
+{
+  "query": "The supermarket offers a variety of top-selling products, with revenue data provided in the ‘Revenue’ column. Each product has its own demand level. The retailer aims to maximize total revenue by focusing on the initial inventory of products classified under ‘27in’. Inventory levels are provided in the ‘Initial Inventory’ column. Demand quantities for ‘27in’ products are given in the ‘Demand’ column and are assumed to be deterministic and known in advance. The decision variables x_i represent the number of units of each ‘27in’ product i that the company plans to fulfill.",
+  "relationships": [],
+  "tables": [
+    {
+      "columns": [
+        "Product Name",
+        "Revenue",
+        "Demand",
+        "Initial Inventory"
+      ],
+      "file_name": "SalesDataAnalysis.csv",
+      "records": [
+        {
+          "data_row_number": 1,
+          "values": {
+            "Demand": "12474",
+            "Initial Inventory": "62440",
+            "Product Name": "27in 4K Gaming Monitor",
+            "Revenue": "389.99"
+          }
+        },
+        {
+          "data_row_number": 2,
+          "values": {
+            "Demand": "15057",
+            "Initial Inventory": "75500",
+            "Product Name": "27in FHD Monitor",
+            "Revenue": "149.99"
+          }
+        }
+      ],
+      "table_id": "file_0_view_0"
+    }
+  ]
+}
