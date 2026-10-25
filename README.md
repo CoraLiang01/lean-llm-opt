@@ -55,6 +55,10 @@ This repository accompanies the paper: https://papers.ssrn.com/sol3/papers.cfm?a
    - Each Primary workflow followed by the fallback with the same model, run on the 36 structural variants in `benchmark_dataset`.
    - Results: `outputs/variants_fallback_gpt41/` (33/36 to 35/36) and `outputs/variants_fallback_gpt_oss_20b/` (29/36 to 33/36).
 
+4. **Parameter-perturbation evaluation (303 numerical variants)**
+   - The variants are in `Test_Dataset/Perturbation-Large-scale-or`. Each is solved end to end by the main workflows.
+   - Summary tables: `outputs/perturbation_303/` (overall, by seed and by source problem type; GPT-4.1 295/303, gpt-oss-20b 279/303).
+
 #### Installation
 Prerequisites:
 - Python 3.10 or higher
