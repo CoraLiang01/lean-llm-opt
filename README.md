@@ -46,18 +46,21 @@ This repository accompanies the paper: https://papers.ssrn.com/sol3/papers.cfm?a
 
 1. **Ablation_Study_gpt_oss_20b_Large-scale_RAG_Only.ipynb** and **Ablation_Study_gpt_oss_20b_Large-scale_Few-shot_Only.ipynb**
    - Component ablations of the gpt-oss-20b workflow on the 101 Large-scale-or instances, with the same two settings as the GPT-4.1 ablations.
-   - Results: `outputs/ablation_gpt_oss_20b_rag_only/` (82/101) and `outputs/ablation_gpt_oss_20b_few_shot_only/` (75/101).
+   - Results: [RAG Only](outputs/ablation_gpt_oss_20b_rag_only/automatic/) (82/101) and [Few-shot Only](outputs/ablation_gpt_oss_20b_few_shot_only/automatic/) (75/101).
+   - Code: [RAG Only notebook](Ablation_Study_gpt_oss_20b_Large-scale_RAG_Only.ipynb) and [Few-shot Only notebook](Ablation_Study_gpt_oss_20b_Large-scale_Few-shot_Only.ipynb).
 
 2. **fallback mechanism/fallback.ipynb**
    - The audit-and-repair fallback: after the Primary workflow, it audits the formulation logic, the data usage and the code, repairs the first failing layer, re-executes the program in isolation and audits it again. It contains the shared definitions and a GPT-4.1 and a gpt-oss-20b backend.
+   - Code: [Shared fallback and model backends](fallback%20mechanism/fallback.ipynb).
 
 3. **fallback mechanism/LEAN_LLM_OPT_4.1_Large-scale_with_Fallback.ipynb** and **fallback mechanism/LEAN_LLM_OPT_gpt_oss_20b_Large-scale_with_Fallback.ipynb**
    - Each Primary workflow followed by the fallback with the same model, run on the 36 structural variants in `benchmark_dataset`.
-   - Results: `outputs/variants_fallback_gpt41/` (33/36 to 35/36) and `outputs/variants_fallback_gpt_oss_20b/` (29/36 to 33/36).
+   - Results: [GPT-4.1](outputs/variants_fallback_gpt41/) (33/36 to 35/36) and [gpt-oss-20b](outputs/variants_fallback_gpt_oss_20b/) (29/36 to 33/36).
+   - Code: [GPT-4.1 notebook](fallback%20mechanism/LEAN_LLM_OPT_4.1_Large-scale_with_Fallback.ipynb) and [gpt-oss-20b notebook](fallback%20mechanism/LEAN_LLM_OPT_gpt_oss_20b_Large-scale_with_Fallback.ipynb).
 
 4. **Parameter-perturbation evaluation (303 numerical variants)**
    - The variants are in `Test_Dataset/Perturbation-Large-scale-or`. Each is solved end to end by the main workflows.
-   - Summary tables: `outputs/perturbation_303/` (overall, by seed and by source problem type; GPT-4.1 295/303, gpt-oss-20b 279/303).
+   - Results: [Overall](outputs/perturbation_303/summary.csv), [by seed](outputs/perturbation_303/accuracy_by_seed.csv) and [by source problem type](outputs/perturbation_303/accuracy_by_problem_type.csv) (GPT-4.1 295/303, gpt-oss-20b 279/303).
 
 #### Installation
 Prerequisites:
