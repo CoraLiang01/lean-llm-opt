@@ -1,0 +1,111 @@
+# Final experiment and reporting protocol.
+# This is the short, frozen specification used to decide whether results are
+# comparable. The larger exp_config.yaml remains the executable configuration.
+
+protocol_id: air_nrm_final_2026-09-18_v1
+status: frozen
+
+source_config:
+  path: exp_config.yaml
+  sha256: 53f512a06b0c459882bbb49fd722c3d1c1721e593237d80d5c158419f6aea146
+
+datasets:
+  Air-NRM-CA-LS:
+    path: Test_Dataset/Air_NRM/large_scale/query_CA.csv
+    rows: 15
+    sha256: cff48ac08dc9c4dc4e54688d2f810f36a62d1011d3a5a4a8159c7ab780549c39
+  Air-NRM-NP-LS:
+    path: Test_Dataset/Air_NRM/large_scale/query_NP_Flow.csv
+    rows: 15
+    sha256: 2d74ef51f20756acefd18155525a29dd2a37fb35d2e81301d6759443c6491d5b
+
+methods:
+  - LEAN-LLM-OPT
+  - Abl-RAGOnly
+  - Abl-FewShotOnly
+  - Base-SingleCall
+  - Base-Agentic-2Stage-1Repair
+
+models:
+  gpt-4.1:
+    provider: openai
+    model: gpt-4.1-2025-04-14
+    temperature: 0.0
+    top_p: 1.0
+    seed: 20250101
+  gpt-5.4:
+    provider: openai
+    model: gpt-5.4
+    temperature: 0.0
+    top_p: 1.0
+    seed: 20250101
+  gemini-3.1-pro:
+    provider: google
+    model: gemini-3.1-pro-preview
+    # The current integration does not send temperature/top_p to this preview.
+    # Keep this explicit; do not describe it as having the GPT decoding setup.
+    temperature: null
+    top_p: null
+    seed: 20250101
+
+shared_execution_controls:
+  seed: 20250101
+  requested_repeats: 3
+  max_retries: 3
+  retry_backoff_s: 5.0
+  solver_time_limit_s: 300.0
+  agent_max_iterations: 40
+  agent_max_execution_time_s: 900.0
+  agent_early_stopping_method: force
+  budget_usd_per_run: 45.0
+
+official_run_rules:
+  expected_unique_instances_per_run: 15
+  required_instance_ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+  require_summary_json: true
+  require_complete_instance_set: true
+  duplicate_record_policy: reject_run
+  incomplete_run_policy: exclude
+  pilot_or_smoke_run_policy: exclude
+  selection_key: run_id
+  pooling_rule: >-
+    Pool only runs with the same dataset fingerprint, method, model profile,
+    and material configuration. repeat_index and run_id may differ.
+
+comparison_protocol:
+  headline_metric:
+    name: objective_accuracy
+    rule: abs(predicted_objective - gold_objective) <= 1e-4 * max(1, abs(gold_objective))
+    denominator: all_15_instances
+    missing_or_failed_prediction: incorrect
+  wmape:
+    rule: sum(abs(predicted - gold)) / sum(abs(gold))
+    missing_or_failed_prediction_value: 0.0
+    aggregation: micro_over_all_instances
+  formulation_or_parameter_check:
+    role: secondary_diagnostic
+    rule: >-
+      Report separately. Do not replace headline objective accuracy with this
+      metric unless the same check is available for every compared method.
+  repeated_runs:
+    report: mean_and_sample_standard_deviation
+    unit: complete_run
+    ddof: 1
+    do_not_use: pooled_instance_rows_as_independent_repeats
+  cost:
+    source: per-call token usage and the price table saved in each run config.json
+    report: [total_cost_per_run, mean_cost_per_instance, cost_per_correct_instance]
+    failed_instances: included
+    local_models: report_wall_time_separately_from_api_cost
+  stage_cost:
+    source: instances.jsonl.summary.by_stage
+    report: [calls, prompt_tokens, completion_tokens, cost_usd, latency_s]
+    aggregation: sum_first_then_divide_by_all_instances_for_means
+
+historical_result_note:
+  baseline_budget_usd_per_run: 30.0
+  final_budget_usd_per_run: 45.0
+  comparability_decision: >-
+    Existing complete baseline runs remain usable because none approached the
+    30 USD cap, so the cap did not stop or alter them. All future final runs
+    use 45 USD. If a historical run ever hit its cap, exclude it.

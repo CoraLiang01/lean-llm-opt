@@ -25,7 +25,7 @@ from pathlib import Path
 import pandas as pd
 
 _HERE = Path(__file__).resolve().parent
-OUT = _HERE / "query_largescale_CA.csv"
+OUT = _HERE / "query_CA.csv"
 
 SEED = 20250729
 

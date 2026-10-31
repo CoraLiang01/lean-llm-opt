@@ -151,7 +151,6 @@ TO_CSV_RE = re.compile(r'\.to_csv\(\s*(?P<q>["\'])(?P<name>[^"\']+\.csv)(?P=q)')
 AIR_NRM_PATH_RE = re.compile(
     r'Test_Dataset/Air_NRM/(?!small_scale/|large_scale/)')
 
-
 # --------------------------------------------------------------------------- #
 class Patcher:
     def __init__(self, path: Path, profile: str, method: str, dataset: str):
@@ -644,12 +643,23 @@ def run_test(test, agent, log=LOG, cfg=CFG):
     output_model, output_code, classification = [], [], []
 
     def extract_problem_type(output_text):
+        # `Mixture` added 2026-08-03. RefData.csv labels 18 of the 96 reference
+        # rows as Mixture, so the classifier is shown the category and can
+        # answer with it -- but the original pattern had no way to capture the
+        # word. re.search returns the leftmost match, so an answer of
+        # "a Mixture of Resource Allocation and Transportation" was recorded as
+        # "Resource Allocation": the hybrid judgement was silently discarded
+        # and those instances could never be scored as correctly classified.
+        #
+        # `Others` on its own is here for the same reason: RefData uses the
+        # bare label, the pattern only had the two "-with/without CSV" forms.
         pattern = (r'(Network Revenue Management|Network Revenue Management Problem|'
                    r'Resource Allocation|Resource Allocation Problem|Transportation|'
                    r'Transportation Problem|Facility Location Problem|Assignment Problem|'
                    r'AP|Uncapacited Facility Location Problem|NRM|RA|TP|FLP|UFLP|'
+                   r'Mixture|'
                    r'Others without CSV|Sales-Based Linear Programming|SBLP|'
-                   r'Others with CSV)')
+                   r'Others with CSV|Others)')
         match = re.search(pattern, output_text, re.IGNORECASE)
         return match.group(0) if match else None
 
@@ -700,6 +710,17 @@ def run_test(test, agent, log=LOG, cfg=CFG):
                         elif selected_problem in ("Assignment Problem", "AP"):
                             print("----------Assignment Problem-----------")
                             output = get_AP_response(query, dataset_address)
+                        elif selected_problem in ("Mixture",):
+                            # No dedicated solver: a Mixture problem combines
+                            # several types, so it takes the generic CSV
+                            # workflow -- the same code the else branch runs.
+                            # It is a separate branch only so that
+                            # selected_problem stays "Mixture" instead of being
+                            # relabelled "Others with CSV" below. Recognising
+                            # the class and handling it are different things,
+                            # and the log should not conflate them.
+                            print("----------Mixture (generic CSV workflow)-----------")
+                            output = get_Others_response(query, dataset_address)
                         else:
                             print("----------Others with CSV-----------")
                             output = get_Others_response(query, dataset_address)

@@ -272,27 +272,110 @@ def stage_breakdown(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(recs).round(4)
 
 
-def classification_report(df: pd.DataFrame, out_dir: Path) -> pd.DataFrame:
-    sub = df[df["gold_type"].notna() & df["pred_type"].notna()]
+def _canon_map(cfg_cls: dict) -> dict:
+    """alias (lowercased) -> canonical label."""
+    out = {}
+    for canon, aliases in (cfg_cls.get("type_aliases") or {}).items():
+        out[str(canon).strip().lower()] = canon
+        for a in aliases or []:
+            out[str(a).strip().lower()] = canon
+    return out
+
+
+def canonical_type(value, canon: dict, others_prefix: bool) -> str | None:
+    """Map either vocabulary onto one canonical label.
+
+    gold_type and pred_type come from different places and use different names
+    for the same class ("NRM" vs "Network Revenue Management"). Comparing them
+    as raw strings reports 0% accuracy no matter how good the classifier is.
+    """
+    if value is None or (isinstance(value, float) and value != value):
+        return None
+    s = str(value).strip()
+    if not s:
+        return None
+    hit = canon.get(s.lower())
+    if hit:
+        return hit
+    # Gold writes the sub-type: "Others -Traveling Salesman Problem". There is
+    # one Others branch and no TSP branch, so the sub-type is unpredictable.
+    if others_prefix and s.lower().startswith("others"):
+        return "Others"
+    return s                                   # unmapped: keep it visible
+
+
+def classification_report(df: pd.DataFrame, out_dir: Path,
+                          cfg_cls: dict | None = None) -> pd.DataFrame:
+    cfg_cls = cfg_cls or {}
+    canon = _canon_map(cfg_cls)
+    others_prefix = bool(cfg_cls.get("others_prefix_counts_as_others", True))
+    no_branch = {str(t).strip().lower()
+                 for t in (cfg_cls.get("types_without_branch") or [])}
+
+    sub = df[df["gold_type"].notna() & df["pred_type"].notna()].copy()
     if sub.empty:
         return pd.DataFrame()
+
+    sub["gold_canon"] = sub["gold_type"].map(
+        lambda v: canonical_type(v, canon, others_prefix))
+    sub["pred_canon"] = sub["pred_type"].map(
+        lambda v: canonical_type(v, canon, others_prefix))
+    # Strict view: gold sub-types must match exactly. Reported alongside so the
+    # choice of convention is visible rather than baked in.
+    sub["gold_strict"] = sub["gold_type"].map(
+        lambda v: canonical_type(v, canon, False))
+
+    excluded = sub["gold_type"].astype(str).str.strip().str.lower().isin(no_branch)
+    if excluded.any():
+        print(f"[aggregate_runs] classification: {int(excluded.sum())} instance(s) "
+              f"excluded from the denominator -- gold class has no routing "
+              f"branch ({', '.join(sorted(cfg_cls.get('types_without_branch') or []))}). "
+              f"Reported separately as n_no_branch.", file=sys.stderr)
+
+    unmapped = sorted(set(sub.loc[~excluded, "pred_canon"].dropna())
+                      - set(canon.values()))
+    if unmapped:
+        print(f"[aggregate_runs] classification: predicted label(s) not in "
+              f"type_aliases: {unmapped}. They can never match; add them to "
+              f"exp_config.yaml:classification.type_aliases.", file=sys.stderr)
+
     rows = []
-    for (ds, m, mp), x in sub.groupby(["dataset", "method", "model_profile"],
-                                      dropna=False):
-        hit = (x["gold_type"].str.strip().str.lower()
-               == x["pred_type"].str.strip().str.lower())
+    for (ds, m, mp), x_all in sub.groupby(["dataset", "method", "model_profile"],
+                                          dropna=False):
+        ex = x_all["gold_type"].astype(str).str.strip().str.lower().isin(no_branch)
+        x = x_all[~ex]
+        if x.empty:
+            continue
+        hit = x["gold_canon"] == x["pred_canon"]
+        hit_strict = x["gold_strict"] == x["pred_canon"]
         rec = {"dataset": ds, "method": m, "model_profile": mp,
-               "n": len(x), "classification_acc_%": 100 * hit.mean()}
-        # downstream accuracy conditional on classification correctness
-        if x["correct_formulation"].notna().any():
-            rec["form_acc_given_correct_cls_%"] = \
-                100 * x.loc[hit, "correct_formulation"].mean() if hit.any() else math.nan
-            rec["form_acc_given_wrong_cls_%"] = \
-                100 * x.loc[~hit, "correct_formulation"].mean() if (~hit).any() else math.nan
+               "n": len(x),
+               "n_no_branch": int(ex.sum()),
+               "classification_acc_%": 100 * hit.mean(),
+               "classification_acc_strict_%": 100 * hit_strict.mean()}
+        # Does getting the class right actually matter downstream? This is the
+        # question referee 1 Q3 is really asking. correct_formulation is human
+        # judgement and stays blank, so condition on correct_optimal, which we
+        # measure.
+        for col, tag in (("correct_optimal", "opt"),
+                         ("correct_formulation", "form")):
+            if col in x.columns and x[col].notna().any():
+                rec[f"{tag}_acc_given_correct_cls_%"] = (
+                    100 * x.loc[hit, col].mean() if hit.any() else math.nan)
+                rec[f"{tag}_acc_given_wrong_cls_%"] = (
+                    100 * x.loc[~hit, col].mean() if (~hit).any() else math.nan)
         rows.append(rec)
 
-        cm = pd.crosstab(x["gold_type"], x["pred_type"], dropna=False)
-        cm.to_csv(out_dir / f"confusion__{ds}__{m}__{mp}.csv")
+        # Two confusion matrices. The raw one shows what was actually written
+        # in each field -- useful when a label looks unfamiliar. The canonical
+        # one is the one to read, and the only one where the diagonal means
+        # "correct".
+        safe = f"{ds}__{m}__{mp}".replace("/", "-")
+        pd.crosstab(x_all["gold_type"], x_all["pred_type"], dropna=False) \
+          .to_csv(out_dir / f"confusion_raw__{safe}.csv")
+        pd.crosstab(x["gold_canon"], x["pred_canon"], dropna=False) \
+          .to_csv(out_dir / f"confusion__{safe}.csv")
+
     return pd.DataFrame(rows).round(3)
 
 
@@ -381,7 +464,13 @@ def main():
     if not sb.empty:
         sb.to_csv(args.out / "stage_breakdown.csv", index=False)
 
-    cr = classification_report(df, args.out)
+    cfg_cls = {}
+    cfg_path = HERE_CFG if (HERE_CFG := Path("exp_config.yaml")).exists() else None
+    if cfg_path:
+        import yaml
+        cfg_cls = ((yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {})
+                   .get("common", {}).get("classification", {}) or {})
+    cr = classification_report(df, args.out, cfg_cls)
     if not cr.empty:
         cr.to_csv(args.out / "classification.csv", index=False)
 
