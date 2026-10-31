@@ -59,6 +59,7 @@ import hashlib
 import json
 import os
 import platform
+import re as _re
 import subprocess
 import sys
 import threading
@@ -119,6 +120,14 @@ class ExpConfig:
     dataset: str = ""
     model_profile: str = ""            # key into exp_config.yaml:model_profiles
     notes: str = ""
+    # Free-text description of the machine a local-model run happened on.
+    # Lives under `common:` in the YAML, but was not a field here, so
+    # load_config()'s field filter dropped it and it never reached config.json
+    # -- the one place a reader would look for it. For an API model that is
+    # merely untidy; for a local model the hardware IS part of the result
+    # (wall-clock and cost are reported against it), so it has to be logged
+    # with the run.
+    hardware_note: str = ""
     # exp_config.yaml:dataset_columns -- see resolve_columns()
     dataset_columns: Dict[str, Any] = field(default_factory=dict)
     dataset_path: Optional[str] = None
@@ -353,6 +362,40 @@ def describe_columns(mapping: Dict[str, Optional[str]]) -> str:
     return "  ".join(f"{k}={v or '-'}" for k, v in mapping.items())
 
 
+_ENV_REF = _re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)(?::-([^}]*))?\}")
+
+
+def expand_env(value):
+    """
+    Expand ``${VAR}`` / ``${VAR:-default}`` inside a config string.
+
+    Used for the endpoint URLs. A local-model profile is otherwise pinned to
+    whatever host:port the person who wrote the YAML happened to use, and the
+    next machine -- a shared server where Ollama listens somewhere else, or a
+    tunnel on a different port -- needs the config file edited before it can
+    run anything. Editing the config to move a run to another host also changes
+    config_sha256, which is supposed to track experimental settings, not
+    addresses.
+
+    An unset variable with no default is an error rather than an empty string:
+    silently pointing an experiment at "" produces a connection error three
+    cells later, far from the cause.
+    """
+    if not isinstance(value, str) or "${" not in value:
+        return value
+
+    def _sub(m):
+        var, default = m.group(1), m.group(2)
+        env = os.environ.get(var)
+        if env:
+            return env
+        if default is not None:
+            return default
+        raise KeyError(f"config references ${{{var}}} but it is not set")
+
+    return _ENV_REF.sub(_sub, value)
+
+
 def load_config(path: str | Path,
                 model_profile: str,
                 method: str = "LEAN-LLM-OPT",
@@ -385,6 +428,13 @@ def load_config(path: str | Path,
 
     cfg_kwargs = {k: v for k, v in common.items()
                   if k in {f.name for f in dataclasses.fields(ExpConfig)}}
+    # LEANOPT_OUT_DIR lets a driver redirect the run log without editing the
+    # config (which would change config_sha256) and without every driver
+    # needing its own --output-dir plumbing: run_notebook.py, run_loto_fold.py
+    # and the notebooks in Jupyter all pick it up from here.
+    if os.environ.get("LEANOPT_OUT_DIR"):
+        cfg_kwargs["out_dir"] = os.environ["LEANOPT_OUT_DIR"]
+
     cfg_kwargs.update({
         "models": models,
         "model_profile": model_profile,
@@ -397,6 +447,17 @@ def load_config(path: str | Path,
         if key in prof:
             cfg_kwargs[key] = prof[key]
     cfg_kwargs.update(overrides)
+
+    # Endpoints may be written as ${OLLAMA_BASE_URL:-http://localhost:11434}
+    # so the same config runs against a differently addressed server without
+    # being edited. Resolution happens here, once, and the resolved value is
+    # what gets serialised into config.json -- the log records the host that
+    # actually served the run, not the template.
+    for _spec in models.values():
+        _spec.base_url = expand_env(_spec.base_url)
+    if cfg_kwargs.get("embedding_base_url"):
+        cfg_kwargs["embedding_base_url"] = expand_env(
+            cfg_kwargs["embedding_base_url"])
 
     cfg = ExpConfig(**cfg_kwargs)
     # Carried on the config so resolve_columns() needs no second file read and
@@ -411,8 +472,18 @@ def load_config(path: str | Path,
     # config_sha256 covers the settings; this covers the data they point at.
     cfg.manifest["dataset"] = dataset_fingerprint(cfg.dataset_path)
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    # Optional driver-supplied uniqueness token.  The timestamp above has
+    # one-second resolution, so two identical configurations launched in the
+    # same second would otherwise append to the same run directory.  Keep the
+    # token out of config_hash (it is storage identity, not an experimental
+    # setting) but record it in the manifest and run_id.
+    raw_suffix = os.environ.get("LEANOPT_RUN_SUFFIX", "").strip()
+    run_suffix = _re.sub(r"[^A-Za-z0-9_-]+", "-", raw_suffix).strip("-_")
+    suffix_part = f"__u{run_suffix}" if run_suffix else ""
+    if run_suffix:
+        cfg.manifest["run_uniqueness_suffix"] = run_suffix
     cfg.run_id = (f"{method}__{model_profile}__{dataset or 'na'}"
-                  f"__r{repeat_index}__{stamp}__{cfg.config_hash()}")
+                  f"__r{repeat_index}__{stamp}{suffix_part}__{cfg.config_hash()}")
     return cfg
 
 
@@ -536,12 +607,33 @@ class UsageTracker:
 
     # -- price lookup ---------------------------------------------------- #
     def _price(self, model_name: Optional[str]) -> Optional[ModelSpec]:
+        """Spec whose model id best matches the one the API actually billed.
+
+        Returning the *first* prefix match was wrong as soon as two roles ran
+        models whose ids nest. `cfg.models` iterates in role order --
+        classifier, modeler, data_agent, coder -- and
+        "gpt-4.1-2025-04-14".startswith("gpt-4") is True, so with a gpt-4
+        classifier every gpt-4.1 call in the run was billed at gpt-4's
+        $30/$60 instead of $2/$8. On 2026-08-22 that reported $42.54 for a run
+        that truly cost $14.52 and tripped the $30 budget guard less than
+        halfway through the dataset.
+
+        Exact id wins outright; otherwise the longest prefix wins, so
+        "gpt-4-0613" still resolves to the gpt-4 spec and
+        "gpt-4.1-2025-04-14" to the gpt-4.1 one.
+        """
         if not self.cfg:
             return None
         if model_name:
+            best = None
             for spec in self.cfg.models.values():
-                if spec.model == model_name or model_name.startswith(spec.model):
+                if spec.model == model_name:
                     return spec
+                if spec.model and model_name.startswith(spec.model):
+                    if best is None or len(spec.model) > len(best.model):
+                        best = spec
+            if best is not None:
+                return best
         # fall back to the modeler spec (dominant cost) if unmatched
         return self.cfg.models.get("modeler") or next(
             iter(self.cfg.models.values()), None)
@@ -818,23 +910,43 @@ def load_refdata_docs(cfg: ExpConfig, columns: Optional[List[str]] = None):
     """
     Build the documents the CLASSIFICATION step retrieves over.
 
-    The default CSVLoader put every column into each document, including
-    `Label` (the full mathematical model) and `Label_Code`. With k=5 and
-    chain_type="stuff" that means five complete formulations are pasted into
-    the prompt just to answer "which problem class is this?" -- a large amount
-    of context that carries no information about the class.
+    By default this reproduces `CSVLoader(RefData.csv).load()` byte for byte,
+    because that is what the notebook cell used before the instrumentation and
+    it is the only thing the classifier ever sees.
 
-    This keeps only the columns listed in
-    exp_config.yaml:classification.refdata_columns (by default the problem
-    description and the class label), which is what the task actually needs.
+    That default matters more than it looks. The first version of this function
+    dropped any field whose cell was empty, on the reasoning that a literal
+    "Data_address: " carries no information and costs tokens. True in itself,
+    but it changed all 96 documents -- `Related` was empty in 94 of them,
+    `Label_Code` in 86, `Data_address` in 78, a median of 38 characters gone
+    per document -- and those documents are the corpus the classifier embeds
+    and retrieves over. Different text, different neighbours, different class.
+    Measured on Large-Scale-OR, only 13 of the 26 Mixture/Others instances
+    still reached the generic Others handler where the March run sent 22; the
+    other 13 went to type specialists that have no template for them and
+    scored 5/13 against 11/13 for the ones that arrived.
+
+    Trimming is still available -- it is a reasonable experiment, and
+    set_refdata_mode.py drives it -- but it has to be asked for:
+
+        classification.refdata_columns          a column subset, or
+        classification.skip_empty_refdata_fields: true
+
+    Either one selects the hand-built path below. Neither is on by default.
 
     Returns: List[Document]
     """
     from langchain_core.documents import Document
 
     df = load_refdata(cfg)
+    # The fallback must reproduce the original CSVLoader, which put *every*
+    # column into every document. A two-column default silently changed the
+    # classifier's retrieval context on any machine whose exp_config.yaml did
+    # not spell `refdata_columns` out -- a different pipeline from the one the
+    # reported numbers came from, with nothing in the run log to show it.
+    # Trimming the columns is an experiment, so it has to be opted into.
     cols = columns or cfg.classification.get(
-        "refdata_columns", ["prompt", "New Problem Type"])
+        "refdata_columns", list(df.columns))
     missing = [c for c in cols if c not in df.columns]
     if missing:
         raise KeyError(f"columns {missing} not in RefData "
@@ -842,18 +954,36 @@ def load_refdata_docs(cfg: ExpConfig, columns: Optional[List[str]] = None):
 
     import pandas as pd
     label_col = cfg.classification.get("label_column", "New Problem Type")
+    skip_empty = bool(cfg.classification.get("skip_empty_refdata_fields", False))
+    faithful = not skip_empty and columns is None and list(cols) == list(df.columns)
+
+    if faithful:
+        # Re-read as text. load_refdata() goes through pandas with default NA
+        # handling, which turns an empty cell into NaN and an integer column
+        # into floats -- neither of which CSVLoader does, since it reads the
+        # file with the csv module and every value arrives as a string.
+        # `dtype=str, keep_default_na=False` gives back exactly what is in the
+        # file, and the .strip() on key and value is CSVLoader's own.
+        # test_smoke.py asserts the result matches CSVLoader on all 96 rows.
+        raw = pd.read_csv(Path(cfg.classification.get(
+            "refdata_file", "Large_Scale_Or_Files/RefData.csv")),
+            dtype=str, keep_default_na=False)
+        rows = [(idx, "\n".join(f"{str(c).strip()}: {str(r[c]).strip()}"
+                                for c in raw.columns))
+                for idx, r in raw.iterrows()]
+    else:
+        rows = []
+        for idx, row in df[cols].iterrows():
+            parts = []
+            for c in cols:
+                v = row[c]
+                if skip_empty and (pd.isna(v) or str(v).strip() in ("", "nan")):
+                    continue
+                parts.append(f"{c}: {'' if pd.isna(v) else str(v).strip()}")
+            rows.append((idx, "\n".join(parts)))
+
     docs = []
-    for idx, row in df[cols].iterrows():
-        # Skip empty cells instead of emitting "Data_address: nan": only 18 of
-        # the 96 reference rows have a Data_address, and a literal "nan" is
-        # noise in the retrieval text as well as wasted prompt tokens.
-        parts = []
-        for c in cols:
-            v = row[c]
-            if pd.isna(v) or str(v).strip() in ("", "nan"):
-                continue
-            parts.append(f"{c}: {str(v).strip()}")
-        text = "\n".join(parts)
+    for idx, text in rows:
         meta = {"row": int(idx)}
         if label_col in df.columns:
             meta["problem_type"] = str(df.at[idx, label_col])
@@ -1146,6 +1276,11 @@ def _build_embeddings_raw(cfg: ExpConfig):
     raise ValueError(f"unknown embedding provider: {cfg.embedding_provider}")
 
 
+# Retriever names already warned about, so the message appears once per run
+# rather than once per lookup.
+_FETCH_K_WARNED: set = set()
+
+
 def build_retriever(cfg: ExpConfig, vectorstore, name: str = "default",
                     search_kwargs: Optional[dict] = None, **overrides):
     """
@@ -1158,8 +1293,50 @@ def build_retriever(cfg: ExpConfig, vectorstore, name: str = "default",
     """
     rc = cfg.retriever_cfg(name)
     sk = {"k": rc["k"]}
+
+    # fetch_k, when the config gives one.
+    #
+    # It matters whenever a metadata `filter` is used, because langchain applies
+    # the filter AFTER the nearest-neighbour search: it takes the fetch_k
+    # closest documents (default 20), filters those, and returns up to k. On a
+    # small corpus 20 is most of it and the filter behaves as if it were exact.
+    # On a large one it is a window, and the rows you filtered for may simply
+    # not be in it -- Air-NRM-CA-LS retrieved the wrong fare family, and
+    # sometimes nothing at all, until fetch_k was raised to the corpus size.
+    #
+    # Belongs in exp_config.yaml rather than a notebook: it changes which
+    # documents come back, so it changes results, so it has to reach
+    # config_hash() and hence the run_id.
+    if rc.get("fetch_k") is not None:
+        sk["fetch_k"] = int(rc["fetch_k"])
     if search_kwargs:
         sk.update(search_kwargs)
+
+    # A filter over a window smaller than the corpus is the failure above.
+    #
+    # Strict only where the config has opted in by declaring fetch_k: a call
+    # site that declares it and then gets it wrong is a regression and should
+    # stop. Where fetch_k is absent the behaviour is whatever it has always
+    # been, so this warns once per retriever instead of breaking runs that
+    # predate the setting -- notably Air-NRM small_scale, whose 38-document
+    # store is also larger than the default 20 and therefore has the same
+    # latent issue, unexamined.
+    if "filter" in sk:
+        total = getattr(getattr(vectorstore, "index", None), "ntotal", None)
+        effective = sk.get("fetch_k", 20)
+        if total and effective < total:
+            message = (
+                f"retriever {name!r}: fetch_k={effective} but the store holds "
+                f"{total} documents, and langchain applies the filter AFTER the "
+                f"nearest-neighbour search. The filter therefore sees an "
+                f"arbitrary {effective}-document window, and rows it is looking "
+                f"for may not be in it. Set fetch_k: {total} under "
+                f"exp_config.yaml:retrievers.{name}.")
+            if rc.get("fetch_k") is not None:
+                raise ValueError(message)
+            if name not in _FETCH_K_WARNED:
+                _FETCH_K_WARNED.add(name)
+                print(f"[leanopt_exp] WARNING  {message}", file=sys.stderr)
     kw = {"search_type": rc.get("search_type", "similarity"), "search_kwargs": sk}
     if rc.get("max_tokens_limit") is not None:
         kw["max_tokens_limit"] = rc["max_tokens_limit"]
@@ -1194,6 +1371,12 @@ _FATAL_ERROR_MARKERS = (
     "permission_denied",
     "model_not_found",
     "billing_not_active",
+    # The request is too big for the model's window. Sending the identical
+    # request twice more cannot make it fit, and each attempt still costs a
+    # round trip. This is reachable on the gpt-4 classifier: RetrievalQA
+    # stuffs k=5 RefData rows, and the five largest sum to ~11k tokens against
+    # an 8192 window.
+    "context_length_exceeded",
 )
 
 
@@ -1511,9 +1694,11 @@ class RunLogger:
         agg = {"run_id": self.cfg.run_id, "method": self.cfg.method,
                "dataset": self.cfg.dataset, "model_profile": self.cfg.model_profile,
                "n_instances": len(self.records)}
-        keys = ["n_llm_calls", "n_tool_calls", "n_retriever_calls",
-                "prompt_tokens", "completion_tokens", "total_tokens",
-                "cost_usd", "llm_latency_s", "wall_s"]
+        keys = ["n_llm_calls", "n_llm_calls_failed",
+                "n_tool_calls", "n_tool_calls_failed", "n_retriever_calls",
+                "prompt_tokens", "cached_prompt_tokens",
+                "completion_tokens", "reasoning_tokens", "total_tokens",
+                "cost_usd", "llm_latency_s", "tool_latency_s", "wall_s"]
         for k in keys:
             vals = [r.summary().get(k) or 0 for r in self.records]
             agg[f"total_{k}"] = round(sum(vals), 6)

@@ -1,0 +1,120 @@
+Question: Based on all flight ticket choices in 'flight.csv' and 'od_demand.csv' with attraction values in v1 and shadow attraction value ratios in v2, develop a Sales-Based Linear Programming (SBLP) model for joint fare type capacity allocation and flight scheduling, while enforcing flow conservation constraints at each airport for a long-term planning model. The goal is to recommend at most 2 flights that maximize the total revenue of flight ticket sales, specifically among flights (OD = ('377', '865') AND Departure Time='23:05'), (OD = ('865', '377') AND Departure Time='18:40'). The SBLP should include decision variables, an objective function, capacity constraints, balance constraints, scale constraints, nonnegative constraints, binary flight selection variables, constraints ensuring that ticket sales are zero for any unselected flight, a cardinality constraint allowing at most 2 selected flights in total, and flow conservation constraints requiring the number of selected inbound flights to equal the number of selected outbound flights at each airport. Each distinct (Oneway_OD, Departure Time) option counts as one flight for selection and flow conservation. Each flight's capacity is 28% of its weekly economy capacity 'Y Seats/Week' in 'flight_capacity.csv'. Please consider that each Eco_flexi ticket consumes 2 units of flight capacity, each Eco_standard ticket consumes 1.6 units, each Eco_value ticket consumes 1.3 units and each Eco_lite ticket consumes 1 unit of capacity
+
+Final Answer:
+### Objective Function
+Maximize total expected ticket-sales revenue:
+
+`maximize sum(avg_price[fid,pid] * x[fid,pid])`.
+
+### Constraints
+
+#### 1. Decision Variables
+`x[fid,pid] >= 0` is sales of product `pid` on flight `fid`; `x_o[od] >= 0`
+is no-purchase demand; `y[fid]` is binary flight selection.
+
+#### 2. Capacity Constraints
+For each flight, capacity-weighted sales cannot exceed `flight_capacity[fid]`.
+
+#### 3. Balance Constraints
+For each OD, ratio-weighted no-purchase demand plus ratio-weighted ticket sales
+equals `avg_pax[od]`.
+
+#### 4. Scale Constraints
+For each ticket option, `value_0_list[od] * x[fid,pid]` cannot exceed
+`value_list[fid,pid] * x_o[od]`.
+
+#### 5. Sales/Selection Linking
+Sales are zero unless the flight is selected, using the tight capacity-derived
+upper bound `flight_capacity[fid] / capacity_consum[pid]`.
+
+#### 6. Cardinality Constraint
+At most `option_num` flights may be selected.
+
+#### 7. Flow Conservation Constraints
+At every airport, the number of selected inbound flights equals the number of
+selected outbound flights.
+
+#### 8. Variable Domains
+Sales and no-purchase variables are nonnegative; flight selections are binary.
+
+### Generated Code
+```python
+products=['Eco_flexi', 'Eco_standard', 'Eco_value', 'Eco_lite']
+flight_info={0: ('377', '865', '23:05'), 1: ('865', '377', '18:40')}
+avg_price={(0, 0): 562.46, (0, 1): 272.58, (0, 2): 202.14, (0, 3): 120.33, (1, 0): 594.58, (1, 1): 295.83, (1, 2): 193.19, (1, 3): 128.01}
+value_list={(0, 0): 0.043131, (0, 1): 0.177988, (0, 2): 0.094505, (0, 3): 0.128148, (1, 0): 0.011834, (1, 1): 0.079573, (1, 2): 0.126093, (1, 3): 0.226273}
+ratio_list={(0, 0): 0.530003, (0, 1): 0.492871, (0, 2): 0.409435, (0, 3): 0.125038, (1, 0): 0.498357, (1, 1): 0.488513, (1, 2): 0.437799, (1, 3): 0.28822}
+value_0_list={('377', '865'): 0.556227, ('865', '377'): 0.556227}
+ratio_0_list={('377', '865'): 3.074356, ('865', '377'): 2.543448}
+avg_pax={('377', '865'): 483.66, ('865', '377'): 454.41}
+capacity_consum={0: 2.0, 1: 1.6, 2: 1.3, 3: 1.0}
+flight_capacity={0: 515.48, 1: 515.48}
+option_num=2
+
+import gurobipy as gp
+from gurobipy import GRB
+# All example parameter assignments appear above this model code.
+
+model = gp.Model("air_nrm_np_flow")
+x = model.addVars(avg_price.keys(), lb=0.0, name="x")
+x_o = model.addVars(avg_pax.keys(), lb=0.0, name="x_o")
+y = model.addVars(flight_info.keys(), vtype=GRB.BINARY, name="y")
+
+model.setObjective(
+    gp.quicksum(avg_price[cell] * x[cell] for cell in avg_price),
+    GRB.MAXIMIZE,
+)
+
+for fid in flight_info:
+    model.addConstr(
+        gp.quicksum(capacity_consum[pid] * x[fid, pid]
+                    for pid in range(len(products))) <= flight_capacity[fid],
+        name="capacity_" + str(fid),
+    )
+
+for od in avg_pax:
+    model.addConstr(
+        ratio_0_list[od] * x_o[od]
+        + gp.quicksum(ratio_list[fid, pid] * x[fid, pid]
+                      for fid, info in flight_info.items() if info[:2] == od
+                      for pid in range(len(products))) == avg_pax[od],
+        name="balance_" + "_".join(od),
+    )
+
+for fid, info in flight_info.items():
+    od = info[:2]
+    for pid in range(len(products)):
+        model.addConstr(
+            value_0_list[od] * x[fid, pid]
+            <= value_list[fid, pid] * x_o[od],
+            name="scale_" + str(fid) + "_" + str(pid),
+        )
+        # Tight sales/selection link derived from capacity; no arbitrary big-M.
+        model.addConstr(
+            x[fid, pid]
+            <= (flight_capacity[fid] / capacity_consum[pid]) * y[fid],
+            name="select_" + str(fid) + "_" + str(pid),
+        )
+
+model.addConstr(gp.quicksum(y[fid] for fid in flight_info) <= option_num,
+                name="cardinality")
+
+airports = sorted({code for info in flight_info.values() for code in info[:2]})
+for airport in airports:
+    model.addConstr(
+        gp.quicksum(y[fid] for fid, info in flight_info.items()
+                    if info[1] == airport)
+        == gp.quicksum(y[fid] for fid, info in flight_info.items()
+                       if info[0] == airport),
+        name="flow_" + airport,
+    )
+
+model.optimize()
+if model.status == GRB.OPTIMAL:
+    print("Optimal objective value:", model.objVal)
+    print("Selected flights:",
+          [flight_info[fid] for fid in flight_info if y[fid].X > 0.5])
+else:
+    print("No optimal solution found; status:", model.status)
+
+```

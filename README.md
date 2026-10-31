@@ -89,3 +89,5 @@ For inquiries, please contact:
 - Kuo Liang: cora.liang1116@outlook.com
 - Hanzhang Qin: hzgin@nus.edu.sg
 - Ruihao Zhu: ruihao.zhu@cornell.edu
+
+Local experiment extensions (July–October 2026): see [tools, data versions and offline checks](LOCAL_EXPERIMENTS_2026.md).

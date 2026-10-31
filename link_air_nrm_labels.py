@@ -39,19 +39,39 @@ import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 BASE = HERE / "Test_Dataset" / "Air_NRM" / "small_scale"
+LARGE = HERE / "Test_Dataset" / "Air_NRM" / "large_scale"
 
 # (query csv, label csv, column holding the objective, column holding the
-#  parameter dump used for the alignment check)
+#  parameter dump used for the alignment check, column holding the expanded
+#  model or None)
+#
+# `Label-model` is the schema Large-scale-or-101.csv uses for the formulation
+# that goes with an objective, and its contents there are the .lp text verbatim.
+# The two small-scale pairs have .lp files too but no column carrying them, so
+# they pass None and only the objective is copied.
 PAIRS = [
     (BASE / "query_CA.csv",
      BASE / "SBLP_CA_Label" / "CA_answer.csv",
-     "Obj_label", "information"),
+     "Obj_label", "information", None),
     (BASE / "query_NP_Flow.csv",
      BASE / "SBLP_NP_Flow_Label" / "np_obj.csv",
-     "Obj_label", "Information_label"),
+     "Obj_label", "Information_label", None),
+    # Large-scale CA. These labels are not shipped with the dataset -- run
+    # `python build_largescale_labels.py` first, which solves each instance and
+    # writes CA_answer.csv in this same schema.
+    #
+    # model_col is None, and no CA_answer.csv column holds the model either.
+    # The expanded formulation is the .lp text -- thousands of newlines per
+    # instance -- so it lives only in SBLP_CA_Label/<n>.lp, indexed by the same
+    # row number. Putting it in a CSV cell is legal but renders as garbage in
+    # every spreadsheet tool and breaks on re-save.
+    (LARGE / "query_CA.csv",
+     LARGE / "SBLP_CA_Label" / "CA_answer.csv",
+     "Obj_label", "information", None),
 ]
 
 TARGET_COL = "Label-objective"
+MODEL_COL = "Label-model"
 
 TIME_IN_QUERY = re.compile(r"\d{2}:\d{2}")
 TIME_IN_LABEL = re.compile(r"'(\d{2}:\d{2})'")
@@ -81,7 +101,7 @@ def main() -> int:
     args = ap.parse_args()
 
     failures = 0
-    for qp, ap_, obj_col, info_col in PAIRS:
+    for qp, ap_, obj_col, info_col, model_col in PAIRS:
         if not qp.exists() or not ap_.exists():
             print(f"  !! missing: {qp if not qp.exists() else ap_}")
             failures += 1
@@ -116,9 +136,24 @@ def main() -> int:
             continue
 
         q[TARGET_COL] = a[obj_col].values
+        wrote = [TARGET_COL]
+        if model_col:
+            if model_col not in a.columns:
+                print(f"  !! {ap_.name} has no {model_col} column -- "
+                      f"rerun build_largescale_labels.py with Gurobi or COPT")
+                failures += 1
+                continue
+            empty = a[model_col].isna() | (a[model_col].astype(str).str.strip() == "")
+            if empty.any():
+                print(f"  !! {model_col} is empty on {int(empty.sum())} row(s) -- "
+                      f"the solver could not write .lp files")
+                failures += 1
+                continue
+            q[MODEL_COL] = a[model_col].values
+            wrote.append(MODEL_COL)
         q.to_csv(qp, index=False)
-        print(f"  wrote {TARGET_COL} -> {qp.relative_to(HERE)}  "
-              f"(first value {a[obj_col].iloc[0]})")
+        print(f"  wrote {' + '.join(wrote)} -> {qp.relative_to(HERE)}  "
+              f"(objective {a[obj_col].iloc[0]})")
 
     if failures:
         print(f"\n{failures} pair(s) failed; nothing was written for those.",

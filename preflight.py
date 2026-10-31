@@ -427,15 +427,30 @@ def check_keys(cfg) -> None:
     except Exception:
         say(WARN, "python-dotenv unavailable", "keys must come from the shell then")
 
-    for var in ("OPENAI_API_KEY",):
+    # Expected key prefix per variable. The prefix check is not pedantry: on
+    # 2026-08-20 .env held an OpenAI key (`sk-proj-...`) under
+    # OPENROUTER_API_KEY with OPENAI_API_KEY left empty, and the only symptom
+    # was a bare "401 Missing Authentication header" from the gateway after the
+    # run had already started.
+    KEY_PREFIX = {"OPENAI_API_KEY": "sk-", "OPENROUTER_API_KEY": "sk-or-"}
+    NEEDED_BY = {
+        "OPENAI_API_KEY": "the OpenAI profiles, and the embeddings of every "
+                          "profile that retrieves with text-embedding-3-small",
+        "OPENROUTER_API_KEY": "the openrouter-* profiles",
+    }
+    for var in ("OPENAI_API_KEY", "OPENROUTER_API_KEY"):
         v = (os.environ.get(var) or "").strip()
         if not v:
             say(WARN, f"{var} not set",
-                "only needed for the OpenAI profiles; "
-                "run `python set_key.py OPENAI_API_KEY`")
+                f"only needed for {NEEDED_BY[var]}; "
+                f"run `python set_key.py {var}`")
         elif len(v) < 20 or v.endswith("..."):
             say(FAIL, f"{var} looks like a placeholder",
                 "it was probably copied from .env.example unchanged")
+        elif not v.startswith(KEY_PREFIX[var]):
+            say(FAIL, f"{var} does not look like a {var.split('_')[0].lower()} key",
+                f"expected it to start with '{KEY_PREFIX[var]}'; a key pasted "
+                f"into the wrong variable fails as a 401 mid-run")
         else:
             say(OK, f"{var} present", f"{len(v)} chars, value not shown")
 
