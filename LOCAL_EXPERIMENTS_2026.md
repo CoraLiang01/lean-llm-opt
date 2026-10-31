@@ -12,9 +12,7 @@ Existing project datasets and October notebooks remain in place.
 | OneShot | `run_airnrm_fewshot_benchmark.py` |
 | NP query/label builders and workflow | `Test_Dataset/Air_NRM/large_scale/build_np_queries.py`, `build_np_labels.py`, `run_np_lean.py` |
 | Medium-scale tools | `run_airnrm_medium_resources.py`, `Test_Dataset/Air_NRM/medium_scale/` |
-| Leave-one-type-out | `LOTO/run_loto_fold.py`, `LOTO/loto_report.py` |
 | Multi-file reference tools | `Test_Dataset/Large-scale-or/benchmark_dataset/reference/` |
-| OSS20B packaging | `build_oss20b_package.py`, `build_oss20b_np_package.py`, `build_oss20b_ca_package.py` |
 | Gemini 3.0 resource estimates | `estimate_gemini_3pro.py`; see `ESTIMATE_GEMINI_3PRO_README.md` |
 
 ## Setup and data
@@ -23,11 +21,11 @@ Use the project's experiment environment and existing setup instructions.
 The native Gemini SDK and SciPy are listed in `requirements-experiments.txt`.
 Supply credentials at runtime.
 
-The new CA/NP/medium workflows and LOTO expect their matching local input
-files, labels and corpora. Those additional data artifacts remain local for
+The new CA/NP/medium workflows expect their matching local input
+files and labels. Those additional data artifacts remain local for
 this code-first import. Existing project inputs are retained. Provide the
 matching local inputs before running the new workflows; preflight and builder
-checks identify missing files. `LOTO/Test_Dataset` links to the shared inputs.
+checks identify missing files.
 
 The restored `LEAN_LLM_OPT_4.1_Large-scale-or.ipynb` is the local V2 workflow;
 main's `_1018` notebooks remain separate versions.
