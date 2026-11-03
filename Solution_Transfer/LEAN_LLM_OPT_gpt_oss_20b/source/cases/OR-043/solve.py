@@ -1,0 +1,103 @@
+CSVQA_DATA = {'ignored_file_indices': [],
+ 'query': 'A pharmacy chain needs to replenish its drug inventory. The ‘products.csv’ file provides a table of '
+          'benefits associated with each drug product. There are overall stock capacity limits for pharmacy chains '
+          'detailed in the ‘capacity.csv’ file.Our objective is to decide which drugs to order each day and in what '
+          'quantities to maximise the overall benefit while adhering to the overall stock capacity. The decision '
+          'variable x_i represents the number of units of the ith drug to be ordered each day.',
+ 'relationships': [],
+ 'route': 'RA',
+ 'tables': [{'columns': ['Capacity'],
+             'file_index': 0,
+             'file_name': 'capacity.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 1,
+             'records': [{'source_row': 0, 'values': {'Capacity': '520'}}],
+             'returned_rows': 1,
+             'role': 'descriptive non-unique role',
+             'table_id': 'file_0_view_0'},
+            {'columns': ['ProductName', 'Value', 'Weight'],
+             'file_index': 1,
+             'file_name': 'products.csv',
+             'filters': {'conditions': [], 'logic': 'and'},
+             'original_rows': 20,
+             'records': [{'source_row': 0, 'values': {'ProductName': 'NSAIDs', 'Value': '250', 'Weight': '913'}},
+                         {'source_row': 1,
+                          'values': {'ProductName': 'Antirheumatic Drugs', 'Value': '178', 'Weight': '754'}},
+                         {'source_row': 2,
+                          'values': {'ProductName': 'Acetic Acid Derivatives', 'Value': '313', 'Weight': '428'}},
+                         {'source_row': 3, 'values': {'ProductName': 'Antibiotics', 'Value': '301', 'Weight': '711'}},
+                         {'source_row': 4,
+                          'values': {'ProductName': 'Antiviral Drugs', 'Value': '425', 'Weight': '350'}},
+                         {'source_row': 5,
+                          'values': {'ProductName': 'Antifungal Agents', 'Value': '260', 'Weight': '159'}},
+                         {'source_row': 6,
+                          'values': {'ProductName': 'Antidepressants', 'Value': '848', 'Weight': '353'}},
+                         {'source_row': 7,
+                          'values': {'ProductName': 'Antipsychotics', 'Value': '934', 'Weight': '291'}},
+                         {'source_row': 8,
+                          'values': {'ProductName': 'Antihistamines', 'Value': '114', 'Weight': '302'}},
+                         {'source_row': 9,
+                          'values': {'ProductName': 'Corticosteroids', 'Value': '1357', 'Weight': '50'}},
+                         {'source_row': 10,
+                          'values': {'ProductName': 'Beta Blockers', 'Value': '156', 'Weight': '250'}},
+                         {'source_row': 11,
+                          'values': {'ProductName': 'Calcium Channel Blockers', 'Value': '1780', 'Weight': '178'}},
+                         {'source_row': 12,
+                          'values': {'ProductName': 'ACE Inhibitors', 'Value': '695', 'Weight': '313'}},
+                         {'source_row': 13,
+                          'values': {'ProductName': 'Angiotensin II Receptor Blockers',
+                                     'Value': '405',
+                                     'Weight': '378'}},
+                         {'source_row': 14, 'values': {'ProductName': 'Diuretics', 'Value': '320', 'Weight': '94'}},
+                         {'source_row': 15, 'values': {'ProductName': 'Statins', 'Value': '320', 'Weight': '97'}},
+                         {'source_row': 16, 'values': {'ProductName': 'Insulin', 'Value': '1357', 'Weight': '470'}},
+                         {'source_row': 17,
+                          'values': {'ProductName': 'Anticoagulants', 'Value': '1357', 'Weight': '341'}},
+                         {'source_row': 18,
+                          'values': {'ProductName': 'Antiepileptic Drugs', 'Value': '405', 'Weight': '121'}},
+                         {'source_row': 19, 'values': {'ProductName': 'Antiemetics', 'Value': '998', 'Weight': '61'}}],
+             'returned_rows': 20,
+             'role': 'descriptive non-unique role',
+             'table_id': 'file_1_view_0'}],
+ 'validation': {'matrix_checks': [], 'status': 'OK'}}
+import gurobipy
+from gurobipy import GRB
+
+def solve_problem():
+    tables = CSVQA_DATA['tables']
+    capacity_table = next((t for t in tables if t['table_id'] == 'file_0_view_0'), None)
+    if capacity_table is None or not capacity_table['records']:
+        raise ValueError('Capacity table missing or empty')
+    capacity_value = capacity_table['records'][0]['values']['Capacity']
+    try:
+        capacity = float(capacity_value)
+    except ValueError:
+        raise ValueError(f'Invalid capacity value: {capacity_value}')
+    products_table = next((t for t in tables if t['table_id'] == 'file_1_view_0'), None)
+    if products_table is None or not products_table['records']:
+        raise ValueError('Products table missing or empty')
+    product_names = []
+    values = {}
+    weights = {}
+    for rec in products_table['records']:
+        vals = rec['values']
+        name = vals['ProductName']
+        try:
+            val = float(vals['Value'])
+            wt = float(vals['Weight'])
+        except ValueError as e:
+            raise ValueError(f'Invalid numeric value in record {rec['source_row']}: {e}')
+        product_names.append(name)
+        values[name] = val
+        weights[name] = wt
+    for name in product_names:
+        if name not in values or name not in weights:
+            raise ValueError(f'Missing value or weight for product {name}')
+    m = gurobipy.Model()
+    m.setParam('MIPGap', 1e-06)
+    x = m.addVars(product_names, lb=0, vtype=GRB.INTEGER, name='')
+    m.setObjective(gurobipy.quicksum((values[i] * x[i] for i in product_names)), GRB.MAXIMIZE)
+    m.addConstr(gurobipy.quicksum((weights[i] * x[i] for i in product_names)) <= capacity, name='capacity')
+    m.optimize()
+    return m
+m = solve_problem()
